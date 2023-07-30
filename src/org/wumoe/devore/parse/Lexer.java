@@ -96,7 +96,7 @@ public class Lexer {
                 }
                 // 处理浮点数
                 if (expressionCharArray[index + 1] != '.') {
-                    tokens.add(DInt.valueOf(negative? v.subtract(v.multiply(BigInteger.TWO)) : v);
+                    tokens.add(DInt.valueOf(negative? v.subtract(v.multiply(BigInteger.TWO)) : v));
                     continue;
                 }
                 var x = new BigDecimal(v.toString());
@@ -165,7 +165,7 @@ public class Lexer {
                     builder.append(expressionCharArray[index]);
                     ++index;
                 }
-                tokens.add(DOp.valueOf(builder.toString());
+                tokens.add(DOp.valueOf(builder.toString()));
             }
         }
         return tokens;
