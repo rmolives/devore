@@ -126,6 +126,11 @@ public class DFloat extends DNumber {
     }
 
     @Override
+    public int compareTo(Token t) {
+        return t instanceof DFloat n ? num.compareTo(n.num): -1;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return obj instanceof DFloat n && num.compareTo(n.num) == 0;
     }

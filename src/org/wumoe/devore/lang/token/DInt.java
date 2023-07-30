@@ -123,6 +123,11 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public int compareTo(Token t) {
+        return t instanceof DInt n ? num.compareTo(n.num): -1;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return obj instanceof DInt n && num.compareTo(n.num) == 0;
     }
