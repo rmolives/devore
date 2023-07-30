@@ -3,7 +3,7 @@ package org.wumoe.devore.lang.token;
 public class DString extends Token {
     public final String str;
 
-    private DString(String str) {
+    protected DString(String str) {
         this.str = str;
     }
 
