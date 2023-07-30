@@ -10,7 +10,7 @@ public class AstNode {
         FUNCTION, BASIC
     }
     public final static AstNode nullAst = new AstNode(null);
-    public final Token op;
+    public Token op;
     public AstType type;
     public final List<AstNode> children;
 
