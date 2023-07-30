@@ -94,7 +94,6 @@ public class Lexer {
                     v = v.multiply(BigInteger.valueOf(10)).add(BigInteger.valueOf(((int) expressionCharArray[index]) - 48));
                     ++index;
                 }
-                // 处理浮点数
                 if (expressionCharArray[index + 1] != '.') {
                     tokens.add(DInt.valueOf(negative? v.subtract(v.multiply(BigInteger.TWO)) : v));
                     continue;
