@@ -1,7 +1,7 @@
 package org.wumoe.devore.lang.token;
 
 public class DOp extends DString {
-    private DOp(String op) {
+    protected DOp(String op) {
         super(op);
     }
 

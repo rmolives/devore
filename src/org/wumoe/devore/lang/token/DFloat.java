@@ -11,7 +11,7 @@ import java.math.RoundingMode;
 public class DFloat extends DNumber {
     public final BigDecimal num;
 
-    private DFloat(BigDecimal num) {
+    protected DFloat(BigDecimal num) {
         this.num = num;
     }
 

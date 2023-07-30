@@ -10,7 +10,7 @@ public class DWord extends Token {
 
     public final WordTags tag;
 
-    private DWord(WordTags tag) {
+    protected DWord(WordTags tag) {
         this.tag = tag;
     }
 
