@@ -121,4 +121,9 @@ public class DInt extends DNumber {
     public Token copy() {
         return DInt.valueOf(num);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof DInt n && num.compareTo(n.num) == 0;
+    }
 }

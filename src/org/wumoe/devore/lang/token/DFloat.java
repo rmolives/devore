@@ -124,4 +124,9 @@ public class DFloat extends DNumber {
     public Token copy() {
         return DFloat.valueOf(num);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof DFloat n && num.compareTo(n.num) == 0;
+    }
 }
