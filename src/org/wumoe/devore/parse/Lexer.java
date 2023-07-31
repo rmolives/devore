@@ -143,7 +143,7 @@ public class Lexer {
                         skip = false;
                         switch (expressionCharArray[index]) {
                             case 'n' ->
-                                builder.append("\n");
+                                    builder.append("\n");
                             case 'r' ->
                                     builder.append("\r");
                             case 't' ->
