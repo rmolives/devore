@@ -1,6 +1,5 @@
 package org.wumoe.devore;
 
-import org.wumoe.devore.module.Core;
 import org.wumoe.devore.lang.Env;
 
 import java.io.IOException;
