@@ -88,14 +88,14 @@ public class Core {
             env.io.out.print(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addTokenFunction("err-println", ((tokens, env) -> {
+        dEnv.addTokenFunction("error-println", ((tokens, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : tokens)
                 builder.append(t);
             env.io.err.println(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addTokenFunction("err-print", ((tokens, env) -> {
+        dEnv.addTokenFunction("error-print", ((tokens, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : tokens)
                 builder.append(t);
