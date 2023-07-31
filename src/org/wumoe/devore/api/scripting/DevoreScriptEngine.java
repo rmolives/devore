@@ -1,12 +1,10 @@
 package org.wumoe.devore.api.scripting;
 
 import org.wumoe.devore.Devore;
-import org.wumoe.devore.exception.DevoreScriptException;
 import org.wumoe.devore.lang.Env;
 
 import javax.script.*;
 import java.io.*;
-import java.util.Map;
 
 public class DevoreScriptEngine implements ScriptEngine {
     private DevoreScriptContext context = new DevoreScriptContext(new DevoreScriptBindings(Env.newEnv().load("core")), new InputStreamReader(System.in), new OutputStreamWriter(System.out), new OutputStreamWriter(System.err));
