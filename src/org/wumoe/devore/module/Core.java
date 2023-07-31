@@ -235,5 +235,29 @@ public class Core {
                 asts.add(new AstNode(arg));
             return ((DFunction) args.get(0)).call(asts, env.createChild());
         }), 1, true);
+        dEnv.addTokenFunction(">", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 1, true);
+        dEnv.addTokenFunction("<", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) < 0)), 1, true);
+        dEnv.addTokenFunction("=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) == 0)), 1, true);
+        dEnv.addTokenFunction("!=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) != 0)), 1, true);
+        dEnv.addTokenFunction(">=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) >= 0)), 1, true);
+        dEnv.addTokenFunction("<=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) <= 0)), 1, true);
+        dEnv.addSymbolFunction("if", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            Token condition = Evaluator.eval(env, ast.get(0));
+            if (!DType.isBool(condition))
+                throw new DevoreCastException(condition.type(), "bool");
+            if (((DBool) condition).bool)
+                result = Evaluator.eval(newEnv, ast.get(1).copy());
+            else if (ast.size() > 2)
+                result = Evaluator.eval(newEnv, ast.get(2).copy());
+            return result;
+        }, 2, true);
     }
 }

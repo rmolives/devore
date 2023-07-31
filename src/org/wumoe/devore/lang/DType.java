@@ -18,6 +18,9 @@ public class DType {
     public static boolean isFloat(Token t) {
         return "float".equals(t.type());
     }
+    public static boolean isBool(Token t) {
+        return "bool".equals(t.type());
+    }
 
     public static boolean isNumber(Token t) {
         return isInt(t) || isFloat(t);
