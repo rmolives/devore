@@ -6,6 +6,7 @@ import org.wumoe.devore.lang.Env;
 
 import javax.script.*;
 import java.io.*;
+import java.util.Map;
 
 public class DevoreScriptEngine implements ScriptEngine {
     private DevoreScriptContext context = new DevoreScriptContext(new DevoreScriptBindings(Env.newEnv().load("core")), new InputStreamReader(System.in), new OutputStreamWriter(System.out), new OutputStreamWriter(System.err));
@@ -65,8 +66,6 @@ public class DevoreScriptEngine implements ScriptEngine {
     public void setBindings(Bindings bindings, int scope) {
         if (bindings instanceof DevoreScriptBindings d)
             context.bindings = d;
-        else
-            throw new DevoreScriptException("bindings并不是DevoreScriptBindings.");
     }
 
     @Override
@@ -83,8 +82,6 @@ public class DevoreScriptEngine implements ScriptEngine {
     public void setContext(ScriptContext context) {
         if (context instanceof DevoreScriptContext d)
             this.context = d;
-        else
-            throw new DevoreScriptException("context并不是DevoreScriptContext.");
     }
 
     @Override
