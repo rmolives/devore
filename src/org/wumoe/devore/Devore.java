@@ -4,13 +4,22 @@ import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.Evaluator;
 import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
+import org.wumoe.devore.module.Core;
+import org.wumoe.devore.module.Module;
 import org.wumoe.devore.parse.Lexer;
 import org.wumoe.devore.parse.Parser;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Devore {
     public static final String VERSION = "0.1";
+    public static Map<String, Module> moduleTable = new HashMap<>() {
+        {
+            put("core", new Core());
+        }
+    };
     public static Token call(Env env, String code) {
         List<String> codes = Lexer.splitCode(code);
         Token result = DWord.WORD_NIL;

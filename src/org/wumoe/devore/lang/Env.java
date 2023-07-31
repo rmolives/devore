@@ -1,5 +1,6 @@
 package org.wumoe.devore.lang;
 
+import org.wumoe.devore.Devore;
 import org.wumoe.devore.lang.token.DFunction;
 import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
@@ -142,5 +143,10 @@ public class Env {
 
     public Env createChild() {
         return newEnv(this, io);
+    }
+
+    public Env load(String name) {
+        Devore.moduleTable.get(name).init(this);
+        return this;
     }
 }

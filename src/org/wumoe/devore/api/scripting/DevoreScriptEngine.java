@@ -8,7 +8,7 @@ import javax.script.*;
 import java.io.*;
 
 public class DevoreScriptEngine implements ScriptEngine {
-    private DevoreScriptContext context = new DevoreScriptContext(new DevoreScriptBindings(Env.newEnv()), new InputStreamReader(System.in), new OutputStreamWriter(System.out), new OutputStreamWriter(System.err));
+    private DevoreScriptContext context = new DevoreScriptContext(new DevoreScriptBindings(Env.newEnv().load("core")), new InputStreamReader(System.in), new OutputStreamWriter(System.out), new OutputStreamWriter(System.err));
 
     @Override
     public Object eval(String script, ScriptContext context) throws ScriptException {
