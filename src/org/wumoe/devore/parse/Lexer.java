@@ -101,7 +101,7 @@ public class Lexer {
                     ++index;
                 }
                 if (expressionCharArray[index + 1] != '.') {
-                    tokens.add(DInt.valueOf(negative? v.subtract(v.multiply(BigInteger.TWO)) : v));
+                    tokens.add(DInt.valueOf(negative ? v.subtract(v.multiply(BigInteger.TWO)) : v));
                     continue;
                 }
                 var x = new BigDecimal(v);
@@ -116,7 +116,7 @@ public class Lexer {
                     x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index])).divide(d, MathContext.DECIMAL128));
                     d = d.multiply(BigDecimal.valueOf(10));
                 }
-                tokens.add(DFloat.valueOf(negative? x.subtract(x.multiply(BigDecimal.valueOf(2))) : x));
+                tokens.add(DFloat.valueOf(negative ? x.subtract(x.multiply(BigDecimal.valueOf(2))) : x));
                 continue;
             }
             if (expressionCharArray[index] == '\"') {
@@ -142,16 +142,11 @@ public class Lexer {
                     if (skip) {
                         skip = false;
                         switch (expressionCharArray[index]) {
-                            case 'n' ->
-                                    builder.append("\n");
-                            case 'r' ->
-                                    builder.append("\r");
-                            case 't' ->
-                                    builder.append("\t");
-                            case 'b' ->
-                                    builder.append("\b");
-                            default ->
-                                builder.append("\\\\").append(expressionCharArray[index]);
+                            case 'n' -> builder.append("\n");
+                            case 'r' -> builder.append("\r");
+                            case 't' -> builder.append("\t");
+                            case 'b' -> builder.append("\b");
+                            default -> builder.append("\\\\").append(expressionCharArray[index]);
 
                         }
                     } else
