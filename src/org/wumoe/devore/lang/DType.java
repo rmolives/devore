@@ -1,36 +1,36 @@
 package org.wumoe.devore.lang;
 
-import org.wumoe.devore.lang.token.Token;
+import org.wumoe.devore.lang.token.*;
 
 public class DType {
     public static boolean isOp(Token t) {
-        return "op".equals(t.type());
+        return t instanceof DOp;
     }
 
     public static boolean isFunction(Token t) {
-        return "function".equals(t.type());
+        return t instanceof DFunction;
     }
 
     public static boolean isInt(Token t) {
-        return "int".equals(t.type());
+        return t instanceof DInt;
     }
 
     public static boolean isFloat(Token t) {
-        return "float".equals(t.type());
+        return t instanceof DFloat;
     }
     public static boolean isBool(Token t) {
-        return "bool".equals(t.type());
+        return t instanceof DBool;
     }
 
     public static boolean isNumber(Token t) {
-        return isInt(t) || isFloat(t);
+        return t instanceof DNumber;
     }
 
     public static boolean isArithmetic(Token t) {
-        return isNumber(t);
+        return t instanceof DArithmetic;
     }
 
     public static boolean isString(Token t) {
-        return "string".equals(t.type());
+        return t instanceof DString;
     }
 }
