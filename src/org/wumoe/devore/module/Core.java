@@ -9,8 +9,6 @@ import org.wumoe.devore.lang.type.DType;
 public class Core {
     public static void init(Env dEnv) {
         dEnv.addBuiltFunction("+", ((tokens, env) -> {
-            if (tokens.isEmpty())
-                throw new DevoreRuntimeException("调用函数 [+] 传参数量错误.");
             if (!DType.isArithmetic(tokens.get(0)))
                 throw new DevoreCastException(tokens.get(0).type(), "arithmetic");
             DArithmetic arithmetic = (DArithmetic) tokens.get(0);
@@ -20,10 +18,8 @@ public class Core {
                 arithmetic = arithmetic.add((DArithmetic) tokens.get(i));
             }
             return arithmetic;
-        }));
+        }), 1, true);
         dEnv.addBuiltFunction("-", ((tokens, env) -> {
-            if (tokens.isEmpty())
-                throw new DevoreRuntimeException("调用函数 [-] 传参数量错误.");
             if (!DType.isArithmetic(tokens.get(0)))
                 throw new DevoreCastException(tokens.get(0).type(), "arithmetic");
             DArithmetic arithmetic = (DArithmetic) tokens.get(0);
@@ -33,10 +29,8 @@ public class Core {
                 arithmetic = arithmetic.sub((DArithmetic) tokens.get(i));
             }
             return arithmetic;
-        }));
+        }), 1, true);
         dEnv.addBuiltFunction("*", ((tokens, env) -> {
-            if (tokens.isEmpty())
-                throw new DevoreRuntimeException("调用函数 [*] 传参数量错误.");
             if (!DType.isArithmetic(tokens.get(0)))
                 throw new DevoreCastException(tokens.get(0).type(), "arithmetic");
             DArithmetic arithmetic = (DArithmetic) tokens.get(0);
@@ -46,10 +40,8 @@ public class Core {
                 arithmetic = arithmetic.mul((DArithmetic) tokens.get(i));
             }
             return arithmetic;
-        }));
+        }), 1, true);
         dEnv.addBuiltFunction("/", ((tokens, env) -> {
-            if (tokens.isEmpty())
-                throw new DevoreRuntimeException("调用函数 [/] 传参数量错误.");
             if (!DType.isArithmetic(tokens.get(0)))
                 throw new DevoreCastException(tokens.get(0).type(), "arithmetic");
             DArithmetic arithmetic = (DArithmetic) tokens.get(0);
@@ -59,7 +51,7 @@ public class Core {
                 arithmetic = arithmetic.div((DArithmetic) tokens.get(i));
             }
             return arithmetic;
-        }));
+        }), 1, true);
 
     }
 }
