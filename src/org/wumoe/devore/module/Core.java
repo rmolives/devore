@@ -7,7 +7,7 @@ import org.wumoe.devore.lang.token.DArithmetic;
 import org.wumoe.devore.lang.token.DNumber;
 import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
-import org.wumoe.devore.lang.type.DType;
+import org.wumoe.devore.lang.DType;
 import org.wumoe.devore.parse.AstNode;
 
 import java.util.ArrayList;

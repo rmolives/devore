@@ -2,7 +2,6 @@ package org.wumoe.devore.lang;
 
 import org.wumoe.devore.lang.token.DFunction;
 import org.wumoe.devore.lang.token.Token;
-import org.wumoe.devore.lang.type.DType;
 import org.wumoe.devore.parse.AstNode;
 
 public class Evaluator {
