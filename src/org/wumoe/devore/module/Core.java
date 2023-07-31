@@ -111,8 +111,8 @@ public class Core {
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
-            Env newEnv = env.createChild();
             if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
+                Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
                 for (int i = 0; i < ast.size(); ++i)
                     result = Evaluator.eval(newEnv, ast.get(i).copy());
@@ -125,12 +125,12 @@ public class Core {
                 for (int i = 1; i < ast.size(); ++i)
                     asts.add(ast.get(i).copy());
                 env.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
-                    Env newInEnv = newEnv.createChild();
+                    Env newEnv = env.createChild();
                     for (int i = 0; i < parameters.size(); ++i)
-                        newInEnv.put(parameters.get(i), cArgs.get(i));
+                        newEnv.put(parameters.get(i), cArgs.get(i));
                     Token result = DWord.WORD_NIL;
                     for (AstNode astNode : asts)
-                        result = Evaluator.eval(newInEnv, astNode.copy());
+                        result = Evaluator.eval(newEnv, astNode.copy());
                     return result;
                 }), parameters.size(), false);
             }
