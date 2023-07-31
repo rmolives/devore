@@ -2,8 +2,6 @@ package org.wumoe.devore;
 
 import org.wumoe.devore.lang.Env;
 
-import javax.script.ScriptException;
-
 import java.io.IOException;
 
 public class Main {
