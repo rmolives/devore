@@ -54,7 +54,7 @@ public class Lexer {
                         || codeCharArray[index] == '\n' || codeCharArray[index] == '\r' || codeCharArray[index] == '\t')
                         && ((codeCharArray[index + 1] == ' '
                         || codeCharArray[index + 1] == '\n' || codeCharArray[index + 1] == '\r' || codeCharArray[index + 1] == '\t')
-                        || codeCharArray[index + 1] == '(' || codeCharArray[index + 1] == ')'))
+                        || codeCharArray[index + 1] == ')'))
                     ++index;
                 if (codeCharArray[index] == '(')
                     ++flag;
