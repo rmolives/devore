@@ -124,10 +124,10 @@ public class Core {
                 List<AstNode> asts = new ArrayList<>();
                 for (int i = 1; i < ast.size(); ++i)
                     asts.add(ast.get(i).copy());
-                env.addTokenFunction(ast.get(0).op.toString(), ((cargs, cEnv) -> {
+                env.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
                     Env newEnv = env.createChild();
                     for (int i = 0; i < parameters.size(); ++i)
-                        newEnv.put(parameters.get(i), cargs.get(i));
+                        newEnv.put(parameters.get(i), cArgs.get(i));
                     Token result = DWord.WORD_NIL;
                     for (AstNode astNode : asts)
                         result = Evaluator.eval(newEnv, astNode.copy());
@@ -147,10 +147,10 @@ public class Core {
                             parameters.add(parameterNode.op.toString());
                         for (int i = 1; i < node.size(); ++i)
                             asts.add(node.get(i).copy());
-                        newEnv.addTokenFunction(ast.get(0).op.toString(), ((cargs, cEnv) -> {
+                        newEnv.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
                             Env newInEnv = env.createChild();
                             for (int i = 0; i < parameters.size(); ++i)
-                                newInEnv.put(parameters.get(i), cargs.get(i));
+                                newInEnv.put(parameters.get(i), cArgs.get(i));
                             Token inResult = DWord.WORD_NIL;
                             for (AstNode astNode : asts)
                                 inResult = Evaluator.eval(newInEnv, astNode.copy());
@@ -178,10 +178,10 @@ public class Core {
                         parameters.add(parameterNode.op.toString());
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
-                    newEnv.addTokenFunction(ast.get(0).op.toString(), ((cargs, cEnv) -> {
+                    newEnv.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = newEnv.createChild();
                         for (int i = 0; i < parameters.size(); ++i)
-                            newInEnv.put(parameters.get(i), cargs.get(i));
+                            newInEnv.put(parameters.get(i), cArgs.get(i));
                         Token inResult = DWord.WORD_NIL;
                         for (AstNode astNode : asts)
                             inResult = Evaluator.eval(newInEnv, astNode.copy());
