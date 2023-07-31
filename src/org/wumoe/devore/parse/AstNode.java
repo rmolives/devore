@@ -10,6 +10,7 @@ public class AstNode {
     public final List<AstNode> children;
     public Token op;
     public AstType type;
+
     public AstNode(Token op) {
         this.op = op;
         this.type = AstType.BASIC;
@@ -38,8 +39,7 @@ public class AstNode {
         ArrayList<AstNode> list = new ArrayList<AstNode>();
         for (AstNode ast : children)
             list.add(ast.copy());
-        AstNode newAst = new AstNode(op, type, list);
-        return newAst;
+        return new AstNode(op, type, list);
     }
 
     public void add(AstNode node) {
@@ -62,16 +62,8 @@ public class AstNode {
         return size() == 0;
     }
 
-    public boolean isNotEmpty() {
-        return !isEmpty();
-    }
-
     public boolean isNull() {
         return op == null;
-    }
-
-    public boolean isNotNull() {
-        return !isNull();
     }
 
     @Override
