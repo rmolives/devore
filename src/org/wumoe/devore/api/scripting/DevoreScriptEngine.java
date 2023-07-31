@@ -10,32 +10,32 @@ public class DevoreScriptEngine implements ScriptEngine {
     private DevoreScriptContext context = new DevoreScriptContext(new DevoreScriptBindings(Env.newEnv().load("core")), new InputStreamReader(System.in), new OutputStreamWriter(System.out), new OutputStreamWriter(System.err));
 
     @Override
-    public Object eval(String script, ScriptContext context) throws ScriptException {
+    public Object eval(String script, ScriptContext context) {
         return Devore.call(((DevoreScriptBindings) context.getBindings(0)).env, script);
     }
 
     @Override
-    public Object eval(Reader reader, ScriptContext context) throws ScriptException {
+    public Object eval(Reader reader, ScriptContext context) {
         return Devore.call(((DevoreScriptBindings) context.getBindings(0)).env, readAllString(reader));
     }
 
     @Override
-    public Object eval(String script) throws ScriptException {
+    public Object eval(String script) {
         return Devore.call(((DevoreScriptBindings) context.getBindings(0)).env, script);
     }
 
     @Override
-    public Object eval(Reader reader) throws ScriptException {
+    public Object eval(Reader reader) {
         return Devore.call(((DevoreScriptBindings) context.getBindings(0)).env, readAllString(reader));
     }
 
     @Override
-    public Object eval(String script, Bindings n) throws ScriptException {
+    public Object eval(String script, Bindings n) {
         return Devore.call(((DevoreScriptBindings) n).env, script);
     }
 
     @Override
-    public Object eval(Reader reader, Bindings n) throws ScriptException {
+    public Object eval(Reader reader, Bindings n) {
         return Devore.call(((DevoreScriptBindings) n).env, readAllString(reader));
     }
 
