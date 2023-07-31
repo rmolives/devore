@@ -33,18 +33,12 @@ public class DevoreScriptEngine implements ScriptEngine {
 
     @Override
     public Object eval(String script, Bindings n) throws ScriptException {
-        if (n instanceof DevoreScriptBindings d)
-            return Devore.call(d.env, script);
-        else
-            throw new DevoreScriptException("bindings并不是DevoreScriptBindings.");
+        return Devore.call(((DevoreScriptBindings) n).env, script);
     }
 
     @Override
     public Object eval(Reader reader, Bindings n) throws ScriptException {
-        if (n instanceof DevoreScriptBindings d)
-            return Devore.call(d.env, readAllString(reader));
-        else
-            throw new DevoreScriptException("bindings并不是DevoreScriptBindings.");
+        return Devore.call(((DevoreScriptBindings) n).env, readAllString(reader));
     }
 
     @Override
