@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
         Env env = Env.newEnv();
-        Core.init(env);
+        new Core().init(env);
         Repl.repl(System.in, System.out, env);
     }
 }

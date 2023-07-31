@@ -11,8 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
-public class Core {
-    public static void init(Env dEnv) {
+public class Core extends Module {
+    @Override
+    public void init(Env dEnv) {
         dEnv.addTokenFunction("+", ((args, env) -> {
             if (!DType.isArithmetic(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "arithmetic");
