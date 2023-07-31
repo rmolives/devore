@@ -5,16 +5,14 @@ import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.parse.AstNode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.script.Bindings;
+import java.util.*;
 import java.util.function.BiFunction;
 
 public class Env {
     public final IOConfig io;
-    private final Map<String, Token> table;
-    private final Env father;
+    public final Map<String, Token> table;
+    public final Env father;
 
     protected Env(Map<String, Token> table, Env father, IOConfig io) {
         this.table = table;
@@ -129,6 +127,17 @@ public class Env {
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
         return temp.contains(key) ? temp.table.get(key) : DWord.WORD_NIL;
+    }
+
+    public Token remove(String key) {
+        Env temp = this;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
+        return temp.contains(key) ? temp.table.remove(key) : DWord.WORD_NIL;
+    }
+
+    public void clear() {
+        this.table.clear();
     }
 
     public Env createChild() {

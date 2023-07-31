@@ -10,6 +10,7 @@ import org.wumoe.devore.parse.Parser;
 import java.util.List;
 
 public class Devore {
+    public static final String VERSION = "0.1";
     public static Token call(Env env, String code) {
         List<String> codes = Lexer.splitCode(code);
         Token result = DWord.WORD_NIL;
