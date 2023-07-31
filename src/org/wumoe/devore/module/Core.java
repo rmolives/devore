@@ -90,7 +90,7 @@ public class Core {
             if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
                 Token result = DWord.WORD_NIL;
                 for (int i = 0; i < ast.size(); ++i)
-                    result = Evaluator.eval(env.createChild(), ast.get(i));
+                    result = Evaluator.eval(env.createChild(), ast.get(i).copy());
                 env.put(ast.get(0).op.toString(), result);
             } else {
                 List<String> parameters = new ArrayList<>();
