@@ -12,17 +12,17 @@ public class DFunction extends Token {
     private final BiFunction<AstNode, Env, Token> function;
     private final int argSize;
     private final List<DFunction> children;
-    private final boolean mult;
+    private final boolean vararg;
 
-    private DFunction(BiFunction<AstNode, Env, Token> function, int argSize, boolean mult) {
+    private DFunction(BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         this.function = function;
         this.argSize = argSize;
         this.children = new ArrayList<>();
-        this.mult = mult;
+        this.vararg = vararg;
     }
 
-    public static DFunction newFunction(BiFunction<AstNode, Env, Token> function, int argSize, boolean mult) {
-        return new DFunction(function, argSize, mult);
+    public static DFunction newFunction(BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+        return new DFunction(function, argSize, vararg);
     }
 
     public DFunction addFunction(DFunction function) {
@@ -32,7 +32,7 @@ public class DFunction extends Token {
 
     private DFunction match(int argSize) {
         DFunction function = null;
-        if (this.argSize == argSize || (this.mult && argSize >= this.argSize))
+        if (this.argSize == argSize || (this.vararg && argSize >= this.argSize))
             function = this;
         else {
             for (DFunction df : children) {
@@ -63,7 +63,7 @@ public class DFunction extends Token {
 
     @Override
     public Token copy() {
-        return newFunction(function, argSize, mult);
+        return newFunction(function, argSize, vararg);
     }
 
     @Override
