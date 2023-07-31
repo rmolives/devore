@@ -30,74 +30,67 @@ public class DFloat extends DNumber {
     public static DFloat valueOf(BigDecimal n) {
         return new DFloat(n);
     }
+
     @Override
     public DArithmetic add(DArithmetic a) {
         DFloat result;
         switch (a) {
-            case DInt n ->
-                    result = DFloat.valueOf(num.add(new BigDecimal(n.num)));
-            case DFloat n ->
-                    result = DFloat.valueOf(num.add(n.num));
+            case DInt n -> result = DFloat.valueOf(num.add(new BigDecimal(n.num)));
+            case DFloat n -> result = DFloat.valueOf(num.add(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         }
-        return NumUtils.isInt(num)? DInt.valueOf(num): result;
+        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
     }
 
     @Override
     public DArithmetic sub(DArithmetic a) {
         DFloat result;
         switch (a) {
-            case DInt n ->
-                    result = DFloat.valueOf(num.subtract(new BigDecimal(n.num)));
-            case DFloat n ->
-                    result = DFloat.valueOf(num.subtract(n.num));
+            case DInt n -> result = DFloat.valueOf(num.subtract(new BigDecimal(n.num)));
+            case DFloat n -> result = DFloat.valueOf(num.subtract(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
         }
-        return NumUtils.isInt(num)? DInt.valueOf(num): result;
+        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
     }
 
     @Override
     public DArithmetic mul(DArithmetic a) {
         DFloat result;
         switch (a) {
-            case DInt n ->
-                    result = DFloat.valueOf(num.multiply(new BigDecimal(n.num)));
-            case DFloat n ->
-                    result = DFloat.valueOf(num.multiply(n.num));
+            case DInt n -> result = DFloat.valueOf(num.multiply(new BigDecimal(n.num)));
+            case DFloat n -> result = DFloat.valueOf(num.multiply(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
         }
-        return NumUtils.isInt(num)? DInt.valueOf(num): result;
+        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
     }
 
     @Override
     public DArithmetic div(DArithmetic a) {
         DFloat result;
         switch (a) {
-            case DInt n ->
-                    result = DFloat.valueOf(num.divide(new BigDecimal(n.num), MathContext.DECIMAL128));
-            case DFloat n ->
-                    result = DFloat.valueOf(num.divide(n.num, MathContext.DECIMAL128));
+            case DInt n -> result = DFloat.valueOf(num.divide(new BigDecimal(n.num), MathContext.DECIMAL128));
+            case DFloat n -> result = DFloat.valueOf(num.divide(n.num, MathContext.DECIMAL128));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
         }
-        return NumUtils.isInt(num)? DInt.valueOf(num): result;
+        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
     }
 
     @Override
     public DNumber sin() {
         DFloat result = DFloat.valueOf(NumUtils.sin(num));
-        return NumUtils.isInt(num)? DInt.valueOf(num): result;
+        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
     }
 
     @Override
     public DNumber cos() {
         DFloat result = DFloat.valueOf(NumUtils.cos(num));
-        return NumUtils.isInt(num)? DInt.valueOf(num): result;
+        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
     }
 
     @Override
     public DNumber tan() {
         DFloat result = DFloat.valueOf(NumUtils.tan(num));
-        return NumUtils.isInt(num)? DInt.valueOf(num): result;
+        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
     }
 
     @Override
@@ -117,7 +110,7 @@ public class DFloat extends DNumber {
 
     @Override
     public String str() {
-        return NumUtils.isInt(num)? DInt.valueOf(num).str(): num.toPlainString();
+        return NumUtils.isInt(num) ? DInt.valueOf(num).str() : num.toPlainString();
     }
 
     @Override
@@ -127,7 +120,7 @@ public class DFloat extends DNumber {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DFloat n ? num.compareTo(n.num): -1;
+        return t instanceof DFloat n ? num.compareTo(n.num) : -1;
     }
 
     @Override

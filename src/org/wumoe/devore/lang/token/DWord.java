@@ -4,11 +4,6 @@ public class DWord extends Token {
     public static final DWord WORD_LB = DWord.valueOf(WordTags.LB);
     public static final DWord WORD_RB = DWord.valueOf(WordTags.RB);
     public static final DWord WORD_NIL = DWord.valueOf(WordTags.NIL);
-
-    public enum WordTags {
-        LB, RB, NIL
-    }
-
     public final WordTags tag;
 
     protected DWord(WordTags tag) {
@@ -28,10 +23,8 @@ public class DWord extends Token {
     public String str() {
         String result = "nil";
         switch (tag) {
-            case LB ->
-                result = "(";
-            case RB ->
-                result = ")";
+            case LB -> result = "(";
+            case RB -> result = ")";
         }
         return result;
     }
@@ -44,5 +37,9 @@ public class DWord extends Token {
     @Override
     public int compareTo(Token t) {
         return -1;
+    }
+
+    public enum WordTags {
+        LB, RB, NIL
     }
 }

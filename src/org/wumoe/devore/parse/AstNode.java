@@ -6,14 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AstNode {
-    public enum AstType {
-        FUNCTION, BASIC
-    }
     public final static AstNode nullAst = new AstNode(null);
+    public final List<AstNode> children;
     public Token op;
     public AstType type;
-    public final List<AstNode> children;
-
     public AstNode(Token op) {
         this.op = op;
         this.type = AstType.BASIC;
@@ -91,5 +87,9 @@ public class AstNode {
             builder.append(")");
         }
         return builder.toString();
+    }
+
+    public enum AstType {
+        FUNCTION, BASIC
     }
 }

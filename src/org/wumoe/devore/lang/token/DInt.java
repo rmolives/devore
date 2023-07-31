@@ -34,10 +34,8 @@ public class DInt extends DNumber {
     public DArithmetic add(DArithmetic a) {
         DArithmetic result;
         switch (a) {
-            case DInt n ->
-                result = DInt.valueOf(num.add(n.num));
-            case DFloat n ->
-                result = DFloat.valueOf(new BigDecimal(num).add(n.num));
+            case DInt n -> result = DInt.valueOf(num.add(n.num));
+            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).add(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         }
         return result;
@@ -47,10 +45,8 @@ public class DInt extends DNumber {
     public DArithmetic sub(DArithmetic a) {
         DArithmetic result;
         switch (a) {
-            case DInt n ->
-                    result = DInt.valueOf(num.subtract(n.num));
-            case DFloat n ->
-                    result = DFloat.valueOf(new BigDecimal(num).subtract(n.num));
+            case DInt n -> result = DInt.valueOf(num.subtract(n.num));
+            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).subtract(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
         }
         return result;
@@ -60,10 +56,8 @@ public class DInt extends DNumber {
     public DArithmetic mul(DArithmetic a) {
         DArithmetic result;
         switch (a) {
-            case DInt n ->
-                    result = DInt.valueOf(num.multiply(n.num));
-            case DFloat n ->
-                    result = DFloat.valueOf(new BigDecimal(num).multiply(n.num));
+            case DInt n -> result = DInt.valueOf(num.multiply(n.num));
+            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).multiply(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
         }
         return result;
@@ -73,10 +67,8 @@ public class DInt extends DNumber {
     public DArithmetic div(DArithmetic a) {
         DArithmetic result;
         switch (a) {
-            case DInt n ->
-                    result = DInt.valueOf(num.divide(n.num));
-            case DFloat n ->
-                    result = DFloat.valueOf(new BigDecimal(num).divide(n.num, MathContext.DECIMAL128));
+            case DInt n -> result = DInt.valueOf(num.divide(n.num));
+            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).divide(n.num, MathContext.DECIMAL128));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
         }
         return result;
@@ -124,7 +116,7 @@ public class DInt extends DNumber {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DInt n ? num.compareTo(n.num): -1;
+        return t instanceof DInt n ? num.compareTo(n.num) : -1;
     }
 
     @Override
