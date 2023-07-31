@@ -17,7 +17,7 @@ public class DevoreScriptEngine implements ScriptEngine {
 
     @Override
     public Object eval(Reader reader, ScriptContext context) throws ScriptException {
-        return null;
+        return Devore.call(((DevoreScriptBindings) context.getBindings(0)).env, readAllString(reader));
     }
 
     @Override

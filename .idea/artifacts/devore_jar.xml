@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="devore:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/devore_jar</output-path>
+    <root id="archive" name="devore.jar">
+      <element id="module-output" name="devore" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/big-math-2.3.2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
