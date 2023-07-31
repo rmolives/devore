@@ -37,7 +37,7 @@ public class DInt extends DNumber {
             case DInt n ->
                 result = DInt.valueOf(num.add(n.num));
             case DFloat n ->
-                result = DInt.valueOf(num.add(n.num.toBigInteger()));
+                result = DFloat.valueOf(new BigDecimal(num).add(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         }
         return result;
@@ -50,7 +50,7 @@ public class DInt extends DNumber {
             case DInt n ->
                     result = DInt.valueOf(num.subtract(n.num));
             case DFloat n ->
-                    result = DInt.valueOf(num.subtract(n.num.toBigInteger()));
+                    result = DFloat.valueOf(new BigDecimal(num).subtract(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
         }
         return result;
@@ -63,7 +63,7 @@ public class DInt extends DNumber {
             case DInt n ->
                     result = DInt.valueOf(num.multiply(n.num));
             case DFloat n ->
-                    result = DInt.valueOf(num.multiply(n.num.toBigInteger()));
+                    result = DFloat.valueOf(new BigDecimal(num).multiply(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
         }
         return result;
@@ -76,7 +76,7 @@ public class DInt extends DNumber {
             case DInt n ->
                     result = DInt.valueOf(num.divide(n.num));
             case DFloat n ->
-                    result = DInt.valueOf(new BigDecimal(num).divide(n.num, MathContext.DECIMAL128).toBigInteger());
+                    result = DFloat.valueOf(new BigDecimal(num).divide(n.num, MathContext.DECIMAL128));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
         }
         return result;
@@ -84,17 +84,17 @@ public class DInt extends DNumber {
 
     @Override
     public DNumber sin() {
-        return DInt.valueOf(NumUtils.sin(new BigDecimal(num)));
+        return DFloat.valueOf(NumUtils.sin(new BigDecimal(num)));
     }
 
     @Override
     public DNumber cos() {
-        return DInt.valueOf(NumUtils.cos(new BigDecimal(num)));
+        return DFloat.valueOf(NumUtils.cos(new BigDecimal(num)));
     }
 
     @Override
     public DNumber tan() {
-        return DInt.valueOf(NumUtils.tan(new BigDecimal(num)));
+        return DFloat.valueOf(NumUtils.tan(new BigDecimal(num)));
     }
 
     @Override

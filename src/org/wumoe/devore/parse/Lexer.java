@@ -104,7 +104,7 @@ public class Lexer {
                     tokens.add(DInt.valueOf(negative? v.subtract(v.multiply(BigInteger.TWO)) : v));
                     continue;
                 }
-                var x = new BigDecimal(v.toString());
+                var x = new BigDecimal(v);
                 var d = BigDecimal.valueOf(10);
                 ++index;
                 while (true) {
@@ -113,7 +113,7 @@ public class Lexer {
                         --index;
                         break;
                     }
-                    x = x.add(BigDecimal.valueOf(((int) expressionCharArray[index]) - 48)).divide(d, MathContext.DECIMAL128);
+                    x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index])).divide(d, MathContext.DECIMAL128));
                     d = d.multiply(BigDecimal.valueOf(10));
                 }
                 tokens.add(DFloat.valueOf(negative? x.subtract(x.multiply(BigDecimal.valueOf(2))) : x));
