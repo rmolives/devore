@@ -97,9 +97,8 @@ public class DevoreScriptEngine implements ScriptEngine {
         char[] buffer = new char[1024];
         int numCharsRead;
         try (BufferedReader bufferedReader = new BufferedReader(reader)) {
-            while ((numCharsRead = bufferedReader.read(buffer)) != -1) {
+            while ((numCharsRead = bufferedReader.read(buffer)) != -1)
                 stringBuilder.append(buffer, 0, numCharsRead);
-            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
