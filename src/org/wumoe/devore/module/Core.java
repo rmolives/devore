@@ -3,6 +3,8 @@ package org.wumoe.devore.module;
 import org.wumoe.devore.exception.DevoreCastException;
 import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.token.DArithmetic;
+import org.wumoe.devore.lang.token.DWord;
+import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.lang.type.DType;
 
 public class Core {
@@ -51,6 +53,33 @@ public class Core {
             }
             return arithmetic;
         }), 1, true);
-
+        dEnv.addBuiltFunction("println", ((tokens, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token t : tokens)
+                builder.append(t);
+            env.io.out.println(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addBuiltFunction("print", ((tokens, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token t : tokens)
+                builder.append(t);
+            env.io.out.print(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addBuiltFunction("err-println", ((tokens, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token t : tokens)
+                builder.append(t);
+            env.io.err.println(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addBuiltFunction("err-print", ((tokens, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token t : tokens)
+                builder.append(t);
+            env.io.err.print(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
     }
 }

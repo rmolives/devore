@@ -50,7 +50,6 @@ public class Repl {
                             if (codeCharArray[index] == '\"')
                                 break;
                         } while (index < codeCharArray.length - 1);
-                        ++index;
                         continue;
                     }
                     if (codeCharArray[index] == '(')
