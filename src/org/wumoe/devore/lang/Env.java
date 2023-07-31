@@ -54,15 +54,17 @@ public class Env {
         return new Env(new HashMap<>(), null, io);
     }
 
-    public void put(String key, Token value) {
+    public Env put(String key, Token value) {
         table.put(key, value);
+        return this;
     }
 
-    public void addFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+    public Env addFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         table.put(key, DFunction.newFunction(function, argSize, vararg));
+        return this;
     }
 
-    public void addTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
+    public Env addTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
         BiFunction<AstNode, Env, Token> df = (ast, env) -> {
             List<Token> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
@@ -72,16 +74,18 @@ public class Env {
             return function.apply(args, env);
         };
         table.put(key, DFunction.newFunction(df, argSize, vararg));
+        return this;
     }
 
-    public void setFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+    public Env setFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
         temp.table.put(key, DFunction.newFunction(function, argSize, vararg));
+        return this;
     }
 
-    public void setTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
+    public Env setTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
@@ -94,20 +98,23 @@ public class Env {
             return function.apply(args, env);
         };
         temp.table.put(key, DFunction.newFunction(df, argSize, vararg));
+        return this;
     }
 
-    public void set(String key, Token value) {
+    public Env set(String key, Token value) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
         temp.table.put(key, value);
+        return this;
     }
 
-    public void set(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+    public Env set(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
         temp.table.put(key, DFunction.newFunction(function, argSize, vararg));
+        return this;
     }
 
     public boolean contains(String key) {
