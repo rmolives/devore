@@ -26,4 +26,8 @@ public class DType {
     public static boolean isArithmetic(Token t) {
         return isNum(t);
     }
+
+    public static boolean isString(Token t) {
+        return "string".equals(t.type());
+    }
 }

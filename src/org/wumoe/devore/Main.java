@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        List<String> expressions = Lexer.splitCode("(+ 2 (+ 4 2.2) (* 3 3.3))");
+        List<String> expressions = Lexer.splitCode("(+ \"566\" (+ 4 2.2) (* 3 3.3))");
         Env env = Env.newEnv();
         Core.init(env);
         for (String expression : expressions) {
