@@ -1,4 +1,4 @@
-package org.wumoe.devore.core;
+package org.wumoe.devore.module;
 
 import org.wumoe.devore.exception.DevoreCastException;
 import org.wumoe.devore.exception.DevoreRuntimeException;
