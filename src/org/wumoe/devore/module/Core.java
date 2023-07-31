@@ -86,7 +86,7 @@ public class Core {
             env.io.err.print(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addFunction("def", ((ast, env) -> {
+        dEnv.addSymbolFunction("def", ((ast, env) -> {
             if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
                 Token result = DWord.WORD_NIL;
                 for (int i = 0; i < ast.size(); ++i)

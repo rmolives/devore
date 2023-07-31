@@ -59,7 +59,7 @@ public class Env {
         return this;
     }
 
-    public Env addFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+    public Env addSymbolFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         table.put(key, DFunction.newFunction(function, argSize, vararg));
         return this;
     }
@@ -77,7 +77,7 @@ public class Env {
         return this;
     }
 
-    public Env setFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+    public Env setSymbolFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
