@@ -1,7 +1,7 @@
 package org.wumoe.devore.lang.token;
 
+import ch.obermuhlner.math.big.BigDecimalMath;
 import org.wumoe.devore.exception.DevoreRuntimeException;
-import org.wumoe.devore.utils.NumUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -39,7 +39,7 @@ public class DFloat extends DNumber {
             case DFloat n -> result = DFloat.valueOf(num.add(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         }
-        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DFloat extends DNumber {
             case DFloat n -> result = DFloat.valueOf(num.subtract(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
         }
-        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DFloat extends DNumber {
             case DFloat n -> result = DFloat.valueOf(num.multiply(n.num));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
         }
-        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -72,25 +72,25 @@ public class DFloat extends DNumber {
             case DFloat n -> result = DFloat.valueOf(num.divide(n.num, MathContext.DECIMAL128));
             default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
         }
-        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber sin() {
-        DFloat result = DFloat.valueOf(NumUtils.sin(num));
-        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
+        DFloat result = DFloat.valueOf(BigDecimalMath.sin(num, MathContext.DECIMAL128));
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber cos() {
-        DFloat result = DFloat.valueOf(NumUtils.cos(num));
-        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
+        DFloat result = DFloat.valueOf(BigDecimalMath.cos(num, MathContext.DECIMAL128));
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber tan() {
-        DFloat result = DFloat.valueOf(NumUtils.tan(num));
-        return NumUtils.isInt(num) ? DInt.valueOf(num) : result;
+        DFloat result = DFloat.valueOf(BigDecimalMath.tan(num, MathContext.DECIMAL128));
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class DFloat extends DNumber {
 
     @Override
     public String str() {
-        return NumUtils.isInt(num) ? DInt.valueOf(num).str() : num.toPlainString();
+        return isInt(num) ? DInt.valueOf(num).str() : num.toPlainString();
     }
 
     @Override
@@ -126,5 +126,10 @@ public class DFloat extends DNumber {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof DFloat n && num.compareTo(n.num) == 0;
+    }
+
+    private static boolean isInt(BigDecimal decimal) {
+        BigDecimal stripped = decimal.stripTrailingZeros();
+        return stripped.scale() <= 0;
     }
 }

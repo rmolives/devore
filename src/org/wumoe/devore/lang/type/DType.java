@@ -19,12 +19,12 @@ public class DType {
         return "float".equals(t.type());
     }
 
-    public static boolean isNum(Token t) {
+    public static boolean isNumber(Token t) {
         return isInt(t) || isFloat(t);
     }
 
     public static boolean isArithmetic(Token t) {
-        return isNum(t);
+        return isNumber(t);
     }
 
     public static boolean isString(Token t) {

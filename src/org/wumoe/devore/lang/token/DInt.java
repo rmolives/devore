@@ -1,7 +1,6 @@
 package org.wumoe.devore.lang.token;
 
 import org.wumoe.devore.exception.DevoreRuntimeException;
-import org.wumoe.devore.utils.NumUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -76,17 +75,17 @@ public class DInt extends DNumber {
 
     @Override
     public DNumber sin() {
-        return DFloat.valueOf(NumUtils.sin(new BigDecimal(num)));
+        return DFloat.valueOf(num).sin();
     }
 
     @Override
     public DNumber cos() {
-        return DFloat.valueOf(NumUtils.cos(new BigDecimal(num)));
+        return DFloat.valueOf(num).cos();
     }
 
     @Override
     public DNumber tan() {
-        return DFloat.valueOf(NumUtils.tan(new BigDecimal(num)));
+        return DFloat.valueOf(num).tan();
     }
 
     @Override

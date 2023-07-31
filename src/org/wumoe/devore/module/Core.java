@@ -4,6 +4,7 @@ import org.wumoe.devore.exception.DevoreCastException;
 import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.Evaluator;
 import org.wumoe.devore.lang.token.DArithmetic;
+import org.wumoe.devore.lang.token.DNumber;
 import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.lang.type.DType;
@@ -58,6 +59,21 @@ public class Core {
             }
             return arithmetic;
         }), 1, true);
+        dEnv.addTokenFunction("sin", ((tokens, env) -> {
+            if (!DType.isNumber(tokens.get(0)))
+                throw new DevoreCastException(tokens.get(0).type(), "number");
+            return ((DNumber) tokens.get(0)).sin();
+        }), 1, false);
+        dEnv.addTokenFunction("cos", ((tokens, env) -> {
+            if (!DType.isNumber(tokens.get(0)))
+                throw new DevoreCastException(tokens.get(0).type(), "number");
+            return ((DNumber) tokens.get(0)).cos();
+        }), 1, false);
+        dEnv.addTokenFunction("tan", ((tokens, env) -> {
+            if (!DType.isNumber(tokens.get(0)))
+                throw new DevoreCastException(tokens.get(0).type(), "number");
+            return ((DNumber) tokens.get(0)).tan();
+        }), 1, false);
         dEnv.addTokenFunction("println", ((tokens, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : tokens)
