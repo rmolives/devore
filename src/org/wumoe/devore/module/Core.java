@@ -325,9 +325,10 @@ public class Core extends Module {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             for (AstNode node : ast.children) {
-                if (DType.isOp(node.op) && "else".equals(node.op.toString()))
+                if (DType.isOp(node.op) && "else".equals(node.op.toString())) {
                     result = Evaluator.eval(newEnv, node.get(0).copy());
-                else {
+                    break;
+                } else {
                     Token condition = Evaluator.eval(newEnv, node.get(0).copy());
                     if (!DType.isBool(condition))
                         throw new DevoreCastException(condition.type(), "bool");
