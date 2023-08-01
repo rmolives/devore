@@ -337,5 +337,9 @@ public class Core extends Module {
                 DBool.valueOf(new Scanner(env.io.in).nextBoolean())), 0, false);
         dEnv.addTokenFunction("read", ((args, env) ->
                 DString.valueOf(new Scanner(env.io.in).next())), 0, false);
+        dEnv.addTokenFunction("newline", ((args, env) -> {
+            System.out.println();
+            return DWord.WORD_NIL;
+        }), 0, false);
     }
 }
