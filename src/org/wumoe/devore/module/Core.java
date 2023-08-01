@@ -313,5 +313,18 @@ public class Core extends Module {
                 result = Evaluator.eval(newEnv, node.copy());
             return result;
         }, 2, true);
+        dEnv.addSymbolFunction("while", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            Token condition = Evaluator.eval(newEnv, ast.get(0).copy());
+            if (!DType.isBool(condition))
+                throw new DevoreCastException(condition.type(), "bool");
+            while (((DBool) condition).bool) {
+                for (int i = 1; i < ast.size(); ++i)
+                    result = Evaluator.eval(newEnv, ast.get(i).copy());
+                condition = Evaluator.eval(newEnv, ast.get(0).copy());
+            }
+            return result;
+        }, 2, true);
     }
 }
