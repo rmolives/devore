@@ -7,8 +7,12 @@ import org.wumoe.devore.lang.token.*;
 import org.wumoe.devore.lang.DType;
 import org.wumoe.devore.parse.AstNode;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.function.BiFunction;
 
@@ -370,5 +374,38 @@ public class Core extends Module {
                 return DBool.FLASE;
             return DBool.TRUE;
         }), 1, false);
+        dEnv.addTokenFunction("random", ((args, env) -> {
+            if (!DType.isInt(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (args.size() > 1)
+                if (!DType.isInt(args.get(1)))
+                    throw new DevoreCastException(args.get(1).type(), "int");
+            BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.get(0)).toBigIntger();
+            BigInteger end = args.size() == 1 ? ((DInt) args.get(0)).toBigIntger() : ((DInt) args.get(1)).toBigIntger();
+            Random rand = new Random();
+            int scale = end.toString().length();
+            StringBuilder generated = new StringBuilder();
+            for (int i = 0; i < scale; ++i)
+                generated.append(rand.nextInt(10));
+            BigDecimal inputRangeStart = new BigDecimal("0").setScale(scale, RoundingMode.FLOOR);
+            BigDecimal inputRangeEnd =
+                    new BigDecimal(String.format("%0" + end.toString().length() + "d", 0).replace('0', '9')).setScale(
+                            scale,
+                            RoundingMode.FLOOR
+                    );
+            BigDecimal outputRangeStart = new BigDecimal(start).setScale(scale, RoundingMode.FLOOR);
+            BigDecimal outputRangeEnd = new BigDecimal(end).add(new BigDecimal("1")).setScale(scale, RoundingMode.FLOOR);
+            BigDecimal bd1 =
+                    new BigDecimal(new BigInteger(generated.toString())).setScale(scale, RoundingMode.FLOOR)
+                            .subtract(inputRangeStart);
+            BigDecimal bd2 = inputRangeEnd.subtract(inputRangeStart);
+            BigDecimal bd3 = bd1.divide(bd2, RoundingMode.FLOOR);
+            BigDecimal bd4 = outputRangeEnd.subtract(outputRangeStart);
+            BigDecimal bd5 = bd3.multiply(bd4);
+            BigDecimal bd6 = bd5.add(outputRangeStart);
+            BigInteger returnInteger = bd6.setScale(0, RoundingMode.FLOOR).toBigInteger();
+            returnInteger = returnInteger.compareTo(end) > 0 ? end : returnInteger;
+            return DInt.valueOf(returnInteger);
+        }), 1, true);
     }
 }

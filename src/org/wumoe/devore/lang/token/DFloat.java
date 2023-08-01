@@ -104,6 +104,16 @@ public class DFloat extends DNumber {
     }
 
     @Override
+    public BigInteger toBigIntger() {
+        return num.toBigInteger();
+    }
+
+    @Override
+    public BigDecimal toBigDecimal() {
+        return num;
+    }
+
+    @Override
     public String type() {
         return "float";
     }

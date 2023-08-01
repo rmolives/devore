@@ -1,5 +1,8 @@
 package org.wumoe.devore.lang.token;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 public abstract class DNumber extends DArithmetic {
     public abstract DNumber sin();
 
@@ -10,4 +13,7 @@ public abstract class DNumber extends DArithmetic {
     public abstract DNumber ceil();
 
     public abstract DNumber floor();
+
+    public abstract BigInteger toBigIntger();
+    public abstract BigDecimal toBigDecimal();
 }

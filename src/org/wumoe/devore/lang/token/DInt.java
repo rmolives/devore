@@ -99,6 +99,16 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public BigInteger toBigIntger() {
+        return num;
+    }
+
+    @Override
+    public BigDecimal toBigDecimal() {
+        return new BigDecimal(num);
+    }
+
+    @Override
     public String type() {
         return "int";
     }
