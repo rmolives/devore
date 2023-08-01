@@ -338,7 +338,11 @@ public class Core extends Module {
         dEnv.addTokenFunction("read", ((args, env) ->
                 DString.valueOf(new Scanner(env.io.in).next())), 0, false);
         dEnv.addTokenFunction("newline", ((args, env) -> {
-            System.out.println();
+            env.io.out.println();
+            return DWord.WORD_NIL;
+        }), 0, false);
+        dEnv.addTokenFunction("error-newline", ((args, env) -> {
+            env.io.err.println();
             return DWord.WORD_NIL;
         }), 0, false);
     }
