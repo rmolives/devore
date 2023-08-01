@@ -1,5 +1,6 @@
 package org.wumoe.devore.lang.token;
 
+import ch.obermuhlner.math.big.BigDecimalMath;
 import org.wumoe.devore.exception.DevoreRuntimeException;
 
 import java.math.BigDecimal;
@@ -96,6 +97,11 @@ public class DInt extends DNumber {
     @Override
     public DNumber floor() {
         return (DNumber) copy();
+    }
+
+    @Override
+    public DNumber pow(DNumber n) {
+        return DInt.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
     }
 
     @Override

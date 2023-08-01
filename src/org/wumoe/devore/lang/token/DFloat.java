@@ -104,6 +104,11 @@ public class DFloat extends DNumber {
     }
 
     @Override
+    public DNumber pow(DNumber n) {
+        return DFloat.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    @Override
     public BigInteger toBigIntger() {
         return num.toBigInteger();
     }

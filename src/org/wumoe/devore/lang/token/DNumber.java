@@ -14,6 +14,5 @@ public abstract class DNumber extends DArithmetic {
 
     public abstract DNumber floor();
 
-    public abstract BigInteger toBigIntger();
-    public abstract BigDecimal toBigDecimal();
+    public abstract DNumber pow(DNumber n);
 }

@@ -65,6 +65,22 @@ public class Core extends Module {
             }
             return arithmetic;
         }), 1, true);
+        dEnv.addTokenFunction("pow", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            if (!DType.isNumber(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            return ((DNumber) args.get(0)).pow(((DNumber) args.get(1)));
+        }), 2, false);
+        dEnv.addTokenFunction("average", ((args, env) -> {
+            DFloat num = DFloat.valueOf(0);
+            for (Token arg : args) {
+                if (!DType.isNumber(arg))
+                    throw new DevoreCastException(arg.type(), "number");
+                num = DFloat.valueOf(num.add((DNumber) arg).toBigDecimal());
+            }
+            return num.div(DFloat.valueOf(args.size()));
+        }), 2, false);
         dEnv.addTokenFunction("sin", ((args, env) -> {
             if (!DType.isNumber(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "number");
