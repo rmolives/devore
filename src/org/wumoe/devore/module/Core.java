@@ -137,6 +137,32 @@ public class Core extends Module {
             }
             return DWord.WORD_NIL;
         }), 2, true);
+        dEnv.addSymbolFunction("set", ((ast, env) -> {
+            if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
+                Env newEnv = env.createChild();
+                Token result = DWord.WORD_NIL;
+                for (int i = 0; i < ast.size(); ++i)
+                    result = Evaluator.eval(newEnv, ast.get(i).copy());
+                env.set(ast.get(0).op.toString(), result);
+            } else {
+                List<String> parameters = new ArrayList<>();
+                for (AstNode parameter : ast.get(0).children)
+                    parameters.add(parameter.op.toString());
+                List<AstNode> asts = new ArrayList<>();
+                for (int i = 1; i < ast.size(); ++i)
+                    asts.add(ast.get(i).copy());
+                env.setTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
+                    Env newEnv = env.createChild();
+                    for (int i = 0; i < parameters.size(); ++i)
+                        newEnv.put(parameters.get(i), cArgs.get(i));
+                    Token result = DWord.WORD_NIL;
+                    for (AstNode astNode : asts)
+                        result = Evaluator.eval(newEnv, astNode.copy());
+                    return result;
+                }), parameters.size(), false);
+            }
+            return DWord.WORD_NIL;
+        }), 2, true);
         dEnv.addSymbolFunction("let", ((ast, env) -> {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
