@@ -105,7 +105,8 @@ public class DFloat extends DNumber {
 
     @Override
     public DNumber pow(DNumber n) {
-        return DFloat.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+        DFloat result =DFloat.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -140,7 +141,7 @@ public class DFloat extends DNumber {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DFloat n ? num.compareTo(n.num) : -1;
+        return t instanceof DNumber n ? num.compareTo(n.toBigDecimal()) : -1;
     }
 
     @Override

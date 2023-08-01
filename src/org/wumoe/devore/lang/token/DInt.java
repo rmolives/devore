@@ -30,6 +30,10 @@ public class DInt extends DNumber {
         return new DInt(n.toBigInteger());
     }
 
+    public DInt mod(DInt n) {
+        return DInt.valueOf(num.mod(n.toBigIntger()));
+    }
+
     @Override
     public DArithmetic add(DArithmetic a) {
         DArithmetic result;
@@ -65,13 +69,7 @@ public class DInt extends DNumber {
 
     @Override
     public DArithmetic div(DArithmetic a) {
-        DArithmetic result;
-        switch (a) {
-            case DInt n -> result = DInt.valueOf(num.divide(n.num));
-            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).divide(n.num, MathContext.DECIMAL128));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
-        }
-        return result;
+        return DFloat.valueOf(this.toBigIntger()).div(a);
     }
 
     @Override
@@ -101,12 +99,12 @@ public class DInt extends DNumber {
 
     @Override
     public DNumber pow(DNumber n) {
-        return DInt.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+        return DFloat.valueOf(this.num).pow(n);
     }
 
     @Override
     public DNumber abs() {
-        return this;
+        return DInt.valueOf(num.abs());
     }
 
     @Override
@@ -136,7 +134,7 @@ public class DInt extends DNumber {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DInt n ? num.compareTo(n.num) : -1;
+        return DFloat.valueOf(this.num).compareTo(t);
     }
 
     @Override

@@ -81,6 +81,13 @@ public class Core extends Module {
             }
             return num.div(DFloat.valueOf(args.size()));
         }), 1, true);
+        dEnv.addTokenFunction("mod", ((args, env) -> {
+            if (!DType.isInt(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            return ((DInt) args.get(0)).mod(((DInt) args.get(1)));
+        }), 2, false);
         dEnv.addTokenFunction("abs", ((args, env) -> {
             if (!DType.isNumber(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "number");
@@ -329,6 +336,7 @@ public class Core extends Module {
                         for (int i = 1; i < node.size(); ++i)
                             r = Evaluator.eval(newEnv, node.get(i).copy());
                         result = r;
+                        break;
                     }
                 }
             }
