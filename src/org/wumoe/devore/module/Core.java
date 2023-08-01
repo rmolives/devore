@@ -9,6 +9,7 @@ import org.wumoe.devore.parse.AstNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.BiFunction;
 
 public class Core extends Module {
@@ -164,32 +165,32 @@ public class Core extends Module {
             return DWord.WORD_NIL;
         }), 2, true);
         dEnv.addSymbolFunction("let", ((ast, env) -> {
-                Env newEnv = env.createChild();
-                Token result = DWord.WORD_NIL;
-                for (AstNode node : ast.get(0).children) {
-                    if ("apply".equals(node.op.toString())) {
-                        List<String> parameters = new ArrayList<>();
-                        List<AstNode> asts = new ArrayList<>();
-                        for (AstNode parameterNode : node.get(0).children)
-                            parameters.add(parameterNode.op.toString());
-                        for (int i = 1; i < node.size(); ++i)
-                            asts.add(node.get(i).copy());
-                        newEnv.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
-                            Env newInEnv = env.createChild();
-                            for (int i = 0; i < parameters.size(); ++i)
-                                newInEnv.put(parameters.get(i), cArgs.get(i));
-                            Token inResult = DWord.WORD_NIL;
-                            for (AstNode astNode : asts)
-                                inResult = Evaluator.eval(newInEnv, astNode.copy());
-                            return inResult;
-                        }), parameters.size(), false);
-                    } else {
-                        Token value = DWord.WORD_NIL;
-                        for (AstNode e : node.children)
-                            value = Evaluator.eval(env, e.copy());
-                        newEnv.put(node.op.toString(), value);
-                    }
+            Env newEnv = env.createChild();
+            Token result = DWord.WORD_NIL;
+            for (AstNode node : ast.get(0).children) {
+                if ("apply".equals(node.op.toString())) {
+                    List<String> parameters = new ArrayList<>();
+                    List<AstNode> asts = new ArrayList<>();
+                    for (AstNode parameterNode : node.get(0).children)
+                        parameters.add(parameterNode.op.toString());
+                    for (int i = 1; i < node.size(); ++i)
+                        asts.add(node.get(i).copy());
+                    newEnv.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
+                        Env newInEnv = env.createChild();
+                        for (int i = 0; i < parameters.size(); ++i)
+                            newInEnv.put(parameters.get(i), cArgs.get(i));
+                        Token inResult = DWord.WORD_NIL;
+                        for (AstNode astNode : asts)
+                            inResult = Evaluator.eval(newInEnv, astNode.copy());
+                        return inResult;
+                    }), parameters.size(), false);
+                } else {
+                    Token value = DWord.WORD_NIL;
+                    for (AstNode e : node.children)
+                        value = Evaluator.eval(env, e.copy());
+                    newEnv.put(node.op.toString(), value);
                 }
+            }
             for (int i = 1; i < ast.size(); ++i)
                 result = Evaluator.eval(newEnv, ast.get(i).copy());
             return result;
@@ -263,17 +264,17 @@ public class Core extends Module {
             return ((DFunction) args.get(0)).call(asts, env.createChild());
         }), 1, true);
         dEnv.addTokenFunction(">", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 1, true);
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 2, false);
         dEnv.addTokenFunction("<", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(args.get(1)) < 0)), 1, true);
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) < 0)), 2, false);
         dEnv.addTokenFunction("=", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(args.get(1)) == 0)), 1, true);
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) == 0)), 2, false);
         dEnv.addTokenFunction("!=", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(args.get(1)) != 0)), 1, true);
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) != 0)), 2, false);
         dEnv.addTokenFunction(">=", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(args.get(1)) >= 0)), 1, true);
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) >= 0)), 2, false);
         dEnv.addTokenFunction("<=", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(args.get(1)) <= 0)), 1, true);
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) <= 0)), 2, false);
         dEnv.addSymbolFunction("if", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
@@ -326,5 +327,13 @@ public class Core extends Module {
             }
             return result;
         }, 2, true);
+        dEnv.addTokenFunction("read-line", ((args, env) ->
+                DString.valueOf(new Scanner(env.io.in).nextLine())), 0, false);
+        dEnv.addTokenFunction("read-int", ((args, env) ->
+                DInt.valueOf(new Scanner(env.io.in).nextBigInteger())), 0, false);
+        dEnv.addTokenFunction("read-float", ((args, env) ->
+                DFloat.valueOf(new Scanner(env.io.in).nextBigDecimal())), 0, false);
+        dEnv.addTokenFunction("read", ((args, env) ->
+                DString.valueOf(new Scanner(env.io.in).next())), 0, false);
     }
 }
