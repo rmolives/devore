@@ -80,7 +80,12 @@ public class Core extends Module {
                 num = DFloat.valueOf(num.add((DNumber) arg).toBigDecimal());
             }
             return num.div(DFloat.valueOf(args.size()));
-        }), 2, false);
+        }), 1, true);
+        dEnv.addTokenFunction("abs", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).abs();
+        }), 1, false);
         dEnv.addTokenFunction("sin", ((args, env) -> {
             if (!DType.isNumber(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "number");

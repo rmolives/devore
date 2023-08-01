@@ -105,6 +105,11 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public DNumber abs() {
+        return this;
+    }
+
+    @Override
     public BigInteger toBigIntger() {
         return num;
     }

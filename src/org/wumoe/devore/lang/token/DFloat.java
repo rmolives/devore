@@ -109,6 +109,11 @@ public class DFloat extends DNumber {
     }
 
     @Override
+    public DNumber abs() {
+        return DFloat.valueOf(num.abs());
+    }
+
+    @Override
     public BigInteger toBigIntger() {
         return num.toBigInteger();
     }
