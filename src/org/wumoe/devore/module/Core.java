@@ -269,7 +269,7 @@ public class Core extends Module {
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) < 0)), 2, false);
         dEnv.addTokenFunction("=", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) == 0)), 2, false);
-        dEnv.addTokenFunction("!=", ((args, env) ->
+        dEnv.addTokenFunction("/=", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) != 0)), 2, false);
         dEnv.addTokenFunction(">=", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) >= 0)), 2, false);
