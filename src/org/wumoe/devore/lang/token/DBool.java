@@ -1,14 +1,16 @@
 package org.wumoe.devore.lang.token;
 
 public class DBool extends Token {
+    public static final DBool FLASE = new DBool(false);
+    public static final DBool TRUE = new DBool(true);
     public final boolean bool;
 
     protected DBool(boolean bool) {
         this.bool = bool;
     }
 
-    public static DBool valueOf(boolean str) {
-        return new DBool(str);
+    public static DBool valueOf(boolean bool) {
+        return bool ? TRUE : FLASE;
     }
 
     @Override

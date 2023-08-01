@@ -345,5 +345,30 @@ public class Core extends Module {
             env.io.err.println();
             return DWord.WORD_NIL;
         }), 0, false);
+        dEnv.addTokenFunction("and", ((args, env) -> {
+            for (Token arg : args) {
+                if (!DType.isBool(arg))
+                    throw new DevoreCastException(arg.type(), "bool");
+                if (!((DBool) arg).bool)
+                    return DBool.FLASE;
+            }
+            return DBool.TRUE;
+        }), 1, true);
+        dEnv.addTokenFunction("or", ((args, env) -> {
+            for (Token arg : args) {
+                if (!DType.isBool(arg))
+                    throw new DevoreCastException(arg.type(), "bool");
+                if (((DBool) arg).bool)
+                    return DBool.TRUE;
+            }
+            return DBool.FLASE;
+        }), 1, true);
+        dEnv.addTokenFunction("not", ((args, env) -> {
+            if (!DType.isBool(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "bool");
+            if (((DBool) args.get(0)).bool)
+                return DBool.FLASE;
+            return DBool.TRUE;
+        }), 1, false);
     }
 }
