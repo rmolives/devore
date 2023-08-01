@@ -290,7 +290,7 @@ public class Core extends Module {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             for (AstNode node : ast.children) {
-                if ("else".equals(node.op.toString()))
+                if (DType.isOp(node.op) && "else".equals(node.op.toString()))
                     result = Evaluator.eval(newEnv, node.get(0).copy());
                 else {
                     Token condition = Evaluator.eval(newEnv, node.get(0).copy());
