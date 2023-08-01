@@ -306,5 +306,12 @@ public class Core extends Module {
             }
             return result;
         }, 2, true);
+        dEnv.addSymbolFunction("begin", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            for (AstNode node : ast.children)
+                result = Evaluator.eval(newEnv, node.copy());
+            return result;
+        }, 2, true);
     }
 }
