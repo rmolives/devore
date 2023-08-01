@@ -20,6 +20,11 @@ public class Devore {
             put("core", new Core());
         }
     };
+
+    public static void addModule(String name, Module module) {
+        moduleTable.put(name, module);
+    }
+
     public static Token call(Env env, String code) {
         List<String> codes = Lexer.splitCode(code);
         Token result = DWord.WORD_NIL;
