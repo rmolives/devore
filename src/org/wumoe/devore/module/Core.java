@@ -277,13 +277,33 @@ public class Core extends Module {
         dEnv.addSymbolFunction("if", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
-            Token condition = Evaluator.eval(env, ast.get(0));
+            Token condition = Evaluator.eval(newEnv, ast.get(0).copy());
             if (!DType.isBool(condition))
                 throw new DevoreCastException(condition.type(), "bool");
             if (((DBool) condition).bool)
                 result = Evaluator.eval(newEnv, ast.get(1).copy());
             else if (ast.size() > 2)
                 result = Evaluator.eval(newEnv, ast.get(2).copy());
+            return result;
+        }, 2, true);
+        dEnv.addSymbolFunction("cond", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            for (AstNode node : ast.children) {
+                if ("else".equals(node.op.toString()))
+                    result = Evaluator.eval(newEnv, node.get(0).copy());
+                else {
+                    Token condition = Evaluator.eval(newEnv, node.get(0).copy());
+                    if (!DType.isBool(condition))
+                        throw new DevoreCastException(condition.type(), "bool");
+                    if (((DBool) condition).bool) {
+                        Token r = DWord.WORD_NIL;
+                        for (int i = 1; i < node.size(); ++i)
+                            r = Evaluator.eval(newEnv, node.get(i).copy());
+                        result = r;
+                    }
+                }
+            }
             return result;
         }, 2, true);
     }
