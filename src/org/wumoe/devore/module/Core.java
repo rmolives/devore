@@ -333,6 +333,8 @@ public class Core extends Module {
                 DInt.valueOf(new Scanner(env.io.in).nextBigInteger())), 0, false);
         dEnv.addTokenFunction("read-float", ((args, env) ->
                 DFloat.valueOf(new Scanner(env.io.in).nextBigDecimal())), 0, false);
+        dEnv.addTokenFunction("read-bool", ((args, env) ->
+                DBool.valueOf(new Scanner(env.io.in).nextBoolean())), 0, false);
         dEnv.addTokenFunction("read", ((args, env) ->
                 DString.valueOf(new Scanner(env.io.in).next())), 0, false);
     }
