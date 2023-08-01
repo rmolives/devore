@@ -16,8 +16,10 @@ public class Lexer {
         while (index < codeCharArray.length) {
             int flag = 0;
             StringBuilder builder = new StringBuilder();
-            while (codeCharArray[index] != '(')
+            while (index < codeCharArray.length && codeCharArray[index] != '(')
                 ++index;
+            if (index >= codeCharArray.length)
+                return expressions;
             do {
                 if (codeCharArray[index] == '\"') {
                     builder.append("\"");
