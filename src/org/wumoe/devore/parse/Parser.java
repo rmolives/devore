@@ -70,6 +70,6 @@ public class Parser {
         }
         if (ast != null)
             return ast;
-        throw new DevoreParseException("ast eq null.");
+        throw new DevoreParseException("语法解析出的AST为null.");
     }
 }
