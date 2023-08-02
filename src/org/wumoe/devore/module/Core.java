@@ -439,5 +439,70 @@ public class Core extends Module {
             returnInteger = returnInteger.compareTo(end) > 0 ? end : returnInteger;
             return DInt.valueOf(returnInteger);
         }), 1, true);
+        dEnv.addTokenFunction("list", ((args, env) -> DImmutableList.valueOf(new ArrayList<>(args))), 1, true);
+        dEnv.addTokenFunction("vlist", ((args, env) -> DVariableList.valueOf(new ArrayList<>(args))), 1, true);
+        dEnv.addTokenFunction("car", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            return DBool.TRUE;
+        }), 1, false);
+        dEnv.addTokenFunction("list-get", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.get(((DInt) args.get(1)).toBigIntger().intValue());
+        }), 2, false);
+        dEnv.addTokenFunction("list-set", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2));
+        }), 3, false);
+        dEnv.addTokenFunction("list-remove", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            if (!DType.isInt(args.get(1)))
+                return list.remove(((DInt) args.get(1)).toBigIntger().intValue());
+            return list.remove(args.get(1));
+        }), 2, false);
+        dEnv.addTokenFunction("head", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.get(0);
+        }), 1, false);
+        dEnv.addTokenFunction("last", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.get(list.size() - 1);
+        }), 1, false);
+        dEnv.addTokenFunction("tail", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.subList(1, list.size());
+        }), 1, false);
+        dEnv.addTokenFunction("init", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.subList(0, list.size() - 1);
+        }), 1, false);
     }
 }

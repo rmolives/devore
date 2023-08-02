@@ -33,4 +33,8 @@ public class DType {
     public static boolean isString(Token t) {
         return t instanceof DString;
     }
+
+    public static boolean isList(Token t) {
+        return t instanceof DList;
+    }
 }
