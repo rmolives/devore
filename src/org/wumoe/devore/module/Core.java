@@ -551,6 +551,11 @@ public class Core extends Module {
             DList list = (DList) args.get(0);
             return list.subList(0, list.size() - 1);
         }), 1, false);
+        dEnv.addTokenFunction("length", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                return DInt.valueOf(args.get(0).toString().length());
+            return DInt.valueOf(((DList) args.get(0)).size());
+        }), 1, false);
         dEnv.addTokenFunction("++", ((args, env) -> {
             boolean flag = false;
             for (Token arg : args)
