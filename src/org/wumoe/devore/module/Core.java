@@ -705,5 +705,25 @@ public class Core extends Module {
             }
             return DList.valueOf(result);
         }), 2, false);
+        dEnv.addTokenFunction("range", ((args, env) -> {
+            if (!DType.isInt(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (args.size() > 1 && !DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            if (args.size() > 2 && !DType.isInt(args.get(2)))
+                throw new DevoreCastException(args.get(2).type(), "int");
+            BigInteger start = args.size() > 1 ? ((DInt) args.get(0)).toBigIntger() : BigInteger.ZERO;
+            BigInteger end = args.size() > 1 ? ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE)
+                    : ((DInt) args.get(0)).toBigIntger().subtract(BigInteger.ONE);
+            BigInteger step = args.size() > 2 ? ((DInt) args.get(2)).toBigIntger() : BigInteger.ONE;
+            BigInteger size = end.subtract(start).divide(step);
+            List<Token> list = new ArrayList<>();
+            BigInteger i = BigInteger.ZERO;
+            while (i.compareTo(size) < 1) {
+                list.add(DInt.valueOf(start.add(i.multiply(step))));
+                i = i.add(BigInteger.ONE);
+            }
+            return DList.valueOf(list);
+        }), 1, true);
     }
 }
