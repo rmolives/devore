@@ -147,9 +147,14 @@ public class Core extends Module {
         }), 1, true);
         dEnv.addTokenFunction("error-print", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
-            for (Token t : args)
-                builder.append(t);
+            for (Token arg : args)
+                builder.append(arg);
             env.io.err.print(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addTokenFunction("undef", ((args, env) -> {
+            for (Token arg : args)
+                env.remove(arg.toString());
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
@@ -178,7 +183,7 @@ public class Core extends Module {
             }
             return DWord.WORD_NIL;
         }), 2, true);
-        dEnv.addSymbolFunction("set", ((ast, env) -> {
+        dEnv.addSymbolFunction("set!", ((ast, env) -> {
             if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
@@ -445,8 +450,7 @@ public class Core extends Module {
             returnInteger = returnInteger.compareTo(end) > 0 ? end : returnInteger;
             return DInt.valueOf(returnInteger);
         }), 1, true);
-        dEnv.addTokenFunction("list", ((args, env) -> DImmutableList.valueOf(new ArrayList<>(args))), 1, true);
-        dEnv.addTokenFunction("vlist", ((args, env) -> DVariableList.valueOf(new ArrayList<>(args))), 1, true);
+        dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 1, true);
         dEnv.addTokenFunction("car", ((args, env) -> {
             if (!DType.isList(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "list");
@@ -475,7 +479,7 @@ public class Core extends Module {
             DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2));
+            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), false);
         }), 3, false);
         dEnv.addTokenFunction("list-remove", ((args, env) -> {
             if (!DType.isList(args.get(0)))
@@ -484,8 +488,40 @@ public class Core extends Module {
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             if (!DType.isInt(args.get(1)))
-                return list.remove(((DInt) args.get(1)).toBigIntger().intValue());
-            return list.remove(args.get(1));
+                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), false);
+            return list.remove(args.get(1), false);
+        }), 2, false);
+        dEnv.addTokenFunction("list-add", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.add(args.get(1), false);
+        }), 2, false);
+        dEnv.addTokenFunction("list-set!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), true);
+        }), 3, false);
+        dEnv.addTokenFunction("list-remove!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            if (!DType.isInt(args.get(1)))
+                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), true);
+            return list.remove(args.get(1), false);
+        }), 2, false);
+        dEnv.addTokenFunction("list-add!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.add(args.get(1), true);
         }), 2, false);
         dEnv.addTokenFunction("head", ((args, env) -> {
             if (!DType.isList(args.get(0)))
@@ -514,6 +550,31 @@ public class Core extends Module {
                 throw new DevoreCastException(args.get(0).type(), "list");
             DList list = (DList) args.get(0);
             return list.subList(0, list.size() - 1);
+        }), 1, false);
+        dEnv.addTokenFunction("++", ((args, env) -> {
+            boolean flag = false;
+            for (Token arg : args)
+                if (DType.isList(arg)) {
+                    flag = true;
+                    break;
+                }
+            Token result;
+            if (flag) {
+                List<Token> list = new ArrayList<>();
+                for (Token arg : args) {
+                    if (DType.isList(arg))
+                        list.addAll(((DList) arg).toList());
+                    else
+                        list.add(arg);
+                }
+                result = DList.valueOf(list);
+            } else {
+                StringBuilder builder = new StringBuilder();
+                for (Token arg : args)
+                    builder.append(arg.toString());
+                result = DString.valueOf(builder.toString());
+            }
+            return result;
         }), 1, false);
     }
 }

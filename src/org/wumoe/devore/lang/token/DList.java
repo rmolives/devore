@@ -1,19 +1,96 @@
 package org.wumoe.devore.lang.token;
 
-public abstract class DList extends Token {
-    public abstract DList add(Token t);
+import java.util.ArrayList;
+import java.util.List;
 
-    public abstract Token get(int index);
+public class DList extends Token {
+    private final List<Token> tokens;
 
-    public abstract Token set(int index, Token t);
+    private DList(List<Token> tokens) {
+        this.tokens = tokens;
+    }
 
-    public abstract DList remove(int index);
+    public static DList valueOf(List<Token> tokens) {
+        return new DList(tokens);
+    }
 
-    public abstract DList remove(Token t);
+    public DList add(Token t, boolean force) {
+        if (force) {
+            tokens.add(t);
+            return this;
+        }
+        List<Token> newList = new ArrayList<>(tokens);
+        newList.add(t);
+        return DList.valueOf(newList);
+    }
 
-    public abstract boolean contains(Token t);
+    public Token get(int index) {
+        return tokens.get(index);
+    }
 
-    public abstract int size();
+    public Token set(int index, Token t, boolean force) {
+        if (force) {
+            tokens.set(index, t);
+            return this;
+        }
+        List<Token> newList = new ArrayList<>(tokens);
+        newList.set(index, t);
+        return DList.valueOf(newList);
+    }
 
-    public abstract DList subList(int fromIndex, int toIndex);
+    public DList remove(int index, boolean force) {
+        if (force) {
+            tokens.remove(index);
+            return this;
+        }
+        List<Token> newList = new ArrayList<>(tokens);
+        newList.remove(index);
+        return DList.valueOf(newList);
+    }
+
+    public DList remove(Token t, boolean force) {
+        if (force) {
+            tokens.remove(t);
+            return this;
+        }
+        List<Token> newList = new ArrayList<>(tokens);
+        newList.add(t);
+        return DList.valueOf(newList);
+    }
+
+    public boolean contains(Token t) {
+        return tokens.contains(t);
+    }
+
+    public int size() {
+        return tokens.size();
+    }
+
+    public DList subList(int fromIndex, int toIndex) {
+        return DList.valueOf(tokens.subList(fromIndex, toIndex));
+    }
+
+    public List<Token> toList() {
+        return tokens;
+    }
+
+    @Override
+    public String type() {
+        return "list";
+    }
+
+    @Override
+    public String str() {
+        return tokens.toString();
+    }
+
+    @Override
+    public Token copy() {
+        return DList.valueOf(new ArrayList<>(tokens));
+    }
+
+    @Override
+    public int compareTo(Token t) {
+        return 0;
+    }
 }
