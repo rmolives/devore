@@ -39,44 +39,48 @@ public class DFloat extends DNumber {
     @Override
     public DArithmetic add(DArithmetic a) {
         DFloat result;
-        switch (a) {
-            case DInt n -> result = DFloat.valueOf(num.add(new BigDecimal(n.num)));
-            case DFloat n -> result = DFloat.valueOf(num.add(n.num));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
-        }
+        if (a instanceof DInt n)
+            result = DFloat.valueOf(num.add(new BigDecimal(n.num)));
+        else if (a instanceof DFloat n)
+            result = DFloat.valueOf(num.add(n.num));
+        else
+            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DArithmetic sub(DArithmetic a) {
         DFloat result;
-        switch (a) {
-            case DInt n -> result = DFloat.valueOf(num.subtract(new BigDecimal(n.num)));
-            case DFloat n -> result = DFloat.valueOf(num.subtract(n.num));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
-        }
+        if (a instanceof DInt n)
+            result = DFloat.valueOf(num.subtract(new BigDecimal(n.num)));
+        else if (a instanceof DFloat n)
+            result = DFloat.valueOf(num.subtract(n.num));
+        else
+            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DArithmetic mul(DArithmetic a) {
         DFloat result;
-        switch (a) {
-            case DInt n -> result = DFloat.valueOf(num.multiply(new BigDecimal(n.num)));
-            case DFloat n -> result = DFloat.valueOf(num.multiply(n.num));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
-        }
+        if (a instanceof DInt n)
+            result = DFloat.valueOf(num.multiply(new BigDecimal(n.num)));
+        else if (a instanceof DFloat n)
+            result = DFloat.valueOf(num.multiply(n.num));
+        else
+            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DArithmetic div(DArithmetic a) {
         DFloat result;
-        switch (a) {
-            case DInt n -> result = DFloat.valueOf(num.divide(new BigDecimal(n.num), MathContext.DECIMAL128));
-            case DFloat n -> result = DFloat.valueOf(num.divide(n.num, MathContext.DECIMAL128));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
-        }
+        if (a instanceof DInt n)
+            result = DFloat.valueOf(num.divide(new BigDecimal(n.num), MathContext.DECIMAL128));
+        else if (a instanceof DFloat n)
+            result = DFloat.valueOf(num.divide(n.num, MathContext.DECIMAL128));
+        else
+            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 

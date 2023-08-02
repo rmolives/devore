@@ -34,35 +34,17 @@ public class DInt extends DNumber {
 
     @Override
     public DArithmetic add(DArithmetic a) {
-        DArithmetic result;
-        switch (a) {
-            case DInt n -> result = DInt.valueOf(num.add(n.num));
-            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).add(n.num));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
-        }
-        return result;
+        return DFloat.valueOf(num).add(a);
     }
 
     @Override
     public DArithmetic sub(DArithmetic a) {
-        DArithmetic result;
-        switch (a) {
-            case DInt n -> result = DInt.valueOf(num.subtract(n.num));
-            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).subtract(n.num));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
-        }
-        return result;
+        return DFloat.valueOf(num).sub(a);
     }
 
     @Override
     public DArithmetic mul(DArithmetic a) {
-        DArithmetic result;
-        switch (a) {
-            case DInt n -> result = DInt.valueOf(num.multiply(n.num));
-            case DFloat n -> result = DFloat.valueOf(new BigDecimal(num).multiply(n.num));
-            default -> throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
-        }
-        return result;
+        return DFloat.valueOf(num).mul(a);
     }
 
     @Override
