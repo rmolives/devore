@@ -4,9 +4,8 @@ import org.wumoe.devore.Devore;
 import org.wumoe.devore.lang.token.DFunction;
 import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
-import org.wumoe.devore.parse.AstNode;
+import org.wumoe.devore.parser.AstNode;
 
-import javax.script.Bindings;
 import java.util.*;
 import java.util.function.BiFunction;
 

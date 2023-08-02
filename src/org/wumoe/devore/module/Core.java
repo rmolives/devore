@@ -5,7 +5,7 @@ import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.Evaluator;
 import org.wumoe.devore.lang.token.*;
 import org.wumoe.devore.lang.DType;
-import org.wumoe.devore.parse.AstNode;
+import org.wumoe.devore.parser.AstNode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

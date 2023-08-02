@@ -1,4 +1,4 @@
-package org.wumoe.devore.parse;
+package org.wumoe.devore.parser;
 
 import org.wumoe.devore.lang.token.*;
 

@@ -1,4 +1,4 @@
-package org.wumoe.devore.parse;
+package org.wumoe.devore.parser;
 
 import org.wumoe.devore.exception.DevoreParseException;
 import org.wumoe.devore.lang.token.DOp;
@@ -8,7 +8,7 @@ import org.wumoe.devore.lang.token.Token;
 import java.util.ArrayDeque;
 import java.util.List;
 
-public class Parser {
+public class Parse {
     public static AstNode parser(List<Token> tokens) {
         AstNode ast = null;
         ArrayDeque<AstNode> stack = new ArrayDeque<>();

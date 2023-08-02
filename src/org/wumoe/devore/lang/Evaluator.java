@@ -2,7 +2,7 @@ package org.wumoe.devore.lang;
 
 import org.wumoe.devore.lang.token.DFunction;
 import org.wumoe.devore.lang.token.Token;
-import org.wumoe.devore.parse.AstNode;
+import org.wumoe.devore.parser.AstNode;
 
 public class Evaluator {
     public static Token eval(Env env, AstNode ast) {

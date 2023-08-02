@@ -2,7 +2,7 @@ package org.wumoe.devore.lang.token;
 
 import org.wumoe.devore.exception.DevoreRuntimeException;
 import org.wumoe.devore.lang.Env;
-import org.wumoe.devore.parse.AstNode;
+import org.wumoe.devore.parser.AstNode;
 
 import java.util.ArrayList;
 import java.util.List;
