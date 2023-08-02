@@ -1,5 +1,6 @@
 package org.wumoe.devore.module;
 
+import org.wumoe.devore.Devore;
 import org.wumoe.devore.exception.DevoreCastException;
 import org.wumoe.devore.lang.DType;
 import org.wumoe.devore.lang.Env;
@@ -124,6 +125,11 @@ public class Core extends Module {
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).floor();
         }), 1, false);
+        dEnv.addTokenFunction("require", ((args, env) -> {
+            for (Token t : args)
+                env.load(t.toString());
+            return DWord.WORD_NIL;
+        }), 1, true);
         dEnv.addTokenFunction("println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
