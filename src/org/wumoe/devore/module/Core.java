@@ -556,6 +556,39 @@ public class Core extends Module {
                 return DInt.valueOf(args.get(0).toString().length());
             return DInt.valueOf(((DList) args.get(0)).size());
         }), 1, false);
+        dEnv.addTokenFunction("reverse", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            List<Token> temp = new ArrayList<>();
+            DList tokens = (DList) args.get(0);
+            for (int i = tokens.size() - 1; i >= 0; --i)
+                temp.add(tokens.get(i));
+            return DList.valueOf(new ArrayList<>(temp));
+        }), 1, false);
+        dEnv.addTokenFunction("reverse!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            List<Token> temp = new ArrayList<>();
+            DList tokens = (DList) args.get(0);
+            for (int i = tokens.size() - 1; i >= 0; --i)
+                temp.add(tokens.get(i));
+            tokens.clear();
+            for (Token t : temp)
+                tokens.add(t, true);
+            return tokens;
+        }), 1, false);
+        dEnv.addTokenFunction("sort", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.sort(false);
+        }), 1, false);
+        dEnv.addTokenFunction("sort!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.sort(false);
+        }), 1, true);
         dEnv.addTokenFunction("++", ((args, env) -> {
             boolean flag = false;
             for (Token arg : args)
@@ -581,5 +614,96 @@ public class Core extends Module {
             }
             return result;
         }), 1, true);
+        dEnv.addTokenFunction("map", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            List<Token> result = new ArrayList<>();
+            List<Token> tokens = ((DList) args.get(1)).toList();
+            for (int i = 0; i < tokens.size(); ++i) {
+                List<Token> parameters = new ArrayList<>();
+                parameters.add(tokens.get(i));
+                for (int j = 1; j < args.size() - 1; ++j) {
+                    if (!DType.isList(args.get(j + 1)))
+                        throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    parameters.add(((DList) args.get(j + 1)).get(i));
+                }
+                AstNode asts = AstNode.nullAst.copy();
+                for (Token arg : parameters)
+                    asts.add(new AstNode(arg));
+                result.add(((DFunction) args.get(0)).call(asts, env.createChild()));
+            }
+            return DList.valueOf(result);
+        }), 2, true);
+        dEnv.addTokenFunction("for-each", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            List<Token> tokens = ((DList) args.get(1)).toList();
+            for (int i = 0; i < tokens.size(); ++i) {
+                List<Token> parameters = new ArrayList<>();
+                parameters.add(tokens.get(i));
+                for (int j = 1; j < args.size() - 1; ++j) {
+                    if (!DType.isList(args.get(j + 1)))
+                        throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    parameters.add(((DList) args.get(j + 1)).get(i));
+                }
+                AstNode asts = AstNode.nullAst.copy();
+                for (Token arg : parameters)
+                    asts.add(new AstNode(arg));
+                ((DFunction) args.get(0)).call(asts, env.createChild());
+            }
+            return DWord.WORD_NIL;
+        }), 2, true);
+        dEnv.addTokenFunction("foldr", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(2)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            var result = args.get(1);
+            List<Token> tokens = ((DList) args.get(2)).toList();
+            for (int i = tokens.size() - 1; i >= 0; --i) {
+                AstNode asts = AstNode.nullAst.copy();
+                asts.add(new AstNode(tokens.get(i)));
+                asts.add(new AstNode(result));
+                result = ((DFunction) args.get(0)).call(asts, env.createChild());
+            }
+            return result;
+        }), 3, false);
+        dEnv.addTokenFunction("foldl", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(2)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            var result = args.get(1);
+            List<Token> tokens = ((DList) args.get(2)).toList();
+            for (int i = tokens.size() - 1; i >= 0; --i) {
+                AstNode asts = AstNode.nullAst.copy();
+                asts.add(new AstNode(result));
+                asts.add(new AstNode(tokens.get(i)));
+                result = ((DFunction) args.get(0)).call(asts, env.createChild());
+            }
+            return result;
+        }), 3, false);
+        dEnv.addTokenFunction("filter", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            List<Token> result = new ArrayList<>();
+            List<Token> tokens = ((DList) args.get(1)).toList();
+            for (Token token : tokens) {
+                AstNode asts = AstNode.nullAst.copy();
+                asts.add(new AstNode(token));
+                Token condition = ((DFunction) args.get(0)).call(asts, env.createChild());
+                if (!DType.isBool(condition))
+                    throw new DevoreCastException(condition.type(), "list");
+                if (((DBool) condition).bool)
+                    result.add(token);
+            }
+            return DList.valueOf(result);
+        }), 2, false);
     }
 }

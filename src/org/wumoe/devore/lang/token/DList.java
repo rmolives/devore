@@ -1,6 +1,8 @@
 package org.wumoe.devore.lang.token;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DList extends Token {
@@ -12,6 +14,20 @@ public class DList extends Token {
 
     public static DList valueOf(List<Token> tokens) {
         return new DList(tokens);
+    }
+
+    public void clear() {
+        tokens.clear();
+    }
+
+    public DList sort(boolean force) {
+        if (force) {
+            tokens.sort(Token::compareTo);
+            return this;
+        }
+        List<Token> newList = new ArrayList<>(tokens);
+        newList.sort(Token::compareTo);
+        return DList.valueOf(newList);
     }
 
     public DList add(Token t, boolean force) {
