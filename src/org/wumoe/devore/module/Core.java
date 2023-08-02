@@ -575,6 +575,6 @@ public class Core extends Module {
                 result = DString.valueOf(builder.toString());
             }
             return result;
-        }), 1, false);
+        }), 1, true);
     }
 }
