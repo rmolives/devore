@@ -1,0 +1,735 @@
+package org.wumoe.devore.module;
+
+import org.wumoe.devore.Devore;
+import org.wumoe.devore.exception.DevoreCastException;
+import org.wumoe.devore.lang.DType;
+import org.wumoe.devore.lang.Env;
+import org.wumoe.devore.lang.Evaluator;
+import org.wumoe.devore.lang.token.*;
+import org.wumoe.devore.parser.AstNode;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.function.BiFunction;
+
+public class Core extends Module {
+    @Override
+    public void init(Env dEnv) {
+        dEnv.put("nil", DWord.WORD_NIL);
+        dEnv.put("true", DBool.TRUE);
+        dEnv.put("false", DBool.FLASE);
+        dEnv.addTokenFunction("+", ((args, env) -> {
+            if (!DType.isArithmetic(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "arithmetic");
+            DArithmetic arithmetic = (DArithmetic) args.get(0);
+            for (int i = 1; i < args.size(); ++i) {
+                if (!DType.isArithmetic(args.get(i)))
+                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
+                arithmetic = arithmetic.add((DArithmetic) args.get(i));
+            }
+            return arithmetic;
+        }), 1, true);
+        dEnv.addTokenFunction("-", ((args, env) -> {
+            if (!DType.isArithmetic(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "arithmetic");
+            DArithmetic arithmetic = (DArithmetic) args.get(0);
+            for (int i = 1; i < args.size(); ++i) {
+                if (!DType.isArithmetic(args.get(i)))
+                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
+                arithmetic = arithmetic.sub((DArithmetic) args.get(i));
+            }
+            return arithmetic;
+        }), 1, true);
+        dEnv.addTokenFunction("*", ((args, env) -> {
+            if (!DType.isArithmetic(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "arithmetic");
+            DArithmetic arithmetic = (DArithmetic) args.get(0);
+            for (int i = 1; i < args.size(); ++i) {
+                if (!DType.isArithmetic(args.get(i)))
+                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
+                arithmetic = arithmetic.mul((DArithmetic) args.get(i));
+            }
+            return arithmetic;
+        }), 1, true);
+        dEnv.addTokenFunction("/", ((args, env) -> {
+            if (!DType.isArithmetic(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "arithmetic");
+            DArithmetic arithmetic = (DArithmetic) args.get(0);
+            for (int i = 1; i < args.size(); ++i) {
+                if (!DType.isArithmetic(args.get(i)))
+                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
+                arithmetic = arithmetic.div((DArithmetic) args.get(i));
+            }
+            return arithmetic;
+        }), 1, true);
+        dEnv.addTokenFunction("pow", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            if (!DType.isNumber(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            return ((DNumber) args.get(0)).pow(((DNumber) args.get(1)));
+        }), 2, false);
+        dEnv.addTokenFunction("average", ((args, env) -> {
+            DFloat num = DFloat.valueOf(0);
+            for (Token arg : args) {
+                if (!DType.isNumber(arg))
+                    throw new DevoreCastException(arg.type(), "number");
+                num = DFloat.valueOf(num.add((DNumber) arg).toBigDecimal());
+            }
+            return num.div(DFloat.valueOf(args.size()));
+        }), 1, true);
+        dEnv.addTokenFunction("mod", ((args, env) -> {
+            if (!DType.isInt(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            return ((DInt) args.get(0)).mod(((DInt) args.get(1)));
+        }), 2, false);
+        dEnv.addTokenFunction("abs", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).abs();
+        }), 1, false);
+        dEnv.addTokenFunction("sqrt", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).sqrt();
+        }), 1, false);
+        dEnv.addTokenFunction("sin", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).sin();
+        }), 1, false);
+        dEnv.addTokenFunction("cos", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).cos();
+        }), 1, false);
+        dEnv.addTokenFunction("tan", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).tan();
+        }), 1, false);
+        dEnv.addTokenFunction("ceil", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).ceil();
+        }), 1, false);
+        dEnv.addTokenFunction("floor", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).floor();
+        }), 1, false);
+        dEnv.addTokenFunction("require", ((args, env) -> {
+            for (Token t : args)
+                env.load(t.toString());
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addTokenFunction("println", ((args, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token t : args)
+                builder.append(t);
+            env.io.out.println(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addTokenFunction("print", ((args, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token t : args)
+                builder.append(t);
+            env.io.out.print(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addTokenFunction("error-println", ((args, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token t : args)
+                builder.append(t);
+            env.io.err.println(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addTokenFunction("error-print", ((args, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (Token arg : args)
+                builder.append(arg);
+            env.io.err.print(builder);
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addTokenFunction("undef", ((args, env) -> {
+            for (Token arg : args)
+                env.remove(arg.toString());
+            return DWord.WORD_NIL;
+        }), 1, true);
+        dEnv.addSymbolFunction("def", ((ast, env) -> {
+            if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
+                Env newEnv = env.createChild();
+                Token result = DWord.WORD_NIL;
+                for (int i = 0; i < ast.size(); ++i)
+                    result = Evaluator.eval(newEnv, ast.get(i).copy());
+                env.put(ast.get(0).op.toString(), result);
+            } else {
+                List<String> parameters = new ArrayList<>();
+                for (AstNode parameter : ast.get(0).children)
+                    parameters.add(parameter.op.toString());
+                List<AstNode> asts = new ArrayList<>();
+                for (int i = 1; i < ast.size(); ++i)
+                    asts.add(ast.get(i).copy());
+                env.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
+                    Env newEnv = env.createChild();
+                    for (int i = 0; i < parameters.size(); ++i)
+                        newEnv.put(parameters.get(i), cArgs.get(i));
+                    Token result = DWord.WORD_NIL;
+                    for (AstNode astNode : asts)
+                        result = Evaluator.eval(newEnv, astNode.copy());
+                    return result;
+                }), parameters.size(), false);
+            }
+            return DWord.WORD_NIL;
+        }), 2, true);
+        dEnv.addSymbolFunction("set!", ((ast, env) -> {
+            if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
+                Env newEnv = env.createChild();
+                Token result = DWord.WORD_NIL;
+                for (int i = 0; i < ast.size(); ++i)
+                    result = Evaluator.eval(newEnv, ast.get(i).copy());
+                env.set(ast.get(0).op.toString(), result);
+            } else {
+                List<String> parameters = new ArrayList<>();
+                for (AstNode parameter : ast.get(0).children)
+                    parameters.add(parameter.op.toString());
+                List<AstNode> asts = new ArrayList<>();
+                for (int i = 1; i < ast.size(); ++i)
+                    asts.add(ast.get(i).copy());
+                env.setTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
+                    Env newEnv = env.createChild();
+                    for (int i = 0; i < parameters.size(); ++i)
+                        newEnv.put(parameters.get(i), cArgs.get(i));
+                    Token result = DWord.WORD_NIL;
+                    for (AstNode astNode : asts)
+                        result = Evaluator.eval(newEnv, astNode.copy());
+                    return result;
+                }), parameters.size(), false);
+            }
+            return DWord.WORD_NIL;
+        }), 2, true);
+        dEnv.addSymbolFunction("let", ((ast, env) -> {
+            Env newEnv = env.createChild();
+            Token result = DWord.WORD_NIL;
+            for (AstNode node : ast.get(0).children) {
+                if ("apply".equals(node.op.toString())) {
+                    List<String> parameters = new ArrayList<>();
+                    List<AstNode> asts = new ArrayList<>();
+                    for (AstNode parameterNode : node.get(0).children)
+                        parameters.add(parameterNode.op.toString());
+                    for (int i = 1; i < node.size(); ++i)
+                        asts.add(node.get(i).copy());
+                    newEnv.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
+                        Env newInEnv = env.createChild();
+                        for (int i = 0; i < parameters.size(); ++i)
+                            newInEnv.put(parameters.get(i), cArgs.get(i));
+                        Token inResult = DWord.WORD_NIL;
+                        for (AstNode astNode : asts)
+                            inResult = Evaluator.eval(newInEnv, astNode.copy());
+                        return inResult;
+                    }), parameters.size(), false);
+                } else {
+                    Token value = DWord.WORD_NIL;
+                    for (AstNode e : node.children)
+                        value = Evaluator.eval(env, e.copy());
+                    newEnv.put(node.op.toString(), value);
+                }
+            }
+            for (int i = 1; i < ast.size(); ++i)
+                result = Evaluator.eval(newEnv, ast.get(i).copy());
+            return result;
+        }), 2, true);
+        dEnv.addSymbolFunction("let*", ((ast, env) -> {
+            Env newEnv = env.createChild();
+            Token result = DWord.WORD_NIL;
+            for (AstNode node : ast.get(0).children) {
+                if ("apply".equals(node.op.toString())) {
+                    List<String> parameters = new ArrayList<>();
+                    List<AstNode> asts = new ArrayList<>();
+                    for (AstNode parameterNode : node.get(0).children)
+                        parameters.add(parameterNode.op.toString());
+                    for (int i = 1; i < node.size(); ++i)
+                        asts.add(node.get(i).copy());
+                    newEnv.addTokenFunction(ast.get(0).op.toString(), ((cArgs, cEnv) -> {
+                        Env newInEnv = newEnv.createChild();
+                        for (int i = 0; i < parameters.size(); ++i)
+                            newInEnv.put(parameters.get(i), cArgs.get(i));
+                        Token inResult = DWord.WORD_NIL;
+                        for (AstNode astNode : asts)
+                            inResult = Evaluator.eval(newInEnv, astNode.copy());
+                        return inResult;
+                    }), parameters.size(), false);
+                } else {
+                    Token value = DWord.WORD_NIL;
+                    for (AstNode e : node.children)
+                        value = Evaluator.eval(newEnv, e.copy());
+                    newEnv.put(node.op.toString(), value);
+                }
+            }
+            for (int i = 1; i < ast.size(); ++i)
+                result = Evaluator.eval(newEnv, ast.get(i).copy());
+            return result;
+        }), 2, true);
+        dEnv.addSymbolFunction("lambda", ((ast, env) -> {
+            List<String> parameters = new ArrayList<>();
+            if (!ast.get(0).isNull()) {
+                parameters.add(ast.get(0).op.toString());
+                for (AstNode parameter : ast.get(0).children)
+                    parameters.add(parameter.op.toString());
+            }
+            List<AstNode> asts = new ArrayList<>();
+            for (int i = 1; i < ast.size(); ++i)
+                asts.add(ast.get(i).copy());
+            BiFunction<AstNode, Env, Token> df = (inAst, inEnv) -> {
+                List<Token> args = new ArrayList<>();
+                for (int i = 0; i < inAst.size(); ++i) {
+                    inAst.get(i).op = Evaluator.eval(inEnv, inAst.get(i).copy());
+                    args.add(inAst.get(i).op);
+                }
+                Env newInEnv = env.createChild();
+                for (int i = 0; i < parameters.size(); ++i)
+                    newInEnv.put(parameters.get(i), args.get(i));
+                Token inResult = DWord.WORD_NIL;
+                for (AstNode astNode : asts)
+                    inResult = Evaluator.eval(newInEnv, astNode.copy());
+                return inResult;
+            };
+            return DFunction.newFunction(df, parameters.size(), false);
+        }), 2, true);
+        dEnv.addTokenFunction("apply", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            List<Token> parameters = new ArrayList<>();
+            for (int i = 1; i < args.size(); ++i)
+                parameters.add(args.get(i));
+            AstNode asts = AstNode.nullAst.copy();
+            for (Token arg : parameters)
+                asts.add(new AstNode(arg));
+            return ((DFunction) args.get(0)).call(asts, env.createChild());
+        }), 1, true);
+        dEnv.addTokenFunction(">", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 2, false);
+        dEnv.addTokenFunction("<", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) < 0)), 2, false);
+        dEnv.addTokenFunction("=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) == 0)), 2, false);
+        dEnv.addTokenFunction("/=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) != 0)), 2, false);
+        dEnv.addTokenFunction(">=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) >= 0)), 2, false);
+        dEnv.addTokenFunction("<=", ((args, env) ->
+                DBool.valueOf(args.get(0).compareTo(args.get(1)) <= 0)), 2, false);
+        dEnv.addSymbolFunction("if", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            Token condition = Evaluator.eval(newEnv, ast.get(0).copy());
+            if (!DType.isBool(condition))
+                throw new DevoreCastException(condition.type(), "bool");
+            if (((DBool) condition).bool)
+                result = Evaluator.eval(newEnv, ast.get(1).copy());
+            else if (ast.size() > 2)
+                result = Evaluator.eval(newEnv, ast.get(2).copy());
+            return result;
+        }, 2, true);
+        dEnv.addSymbolFunction("cond", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            for (AstNode node : ast.children) {
+                if (DType.isOp(node.op) && "else".equals(node.op.toString())) {
+                    result = Evaluator.eval(newEnv, node.get(0).copy());
+                    break;
+                } else {
+                    Token condition = Evaluator.eval(newEnv, node.get(0).copy());
+                    if (!DType.isBool(condition))
+                        throw new DevoreCastException(condition.type(), "bool");
+                    if (((DBool) condition).bool) {
+                        Token r = DWord.WORD_NIL;
+                        for (int i = 1; i < node.size(); ++i)
+                            r = Evaluator.eval(newEnv, node.get(i).copy());
+                        result = r;
+                        break;
+                    }
+                }
+            }
+            return result;
+        }, 2, true);
+        dEnv.addSymbolFunction("begin", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            for (AstNode node : ast.children)
+                result = Evaluator.eval(newEnv, node.copy());
+            return result;
+        }, 2, true);
+        dEnv.addSymbolFunction("while", (ast, env) -> {
+            Token result = DWord.WORD_NIL;
+            Env newEnv = env.createChild();
+            Token condition = Evaluator.eval(newEnv, ast.get(0).copy());
+            if (!DType.isBool(condition))
+                throw new DevoreCastException(condition.type(), "bool");
+            while (((DBool) condition).bool) {
+                for (int i = 1; i < ast.size(); ++i)
+                    result = Evaluator.eval(newEnv, ast.get(i).copy());
+                condition = Evaluator.eval(newEnv, ast.get(0).copy());
+            }
+            return result;
+        }, 2, true);
+        dEnv.addTokenFunction("read-line", ((args, env) ->
+                DString.valueOf(new Scanner(env.io.in).nextLine())), 0, false);
+        dEnv.addTokenFunction("read-int", ((args, env) ->
+                DInt.valueOf(new Scanner(env.io.in).nextBigInteger())), 0, false);
+        dEnv.addTokenFunction("read-float", ((args, env) ->
+                DFloat.valueOf(new Scanner(env.io.in).nextBigDecimal())), 0, false);
+        dEnv.addTokenFunction("read-bool", ((args, env) ->
+                DBool.valueOf(new Scanner(env.io.in).nextBoolean())), 0, false);
+        dEnv.addTokenFunction("read", ((args, env) ->
+                DString.valueOf(new Scanner(env.io.in).next())), 0, false);
+        dEnv.addTokenFunction("newline", ((args, env) -> {
+            env.io.out.println();
+            return DWord.WORD_NIL;
+        }), 0, false);
+        dEnv.addTokenFunction("error-newline", ((args, env) -> {
+            env.io.err.println();
+            return DWord.WORD_NIL;
+        }), 0, false);
+        dEnv.addTokenFunction("and", ((args, env) -> {
+            for (Token arg : args) {
+                if (!DType.isBool(arg))
+                    throw new DevoreCastException(arg.type(), "bool");
+                if (!((DBool) arg).bool)
+                    return DBool.FLASE;
+            }
+            return DBool.TRUE;
+        }), 1, true);
+        dEnv.addTokenFunction("or", ((args, env) -> {
+            for (Token arg : args) {
+                if (!DType.isBool(arg))
+                    throw new DevoreCastException(arg.type(), "bool");
+                if (((DBool) arg).bool)
+                    return DBool.TRUE;
+            }
+            return DBool.FLASE;
+        }), 1, true);
+        dEnv.addTokenFunction("not", ((args, env) -> {
+            if (!DType.isBool(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "bool");
+            if (((DBool) args.get(0)).bool)
+                return DBool.FLASE;
+            return DBool.TRUE;
+        }), 1, false);
+        dEnv.addTokenFunction("random", ((args, env) -> {
+            if (!DType.isInt(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (args.size() > 1)
+                if (!DType.isInt(args.get(1)))
+                    throw new DevoreCastException(args.get(1).type(), "int");
+            BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.get(0)).toBigIntger();
+            BigInteger end = args.size() == 1 ? ((DInt) args.get(0)).toBigIntger() : ((DInt) args.get(1)).toBigIntger();
+            Random rand = new Random();
+            int scale = end.toString().length();
+            StringBuilder generated = new StringBuilder();
+            for (int i = 0; i < scale; ++i)
+                generated.append(rand.nextInt(10));
+            BigDecimal inputRangeStart = new BigDecimal("0").setScale(scale, RoundingMode.FLOOR);
+            BigDecimal inputRangeEnd =
+                    new BigDecimal(String.format("%0" + end.toString().length() + "d", 0).replace('0', '9')).setScale(
+                            scale,
+                            RoundingMode.FLOOR
+                    );
+            BigDecimal outputRangeStart = new BigDecimal(start).setScale(scale, RoundingMode.FLOOR);
+            BigDecimal outputRangeEnd = new BigDecimal(end).add(new BigDecimal("1")).setScale(scale, RoundingMode.FLOOR);
+            BigDecimal bd1 =
+                    new BigDecimal(new BigInteger(generated.toString())).setScale(scale, RoundingMode.FLOOR)
+                            .subtract(inputRangeStart);
+            BigDecimal bd2 = inputRangeEnd.subtract(inputRangeStart);
+            BigDecimal bd3 = bd1.divide(bd2, RoundingMode.FLOOR);
+            BigDecimal bd4 = outputRangeEnd.subtract(outputRangeStart);
+            BigDecimal bd5 = bd3.multiply(bd4);
+            BigDecimal bd6 = bd5.add(outputRangeStart);
+            BigInteger returnInteger = bd6.setScale(0, RoundingMode.FLOOR).toBigInteger();
+            returnInteger = returnInteger.compareTo(end) > 0 ? end : returnInteger;
+            return DInt.valueOf(returnInteger);
+        }), 1, true);
+        dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 1, true);
+        dEnv.addTokenFunction("car", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            return DBool.TRUE;
+        }), 1, false);
+        dEnv.addTokenFunction("list-contains", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            return DBool.valueOf(((DList) args.get(0)).contains(args.get(1)));
+        }), 2, false);
+        dEnv.addTokenFunction("list-get", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.get(((DInt) args.get(1)).toBigIntger().intValue());
+        }), 2, false);
+        dEnv.addTokenFunction("list-set", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), false);
+        }), 3, false);
+        dEnv.addTokenFunction("list-remove", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            if (!DType.isInt(args.get(1)))
+                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), false);
+            return list.remove(args.get(1), false);
+        }), 2, false);
+        dEnv.addTokenFunction("list-add", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.add(args.get(1), false);
+        }), 2, false);
+        dEnv.addTokenFunction("list-set!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            if (!DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), true);
+        }), 3, false);
+        dEnv.addTokenFunction("list-remove!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            if (!DType.isInt(args.get(1)))
+                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), true);
+            return list.remove(args.get(1), false);
+        }), 2, false);
+        dEnv.addTokenFunction("list-add!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.add(args.get(1), true);
+        }), 2, false);
+        dEnv.addTokenFunction("head", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.get(0);
+        }), 1, false);
+        dEnv.addTokenFunction("last", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            if (list.size() == 0)
+                return DWord.WORD_NIL;
+            return list.get(list.size() - 1);
+        }), 1, false);
+        dEnv.addTokenFunction("tail", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.subList(1, list.size());
+        }), 1, false);
+        dEnv.addTokenFunction("init", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.subList(0, list.size() - 1);
+        }), 1, false);
+        dEnv.addTokenFunction("length", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                return DInt.valueOf(args.get(0).toString().length());
+            return DInt.valueOf(((DList) args.get(0)).size());
+        }), 1, false);
+        dEnv.addTokenFunction("reverse", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            List<Token> temp = new ArrayList<>();
+            DList tokens = (DList) args.get(0);
+            for (int i = tokens.size() - 1; i >= 0; --i)
+                temp.add(tokens.get(i));
+            return DList.valueOf(new ArrayList<>(temp));
+        }), 1, false);
+        dEnv.addTokenFunction("reverse!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            List<Token> temp = new ArrayList<>();
+            DList tokens = (DList) args.get(0);
+            for (int i = tokens.size() - 1; i >= 0; --i)
+                temp.add(tokens.get(i));
+            tokens.clear();
+            for (Token t : temp)
+                tokens.add(t, true);
+            return tokens;
+        }), 1, false);
+        dEnv.addTokenFunction("sort", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.sort(false);
+        }), 1, false);
+        dEnv.addTokenFunction("sort!", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            DList list = (DList) args.get(0);
+            return list.sort(false);
+        }), 1, true);
+        dEnv.addTokenFunction("++", ((args, env) -> {
+            boolean flag = false;
+            for (Token arg : args)
+                if (DType.isList(arg)) {
+                    flag = true;
+                    break;
+                }
+            Token result;
+            if (flag) {
+                List<Token> list = new ArrayList<>();
+                for (Token arg : args) {
+                    if (DType.isList(arg))
+                        list.addAll(((DList) arg).toList());
+                    else
+                        list.add(arg);
+                }
+                result = DList.valueOf(list);
+            } else {
+                StringBuilder builder = new StringBuilder();
+                for (Token arg : args)
+                    builder.append(arg.toString());
+                result = DString.valueOf(builder.toString());
+            }
+            return result;
+        }), 1, true);
+        dEnv.addTokenFunction("map", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            List<Token> result = new ArrayList<>();
+            List<Token> tokens = ((DList) args.get(1)).toList();
+            for (int i = 0; i < tokens.size(); ++i) {
+                List<Token> parameters = new ArrayList<>();
+                parameters.add(tokens.get(i));
+                for (int j = 1; j < args.size() - 1; ++j) {
+                    if (!DType.isList(args.get(j + 1)))
+                        throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    parameters.add(((DList) args.get(j + 1)).get(i));
+                }
+                AstNode asts = AstNode.nullAst.copy();
+                for (Token arg : parameters)
+                    asts.add(new AstNode(arg));
+                result.add(((DFunction) args.get(0)).call(asts, env.createChild()));
+            }
+            return DList.valueOf(result);
+        }), 2, true);
+        dEnv.addTokenFunction("for-each", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            List<Token> tokens = ((DList) args.get(1)).toList();
+            for (int i = 0; i < tokens.size(); ++i) {
+                List<Token> parameters = new ArrayList<>();
+                parameters.add(tokens.get(i));
+                for (int j = 1; j < args.size() - 1; ++j) {
+                    if (!DType.isList(args.get(j + 1)))
+                        throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    parameters.add(((DList) args.get(j + 1)).get(i));
+                }
+                AstNode asts = AstNode.nullAst.copy();
+                for (Token arg : parameters)
+                    asts.add(new AstNode(arg));
+                ((DFunction) args.get(0)).call(asts, env.createChild());
+            }
+            return DWord.WORD_NIL;
+        }), 2, true);
+        dEnv.addTokenFunction("foldr", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(2)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            var result = args.get(1);
+            List<Token> tokens = ((DList) args.get(2)).toList();
+            for (int i = tokens.size() - 1; i >= 0; --i) {
+                AstNode asts = AstNode.nullAst.copy();
+                asts.add(new AstNode(tokens.get(i)));
+                asts.add(new AstNode(result));
+                result = ((DFunction) args.get(0)).call(asts, env.createChild());
+            }
+            return result;
+        }), 3, false);
+        dEnv.addTokenFunction("foldl", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(2)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            var result = args.get(1);
+            List<Token> tokens = ((DList) args.get(2)).toList();
+            for (int i = tokens.size() - 1; i >= 0; --i) {
+                AstNode asts = AstNode.nullAst.copy();
+                asts.add(new AstNode(result));
+                asts.add(new AstNode(tokens.get(i)));
+                result = ((DFunction) args.get(0)).call(asts, env.createChild());
+            }
+            return result;
+        }), 3, false);
+        dEnv.addTokenFunction("filter", ((args, env) -> {
+            if (!DType.isFunction(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "function");
+            if (!DType.isList(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "list");
+            List<Token> result = new ArrayList<>();
+            List<Token> tokens = ((DList) args.get(1)).toList();
+            for (Token token : tokens) {
+                AstNode asts = AstNode.nullAst.copy();
+                asts.add(new AstNode(token));
+                Token condition = ((DFunction) args.get(0)).call(asts, env.createChild());
+                if (!DType.isBool(condition))
+                    throw new DevoreCastException(condition.type(), "list");
+                if (((DBool) condition).bool)
+                    result.add(token);
+            }
+            return DList.valueOf(result);
+        }), 2, false);
+        dEnv.addTokenFunction("range", ((args, env) -> {
+            if (!DType.isInt(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (args.size() > 1 && !DType.isInt(args.get(1)))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            if (args.size() > 2 && !DType.isInt(args.get(2)))
+                throw new DevoreCastException(args.get(2).type(), "int");
+            BigInteger start = args.size() > 1 ? ((DInt) args.get(0)).toBigIntger() : BigInteger.ZERO;
+            BigInteger end = args.size() > 1 ? ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE)
+                    : ((DInt) args.get(0)).toBigIntger().subtract(BigInteger.ONE);
+            BigInteger step = args.size() > 2 ? ((DInt) args.get(2)).toBigIntger() : BigInteger.ONE;
+            BigInteger size = end.subtract(start).divide(step);
+            List<Token> list = new ArrayList<>();
+            BigInteger i = BigInteger.ZERO;
+            while (i.compareTo(size) < 1) {
+                list.add(DInt.valueOf(start.add(i.multiply(step))));
+                i = i.add(BigInteger.ONE);
+            }
+            return DList.valueOf(list);
+        }), 1, true);
+    }
+}
