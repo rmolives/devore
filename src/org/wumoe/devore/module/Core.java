@@ -446,6 +446,11 @@ public class Core extends Module {
                 throw new DevoreCastException(args.get(0).type(), "list");
             return DBool.TRUE;
         }), 1, false);
+        dEnv.addTokenFunction("list-contains", ((args, env) -> {
+            if (!DType.isList(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            return DBool.valueOf(((DList) args.get(0)).contains(args.get(1)));
+        }), 2, false);
         dEnv.addTokenFunction("list-get", ((args, env) -> {
             if (!DType.isList(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "list");

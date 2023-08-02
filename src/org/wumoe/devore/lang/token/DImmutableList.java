@@ -52,6 +52,11 @@ public class DImmutableList extends DList {
     }
 
     @Override
+    public boolean contains(Token t) {
+        return tokens.contains(t);
+    }
+
+    @Override
     public int size() {
         return tokens.size();
     }
