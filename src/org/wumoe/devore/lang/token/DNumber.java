@@ -11,6 +11,8 @@ public abstract class DNumber extends DArithmetic {
 
     public abstract DNumber floor();
 
+    public abstract DNumber sqrt();
+
     public abstract DNumber pow(DNumber n);
 
     public abstract DNumber abs();

@@ -93,6 +93,11 @@ public class Core extends Module {
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).abs();
         }), 1, false);
+        dEnv.addTokenFunction("sqrt", ((args, env) -> {
+            if (!DType.isNumber(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).sqrt();
+        }), 1, false);
         dEnv.addTokenFunction("sin", ((args, env) -> {
             if (!DType.isNumber(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "number");

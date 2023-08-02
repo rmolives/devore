@@ -96,6 +96,11 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public DNumber sqrt() {
+        return DFloat.valueOf(num).sqrt();
+    }
+
+    @Override
     public DNumber pow(DNumber n) {
         return DFloat.valueOf(this.num).pow(n);
     }

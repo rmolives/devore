@@ -109,6 +109,12 @@ public class DFloat extends DNumber {
     }
 
     @Override
+    public DNumber sqrt() {
+        DFloat result = DFloat.valueOf(BigDecimalMath.sqrt(num, MathContext.DECIMAL128));
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+    }
+
+    @Override
     public DNumber pow(DNumber n) {
         DFloat result = DFloat.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
