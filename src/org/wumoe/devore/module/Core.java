@@ -19,6 +19,7 @@ import java.util.function.BiFunction;
 public class Core extends Module {
     @Override
     public void init(Env dEnv) {
+        dEnv.put("nil", DWord.WORD_NIL);
         dEnv.put("true", DBool.TRUE);
         dEnv.put("false", DBool.FLASE);
         dEnv.addTokenFunction("+", ((args, env) -> {
