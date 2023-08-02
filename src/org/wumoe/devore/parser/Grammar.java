@@ -8,7 +8,7 @@ import org.wumoe.devore.lang.token.Token;
 import java.util.ArrayDeque;
 import java.util.List;
 
-public class Parse {
+public class Grammar {
     public static AstNode parser(List<Token> tokens) {
         AstNode ast = null;
         ArrayDeque<AstNode> stack = new ArrayDeque<>();

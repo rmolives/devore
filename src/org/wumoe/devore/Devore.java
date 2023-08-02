@@ -7,7 +7,7 @@ import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.module.Core;
 import org.wumoe.devore.module.Module;
 import org.wumoe.devore.parser.Lexer;
-import org.wumoe.devore.parser.Parse;
+import org.wumoe.devore.parser.Grammar;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +29,7 @@ public class Devore {
         List<String> codes = Lexer.splitCode(code);
         Token result = DWord.WORD_NIL;
         for (String exp : codes)
-            result = Evaluator.eval(env, Parse.parser(Lexer.lexer(exp)));
+            result = Evaluator.eval(env, Grammar.parser(Lexer.lexer(exp)));
         return result;
     }
 }
