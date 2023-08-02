@@ -31,6 +31,11 @@ public class DFloat extends DNumber {
         return new DFloat(n);
     }
 
+    private static boolean isInt(BigDecimal decimal) {
+        BigDecimal stripped = decimal.stripTrailingZeros();
+        return stripped.scale() <= 0;
+    }
+
     @Override
     public DArithmetic add(DArithmetic a) {
         DFloat result;
@@ -105,7 +110,7 @@ public class DFloat extends DNumber {
 
     @Override
     public DNumber pow(DNumber n) {
-        DFloat result =DFloat.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+        DFloat result = DFloat.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
@@ -147,10 +152,5 @@ public class DFloat extends DNumber {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof DFloat n && num.compareTo(n.num) == 0;
-    }
-
-    private static boolean isInt(BigDecimal decimal) {
-        BigDecimal stripped = decimal.stripTrailingZeros();
-        return stripped.scale() <= 0;
     }
 }

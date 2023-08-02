@@ -1,8 +1,5 @@
 package org.wumoe.devore.lang.token;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 public abstract class DNumber extends DArithmetic {
     public abstract DNumber sin();
 

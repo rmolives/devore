@@ -1,10 +1,10 @@
 package org.wumoe.devore.module;
 
 import org.wumoe.devore.exception.DevoreCastException;
+import org.wumoe.devore.lang.DType;
 import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.Evaluator;
 import org.wumoe.devore.lang.token.*;
-import org.wumoe.devore.lang.DType;
 import org.wumoe.devore.parser.AstNode;
 
 import java.math.BigDecimal;

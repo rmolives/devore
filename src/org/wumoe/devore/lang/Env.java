@@ -6,7 +6,10 @@ import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.parser.AstNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 public class Env {

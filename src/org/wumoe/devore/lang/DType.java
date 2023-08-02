@@ -18,6 +18,7 @@ public class DType {
     public static boolean isFloat(Token t) {
         return t instanceof DFloat;
     }
+
     public static boolean isBool(Token t) {
         return t instanceof DBool;
     }

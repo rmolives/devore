@@ -1,7 +1,7 @@
 package org.wumoe.devore.parser;
 
-import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.lang.DType;
+import org.wumoe.devore.lang.token.Token;
 
 import java.util.ArrayList;
 import java.util.List;

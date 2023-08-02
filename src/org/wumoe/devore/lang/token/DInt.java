@@ -1,11 +1,9 @@
 package org.wumoe.devore.lang.token;
 
-import ch.obermuhlner.math.big.BigDecimalMath;
 import org.wumoe.devore.exception.DevoreRuntimeException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 
 public class DInt extends DNumber {
     public final BigInteger num;
