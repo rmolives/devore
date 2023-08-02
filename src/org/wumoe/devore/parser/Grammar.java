@@ -9,7 +9,7 @@ import java.util.ArrayDeque;
 import java.util.List;
 
 public class Grammar {
-    public static AstNode parser(List<Token> tokens) {
+    public static AstNode grammar(List<Token> tokens) {
         AstNode ast = null;
         ArrayDeque<AstNode> stack = new ArrayDeque<>();
         int state = -1;

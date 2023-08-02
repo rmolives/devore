@@ -29,7 +29,7 @@ public class Devore {
         List<String> codes = Lexer.splitCode(code);
         Token result = DWord.WORD_NIL;
         for (String exp : codes)
-            result = Evaluator.eval(env, Grammar.parser(Lexer.lexer(exp)));
+            result = Evaluator.eval(env, Grammar.grammar(Lexer.lexer(exp)));
         return result;
     }
 }
