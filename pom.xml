@@ -8,21 +8,6 @@
     <artifactId>devore</artifactId>
     <version>0.1</version>
 
-    <url>https://github.com/wumoe-community/devore</url>
-    <description>This is the interpreter of Devore language, a dialect of Lisp, run on JVM platform.</description>
-    <licenses>
-        <license>
-            <name>GNU General Public License, Version 3.0</name>
-            <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
-            <distribution>repo</distribution>
-            <comments>A business-friendly OSS license</comments>
-        </license>
-    </licenses>
-    <scm>
-        <url>https://github.com/wumoe-community/devore</url>
-        <connection>https://github.com/wumoe-community/devore.git</connection>
-    </scm>
-
     <dependencies>
         <dependency>
             <groupId>ch.obermuhlner</groupId>
