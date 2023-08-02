@@ -7,7 +7,7 @@ import org.wumoe.devore.parser.AstNode;
 public class Evaluator {
     public static Token eval(Env env, AstNode ast) {
         while (true) {
-            if (DType.isOp(ast.op) && env.contains(ast.op.str()))
+            if (env.contains(ast.op.str()))
                 ast.op = env.get(ast.op.str());
             else
                 break;
