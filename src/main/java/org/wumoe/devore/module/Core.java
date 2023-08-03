@@ -429,7 +429,7 @@ public class Core extends Module {
                 if (!DType.isInt(args.get(1)))
                     throw new DevoreCastException(args.get(1).type(), "int");
             BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.get(0)).toBigIntger();
-            BigInteger end = args.size() == 1 ? ((DInt) args.get(0)).toBigIntger() : ((DInt) args.get(1)).toBigIntger();
+            BigInteger end = args.size() == 1 ? ((DInt) args.get(0)).toBigIntger().subtract(BigInteger.ONE) : ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE);
             Random rand = new Random();
             int scale = end.toString().length();
             StringBuilder generated = new StringBuilder();
