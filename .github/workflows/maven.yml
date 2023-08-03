@@ -43,4 +43,4 @@ jobs:
         prerelease: false
         title: "Release ${{ env.RELEASE_VERSION }}"
         files: |
-          staging/*.jar
+          staging/devore*.jar

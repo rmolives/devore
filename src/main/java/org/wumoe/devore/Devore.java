@@ -32,7 +32,7 @@ public class Devore {
         moduleTable.put(name, module);
     }
 
-    public static void addInitModule(String name) {
+    public static void addDefaultLoadModule(String name) {
         initModule.add(name);
     }
 
