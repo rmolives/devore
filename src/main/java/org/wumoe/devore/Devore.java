@@ -9,6 +9,7 @@ import org.wumoe.devore.module.Module;
 import org.wumoe.devore.parser.Lexer;
 import org.wumoe.devore.parser.Parse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,18 @@ public class Devore {
         }
     };
 
+    public static List<String> initModule = new ArrayList<>() {
+        {
+            add("core");
+        }
+    };
+
     public static void addModule(String name, Module module) {
         moduleTable.put(name, module);
+    }
+
+    public static void addInitModule(String name) {
+        initModule.add(name);
     }
 
     public static Token call(Env env, String code) {

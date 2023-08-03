@@ -21,6 +21,8 @@ public class Env {
         this.table = table;
         this.father = father;
         this.io = io;
+        for (String name : Devore.initModule)
+            load(name);
     }
 
     public static Env newEnv(Map<String, Token> table, Env father) {
