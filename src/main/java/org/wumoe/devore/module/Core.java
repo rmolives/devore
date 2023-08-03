@@ -731,5 +731,40 @@ public class Core extends Module {
             }
             return DList.valueOf(list);
         }), 1, true);
+        dEnv.addTokenFunction("string->int", ((args, env) -> {
+            if (!DType.isString(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            return DInt.valueOf(new BigInteger(args.get(0).toString()));
+        }), 1, false);
+        dEnv.addTokenFunction("string->float", ((args, env) -> {
+            if (!DType.isString(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            return DFloat.valueOf(new BigDecimal(args.get(0).toString()));
+        }), 1, false);
+        dEnv.addTokenFunction("string->bool", ((args, env) -> {
+            if (!DType.isString(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            return "true".equals(args.get(0).toString()) ? DBool.TRUE : DBool.FLASE;
+        }), 1, false);
+        dEnv.addTokenFunction("->string", ((args, env) -> DString.valueOf(args.get(0).toString())), 1, false);
+        dEnv.addTokenFunction("string->chars", ((args, env) -> {
+            if (!DType.isString(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            char[] chars = args.get(0).toString().toCharArray();
+            List<Token> tokens = new ArrayList<>();
+            for (char c : chars)
+                tokens.add(DString.valueOf(String.valueOf(c)));
+            return DList.valueOf(tokens);
+        }), 1, false);
+        dEnv.addTokenFunction("char->ascii", ((args, env) -> {
+            if (!DType.isString(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            return DInt.valueOf((int) args.get(0).toString().charAt(0));
+        }), 1, false);
+        dEnv.addTokenFunction("ascii->char", ((args, env) -> {
+            if (!DType.isInt(args.get(0)))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            return DString.valueOf(String.valueOf((char) ((DInt) args.get(0)).toBigIntger().intValue()));
+        }), 1, false);
     }
 }
