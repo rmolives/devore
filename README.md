@@ -22,7 +22,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
         (if (good-enough guess)
             guess
             (sqrt-iter (improve guess))))
-        (sqrt-iter 1.0))
+    (sqrt-iter 1.0))
 (println (sqrt 81))
 ```
 
