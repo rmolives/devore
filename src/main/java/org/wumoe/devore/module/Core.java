@@ -1,6 +1,5 @@
 package org.wumoe.devore.module;
 
-import org.wumoe.devore.Devore;
 import org.wumoe.devore.exception.DevoreCastException;
 import org.wumoe.devore.lang.DType;
 import org.wumoe.devore.lang.Env;
