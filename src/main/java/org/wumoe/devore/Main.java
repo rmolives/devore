@@ -2,6 +2,7 @@ package org.wumoe.devore;
 
 import org.wumoe.devore.lang.Env;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,6 @@ public class Main {
         else if ("--version".equals(args[0]) || "-v".equals(args[0]))
             System.out.println("Devore v" + Devore.VERSION + ".\nWuMoe Community.");
         else
-            Devore.call(Env.newEnv(), Files.readString(Path.of(System.getProperty("user.dir") + args[0])));
+            Devore.call(Env.newEnv(), Files.readString(Path.of(System.getProperty("user.dir") + File.separator + args[0])));
     }
 }
