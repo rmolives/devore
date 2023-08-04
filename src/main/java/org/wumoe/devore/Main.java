@@ -13,6 +13,6 @@ public class Main {
         else if ("--version".equals(args[0]) || "-v".equals(args[0]))
             System.out.println("Devore v" + Devore.VERSION + ".\nWuMoe Community.");
         else
-            Devore.call(Env.newEnv(), Files.readString(Path.of(args[0])));
+            Devore.call(Env.newEnv(), Files.readString(Path.of(System.getProperty("user.dir") + args[0])));
     }
 }
