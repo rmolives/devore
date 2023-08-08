@@ -37,6 +37,8 @@ public class Core extends Module {
             if (!DType.isArithmetic(args.get(0)))
                 throw new DevoreCastException(args.get(0).type(), "arithmetic");
             DArithmetic arithmetic = (DArithmetic) args.get(0);
+            if (args.size() == 1)
+                return DInt.valueOf(0).sub(arithmetic);
             for (int i = 1; i < args.size(); ++i) {
                 if (!DType.isArithmetic(args.get(i)))
                     throw new DevoreCastException(args.get(i).type(), "arithmetic");
