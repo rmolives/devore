@@ -1,7 +1,6 @@
 package org.wumoe.devore.module;
 
 import org.wumoe.devore.exception.DevoreCastException;
-import org.wumoe.devore.lang.DType;
 import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.Evaluator;
 import org.wumoe.devore.lang.token.*;
@@ -23,106 +22,102 @@ public class Core extends Module {
         dEnv.put("true", DBool.TRUE);
         dEnv.put("false", DBool.FLASE);
         dEnv.addTokenFunction("+", ((args, env) -> {
-            if (!DType.isArithmetic(args.get(0)))
+            if (!(args.get(0) instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.get(0).type(), "arithmetic");
-            DArithmetic arithmetic = (DArithmetic) args.get(0);
             for (int i = 1; i < args.size(); ++i) {
-                if (!DType.isArithmetic(args.get(i)))
+                if (!(args.get(i) instanceof DArithmetic))
                     throw new DevoreCastException(args.get(i).type(), "arithmetic");
                 arithmetic = arithmetic.add((DArithmetic) args.get(i));
             }
             return arithmetic;
         }), 1, true);
         dEnv.addTokenFunction("-", ((args, env) -> {
-            if (!DType.isArithmetic(args.get(0)))
+            if (!(args.get(0) instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.get(0).type(), "arithmetic");
-            DArithmetic arithmetic = (DArithmetic) args.get(0);
             if (args.size() == 1)
                 return DInt.valueOf(0).sub(arithmetic);
             for (int i = 1; i < args.size(); ++i) {
-                if (!DType.isArithmetic(args.get(i)))
+                if (!(args.get(i) instanceof DArithmetic))
                     throw new DevoreCastException(args.get(i).type(), "arithmetic");
                 arithmetic = arithmetic.sub((DArithmetic) args.get(i));
             }
             return arithmetic;
         }), 1, true);
         dEnv.addTokenFunction("*", ((args, env) -> {
-            if (!DType.isArithmetic(args.get(0)))
+            if (!(args.get(0) instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.get(0).type(), "arithmetic");
-            DArithmetic arithmetic = (DArithmetic) args.get(0);
             for (int i = 1; i < args.size(); ++i) {
-                if (!DType.isArithmetic(args.get(i)))
+                if (!(args.get(i) instanceof DArithmetic))
                     throw new DevoreCastException(args.get(i).type(), "arithmetic");
                 arithmetic = arithmetic.mul((DArithmetic) args.get(i));
             }
             return arithmetic;
         }), 1, true);
         dEnv.addTokenFunction("/", ((args, env) -> {
-            if (!DType.isArithmetic(args.get(0)))
+            if (!(args.get(0) instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.get(0).type(), "arithmetic");
-            DArithmetic arithmetic = (DArithmetic) args.get(0);
             for (int i = 1; i < args.size(); ++i) {
-                if (!DType.isArithmetic(args.get(i)))
+                if (!(args.get(i) instanceof DArithmetic))
                     throw new DevoreCastException(args.get(i).type(), "arithmetic");
                 arithmetic = arithmetic.div((DArithmetic) args.get(i));
             }
             return arithmetic;
         }), 1, true);
         dEnv.addTokenFunction("pow", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
-            if (!DType.isNumber(args.get(1)))
+            if (!(args.get(1) instanceof DNumber))
                 throw new DevoreCastException(args.get(1).type(), "number");
             return ((DNumber) args.get(0)).pow(((DNumber) args.get(1)));
         }), 2, false);
         dEnv.addTokenFunction("average", ((args, env) -> {
             DFloat num = DFloat.valueOf(0);
             for (Token arg : args) {
-                if (!DType.isNumber(arg))
+                if (!(arg instanceof DNumber))
                     throw new DevoreCastException(arg.type(), "number");
                 num = DFloat.valueOf(num.add((DNumber) arg).toBigDecimal());
             }
             return num.div(DFloat.valueOf(args.size()));
         }), 1, true);
         dEnv.addTokenFunction("mod", ((args, env) -> {
-            if (!DType.isInt(args.get(0)))
+            if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            if (!DType.isInt(args.get(1)))
+            if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             return ((DInt) args.get(0)).mod(((DInt) args.get(1)));
         }), 2, false);
         dEnv.addTokenFunction("abs", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).abs();
         }), 1, false);
         dEnv.addTokenFunction("sqrt", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).sqrt();
         }), 1, false);
         dEnv.addTokenFunction("sin", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).sin();
         }), 1, false);
         dEnv.addTokenFunction("cos", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).cos();
         }), 1, false);
         dEnv.addTokenFunction("tan", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).tan();
         }), 1, false);
         dEnv.addTokenFunction("ceil", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).ceil();
         }), 1, false);
         dEnv.addTokenFunction("floor", ((args, env) -> {
-            if (!DType.isNumber(args.get(0)))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).floor();
         }), 1, false);
@@ -305,7 +300,7 @@ public class Core extends Module {
             return DFunction.newFunction(df, parameters.size(), false);
         }), 2, true);
         dEnv.addTokenFunction("apply", ((args, env) -> {
-            if (!DType.isFunction(args.get(0)))
+            if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
             List<Token> parameters = new ArrayList<>();
             for (int i = 1; i < args.size(); ++i)
@@ -331,7 +326,7 @@ public class Core extends Module {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             Token condition = Evaluator.eval(newEnv, ast.get(0).copy());
-            if (!DType.isBool(condition))
+            if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
             if (((DBool) condition).bool)
                 result = Evaluator.eval(newEnv, ast.get(1).copy());
@@ -343,12 +338,12 @@ public class Core extends Module {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             for (AstNode node : ast.children) {
-                if (DType.isOp(node.op) && "else".equals(node.op.toString())) {
+                if (node.op instanceof DOp && "else".equals(node.op.toString())) {
                     result = Evaluator.eval(newEnv, node.get(0).copy());
                     break;
                 } else {
                     Token condition = Evaluator.eval(newEnv, node.get(0).copy());
-                    if (!DType.isBool(condition))
+                    if (!(condition instanceof DBool))
                         throw new DevoreCastException(condition.type(), "bool");
                     if (((DBool) condition).bool) {
                         Token r = DWord.WORD_NIL;
@@ -372,7 +367,7 @@ public class Core extends Module {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             Token condition = Evaluator.eval(newEnv, ast.get(0).copy());
-            if (!DType.isBool(condition))
+            if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
             while (((DBool) condition).bool) {
                 for (int i = 1; i < ast.size(); ++i)
@@ -401,7 +396,7 @@ public class Core extends Module {
         }), 0, false);
         dEnv.addTokenFunction("and", ((args, env) -> {
             for (Token arg : args) {
-                if (!DType.isBool(arg))
+                if (!(arg instanceof DBool))
                     throw new DevoreCastException(arg.type(), "bool");
                 if (!((DBool) arg).bool)
                     return DBool.FLASE;
@@ -410,7 +405,7 @@ public class Core extends Module {
         }), 1, true);
         dEnv.addTokenFunction("or", ((args, env) -> {
             for (Token arg : args) {
-                if (!DType.isBool(arg))
+                if (!(arg instanceof DBool))
                     throw new DevoreCastException(arg.type(), "bool");
                 if (((DBool) arg).bool)
                     return DBool.TRUE;
@@ -418,17 +413,17 @@ public class Core extends Module {
             return DBool.FLASE;
         }), 1, true);
         dEnv.addTokenFunction("not", ((args, env) -> {
-            if (!DType.isBool(args.get(0)))
+            if (!(args.get(0) instanceof DBool))
                 throw new DevoreCastException(args.get(0).type(), "bool");
             if (((DBool) args.get(0)).bool)
                 return DBool.FLASE;
             return DBool.TRUE;
         }), 1, false);
         dEnv.addTokenFunction("random", ((args, env) -> {
-            if (!DType.isInt(args.get(0)))
+            if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
             if (args.size() > 1)
-                if (!DType.isInt(args.get(1)))
+                if (!(args.get(1) instanceof DInt))
                     throw new DevoreCastException(args.get(1).type(), "int");
             BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.get(0)).toBigIntger();
             BigInteger end = args.size() == 1 ? ((DInt) args.get(0)).toBigIntger().subtract(BigInteger.ONE) : ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE);
@@ -459,124 +454,111 @@ public class Core extends Module {
         }), 1, true);
         dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 1, true);
         dEnv.addTokenFunction("car", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             return DBool.TRUE;
         }), 1, false);
         dEnv.addTokenFunction("list-contains", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             return DBool.valueOf(((DList) args.get(0)).contains(args.get(1)));
         }), 2, false);
         dEnv.addTokenFunction("list-get", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            if (!DType.isInt(args.get(1)))
+            if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             return list.get(((DInt) args.get(1)).toBigIntger().intValue());
         }), 2, false);
         dEnv.addTokenFunction("list-set", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            if (!DType.isInt(args.get(1)))
+            if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), false);
         }), 3, false);
         dEnv.addTokenFunction("list-remove", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            if (!DType.isInt(args.get(1)))
+            if (!(args.get(1) instanceof DInt))
                 return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), false);
             return list.remove(args.get(1), false);
         }), 2, false);
         dEnv.addTokenFunction("list-add", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             return list.add(args.get(1), false);
         }), 2, false);
         dEnv.addTokenFunction("list-set!", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            if (!DType.isInt(args.get(1)))
+            if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), true);
         }), 3, false);
         dEnv.addTokenFunction("list-remove!", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            if (!DType.isInt(args.get(1)))
+            if (!(args.get(1) instanceof DInt))
                 return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), true);
             return list.remove(args.get(1), false);
         }), 2, false);
         dEnv.addTokenFunction("list-add!", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             return list.add(args.get(1), true);
         }), 2, false);
         dEnv.addTokenFunction("head", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             return list.get(0);
         }), 1, false);
         dEnv.addTokenFunction("last", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             return list.get(list.size() - 1);
         }), 1, false);
         dEnv.addTokenFunction("tail", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             return list.subList(1, list.size());
         }), 1, false);
         dEnv.addTokenFunction("init", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             return list.subList(0, list.size() - 1);
         }), 1, false);
         dEnv.addTokenFunction("length", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList))
                 return DInt.valueOf(args.get(0).toString().length());
             return DInt.valueOf(((DList) args.get(0)).size());
         }), 1, false);
         dEnv.addTokenFunction("reverse", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList tokens))
                 throw new DevoreCastException(args.get(0).type(), "list");
             List<Token> temp = new ArrayList<>();
-            DList tokens = (DList) args.get(0);
             for (int i = tokens.size() - 1; i >= 0; --i)
                 temp.add(tokens.get(i));
             return DList.valueOf(new ArrayList<>(temp));
         }), 1, false);
         dEnv.addTokenFunction("reverse!", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList tokens))
                 throw new DevoreCastException(args.get(0).type(), "list");
             List<Token> temp = new ArrayList<>();
-            DList tokens = (DList) args.get(0);
             for (int i = tokens.size() - 1; i >= 0; --i)
                 temp.add(tokens.get(i));
             tokens.clear();
@@ -585,21 +567,19 @@ public class Core extends Module {
             return tokens;
         }), 1, false);
         dEnv.addTokenFunction("sort", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             return list.sort(false);
         }), 1, false);
         dEnv.addTokenFunction("sort!", ((args, env) -> {
-            if (!DType.isList(args.get(0)))
+            if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
             return list.sort(false);
         }), 1, true);
         dEnv.addTokenFunction("++", ((args, env) -> {
             boolean flag = false;
             for (Token arg : args)
-                if (DType.isList(arg)) {
+                if (arg instanceof DList) {
                     flag = true;
                     break;
                 }
@@ -607,7 +587,7 @@ public class Core extends Module {
             if (flag) {
                 List<Token> list = new ArrayList<>();
                 for (Token arg : args) {
-                    if (DType.isList(arg))
+                    if (arg instanceof DList)
                         list.addAll(((DList) arg).toList());
                     else
                         list.add(arg);
@@ -622,9 +602,9 @@ public class Core extends Module {
             return result;
         }), 1, true);
         dEnv.addTokenFunction("map", ((args, env) -> {
-            if (!DType.isFunction(args.get(0)))
+            if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
-            if (!DType.isList(args.get(1)))
+            if (!(args.get(1) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             List<Token> result = new ArrayList<>();
             List<Token> tokens = ((DList) args.get(1)).toList();
@@ -632,7 +612,7 @@ public class Core extends Module {
                 List<Token> parameters = new ArrayList<>();
                 parameters.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
-                    if (!DType.isList(args.get(j + 1)))
+                    if (!(args.get(j + 1) instanceof DList))
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
                     parameters.add(((DList) args.get(j + 1)).get(i));
                 }
@@ -644,16 +624,16 @@ public class Core extends Module {
             return DList.valueOf(result);
         }), 2, true);
         dEnv.addTokenFunction("for-each", ((args, env) -> {
-            if (!DType.isFunction(args.get(0)))
+            if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
-            if (!DType.isList(args.get(1)))
+            if (!(args.get(1) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             List<Token> tokens = ((DList) args.get(1)).toList();
             for (int i = 0; i < tokens.size(); ++i) {
                 List<Token> parameters = new ArrayList<>();
                 parameters.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
-                    if (!DType.isList(args.get(j + 1)))
+                    if (!(args.get(j + 1) instanceof DList))
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
                     parameters.add(((DList) args.get(j + 1)).get(i));
                 }
@@ -665,9 +645,9 @@ public class Core extends Module {
             return DWord.WORD_NIL;
         }), 2, true);
         dEnv.addTokenFunction("foldr", ((args, env) -> {
-            if (!DType.isFunction(args.get(0)))
+            if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
-            if (!DType.isList(args.get(2)))
+            if (!(args.get(2) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
@@ -680,9 +660,9 @@ public class Core extends Module {
             return result;
         }), 3, false);
         dEnv.addTokenFunction("foldl", ((args, env) -> {
-            if (!DType.isFunction(args.get(0)))
+            if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
-            if (!DType.isList(args.get(2)))
+            if (!(args.get(2) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
@@ -695,9 +675,9 @@ public class Core extends Module {
             return result;
         }), 3, false);
         dEnv.addTokenFunction("filter", ((args, env) -> {
-            if (!DType.isFunction(args.get(0)))
+            if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
-            if (!DType.isList(args.get(1)))
+            if (!(args.get(1) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             List<Token> result = new ArrayList<>();
             List<Token> tokens = ((DList) args.get(1)).toList();
@@ -705,7 +685,7 @@ public class Core extends Module {
                 AstNode asts = AstNode.nullAst.copy();
                 asts.add(new AstNode(token));
                 Token condition = ((DFunction) args.get(0)).call(asts, env.createChild());
-                if (!DType.isBool(condition))
+                if (!(condition instanceof DBool))
                     throw new DevoreCastException(condition.type(), "list");
                 if (((DBool) condition).bool)
                     result.add(token);
@@ -713,11 +693,11 @@ public class Core extends Module {
             return DList.valueOf(result);
         }), 2, false);
         dEnv.addTokenFunction("range", ((args, env) -> {
-            if (!DType.isInt(args.get(0)))
+            if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            if (args.size() > 1 && !DType.isInt(args.get(1)))
+            if (args.size() > 1 && !(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            if (args.size() > 2 && !DType.isInt(args.get(2)))
+            if (args.size() > 2 && !(args.get(2) instanceof DInt))
                 throw new DevoreCastException(args.get(2).type(), "int");
             BigInteger start = args.size() > 1 ? ((DInt) args.get(0)).toBigIntger() : BigInteger.ZERO;
             BigInteger end = args.size() > 1 ? ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE)
@@ -733,23 +713,23 @@ public class Core extends Module {
             return DList.valueOf(list);
         }), 1, true);
         dEnv.addTokenFunction("string->int", ((args, env) -> {
-            if (!DType.isString(args.get(0)))
+            if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DInt.valueOf(new BigInteger(args.get(0).toString()));
         }), 1, false);
         dEnv.addTokenFunction("string->float", ((args, env) -> {
-            if (!DType.isString(args.get(0)))
+            if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DFloat.valueOf(new BigDecimal(args.get(0).toString()));
         }), 1, false);
         dEnv.addTokenFunction("string->bool", ((args, env) -> {
-            if (!DType.isString(args.get(0)))
+            if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return "true".equals(args.get(0).toString()) ? DBool.TRUE : DBool.FLASE;
         }), 1, false);
         dEnv.addTokenFunction("->string", ((args, env) -> DString.valueOf(args.get(0).toString())), 1, false);
         dEnv.addTokenFunction("string->chars", ((args, env) -> {
-            if (!DType.isString(args.get(0)))
+            if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             char[] chars = args.get(0).toString().toCharArray();
             List<Token> tokens = new ArrayList<>();
@@ -758,12 +738,12 @@ public class Core extends Module {
             return DList.valueOf(tokens);
         }), 1, false);
         dEnv.addTokenFunction("char->ascii", ((args, env) -> {
-            if (!DType.isString(args.get(0)))
+            if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DInt.valueOf((int) args.get(0).toString().charAt(0));
         }), 1, false);
         dEnv.addTokenFunction("ascii->char", ((args, env) -> {
-            if (!DType.isInt(args.get(0)))
+            if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
             return DString.valueOf(String.valueOf((char) ((DInt) args.get(0)).toBigIntger().intValue()));
         }), 1, false);

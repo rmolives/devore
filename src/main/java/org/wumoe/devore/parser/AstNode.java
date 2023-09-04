@@ -1,6 +1,6 @@
 package org.wumoe.devore.parser;
 
-import org.wumoe.devore.lang.DType;
+import org.wumoe.devore.lang.token.DString;
 import org.wumoe.devore.lang.token.Token;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class AstNode {
     }
 
     public AstNode copy() {
-        ArrayList<AstNode> list = new ArrayList<AstNode>();
+        ArrayList<AstNode> list = new ArrayList<>();
         for (AstNode ast : children)
             list.add(ast.copy());
         return new AstNode(op, type, list);
@@ -71,13 +71,13 @@ public class AstNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (isEmpty()) {
-            if (DType.isString(op))
+            if (op instanceof DString)
                 builder.append("\"").append(op).append("\"");
             else
                 builder.append(op);
         } else {
             builder.append("(");
-            if (DType.isString(op))
+            if (op instanceof DString)
                 builder.append("\"").append(op).append("\"");
             else
                 builder.append(op);
