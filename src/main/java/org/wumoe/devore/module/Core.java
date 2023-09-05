@@ -9,10 +9,7 @@ import org.wumoe.devore.parser.AstNode;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.BiFunction;
 
 public class Core extends Module {
@@ -746,6 +743,42 @@ public class Core extends Module {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
             return DString.valueOf(String.valueOf((char) ((DInt) args.get(0)).toBigIntger().intValue()));
+        }), 1, false);
+        dEnv.addTokenFunction("table", ((args, env) -> DTable.valueOf(new HashMap<>())), 0, false);
+        dEnv.addTokenFunction("table-get", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable table))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return table.get(args.get(1));
+        }), 2, false);
+        dEnv.addTokenFunction("table-size", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable table))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return DInt.valueOf(table.size());
+        }), 1, false);
+        dEnv.addTokenFunction("table-put", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable table))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return table.put(args.get(1), args.get(2), false);
+        }), 3, false);
+        dEnv.addTokenFunction("table-put!", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable table))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return table.put(args.get(1), args.get(2), true);
+        }), 3, false);
+        dEnv.addTokenFunction("table-remove", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable table))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return table.remove(args.get(1), false);
+        }), 2, false);
+        dEnv.addTokenFunction("table-remove!", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable table))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return table.remove(args.get(1), true);
+        }), 2, false);
+        dEnv.addTokenFunction("table-keys", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable table))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return DList.valueOf(new ArrayList<>(table.keys()));
         }), 1, false);
     }
 }

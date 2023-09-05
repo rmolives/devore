@@ -58,7 +58,7 @@ public class DFunction extends Token {
 
     @Override
     public String str() {
-        return "<function>";
+        return "{function=" + function.toString() + ",argSize=" + argSize + ",children=" + children + ",vararg=" + vararg + "}";
     }
 
     @Override
@@ -68,6 +68,8 @@ public class DFunction extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return -1;
+        return t instanceof DFunction func && func.function.equals(this.function)
+                && func.argSize == this.argSize && func.children.equals(this.children)
+                && func.vararg == this.vararg ? 0 : -1;
     }
 }

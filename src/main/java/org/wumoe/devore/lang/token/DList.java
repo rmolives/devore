@@ -107,6 +107,11 @@ public class DList extends Token {
 
     @Override
     public int compareTo(Token t) {
+        if (!(t instanceof DList list) || list.size() != this.size())
+            return -1;
+        for (int i = 0; i < this.size(); ++i)
+            if (!list.get(i).equals(this.get(i)))
+                return -1;
         return 0;
     }
 }
