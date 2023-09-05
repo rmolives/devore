@@ -49,7 +49,7 @@ public class DPluginManager {
             try {
                 c.loader.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new DevoreRuntimeException(e.getMessage());
             }
         })));
     }
