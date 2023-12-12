@@ -645,7 +645,7 @@ public class Core extends Module {
             if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
             if (!(args.get(2) instanceof DList))
-                throw new DevoreCastException(args.get(1).type(), "list");
+                throw new DevoreCastException(args.get(2).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
             for (int i = tokens.size() - 1; i >= 0; --i) {
@@ -660,7 +660,7 @@ public class Core extends Module {
             if (!(args.get(0) instanceof DFunction))
                 throw new DevoreCastException(args.get(0).type(), "function");
             if (!(args.get(2) instanceof DList))
-                throw new DevoreCastException(args.get(1).type(), "list");
+                throw new DevoreCastException(args.get(2).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
             for (int i = tokens.size() - 1; i >= 0; --i) {
