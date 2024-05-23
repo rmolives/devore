@@ -7,6 +7,7 @@ import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.module.CoreModule;
 import org.wumoe.devore.module.MathModule;
 import org.wumoe.devore.module.Module;
+import org.wumoe.devore.module.TableModule;
 import org.wumoe.devore.parser.Lexer;
 import org.wumoe.devore.parser.Parse;
 
@@ -21,6 +22,7 @@ public class Devore {
         {
             put("core", new CoreModule());
             put("math", new MathModule());
+            put("table", new TableModule());
         }
     };
 
