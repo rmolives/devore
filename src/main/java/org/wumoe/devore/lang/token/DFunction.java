@@ -26,6 +26,8 @@ public class DFunction extends Token {
     }
 
     public DFunction addFunction(DFunction function) {
+        if (!isEqArgs(function.argSize))
+            throw new DevoreRuntimeException("函数定义冲突");
         this.children.add(function);
         return this;
     }
@@ -49,6 +51,10 @@ public class DFunction extends Token {
         if (df == null)
             throw new DevoreRuntimeException("找不到匹配条件的函数.");
         return df.function.apply(ast, env);
+    }
+
+    private boolean isEqArgs(int argSize) {
+        return match(argSize) == null;
     }
 
     @Override

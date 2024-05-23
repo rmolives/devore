@@ -12,7 +12,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.BiFunction;
 
-public class Core extends Module {
+public class CoreModule extends Module {
     @Override
     public void init(Env dEnv) {
         dEnv.put("nil", DWord.WORD_NIL);
@@ -437,15 +437,11 @@ public class Core extends Module {
                     );
             BigDecimal outputRangeStart = new BigDecimal(start).setScale(scale, RoundingMode.FLOOR);
             BigDecimal outputRangeEnd = new BigDecimal(end).add(new BigDecimal("1")).setScale(scale, RoundingMode.FLOOR);
-            BigDecimal bd1 =
-                    new BigDecimal(new BigInteger(generated.toString())).setScale(scale, RoundingMode.FLOOR)
-                            .subtract(inputRangeStart);
-            BigDecimal bd2 = inputRangeEnd.subtract(inputRangeStart);
-            BigDecimal bd3 = bd1.divide(bd2, RoundingMode.FLOOR);
-            BigDecimal bd4 = outputRangeEnd.subtract(outputRangeStart);
-            BigDecimal bd5 = bd3.multiply(bd4);
-            BigDecimal bd6 = bd5.add(outputRangeStart);
-            BigInteger returnInteger = bd6.setScale(0, RoundingMode.FLOOR).toBigInteger();
+            BigInteger returnInteger = new BigDecimal(new BigInteger(generated.toString())).setScale(scale, RoundingMode.FLOOR)
+                    .subtract(inputRangeStart)
+                    .divide(inputRangeEnd.subtract(inputRangeStart), RoundingMode.FLOOR)
+                    .multiply(outputRangeEnd.subtract(outputRangeStart))
+                    .add(outputRangeStart).setScale(0, RoundingMode.FLOOR).toBigInteger();
             returnInteger = returnInteger.compareTo(end) > 0 ? end : returnInteger;
             return DInt.valueOf(returnInteger);
         }), 1, true);

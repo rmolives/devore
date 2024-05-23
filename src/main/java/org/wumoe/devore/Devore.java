@@ -4,7 +4,8 @@ import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.Evaluator;
 import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
-import org.wumoe.devore.module.Core;
+import org.wumoe.devore.module.CoreModule;
+import org.wumoe.devore.module.MathModule;
 import org.wumoe.devore.module.Module;
 import org.wumoe.devore.parser.Lexer;
 import org.wumoe.devore.parser.Parse;
@@ -18,7 +19,8 @@ public class Devore {
     public static final String VERSION = "0.1-alpha";
     public static Map<String, Module> moduleTable = new HashMap<>() {
         {
-            put("core", new Core());
+            put("core", new CoreModule());
+            put("math", new MathModule());
         }
     };
 

@@ -63,6 +63,10 @@ public class Env {
     }
 
     public Env addSymbolFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+        if (table.containsKey(key)) {
+            table.put(key, ((DFunction) table.get(key)).addFunction(DFunction.newFunction(function, argSize, vararg)));
+            return this;
+        }
         table.put(key, DFunction.newFunction(function, argSize, vararg));
         return this;
     }
@@ -76,6 +80,10 @@ public class Env {
             }
             return function.apply(args, env);
         };
+        if (table.containsKey(key)) {
+            table.put(key, ((DFunction) table.get(key)).addFunction(DFunction.newFunction(df, argSize, vararg)));
+            return this;
+        }
         table.put(key, DFunction.newFunction(df, argSize, vararg));
         return this;
     }
