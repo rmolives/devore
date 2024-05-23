@@ -1,7 +1,5 @@
 package org.wumoe.devore.lang.token;
 
-import org.wumoe.devore.exception.DevoreRuntimeException;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
