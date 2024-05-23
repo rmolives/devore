@@ -53,6 +53,15 @@ public class DFunction extends Token {
         return df.function.apply(ast, env);
     }
 
+    public Token call(Token[] args, Env env) {
+        DFunction df = match(args.length);
+        if (df == null)
+            throw new DevoreRuntimeException("找不到匹配条件的函数.");
+        AstNode ast = AstNode.nullAst.copy();
+        for (Token arg : args) ast.add(new AstNode(arg));
+        return df.function.apply(ast, env);
+    }
+
     private boolean isEqArgs(int argSize) {
         return match(argSize) == null;
     }

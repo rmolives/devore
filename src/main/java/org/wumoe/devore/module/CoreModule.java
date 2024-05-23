@@ -417,13 +417,13 @@ public class CoreModule extends Module {
             return DBool.TRUE;
         }), 1, false);
         dEnv.addTokenFunction("random", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
-                throw new DevoreCastException(args.get(0).type(), "int");
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
             if (args.size() > 1)
-                if (!(args.get(1) instanceof DInt))
-                    throw new DevoreCastException(args.get(1).type(), "int");
-            BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.get(0)).toBigIntger();
-            BigInteger end = args.size() == 1 ? ((DInt) args.get(0)).toBigIntger().subtract(BigInteger.ONE) : ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE);
+                if (!(args.get(1) instanceof DNumber))
+                    throw new DevoreCastException(args.get(1).type(), "number");
+            BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DNumber) args.get(0)).toBigIntger();
+            BigInteger end = args.size() == 1 ? ((DNumber) args.get(0)).toBigIntger().subtract(BigInteger.ONE) : ((DNumber) args.get(1)).toBigIntger().subtract(BigInteger.ONE);
             Random rand = new Random();
             int scale = end.toString().length();
             StringBuilder generated = new StringBuilder();
@@ -459,28 +459,28 @@ public class CoreModule extends Module {
         dEnv.addTokenFunction("list-get", ((args, env) -> {
             if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            if (!(args.get(1) instanceof DInt))
-                throw new DevoreCastException(args.get(1).type(), "int");
+            if (!(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            return list.get(((DInt) args.get(1)).toBigIntger().intValue());
+            return list.get(((DNumber) args.get(1)).toBigIntger().intValue());
         }), 2, false);
         dEnv.addTokenFunction("list-set", ((args, env) -> {
             if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            if (!(args.get(1) instanceof DInt))
-                throw new DevoreCastException(args.get(1).type(), "int");
+            if (!(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), false);
+            return list.set(((DNumber) args.get(1)).toBigIntger().intValue(), args.get(2), false);
         }), 3, false);
         dEnv.addTokenFunction("list-remove", ((args, env) -> {
             if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            if (!(args.get(1) instanceof DInt))
-                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), false);
+            if (!(args.get(1) instanceof DNumber))
+                return list.remove(((DNumber) args.get(1)).toBigIntger().intValue(), false);
             return list.remove(args.get(1), false);
         }), 2, false);
         dEnv.addTokenFunction("list-add", ((args, env) -> {
@@ -491,19 +491,19 @@ public class CoreModule extends Module {
         dEnv.addTokenFunction("list-set!", ((args, env) -> {
             if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            if (!(args.get(1) instanceof DInt))
-                throw new DevoreCastException(args.get(1).type(), "int");
+            if (!(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), true);
+            return list.set(((DNumber) args.get(1)).toBigIntger().intValue(), args.get(2), true);
         }), 3, false);
         dEnv.addTokenFunction("list-remove!", ((args, env) -> {
             if (!(args.get(0) instanceof DList list))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            if (!(args.get(1) instanceof DInt))
-                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), true);
+            if (!(args.get(1) instanceof DNumber))
+                return list.remove(((DNumber) args.get(1)).toBigIntger().intValue(), true);
             return list.remove(args.get(1), false);
         }), 2, false);
         dEnv.addTokenFunction("list-add!", ((args, env) -> {
@@ -609,10 +609,7 @@ public class CoreModule extends Module {
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
                     parameters.add(((DList) args.get(j + 1)).get(i));
                 }
-                AstNode asts = AstNode.nullAst.copy();
-                for (Token arg : parameters)
-                    asts.add(new AstNode(arg));
-                result.add(((DFunction) args.get(0)).call(asts, env.createChild()));
+                ((DFunction) args.get(0)).call(parameters.toArray(Token[]::new), env.createChild());
             }
             return DList.valueOf(result);
         }), 2, true);
@@ -630,10 +627,7 @@ public class CoreModule extends Module {
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
                     parameters.add(((DList) args.get(j + 1)).get(i));
                 }
-                AstNode asts = AstNode.nullAst.copy();
-                for (Token arg : parameters)
-                    asts.add(new AstNode(arg));
-                ((DFunction) args.get(0)).call(asts, env.createChild());
+                ((DFunction) args.get(0)).call(parameters.toArray(Token[]::new), env.createChild());
             }
             return DWord.WORD_NIL;
         }), 2, true);
@@ -644,12 +638,8 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(2).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
-            for (int i = tokens.size() - 1; i >= 0; --i) {
-                AstNode asts = AstNode.nullAst.copy();
-                asts.add(new AstNode(tokens.get(i)));
-                asts.add(new AstNode(result));
-                result = ((DFunction) args.get(0)).call(asts, env.createChild());
-            }
+            for (int i = tokens.size() - 1; i >= 0; --i)
+                result = ((DFunction) args.get(0)).call(new Token[]{tokens.get(i), result}, env.createChild());
             return result;
         }), 3, false);
         dEnv.addTokenFunction("foldl", ((args, env) -> {
@@ -659,12 +649,8 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(2).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
-            for (int i = tokens.size() - 1; i >= 0; --i) {
-                AstNode asts = AstNode.nullAst.copy();
-                asts.add(new AstNode(result));
-                asts.add(new AstNode(tokens.get(i)));
-                result = ((DFunction) args.get(0)).call(asts, env.createChild());
-            }
+            for (int i = tokens.size() - 1; i >= 0; --i)
+                result = ((DFunction) args.get(0)).call(new Token[]{result, tokens.get(i)}, env.createChild());
             return result;
         }), 3, false);
         dEnv.addTokenFunction("filter", ((args, env) -> {
@@ -686,16 +672,16 @@ public class CoreModule extends Module {
             return DList.valueOf(result);
         }), 2, false);
         dEnv.addTokenFunction("range", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
-                throw new DevoreCastException(args.get(0).type(), "int");
-            if (args.size() > 1 && !(args.get(1) instanceof DInt))
-                throw new DevoreCastException(args.get(1).type(), "int");
-            if (args.size() > 2 && !(args.get(2) instanceof DInt))
-                throw new DevoreCastException(args.get(2).type(), "int");
-            BigInteger start = args.size() > 1 ? ((DInt) args.get(0)).toBigIntger() : BigInteger.ZERO;
-            BigInteger end = args.size() > 1 ? ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE)
-                    : ((DInt) args.get(0)).toBigIntger().subtract(BigInteger.ONE);
-            BigInteger step = args.size() > 2 ? ((DInt) args.get(2)).toBigIntger() : BigInteger.ONE;
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            if (args.size() > 1 && !(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            if (args.size() > 2 && !(args.get(2) instanceof DNumber))
+                throw new DevoreCastException(args.get(2).type(), "number");
+            BigInteger start = args.size() > 1 ? ((DNumber) args.get(0)).toBigIntger() : BigInteger.ZERO;
+            BigInteger end = args.size() > 1 ? ((DNumber) args.get(1)).toBigIntger().subtract(BigInteger.ONE)
+                    : ((DNumber) args.get(0)).toBigIntger().subtract(BigInteger.ONE);
+            BigInteger step = args.size() > 2 ? ((DNumber) args.get(2)).toBigIntger() : BigInteger.ONE;
             BigInteger size = end.subtract(start).divide(step);
             List<Token> list = new ArrayList<>();
             BigInteger i = BigInteger.ZERO;
@@ -736,9 +722,9 @@ public class CoreModule extends Module {
             return DInt.valueOf((int) args.get(0).toString().charAt(0));
         }), 1, false);
         dEnv.addTokenFunction("ascii->char", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
-                throw new DevoreCastException(args.get(0).type(), "int");
-            return DString.valueOf(String.valueOf((char) ((DInt) args.get(0)).toBigIntger().intValue()));
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return DString.valueOf(String.valueOf((char) ((DNumber) args.get(0)).toBigIntger().intValue()));
         }), 1, false);
     }
 }
