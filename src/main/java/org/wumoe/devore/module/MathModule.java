@@ -23,6 +23,33 @@ public class MathModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "int");
             return DBool.valueOf(num.toBigIntger().isProbablePrime(certainty.toBigIntger().intValue()));
         }), 2, false);
+        dEnv.addTokenFunction("gcd", ((args, env) -> {
+            if (!(args.get(0) instanceof DInt n1))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (!(args.get(1) instanceof DInt n2))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            for (BigInteger i = (n1.toBigIntger().compareTo(n2.toBigIntger()) < 0? n1 : n2).toBigIntger();
+                 i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
+                if (n1.toBigIntger().mod(i).equals(BigInteger.ZERO) && n2.toBigIntger().mod(i).equals(BigInteger.ZERO))
+                    return DInt.valueOf(i);
+            return DInt.valueOf(1);
+        }), 2, false);
+        dEnv.addTokenFunction("lcm", ((args, env) -> {
+            if (!(args.get(0) instanceof DInt n1))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            if (!(args.get(1) instanceof DInt n2))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            BigInteger gcd = BigInteger.ONE;
+            for (BigInteger i = (n1.toBigIntger().compareTo(n2.toBigIntger()) < 0? n1 : n2).toBigIntger();
+                 i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
+                if (n1.toBigIntger().mod(i).equals(BigInteger.ZERO) && n2.toBigIntger().mod(i).equals(BigInteger.ZERO)) {
+                    gcd = i;
+                    break;
+                }
+            if (n1.toBigIntger().compareTo(BigInteger.ZERO) == 0 || n2.toBigIntger().compareTo(BigInteger.ZERO) == 0)
+                return DInt.valueOf(0);
+            return DInt.valueOf(n1.toBigIntger().multiply(n2.toBigIntger()).divide(gcd));
+        }), 2, false);
         dEnv.addTokenFunction("legendre", ((args, env) -> {
             if (!(args.get(0) instanceof DInt n1))
                 throw new DevoreCastException(args.get(0).type(), "int");
