@@ -1,6 +1,7 @@
 package org.wumoe.devore.lang;
 
 import org.wumoe.devore.Devore;
+import org.wumoe.devore.exception.DevoreRuntimeException;
 import org.wumoe.devore.lang.token.DFunction;
 import org.wumoe.devore.lang.token.DWord;
 import org.wumoe.devore.lang.token.Token;
@@ -58,6 +59,8 @@ public class Env {
     }
 
     public Env put(String key, Token value) {
+        if (table.containsKey(key))
+            throw new DevoreRuntimeException("定义冲突");
         table.put(key, value);
         return this;
     }
