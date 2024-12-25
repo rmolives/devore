@@ -732,5 +732,6 @@ public class CoreModule extends Module {
             System.exit(((DInt) args.get(0)).toBigIntger().intValue());
             return args.get(0);
         }), 1, false);
+        dEnv.addTokenFunction("exit", ((args, env) -> DString.valueOf(args.get(0).type())), 1, false);
     }
 }
