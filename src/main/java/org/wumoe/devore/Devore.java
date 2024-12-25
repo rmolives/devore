@@ -21,6 +21,7 @@ public class Devore {
             put("core", new CoreModule());
             put("math", new MathModule());
             put("table", new TableModule());
+            put("thread", new ThreadModule());
         }
     };
 

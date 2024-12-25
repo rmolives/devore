@@ -732,6 +732,16 @@ public class CoreModule extends Module {
             System.exit(((DInt) args.get(0)).toBigIntger().intValue());
             return args.get(0);
         }), 1, false);
+        dEnv.addTokenFunction("sleep", ((args, env) -> {
+            if (!(args.get(0) instanceof DInt))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            try {
+                Thread.sleep(((DInt) args.get(0)).toBigIntger().longValue());
+            } catch (InterruptedException e) {
+                return args.get(0);
+            }
+            return args.get(0);
+        }), 1, false);
         dEnv.addTokenFunction("type", ((args, env) -> DString.valueOf(args.get(0).type())), 1, false);
     }
 }
