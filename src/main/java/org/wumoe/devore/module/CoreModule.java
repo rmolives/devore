@@ -726,5 +726,11 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "int");
             return DString.valueOf(String.valueOf((char) ((DInt) args.get(0)).toBigIntger().intValue()));
         }), 1, false);
+        dEnv.addTokenFunction("exit", ((args, env) -> {
+            if (!(args.get(0) instanceof DInt))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            System.exit(((DInt) args.get(0)).toBigIntger().intValue());
+            return args.get(0);
+        }), 1, false);
     }
 }
