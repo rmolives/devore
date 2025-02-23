@@ -15,7 +15,7 @@ public class Main {
             DPluginManager.init();
             Repl.repl(System.in, System.out, Env.newEnv());
         } else if ("--version".equals(args[0]) || "-v".equals(args[0]))
-            System.out.println("Devore v" + Devore.VERSION + ".\nWuMoe Community.");
+            System.out.println("Devore v" + Devore.VERSION + ".\nAuthor: RMOlive (rmolives@wumoe.org)");
         else {
             DPluginManager.init();
             Devore.call(Env.newEnv(), Files.readString(Path.of(System.getProperty("user.dir") + File.separator + args[0])));
