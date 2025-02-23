@@ -567,7 +567,7 @@ public class CoreModule extends Module {
         dEnv.addTokenFunction("sort!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
-            return list.sort(false);
+            return list.sort(true);
         }), 1, true);
         dEnv.addTokenFunction("++", ((args, env) -> {
             boolean flag = false;
