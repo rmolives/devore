@@ -422,8 +422,8 @@ public class CoreModule extends Module {
             if (args.size() > 1)
                 if (!(args.get(1) instanceof DInt))
                     throw new DevoreCastException(args.get(1).type(), "int");
-            BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.getFirst()).toBigIntger();
-            BigInteger end = args.size() == 1 ? ((DInt) args.getFirst()).toBigIntger().subtract(BigInteger.ONE) : ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE);
+            BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.getFirst()).toBigInteger();
+            BigInteger end = args.size() == 1 ? ((DInt) args.getFirst()).toBigInteger().subtract(BigInteger.ONE) : ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE);
             Random rand = new Random();
             int scale = end.toString().length();
             StringBuilder generated = new StringBuilder();
@@ -463,7 +463,7 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            return list.get(((DInt) args.get(1)).toBigIntger().intValue());
+            return list.get(((DInt) args.get(1)).toBigInteger().intValue());
         }), 2, false);
         dEnv.addTokenFunction("list-set", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
@@ -472,7 +472,7 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), false);
+            return list.set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), false);
         }), 3, false);
         dEnv.addTokenFunction("list-remove", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
@@ -480,7 +480,7 @@ public class CoreModule extends Module {
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             if (!(args.get(1) instanceof DInt))
-                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), false);
+                return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), false);
             return list.remove(args.get(1), false);
         }), 2, false);
         dEnv.addTokenFunction("list-add", ((args, env) -> {
@@ -495,7 +495,7 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
-            return list.set(((DInt) args.get(1)).toBigIntger().intValue(), args.get(2), true);
+            return list.set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), true);
         }), 3, false);
         dEnv.addTokenFunction("list-remove!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
@@ -503,7 +503,7 @@ public class CoreModule extends Module {
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             if (!(args.get(1) instanceof DInt))
-                return list.remove(((DInt) args.get(1)).toBigIntger().intValue(), true);
+                return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), true);
             return list.remove(args.get(1), false);
         }), 2, false);
         dEnv.addTokenFunction("list-add!", ((args, env) -> {
@@ -678,10 +678,10 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (args.size() > 2 && !(args.get(2) instanceof DInt))
                 throw new DevoreCastException(args.get(2).type(), "int");
-            BigInteger start = args.size() > 1 ? ((DInt) args.getFirst()).toBigIntger() : BigInteger.ZERO;
-            BigInteger end = args.size() > 1 ? ((DInt) args.get(1)).toBigIntger().subtract(BigInteger.ONE)
-                    : ((DInt) args.getFirst()).toBigIntger().subtract(BigInteger.ONE);
-            BigInteger step = args.size() > 2 ? ((DInt) args.get(2)).toBigIntger() : BigInteger.ONE;
+            BigInteger start = args.size() > 1 ? ((DInt) args.getFirst()).toBigInteger() : BigInteger.ZERO;
+            BigInteger end = args.size() > 1 ? ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE)
+                    : ((DInt) args.getFirst()).toBigInteger().subtract(BigInteger.ONE);
+            BigInteger step = args.size() > 2 ? ((DInt) args.get(2)).toBigInteger() : BigInteger.ONE;
             BigInteger size = end.subtract(start).divide(step);
             List<Token> list = new ArrayList<>();
             BigInteger i = BigInteger.ZERO;
@@ -724,19 +724,19 @@ public class CoreModule extends Module {
         dEnv.addTokenFunction("ascii->char", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
-            return DString.valueOf(String.valueOf((char) ((DInt) args.getFirst()).toBigIntger().intValue()));
+            return DString.valueOf(String.valueOf((char) ((DInt) args.getFirst()).toBigInteger().intValue()));
         }), 1, false);
         dEnv.addTokenFunction("exit", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
-            System.exit(((DInt) args.getFirst()).toBigIntger().intValue());
+            System.exit(((DInt) args.getFirst()).toBigInteger().intValue());
             return args.getFirst();
         }), 1, false);
         dEnv.addTokenFunction("sleep", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             try {
-                Thread.sleep(((DInt) args.getFirst()).toBigIntger().longValue());
+                Thread.sleep(((DInt) args.getFirst()).toBigInteger().longValue());
             } catch (InterruptedException e) {
                 return args.getFirst();
             }

@@ -130,7 +130,7 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public BigInteger toBigIntger() {
+    public BigInteger toBigInteger() {
         return num.toBigInteger();
     }
 

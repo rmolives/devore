@@ -27,7 +27,7 @@ public class DInt extends DNumber {
     }
 
     public DInt mod(DInt n) {
-        return DInt.valueOf(num.mod(n.toBigIntger()));
+        return DInt.valueOf(num.mod(n.toBigInteger()));
     }
 
     @Override
@@ -47,7 +47,7 @@ public class DInt extends DNumber {
 
     @Override
     public DArithmetic div(DArithmetic a) {
-        return DFloat.valueOf(this.toBigIntger()).div(a);
+        return DFloat.valueOf(this.toBigInteger()).div(a);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class DInt extends DNumber {
     }
 
     @Override
-    public BigInteger toBigIntger() {
+    public BigInteger toBigInteger() {
         return num;
     }
 

@@ -12,7 +12,7 @@ public abstract class DArithmetic extends Token {
 
     public abstract DArithmetic div(DArithmetic a);
 
-    public abstract BigInteger toBigIntger();
+    public abstract BigInteger toBigInteger();
 
     public abstract BigDecimal toBigDecimal();
 }
