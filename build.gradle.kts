@@ -12,3 +12,11 @@ repositories {
 dependencies {
     implementation("ch.obermuhlner:big-math:2.3.2")
 }
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "org.wumoe.devore.Main"
+    }
+
+    from(configurations.runtimeClasspath.get().filter { it.exists() }.map { if (it.isDirectory) it else zipTree(it) })
+}

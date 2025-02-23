@@ -743,5 +743,6 @@ public class CoreModule extends Module {
             return args.getFirst();
         }), 1, false);
         dEnv.addTokenFunction("type", ((args, env) -> DString.valueOf(args.getFirst().type())), 1, false);
+        dEnv.addTokenFunction("time", ((args, env) -> DInt.valueOf(System.currentTimeMillis())), 0, false);
     }
 }
