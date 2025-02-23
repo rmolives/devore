@@ -446,11 +446,6 @@ public class CoreModule extends Module {
             return DInt.valueOf(returnInteger);
         }), 1, true);
         dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 1, true);
-        dEnv.addTokenFunction("car", ((args, env) -> {
-            if (!(args.getFirst() instanceof DList))
-                throw new DevoreCastException(args.getFirst().type(), "list");
-            return DBool.TRUE;
-        }), 1, false);
         dEnv.addTokenFunction("list-contains", ((args, env) -> {
             if (!(args.getFirst() instanceof DList))
                 throw new DevoreCastException(args.getFirst().type(), "list");
