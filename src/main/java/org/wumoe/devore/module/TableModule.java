@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class TableModule extends Module {
     @Override
     public void init(Env dEnv) {
-        dEnv.addTokenFunction("table", ((args, env) -> DTable.valueOf(new HashMap<>())), 0, false);
+        dEnv.addTokenFunction("table-new", ((args, env) -> DTable.valueOf(new HashMap<>())), 0, false);
         dEnv.addTokenFunction("table-get", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
