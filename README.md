@@ -13,7 +13,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 ### Sqrt
 
 ```lisp
-(def (sqrt x)
+(def (mysqrt x)
     (def (good-enough guess)
         (< (abs (- (pow guess 2) x)) 0.001))
     (def (improve guess)
@@ -23,7 +23,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
             guess
             (sqrt-iter (improve guess))))
     (sqrt-iter 1.0))
-(println (sqrt 81))
+(println (mysqrt 81))
 ```
 
 ### Prime?
