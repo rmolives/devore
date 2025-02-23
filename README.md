@@ -27,6 +27,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 ```
 
 ### Prime?
+
 ```lisp
 (def (prime? n)
     (def (divides? a b)
@@ -42,6 +43,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 ```
 
 ### Fibonacci
+
 ```lisp
 (def (fib n)
     (cond ((= n 0) 0)
