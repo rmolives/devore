@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class Devore {
     public static final String VERSION = "0.1-alpha";
+    public static final String VERSION_MESSAGE = "Devore v" + VERSION + ".\nAuthor: RMOlive (rmolives@wumoe.org)\nGithub: https://github.com/rmolives/devore";
     public static Map<String, Module> moduleTable = new HashMap<>() {
         {
             put("core", new CoreModule());

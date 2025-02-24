@@ -25,6 +25,8 @@ public class Repl {
             String read = reader.readLine();
             if (read.startsWith(":exit"))
                 break;
+            else if (read.startsWith(":version"))
+                out.println(Devore.VERSION_MESSAGE);
             else if (read.startsWith(":clear"))
                 env = Env.newEnv();
             else if (read.startsWith(":load")) {
