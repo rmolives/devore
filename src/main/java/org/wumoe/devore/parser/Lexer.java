@@ -149,7 +149,6 @@ public class Lexer {
                             case 't' -> builder.append("\t");
                             case 'b' -> builder.append("\b");
                             default -> builder.append("\\\\").append(expressionCharArray[index]);
-
                         }
                     } else
                         builder.append(expressionCharArray[index]);
