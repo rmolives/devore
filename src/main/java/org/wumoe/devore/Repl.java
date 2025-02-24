@@ -27,9 +27,10 @@ public class Repl {
                 break;
             else if (read.startsWith(":clear"))
                 env = Env.newEnv();
-            else if (read.startsWith(":load"))
-                codeBuilder.append(Files.readString(Path.of(read.substring(6))));
-            else {
+            else if (read.startsWith(":load")) {
+                String[] files = read.substring(6).split(" ");
+                for (String file : files) codeBuilder.append(Files.readString(Path.of(file)));
+            } else {
                 codeBuilder.append(read);
                 char[] codeCharArray = codeBuilder.toString().toCharArray();
                 boolean skip = false;
