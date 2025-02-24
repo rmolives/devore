@@ -1,7 +1,7 @@
 package org.wumoe.devore.lang.token;
 
 public class DBool extends Token {
-    public static final DBool FLASE = new DBool(false);
+    public static final DBool FALSE = new DBool(false);
     public static final DBool TRUE = new DBool(true);
     public final boolean bool;
 
@@ -10,7 +10,7 @@ public class DBool extends Token {
     }
 
     public static DBool valueOf(boolean bool) {
-        return bool ? TRUE : FLASE;
+        return bool ? TRUE : FALSE;
     }
 
     @Override

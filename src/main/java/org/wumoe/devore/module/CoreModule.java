@@ -17,7 +17,7 @@ public class CoreModule extends Module {
     public void init(Env dEnv) {
         dEnv.put("nil", DWord.WORD_NIL);
         dEnv.put("true", DBool.TRUE);
-        dEnv.put("false", DBool.FLASE);
+        dEnv.put("false", DBool.FALSE);
         dEnv.addTokenFunction("+", ((args, env) -> {
             if (!(args.getFirst() instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.getFirst().type(), "arithmetic");
@@ -396,7 +396,7 @@ public class CoreModule extends Module {
                 if (!(arg instanceof DBool))
                     throw new DevoreCastException(arg.type(), "bool");
                 if (!((DBool) arg).bool)
-                    return DBool.FLASE;
+                    return DBool.FALSE;
             }
             return DBool.TRUE;
         }), 1, true);
@@ -407,13 +407,13 @@ public class CoreModule extends Module {
                 if (((DBool) arg).bool)
                     return DBool.TRUE;
             }
-            return DBool.FLASE;
+            return DBool.FALSE;
         }), 1, true);
         dEnv.addTokenFunction("not", ((args, env) -> {
             if (!(args.getFirst() instanceof DBool))
                 throw new DevoreCastException(args.getFirst().type(), "bool");
             if (((DBool) args.getFirst()).bool)
-                return DBool.FLASE;
+                return DBool.FALSE;
             return DBool.TRUE;
         }), 1, false);
         dEnv.addTokenFunction("random", ((args, env) -> {
@@ -699,7 +699,7 @@ public class CoreModule extends Module {
         dEnv.addTokenFunction("string->bool", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
-            return "true".equals(args.getFirst().toString()) ? DBool.TRUE : DBool.FLASE;
+            return "true".equals(args.getFirst().toString()) ? DBool.TRUE : DBool.FALSE;
         }), 1, false);
         dEnv.addTokenFunction("->string", ((args, env) -> DString.valueOf(args.getFirst().toString())), 1, false);
         dEnv.addTokenFunction("string->chars", ((args, env) -> {
