@@ -38,12 +38,14 @@ public class Repl {
                 do {
                     if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
                         skip = true;
+                        ++index;
                         continue;
                     }
                     if (codeCharArray[index] == '\"') {
                         do {
                             if (skip) {
                                 skip = false;
+                                ++index;
                                 continue;
                             }
                             ++index;
