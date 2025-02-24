@@ -119,9 +119,4 @@ public class DInt extends DNumber {
     public int compareTo(Token t) {
         return DFloat.valueOf(this.num).compareTo(t);
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof DInt n && num.compareTo(n.num) == 0;
-    }
 }

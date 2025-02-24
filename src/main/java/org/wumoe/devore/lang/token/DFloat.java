@@ -158,9 +158,4 @@ public class DFloat extends DNumber {
     public int compareTo(Token t) {
         return t instanceof DNumber n ? num.compareTo(n.toBigDecimal()) : -1;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof DFloat n && num.compareTo(n.num) == 0;
-    }
 }
