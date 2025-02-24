@@ -60,7 +60,7 @@ public class Env {
 
     public Env put(String key, Token value) {
         if (table.containsKey(key))
-            throw new DevoreRuntimeException("定义冲突");
+            throw new DevoreRuntimeException("定义冲突: " + key);
         table.put(key, value);
         return this;
     }
