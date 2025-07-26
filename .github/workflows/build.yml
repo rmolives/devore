@@ -62,7 +62,7 @@ jobs:
         run: echo "date=$(date -u +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
       - name: Create Release with fixed tag
         id: create_release
-        uses: actions/create-release@v2
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -77,7 +77,7 @@ jobs:
             - Commit: ${{ github.sha }}
             - SHA256: ${{ steps.calculate_sha.outputs.sha256 }}
       - name: Upload Release Asset
-        uses: actions/upload-release-asset@v2
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
