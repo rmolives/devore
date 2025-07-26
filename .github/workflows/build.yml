@@ -8,7 +8,6 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,19 +47,14 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Verify JAR
-        id: verify_jar
+      - name: Get JAR Path
+        id: jar
         run: |
-          JAR_PATH=$(ls build/libs/*.jar | head -n 1)
-          if [ ! -f "$JAR_PATH" ]; then
-            echo "::error::No JAR file found in build/libs/"
-            exit 1
-          fi
-          echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
+          echo "jar_path=$(ls build/libs/*.jar | head -n 1)" >> $GITHUB_OUTPUT
       - name: Calculate SHA256
         id: calculate_sha
         run: |
-          SHA256=$(sha256sum ${{ steps.verify_jar.outputs.jar_path }} | awk '{print $1}')
+          SHA256=$(sha256sum ${{ steps.jar.outputs.jar_path }} | awk '{print $1}')
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
           echo "SHA256: $SHA256"
       - name: Get timestamp
@@ -88,6 +82,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.verify_jar.outputs.jar_path }}
+          asset_path: ${{ steps.jar.outputs.jar_path }}
           asset_name: Devore-${{ steps.gradle_version.outputs.version }}.jar
           asset_content_type: application/java-archive
