@@ -72,6 +72,16 @@ public class NumberUtils {
     }
 
     /**
+     * 判断BigDecimal是否为整数
+     * @param decimal   BigDecimal
+     * @return          结果
+     */
+    public static boolean isInt(BigDecimal decimal) {
+        BigDecimal stripped = decimal.stripTrailingZeros();
+        return stripped.scale() <= 0;
+    }
+
+    /**
      * 使用泰勒级数展开计算sin(x)
      * @param x     x
      * @param mc    精度
@@ -171,7 +181,7 @@ public class NumberUtils {
         }
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ONE;
-        if (y.scale() <= 0 || y.stripTrailingZeros().scale() <= 0)
+        if (isInt(y))
             return powInt(x, y.toBigInteger(), mc);
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new DevoreRuntimeException("非整数指数的负数.");

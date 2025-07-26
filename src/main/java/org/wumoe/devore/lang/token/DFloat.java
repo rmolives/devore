@@ -34,10 +34,7 @@ public class DFloat extends DNumber {
         return new DFloat(n);
     }
 
-    private static boolean isInt(BigDecimal decimal) {
-        BigDecimal stripped = decimal.stripTrailingZeros();
-        return stripped.scale() <= 0;
-    }
+    
 
     @Override
     public DArithmetic add(DArithmetic a) {
@@ -48,7 +45,7 @@ public class DFloat extends DNumber {
             result = DFloat.valueOf(num.add(n.num));
         else
             throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -60,7 +57,7 @@ public class DFloat extends DNumber {
             result = DFloat.valueOf(num.subtract(n.num));
         else
             throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -72,7 +69,7 @@ public class DFloat extends DNumber {
             result = DFloat.valueOf(num.multiply(n.num));
         else
             throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -84,25 +81,25 @@ public class DFloat extends DNumber {
             result = DFloat.valueOf(num.divide(n.num, MathContext.DECIMAL128));
         else
             throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber sin() {
         DFloat result = DFloat.valueOf(NumberUtils.sin(num, MathContext.DECIMAL128));
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber cos() {
         DFloat result = DFloat.valueOf(NumberUtils.cos(num, MathContext.DECIMAL128));
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber tan() {
         DFloat result = DFloat.valueOf(NumberUtils.tan(num, MathContext.DECIMAL128));
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -118,13 +115,13 @@ public class DFloat extends DNumber {
     @Override
     public DNumber sqrt() {
         DFloat result = DFloat.valueOf(NumberUtils.sqrt(num, MathContext.DECIMAL128));
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber pow(DNumber n) {
         DFloat result = DFloat.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -135,13 +132,13 @@ public class DFloat extends DNumber {
     @Override
     public DNumber ln() {
         DFloat result = DFloat.valueOf(NumberUtils.ln(this.toBigDecimal(), MathContext.DECIMAL128));
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber exp() {
         DFloat result = DFloat.valueOf(NumberUtils.exp(this.toBigDecimal(), MathContext.DECIMAL128));
-        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
@@ -161,7 +158,7 @@ public class DFloat extends DNumber {
 
     @Override
     public String str() {
-        return isInt(num) ? DInt.valueOf(num).str() : num.toPlainString();
+        return NumberUtils.isInt(num) ? DInt.valueOf(num).str() : num.toPlainString();
     }
 
     @Override
