@@ -22,13 +22,25 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: List build outputs
+        run: |
+          echo "Build directory contents:"
+          ls -la build/libs/
+
+      - name: Verify JAR exists
+        run: |
+          if [ ! -f build/libs/*.jar ]; then
+            echo "Error: No JAR file found in build/libs/"
+            exit 1
+          fi
+
       - name: Build with Gradle
         run: ./gradlew build
 
       - name: Delete old dev-latest tag if exists
         run: |
-          if git ls-remote --tags origin | grep -q "refs/tags/dev-latest"; then
-            git push --delete origin dev-latest
+          if git ls-remote --tags origin | grep -q "refs/tags/0.1-alpha"; then
+            git push --delete origin 0.1-alpha
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
