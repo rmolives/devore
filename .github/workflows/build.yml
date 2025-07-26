@@ -67,15 +67,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.gradle_version.outputs.version }}
-          release_name: Latest Dev Build
+          release_name: Development build
           draft: false
           prerelease: true
           body: |
-            Latest development build
-            - Version: ${{ steps.gradle_version.outputs.version }}
-            - Build date: ${{ steps.timestamp.outputs.date }}
-            - Commit: ${{ github.sha }}
-            - SHA256: ${{ steps.calculate_sha.outputs.sha256 }}
+            Version: ${{ steps.gradle_version.outputs.version }}
+            Build date: ${{ steps.timestamp.outputs.date }}
+            Commit: ${{ github.sha }}
+            SHA256: ${{ steps.calculate_sha.outputs.sha256 }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
