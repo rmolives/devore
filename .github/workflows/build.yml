@@ -64,6 +64,7 @@ jobs:
           prerelease: true
           body: |
             Latest development build
+            - Version: ${{ steps.gradle_version.outputs.version }}
             - Build date: ${{ steps.timestamp.outputs.date }}
             - Commit: ${{ github.sha }}
             - SHA256: ${{ steps.calculate_sha.outputs.sha256 }}
