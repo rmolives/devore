@@ -32,7 +32,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Delete old dev-latest tag if exists
+      - name: Delete old tag if exists
         run: |
           if git ls-remote --tags origin | grep -q "refs/tags/${{ steps.gradle_version.outputs.version }}"; then
             git push --delete origin ${{ steps.gradle_version.outputs.version }}
@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: dev-latest
+          tag_name: ${{ steps.gradle_version.outputs.version }}
           release_name: Latest Dev Build (${{ github.ref_name }})
           draft: false
           prerelease: true
