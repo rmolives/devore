@@ -27,7 +27,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Delete old tag if exists
+      - name: Delete old tag and releases
         run: |
           if git ls-remote --tags origin | grep -q "refs/tags/${{ steps.gradle_version.outputs.version }}"; then
             git push --delete origin "refs/tags/${{ steps.gradle_version.outputs.version }}"
@@ -73,7 +73,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.gradle_version.outputs.version }}
-          release_name: Latest Dev Build (${{ github.ref_name }})
+          release_name: Latest Dev Build
           draft: false
           prerelease: true
           body: |
