@@ -25,7 +25,7 @@ jobs:
       - name: List build outputs
         run: |
           echo "Build directory contents:"
-          ls -la build/libs/
+          ls -la build/
 
       - name: Verify JAR exists
         run: |
