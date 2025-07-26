@@ -11,20 +11,20 @@ public class MathModule extends Module {
     @Override
     public void init(Env dEnv) {
         dEnv.addTokenFunction("prime?", ((args, env) -> {
-            if (!(args.getFirst() instanceof DInt num))
-                throw new DevoreCastException(args.getFirst().type(), "int");
+            if (!(args.get(0) instanceof DInt num))
+                throw new DevoreCastException(args.get(0).type(), "int");
             return DBool.valueOf(num.toBigInteger().isProbablePrime(100));
         }), 1, false);
         dEnv.addTokenFunction("prime?", ((args, env) -> {
-            if (!(args.getFirst() instanceof DInt num))
-                throw new DevoreCastException(args.getFirst().type(), "int");
+            if (!(args.get(0) instanceof DInt num))
+                throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt certainty))
                 throw new DevoreCastException(args.get(1).type(), "int");
             return DBool.valueOf(num.toBigInteger().isProbablePrime(certainty.toBigInteger().intValue()));
         }), 2, false);
         dEnv.addTokenFunction("gcd", ((args, env) -> {
-            if (!(args.getFirst() instanceof DInt n1))
-                throw new DevoreCastException(args.getFirst().type(), "int");
+            if (!(args.get(0) instanceof DInt n1))
+                throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt n2))
                 throw new DevoreCastException(args.get(1).type(), "int");
             for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0? n1 : n2).toBigInteger();
@@ -34,8 +34,8 @@ public class MathModule extends Module {
             return DInt.valueOf(1);
         }), 2, false);
         dEnv.addTokenFunction("lcm", ((args, env) -> {
-            if (!(args.getFirst() instanceof DInt n1))
-                throw new DevoreCastException(args.getFirst().type(), "int");
+            if (!(args.get(0) instanceof DInt n1))
+                throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt n2))
                 throw new DevoreCastException(args.get(1).type(), "int");
             BigInteger gcd = BigInteger.ONE;

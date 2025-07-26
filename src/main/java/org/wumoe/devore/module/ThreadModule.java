@@ -28,25 +28,25 @@ public class ThreadModule extends Module {
             return DThread.create(DFunction.newFunction(df, 0, false), env);
         }), 1, false);
         dEnv.addTokenFunction("thread-start", ((args, env) -> {
-            if (!(args.getFirst() instanceof DThread))
-                throw new DevoreCastException(args.getFirst().type(), "thread");
-            ((DThread) args.getFirst()).start();
+            if (!(args.get(0) instanceof DThread))
+                throw new DevoreCastException(args.get(0).type(), "thread");
+            ((DThread) args.get(0)).start();
             return DWord.WORD_NIL;
         }), 1, false);
         dEnv.addTokenFunction("thread-start?", ((args, env) -> {
-            if (!(args.getFirst() instanceof DThread))
-                throw new DevoreCastException(args.getFirst().type(), "thread");
-            return DBool.valueOf(((DThread) args.getFirst()).isStart());
+            if (!(args.get(0) instanceof DThread))
+                throw new DevoreCastException(args.get(0).type(), "thread");
+            return DBool.valueOf(((DThread) args.get(0)).isStart());
         }), 1, false);
         dEnv.addTokenFunction("thread-done?", ((args, env) -> {
-            if (!(args.getFirst() instanceof DThread))
-                throw new DevoreCastException(args.getFirst().type(), "thread");
-            return DBool.valueOf(((DThread) args.getFirst()).isDone());
+            if (!(args.get(0) instanceof DThread))
+                throw new DevoreCastException(args.get(0).type(), "thread");
+            return DBool.valueOf(((DThread) args.get(0)).isDone());
         }), 1, false);
         dEnv.addTokenFunction("thread-join", ((args, env) -> {
-            if (!(args.getFirst() instanceof DThread))
-                throw new DevoreCastException(args.getFirst().type(), "thread");
-            return DBool.valueOf(((DThread) args.getFirst()).join());
+            if (!(args.get(0) instanceof DThread))
+                throw new DevoreCastException(args.get(0).type(), "thread");
+            return DBool.valueOf(((DThread) args.get(0)).join());
         }), 1, false);
     }
 
