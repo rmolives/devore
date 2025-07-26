@@ -25,19 +25,27 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Create Release
+      - name: Delete old dev-latest tag if exists
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/dev-latest"; then
+            git push --delete origin dev-latest
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release with fixed tag
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: dev-${{ github.ref_name }}-${{ github.run_id }}
-          release_name: Dev Build ${{ github.run_id }} (${{ github.ref_name }})
+          tag_name: dev-latest
+          release_name: Latest Dev Build (${{ github.ref_name }})
           draft: false
           prerelease: true
           body: |
-            Automatic nightly development build
-            - Build date: ${{ steps.date.outputs.date }}
+            Latest development build
+            - Build date: $(date -u +'%Y-%m-%d %H:%M:%S')
             - Commit: ${{ github.sha }}
 
       - name: Upload Release Asset
@@ -47,5 +55,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/libs/*.jar
-          asset_name: app-dev-${{ github.run_id }}.jar
+          asset_name: app-dev-latest.jar
           asset_content_type: application/java-archive
