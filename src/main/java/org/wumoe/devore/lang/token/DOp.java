@@ -1,5 +1,8 @@
 package org.wumoe.devore.lang.token;
 
+/**
+ * 关键字
+ */
 public class DOp extends DString {
     protected DOp(String op) {
         super(op);

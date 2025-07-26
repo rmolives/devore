@@ -1,5 +1,8 @@
 package org.wumoe.devore.lang.token;
 
+/**
+ * 布尔值
+ */
 public class DBool extends Token {
     public static final DBool FALSE = new DBool(false);
     public static final DBool TRUE = new DBool(true);

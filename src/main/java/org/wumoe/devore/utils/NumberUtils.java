@@ -7,15 +7,18 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+/**
+ * 数学工具
+ */
 public class NumberUtils {
-    private static final BigDecimal TWO = BigDecimal.valueOf(2);
-    private static final BigDecimal PI = approximatePi(100);
-    private static final BigDecimal TWO_PI = PI.multiply(TWO);
+    private static final BigDecimal TWO = BigDecimal.valueOf(2);        // 2
+    private static final BigDecimal PI = approximatePi(100);    // 100位Pi
+    private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
 
     /**
      * 使用Machin公式将 π 近似为指定精度
      * @param precision 精度小数位数
-     * @return π 近似值
+     * @return          π 近似值
      */
     private static BigDecimal approximatePi(int precision) {
         MathContext mc = new MathContext(precision + 2, RoundingMode.HALF_EVEN);
@@ -30,9 +33,9 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算arctan(x)
-     * @param x x
-     * @param mc 精度
-     * @return arctan(x)
+     * @param x     x
+     * @param mc    精度
+     * @return      arctan(x)
      */
     private static BigDecimal arctan(BigDecimal x, MathContext mc) {
         BigDecimal result = BigDecimal.ZERO;
@@ -56,8 +59,8 @@ public class NumberUtils {
     /**
      * 将角度缩小到范围[-π，π]
      * @param angle 角度
-     * @param mc 精度
-     * @return [-π, π]
+     * @param mc    精度
+     * @return      [-π, π]
      */
     private static BigDecimal reduceAngle(BigDecimal angle, MathContext mc) {
         angle = angle.remainder(TWO_PI, mc);
@@ -70,9 +73,9 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算sin(x)
-     * @param x x
-     * @param mc 精度
-     * @return sin(x)
+     * @param x     x
+     * @param mc    精度
+     * @return      sin(x)
      */
     public static BigDecimal sin(BigDecimal x, MathContext mc) {
         x = reduceAngle(x, mc);
@@ -93,9 +96,9 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算cos(x)
-     * @param x x
-     * @param mc 精度
-     * @return cos(x)
+     * @param x     x
+     * @param mc    精度
+     * @return      cos(x)
      */
     public static BigDecimal cos(BigDecimal x, MathContext mc) {
         x = reduceAngle(x, mc);
@@ -117,9 +120,9 @@ public class NumberUtils {
 
     /**
      * 将tan计算为sin(x)/cos(x)
-     * @param x x
-     * @param mc 精度
-     * @return tan(x)
+     * @param x     x
+     * @param mc    精度
+     * @return      tan(x)
      */
     public static BigDecimal tan(BigDecimal x, MathContext mc) {
         BigDecimal cos = cos(x, mc);
@@ -130,9 +133,9 @@ public class NumberUtils {
 
     /**
      * 使用牛顿法计算BigDecimal的平方根
-     * @param x x
-     * @param mc 精度
-     * @return √x
+     * @param x     x
+     * @param mc    精度
+     * @return      √x
      */
     public static BigDecimal sqrt(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
@@ -153,10 +156,10 @@ public class NumberUtils {
 
     /**
      * 计算BigDecimal的x^y
-     * @param x x
-     * @param y y
-     * @param mc 精度
-     * @return x^y
+     * @param x     x
+     * @param y     y
+     * @param mc    精度
+     * @return      x^y
      */
     public static BigDecimal pow(BigDecimal x, BigDecimal y, MathContext mc) {
         if (y.compareTo(BigDecimal.ZERO) == 0)
@@ -178,10 +181,10 @@ public class NumberUtils {
 
     /**
      * 计算BigDecimal的x^y, 其中y为整数
-     * @param x x
-     * @param y y
-     * @param mc 精度
-     * @return x^y
+     * @param x     x
+     * @param y     y
+     * @param mc    精度
+     * @return      x^y
      */
     private static BigDecimal powInt(BigDecimal x, BigInteger y, MathContext mc) {
         if (y.compareTo(BigInteger.ZERO) < 0)
@@ -200,9 +203,9 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数计算ln(x)
-     * @param x x
-     * @param mc 精度
-     * @return ln(x)
+     * @param x     x
+     * @param mc    精度
+     * @return      ln(x)
      */
     public static BigDecimal ln(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0)
@@ -225,9 +228,9 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数计算e^x
-     * @param x x
-     * @param mc 精度
-     * @return e^x
+     * @param x     x
+     * @param mc    精度
+     * @return      e^x
      */
     public static BigDecimal exp(BigDecimal x, MathContext mc) {
         BigDecimal result = BigDecimal.ONE;

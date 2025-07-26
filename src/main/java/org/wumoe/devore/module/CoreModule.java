@@ -12,6 +12,9 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.BiFunction;
 
+/**
+ * 核心模块
+ */
 public class CoreModule extends Module {
     @Override
     public void init(Env dEnv) {

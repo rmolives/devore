@@ -3,6 +3,9 @@ package org.wumoe.devore.lang.token;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ * 整数
+ */
 public class DInt extends DNumber {
     public final BigInteger num;
 

@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
+/**
+ * 函数
+ */
 public class DFunction extends Token {
     private final BiFunction<AstNode, Env, Token> function;
     private final int argSize;

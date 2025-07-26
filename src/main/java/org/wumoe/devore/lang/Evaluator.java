@@ -5,7 +5,16 @@ import org.wumoe.devore.lang.token.DOp;
 import org.wumoe.devore.lang.token.Token;
 import org.wumoe.devore.parser.AstNode;
 
+/**
+ * 求值器
+ */
 public class Evaluator {
+    /**
+     * 求值
+     * @param env   环境
+     * @param ast   语法树
+     * @return      返回值
+     */
     public static Token eval(Env env, AstNode ast) {
         while (true) {
             if (ast.op instanceof DOp && env.contains(ast.op.toString()))

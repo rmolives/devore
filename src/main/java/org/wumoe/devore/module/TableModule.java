@@ -9,6 +9,9 @@ import org.wumoe.devore.lang.token.DTable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * 表相关模块
+ */
 public class TableModule extends Module {
     @Override
     public void init(Env dEnv) {

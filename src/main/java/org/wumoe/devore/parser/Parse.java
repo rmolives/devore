@@ -8,11 +8,14 @@ import org.wumoe.devore.lang.token.Token;
 import java.util.ArrayDeque;
 import java.util.List;
 
+/**
+ * 语法分析器
+ */
 public class Parse {
     /**
      * 语法分析器
-     * @param tokens Token序列
-     * @return 抽象语法树
+     * @param tokens    Token序列
+     * @return          语法树
      */
     public static AstNode parse(List<Token> tokens) {
         AstNode ast = null;

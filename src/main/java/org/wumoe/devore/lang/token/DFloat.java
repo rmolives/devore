@@ -8,6 +8,9 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+/**
+ * 浮点数
+ */
 public class DFloat extends DNumber {
     public final BigDecimal num;
 

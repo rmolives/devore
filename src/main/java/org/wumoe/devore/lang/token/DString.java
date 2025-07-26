@@ -1,5 +1,8 @@
 package org.wumoe.devore.lang.token;
 
+/**
+ * 字符串
+ */
 public class DString extends Token {
     public final String str;
 

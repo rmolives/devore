@@ -3,6 +3,9 @@ package org.wumoe.devore.lang.token;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ * 四则运算
+ */
 public abstract class DArithmetic extends Token {
     public abstract DArithmetic add(DArithmetic a);
 

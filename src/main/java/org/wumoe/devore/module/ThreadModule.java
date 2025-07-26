@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
+/**
+ * 并发相关模块
+ */
 public class ThreadModule extends Module {
     @Override
     public void init(Env dEnv) {

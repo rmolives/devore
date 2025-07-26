@@ -8,10 +8,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * 线程
+ */
 public class DThread extends Token {
-    private final Runnable task;
-    private final String str;
-    public final UUID uuid;
+    private final Runnable task;    // 任务
+    private final String str;       // str
+    public final UUID uuid;         // 线程uuid
 
     private Future<?> future;
 

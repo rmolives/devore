@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 表
+ */
 public class DTable extends Token {
     private final Map<Token, Token> table;
 

@@ -1,5 +1,8 @@
 package org.wumoe.devore.lang.token;
 
+/**
+ * 复杂数学相关
+ */
 public abstract class DNumber extends DArithmetic {
     public abstract DNumber sin();
 

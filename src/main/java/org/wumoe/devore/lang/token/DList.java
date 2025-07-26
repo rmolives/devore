@@ -1,10 +1,11 @@
 package org.wumoe.devore.lang.token;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+/**
+ * 列表
+ */
 public class DList extends Token {
     private final List<Token> tokens;
 

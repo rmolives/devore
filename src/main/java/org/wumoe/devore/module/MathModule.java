@@ -8,6 +8,9 @@ import org.wumoe.devore.lang.token.DNumber;
 
 import java.math.BigInteger;
 
+/**
+ * 数学相关模块
+ */
 public class MathModule extends Module {
     @Override
     public void init(Env dEnv) {
