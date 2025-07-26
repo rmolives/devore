@@ -34,6 +34,9 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get timestamp
+        id: timestamp
+        run: echo "date=$(date -u +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
       - name: Create Release with fixed tag
         id: create_release
         uses: actions/create-release@v1
@@ -46,7 +49,7 @@ jobs:
           prerelease: true
           body: |
             Latest development build
-            - Build date: ${{ github.run_number }}
+            - Build date: ${{ steps.timestamp.outputs.date }}
             - Commit: ${{ github.sha }}
             - Workflow: ${{ github.workflow }} #${{ github.run_id }}
       - name: Get JAR path
@@ -61,5 +64,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.jar_path.outputs.jar_path }}
-          asset_name: ${{ steps.gradle_version.outputs.version }}.jar
+          asset_name: Devore-${{ steps.gradle_version.outputs.version }}.jar
           asset_content_type: application/java-archive
