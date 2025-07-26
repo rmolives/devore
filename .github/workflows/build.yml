@@ -33,7 +33,7 @@ jobs:
       - name: List build2 outputs
         run: |
           echo "Build directory contents:"
-          ls -la build/jar/
+          ls -la build/libs/
 
       - name: Verify JAR exists
         run: |
