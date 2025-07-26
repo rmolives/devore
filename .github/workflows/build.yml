@@ -73,6 +73,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.jar_path.outputs.jar_path }}
+          asset_path: ${{ steps.verify_jar.outputs.jar_path }}
           asset_name: Devore-${{ steps.gradle_version.outputs.version }}.jar
           asset_content_type: application/java-archive
