@@ -91,6 +91,16 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public DNumber ln() {
+        return DFloat.valueOf(num).ln();
+    }
+
+    @Override
+    public DNumber exp() {
+        return DFloat.valueOf(num).exp();
+    }
+
+    @Override
     public BigInteger toBigInteger() {
         return num;
     }

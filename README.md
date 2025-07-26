@@ -29,7 +29,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 ### Prime?
 
 ```lisp
-(def (prime? n)
+(def (myprime? n)
     (def (divides? a b)
         (= (mod b a) 0))
     (def (find-divisor n test-divisor)
@@ -39,7 +39,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
     (def (smallest-divisor n)
         (find-divisor n 2))
     (= n (smallest-divisor n)))
-(println (prime? 17))
+(println (myprime? 17))
 ```
 
 ### Fibonacci

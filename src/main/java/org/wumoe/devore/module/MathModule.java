@@ -4,6 +4,7 @@ import org.wumoe.devore.exception.DevoreCastException;
 import org.wumoe.devore.lang.Env;
 import org.wumoe.devore.lang.token.DBool;
 import org.wumoe.devore.lang.token.DInt;
+import org.wumoe.devore.lang.token.DNumber;
 
 import java.math.BigInteger;
 
@@ -49,5 +50,15 @@ public class MathModule extends Module {
                 return DInt.valueOf(0);
             return DInt.valueOf(n1.toBigInteger().multiply(n2.toBigInteger()).divide(gcd));
         }), 2, false);
+        dEnv.addTokenFunction("ln", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).ln();
+        }), 1, false);
+        dEnv.addTokenFunction("exp", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).exp();
+        }), 1, false);
     }
 }

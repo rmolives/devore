@@ -1,7 +1,7 @@
 package org.wumoe.devore.lang.token;
 
-import ch.obermuhlner.math.big.BigDecimalMath;
 import org.wumoe.devore.exception.DevoreRuntimeException;
+import org.wumoe.devore.utils.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -86,19 +86,19 @@ public class DFloat extends DNumber {
 
     @Override
     public DNumber sin() {
-        DFloat result = DFloat.valueOf(BigDecimalMath.sin(num, MathContext.DECIMAL128));
+        DFloat result = DFloat.valueOf(NumberUtils.sin(num, MathContext.DECIMAL128));
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber cos() {
-        DFloat result = DFloat.valueOf(BigDecimalMath.cos(num, MathContext.DECIMAL128));
+        DFloat result = DFloat.valueOf(NumberUtils.cos(num, MathContext.DECIMAL128));
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber tan() {
-        DFloat result = DFloat.valueOf(BigDecimalMath.tan(num, MathContext.DECIMAL128));
+        DFloat result = DFloat.valueOf(NumberUtils.tan(num, MathContext.DECIMAL128));
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
@@ -114,19 +114,31 @@ public class DFloat extends DNumber {
 
     @Override
     public DNumber sqrt() {
-        DFloat result = DFloat.valueOf(BigDecimalMath.sqrt(num, MathContext.DECIMAL128));
+        DFloat result = DFloat.valueOf(NumberUtils.sqrt(num, MathContext.DECIMAL128));
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber pow(DNumber n) {
-        DFloat result = DFloat.valueOf(BigDecimalMath.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+        DFloat result = DFloat.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override
     public DNumber abs() {
         return DFloat.valueOf(num.abs());
+    }
+
+    @Override
+    public DNumber ln() {
+        DFloat result = DFloat.valueOf(NumberUtils.ln(this.toBigDecimal(), MathContext.DECIMAL128));
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
+    }
+
+    @Override
+    public DNumber exp() {
+        DFloat result = DFloat.valueOf(NumberUtils.exp(this.toBigDecimal(), MathContext.DECIMAL128));
+        return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
     @Override

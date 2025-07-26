@@ -10,7 +10,6 @@ repositories {
 }
 
 dependencies {
-    implementation("ch.obermuhlner:big-math:2.3.2")
 }
 
 tasks.jar {
