@@ -12,26 +12,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
       - name: Extract Gradle version
         id: gradle_version
         run: |
           VERSION=$(./gradlew properties -q | grep "version:" | awk '{print $2}' | tr -d "'\r\n ")
           echo "Extracted version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
       - name: Build with Gradle
         run: ./gradlew build
-
       - name: Delete old tag if exists
         run: |
           if git ls-remote --tags origin | grep -q "refs/tags/${{ steps.gradle_version.outputs.version }}"; then
@@ -39,7 +34,6 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create Release with fixed tag
         id: create_release
         uses: actions/create-release@v1
