@@ -9,6 +9,11 @@ import java.util.ArrayDeque;
 import java.util.List;
 
 public class Parse {
+    /**
+     * 语法分析器
+     * @param tokens Token序列
+     * @return 抽象语法树
+     */
     public static AstNode parse(List<Token> tokens) {
         AstNode ast = null;
         ArrayDeque<AstNode> stack = new ArrayDeque<>();

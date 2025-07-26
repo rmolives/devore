@@ -9,6 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lexer {
+    /**
+     * 分割代码
+     * 例如：把(+ 2 3)(- 4 5)分割成(+ 2 3)和(- 4 5)
+     * @param code 代码
+     * @return 代码序列
+     */
     public static List<String> splitCode(String code) {
         char[] codeCharArray = code.toCharArray();
         List<String> expressions = new ArrayList<>();
@@ -69,6 +75,11 @@ public class Lexer {
         return expressions;
     }
 
+    /**
+     * 词法分析器
+     * @param expression 代码
+     * @return Token序列
+     */
     public static List<Token> lexer(String expression) {
         char[] expressionCharArray = expression.toCharArray();
         List<Token> tokens = new ArrayList<>();
