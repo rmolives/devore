@@ -34,6 +34,21 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify JAR
+        id: verify_jar
+        run: |
+          JAR_PATH=$(ls build/libs/*.jar | head -n 1)
+          if [ ! -f "$JAR_PATH" ]; then
+            echo "::error::No JAR file found in build/libs/"
+            exit 1
+          fi
+          echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
+      - name: Calculate SHA256
+        id: calculate_sha
+        run: |
+          SHA256=$(sha256sum ${{ steps.verify_jar.outputs.jar_path }} | awk '{print $1}')
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          echo "SHA256: $SHA256"
       - name: Get timestamp
         id: timestamp
         run: echo "date=$(date -u +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
@@ -51,12 +66,7 @@ jobs:
             Latest development build
             - Build date: ${{ steps.timestamp.outputs.date }}
             - Commit: ${{ github.sha }}
-            - Workflow: ${{ github.workflow }} #${{ github.run_id }}
-      - name: Get JAR path
-        id: jar_path
-        run: |
-          JAR_PATH=$(find build/libs -name '*.jar' | head -n 1)
-          echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
+            - SHA256: ${{ steps.calculate_sha.outputs.sha256 }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
