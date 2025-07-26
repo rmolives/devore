@@ -56,7 +56,7 @@ public class DFloat extends DNumber {
         else if (a instanceof DFloat n)
             result = DFloat.valueOf(num.subtract(n.num));
         else
-            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
+            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相减.");
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
@@ -68,7 +68,7 @@ public class DFloat extends DNumber {
         else if (a instanceof DFloat n)
             result = DFloat.valueOf(num.multiply(n.num));
         else
-            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
+            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相乘.");
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
@@ -80,7 +80,7 @@ public class DFloat extends DNumber {
         else if (a instanceof DFloat n)
             result = DFloat.valueOf(num.divide(n.num, MathContext.DECIMAL128));
         else
-            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相加.");
+            throw new DevoreRuntimeException("无法将类型 [" + type() + "] 与类型 [" + a.type() + "] 相除.");
         return isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
