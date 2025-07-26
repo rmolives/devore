@@ -22,10 +22,18 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Build with Gradle
+        run: ./gradlew build
+
       - name: List build outputs
         run: |
           echo "Build directory contents:"
           ls -la build/
+
+      - name: List build2 outputs
+        run: |
+          echo "Build directory contents:"
+          ls -la build/jar/
 
       - name: Verify JAR exists
         run: |
@@ -33,9 +41,6 @@ jobs:
             echo "Error: No JAR file found in build/libs/"
             exit 1
           fi
-
-      - name: Build with Gradle
-        run: ./gradlew build
 
       - name: Delete old dev-latest tag if exists
         run: |
