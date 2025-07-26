@@ -29,9 +29,6 @@ jobs:
         run: ./gradlew build
       - name: Delete old tag and releases
         run: |
-          if git ls-remote --tags origin | grep -q "refs/tags/${{ steps.gradle_version.outputs.version }}"; then
-            git push --delete origin "refs/tags/${{ steps.gradle_version.outputs.version }}"
-          fi
           TAG=${{ steps.gradle_version.outputs.version }}
           RELEASES=$(curl -s \
                         -H "Authorization: token $GITHUB_TOKEN" \
@@ -46,6 +43,9 @@ jobs:
                           -H "Accept: application/vnd.github.v3+json" \
                           "https://api.github.com/repos/${{ github.repository }}/releases/$ID"
                       done
+          if git ls-remote --tags origin | grep -q "refs/tags/${{ steps.gradle_version.outputs.version }}"; then
+            git push --delete origin "refs/tags/${{ steps.gradle_version.outputs.version }}"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify JAR
