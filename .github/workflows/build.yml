@@ -22,30 +22,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Extract Gradle version
+        id: gradle_version
+        run: |
+          VERSION=$(./gradlew properties -q | grep "version:" | awk '{print $2}' | tr -d "'\r\n ")
+          echo "Extracted version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: List build outputs
-        run: |
-          echo "Build directory contents:"
-          ls -la build/
-
-      - name: List build2 outputs
-        run: |
-          echo "Build directory contents:"
-          ls -la build/libs/
-
-      - name: Verify JAR exists
-        run: |
-          if [ ! -f build/libs/*.jar ]; then
-            echo "Error: No JAR file found in build/libs/"
-            exit 1
-          fi
-
       - name: Delete old dev-latest tag if exists
         run: |
-          if git ls-remote --tags origin | grep -q "refs/tags/0.1-alpha"; then
-            git push --delete origin 0.1-alpha
+          if git ls-remote --tags origin | grep -q "refs/tags/${{ steps.gradle_version.outputs.version }}"; then
+            git push --delete origin ${{ steps.gradle_version.outputs.version }}
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,15 +52,20 @@ jobs:
           prerelease: true
           body: |
             Latest development build
-            - Build date: $(date -u +'%Y-%m-%d %H:%M:%S')
+            - Build date: ${{ github.run_number }}
             - Commit: ${{ github.sha }}
-
+            - Workflow: ${{ github.workflow }} #${{ github.run_id }}
+      - name: Get JAR path
+        id: jar_path
+        run: |
+          JAR_PATH=$(find build/libs -name '*.jar' | head -n 1)
+          echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/libs/*.jar
-          asset_name: app-dev-latest.jar
+          asset_path: ${{ steps.jar_path.outputs.jar_path }}
+          asset_name: ${{ steps.gradle_version.outputs.version }}.jar
           asset_content_type: application/java-archive
