@@ -132,7 +132,7 @@ public class CoreModule extends Module {
                 if (Devore.moduleTable.containsKey(t.toString()))
                     env.load(t.toString());
                 else {
-                    File file = new File(t.toString().replaceAll("\\.", "/") + ".devore");
+                    File file = new File(System.getProperty("user.dir") + t.toString().replaceAll("\\.", "/") + ".devore");
                     if (file.exists()) {
                         try {
                             Devore.call(env, Files.readString(Path.of(file.toURI())));
