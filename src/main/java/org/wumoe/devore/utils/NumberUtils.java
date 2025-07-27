@@ -200,13 +200,10 @@ public class NumberUtils {
         if (y.compareTo(BigInteger.ZERO) < 0)
             return BigDecimal.ONE.divide(powInt(x, y.subtract(y.multiply(BigInteger.TWO)), mc), mc);
         BigDecimal result = BigDecimal.ONE;
-        BigDecimal base = x;
         BigInteger exp = y;
         while (exp.compareTo(BigInteger.ZERO) > 0) {
-            if (exp.mod(BigInteger.TWO).compareTo(BigInteger.ONE) == 0)
-                result = result.multiply(base, mc);
-            base = base.multiply(base, mc);
-            exp = exp.multiply(BigInteger.valueOf(10));
+            result = result.multiply(x);
+            exp = exp.subtract(BigInteger.ONE);
         }
         return result;
     }
