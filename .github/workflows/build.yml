@@ -1,8 +1,9 @@
 name: Build and Release (dev)
 
 on:
-  schedule:
-    - cron: '0 17 * * *'
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
