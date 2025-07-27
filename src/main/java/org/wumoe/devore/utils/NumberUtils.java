@@ -52,7 +52,6 @@ public class NumberUtils {
                     BigDecimal.valueOf(i + 2), mc);
             add = !add;
         }
-
         return result;
     }
 
@@ -112,7 +111,6 @@ public class NumberUtils {
      */
     public static BigDecimal cos(BigDecimal x, MathContext mc) {
         x = reduceAngle(x, mc);
-
         BigDecimal result = BigDecimal.ZERO;
         BigDecimal term = BigDecimal.ONE;
         BigDecimal xSquared = x.multiply(x);
