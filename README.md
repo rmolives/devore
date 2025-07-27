@@ -4,7 +4,7 @@
 
 ## About
 
-This is the interpreter of Devore language, a dialect of Lisp, running on JVM platform.
+This is the interpreter of Devore Language, a dialect of Lisp, running on JVM platform.
 
 Once a feature is finished and tested, and not considered harmful, I'll copy the codes here and publish releases.
 
