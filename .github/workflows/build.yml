@@ -69,7 +69,7 @@ jobs:
         with:
           tag_name: ${{ steps.gradle_version.outputs.version }}
           release_name: Devore Language
-          draft: false
+          draft: true
           prerelease: true
           body: |
             Version: ${{ steps.gradle_version.outputs.version }}
