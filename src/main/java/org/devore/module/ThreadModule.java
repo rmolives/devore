@@ -4,7 +4,6 @@ import org.devore.exception.DevoreCastException;
 import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
-import org.wumoe.devore.lang.token.*;
 import org.devore.parser.AstNode;
 
 import java.util.ArrayList;

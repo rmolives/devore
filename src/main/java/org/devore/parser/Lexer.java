@@ -1,7 +1,6 @@
 package org.devore.parser;
 
 import org.devore.lang.token.*;
-import org.wumoe.devore.lang.token.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

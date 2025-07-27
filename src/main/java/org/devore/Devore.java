@@ -6,7 +6,6 @@ import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
 import org.devore.module.*;
 import org.devore.module.Module;
-import org.wumoe.devore.module.*;
 import org.devore.parser.Lexer;
 import org.devore.parser.Parse;
 

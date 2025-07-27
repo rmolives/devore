@@ -1,14 +1,20 @@
 package org.devore.module;
 
+import org.devore.Devore;
 import org.devore.exception.DevoreCastException;
+import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.AstNode;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -122,8 +128,20 @@ public class CoreModule extends Module {
             return ((DNumber) args.get(0)).floor();
         }), 1, false);
         dEnv.addTokenFunction("require", ((args, env) -> {
-            for (Token t : args)
-                env.load(t.toString());
+            for (Token t : args) {
+                if (Devore.moduleTable.containsKey(t.toString()))
+                    env.load(t.toString());
+                else {
+                    File file = new File(t.toString().replaceAll("\\.", "/") + ".devore");
+                    if (file.exists()) {
+                        try {
+                            Devore.call(env, Files.readString(Path.of(file.toURI())));
+                        } catch (IOException e) {
+                            throw new DevoreRuntimeException("加载模块[" + e + "]失败.");
+                        }
+                    }
+                }
+            }
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addTokenFunction("println", ((args, env) -> {
