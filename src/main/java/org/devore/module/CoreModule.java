@@ -181,7 +181,7 @@ public class CoreModule extends Module {
             if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
-                for (int i = 0; i < ast.size(); ++i)
+                for (int i = 1; i < ast.size(); ++i)
                     result = Evaluator.eval(newEnv, ast.get(i).copy());
                 env.put(ast.get(0).op.toString(), result);
             } else {
@@ -207,7 +207,7 @@ public class CoreModule extends Module {
             if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.FUNCTION) {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
-                for (int i = 0; i < ast.size(); ++i)
+                for (int i = 1; i < ast.size(); ++i)
                     result = Evaluator.eval(newEnv, ast.get(i).copy());
                 env.set(ast.get(0).op.toString(), result);
             } else {
