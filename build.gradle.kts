@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "org.wumoe.devore"
+group = "org.devore"
 version = "0.1-alpha"
 
 repositories {
