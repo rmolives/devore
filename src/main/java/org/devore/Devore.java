@@ -18,7 +18,7 @@ public class Devore {
     // 版本
     public static final String VERSION = "0.1-alpha";
     // 版本信息
-    public static final String VERSION_MESSAGE = "Devore v" + VERSION + ".\nAuthor: RMOlive (rmolives@wumoe.org)\nGithub: https://github.com/rmolives/devore";
+    public static final String VERSION_MESSAGE = "Devore v" + VERSION + ".\nAuthor: RMOlive (rmolives@wumoe.org)\nGitHub: https://github.com/rmolives/devore";
 
     // 模块列表
     public static Map<String, Module> moduleTable = new HashMap<>() {
