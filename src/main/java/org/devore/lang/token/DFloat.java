@@ -34,8 +34,6 @@ public class DFloat extends DNumber {
         return new DFloat(n);
     }
 
-    
-
     @Override
     public DArithmetic add(DArithmetic a) {
         DFloat result;
