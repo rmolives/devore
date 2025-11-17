@@ -18,7 +18,7 @@ public class ThreadModule extends Module {
     public void init(Env dEnv) {
         dEnv.addSymbolFunction("thread-new", ((ast, env) -> {
             List<AstNode> asts = new ArrayList<>();
-            asts.add(ast.get(0).copy());
+            asts.add(ast.getFirst().copy());
             BiFunction<AstNode, Env, Token> df = (inAst, inEnv) -> {
                 for (int i = 0; i < inAst.size(); ++i)
                     inAst.get(i).op = Evaluator.eval(inEnv, inAst.get(i).copy());
@@ -31,25 +31,25 @@ public class ThreadModule extends Module {
             return DThread.create(DFunction.newFunction(df, 0, false), env);
         }), 1, false);
         dEnv.addTokenFunction("thread-start", ((args, env) -> {
-            if (!(args.get(0) instanceof DThread))
-                throw new DevoreCastException(args.get(0).type(), "thread");
-            ((DThread) args.get(0)).start();
+            if (!(args.getFirst() instanceof DThread))
+                throw new DevoreCastException(args.getFirst().type(), "thread");
+            ((DThread) args.getFirst()).start();
             return DWord.WORD_NIL;
         }), 1, false);
         dEnv.addTokenFunction("thread-start?", ((args, env) -> {
-            if (!(args.get(0) instanceof DThread))
-                throw new DevoreCastException(args.get(0).type(), "thread");
-            return DBool.valueOf(((DThread) args.get(0)).isStart());
+            if (!(args.getFirst() instanceof DThread))
+                throw new DevoreCastException(args.getFirst().type(), "thread");
+            return DBool.valueOf(((DThread) args.getFirst()).isStart());
         }), 1, false);
         dEnv.addTokenFunction("thread-done?", ((args, env) -> {
-            if (!(args.get(0) instanceof DThread))
-                throw new DevoreCastException(args.get(0).type(), "thread");
-            return DBool.valueOf(((DThread) args.get(0)).isDone());
+            if (!(args.getFirst() instanceof DThread))
+                throw new DevoreCastException(args.getFirst().type(), "thread");
+            return DBool.valueOf(((DThread) args.getFirst()).isDone());
         }), 1, false);
         dEnv.addTokenFunction("thread-join", ((args, env) -> {
-            if (!(args.get(0) instanceof DThread))
-                throw new DevoreCastException(args.get(0).type(), "thread");
-            return DBool.valueOf(((DThread) args.get(0)).join());
+            if (!(args.getFirst() instanceof DThread))
+                throw new DevoreCastException(args.getFirst().type(), "thread");
+            return DBool.valueOf(((DThread) args.getFirst()).join());
         }), 1, false);
     }
 

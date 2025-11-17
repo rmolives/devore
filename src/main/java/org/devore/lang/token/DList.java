@@ -45,6 +45,10 @@ public class DList extends Token {
         return tokens.get(index);
     }
 
+    public Token getFirst() {
+        return get(0);
+    }
+
     public Token set(int index, Token t, boolean force) {
         if (force) {
             tokens.set(index, t);
