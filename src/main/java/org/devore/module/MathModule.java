@@ -31,7 +31,7 @@ public class MathModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "int");
             if (!(args.get(1) instanceof DInt n2))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0? n1 : n2).toBigInteger();
+            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
                  i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
                 if (n1.toBigInteger().mod(i).equals(BigInteger.ZERO) && n2.toBigInteger().mod(i).equals(BigInteger.ZERO))
                     return DInt.valueOf(i);
@@ -43,7 +43,7 @@ public class MathModule extends Module {
             if (!(args.get(1) instanceof DInt n2))
                 throw new DevoreCastException(args.get(1).type(), "int");
             BigInteger gcd = BigInteger.ONE;
-            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0? n1 : n2).toBigInteger();
+            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
                  i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
                 if (n1.toBigInteger().mod(i).equals(BigInteger.ZERO) && n2.toBigInteger().mod(i).equals(BigInteger.ZERO)) {
                     gcd = i;
