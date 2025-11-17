@@ -466,7 +466,7 @@ public class CoreModule extends Module {
             returnInteger = returnInteger.compareTo(end) > 0 ? end : returnInteger;
             return DInt.valueOf(returnInteger);
         }), 1, true);
-        dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 1, true);
+        dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 0, true);
         dEnv.addTokenFunction("list-contains", ((args, env) -> {
             if (!(args.getFirst() instanceof DList))
                 throw new DevoreCastException(args.getFirst().type(), "list");
