@@ -43,7 +43,7 @@ public class Repl {
                 codeBuilder.append(read);
                 char[] codeCharArray = codeBuilder.toString().toCharArray();
                 boolean skip = false;
-                while (codeCharArray[index] != '(')
+                while (codeCharArray[index] != '(' && codeCharArray[index] != '[')
                     ++index;
                 do {
                     if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
@@ -63,9 +63,9 @@ public class Repl {
                                 break;
                         } while (index < codeCharArray.length - 1);
                     }
-                    if (codeCharArray[index] == '(')
+                    if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
                         ++flag;
-                    else if (codeCharArray[index] == ')')
+                    else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
                         --flag;
                     ++index;
                 } while (index < codeCharArray.length);
