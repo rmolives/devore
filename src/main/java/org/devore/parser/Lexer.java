@@ -25,7 +25,7 @@ public class Lexer {
         while (index < codeCharArray.length) {
             int flag = 0;
             StringBuilder builder = new StringBuilder();
-            while (index < codeCharArray.length && codeCharArray[index] != '(')
+            while (index < codeCharArray.length && codeCharArray[index] != '(' && codeCharArray[index] != '[')
                 ++index;
             if (index >= codeCharArray.length)
                 return expressions;
@@ -65,11 +65,11 @@ public class Lexer {
                         || codeCharArray[index] == '\n' || codeCharArray[index] == '\r' || codeCharArray[index] == '\t')
                         && ((codeCharArray[index + 1] == ' '
                         || codeCharArray[index + 1] == '\n' || codeCharArray[index + 1] == '\r' || codeCharArray[index + 1] == '\t')
-                        || codeCharArray[index + 1] == ')'))
+                        || codeCharArray[index + 1] == ')' || codeCharArray[index + 1] == ']'))
                     ++index;
-                if (codeCharArray[index] == '(')
+                if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
                     ++flag;
-                else if (codeCharArray[index] == ')')
+                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
                     --flag;
                 builder.append(codeCharArray[index++]);
             } while (flag > 0);
@@ -94,6 +94,14 @@ public class Lexer {
                     continue;
                 }
                 case ')' -> {
+                    tokens.add(DWord.WORD_RB);
+                    continue;
+                }
+                case '[' -> {
+                    tokens.add(DWord.WORD_LB);
+                    continue;
+                }
+                case ']' -> {
                     tokens.add(DWord.WORD_RB);
                     continue;
                 }
@@ -170,10 +178,12 @@ public class Lexer {
                 tokens.add(DString.valueOf(builder.toString()));
                 continue;
             }
-            if (expressionCharArray[index] != ' ' && expressionCharArray[index] != '(' && expressionCharArray[index] != ')') {
+            if (expressionCharArray[index] != ' ' && expressionCharArray[index] != '(' && expressionCharArray[index] != ')'
+                    && expressionCharArray[index] != '[' && expressionCharArray[index] != ']') {
                 StringBuilder builder = new StringBuilder();
                 while (true) {
-                    if (index >= expressionCharArray.length - 1 || expressionCharArray[index] == ' ' || expressionCharArray[index] == ')') {
+                    if (index >= expressionCharArray.length - 1 || expressionCharArray[index] == ' '
+                            || expressionCharArray[index] == ')' || expressionCharArray[index] == ']') {
                         --index;
                         break;
                     }
