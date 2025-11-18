@@ -1,5 +1,5 @@
 (require "table")
-(def (is_digit n)
+(def (is-digit n)
     (let ([ascii (char->ascii n)])
         (and (>= ascii 48) (<= ascii 57))))
 (def (lexer code)
@@ -13,16 +13,16 @@
                   [else (let ([negative false])
                             (if (and (= (list-get code_array index) "-")
                                     (< index (- (length code_array) 1))
-                                    (is_digit (list-get code_array (+ index 1))))
+                                    (is-digit (list-get code_array (+ index 1))))
                                 (begin
                                     (set! negative true)
                                     (set! index (+ index 1))))
-                            (if (is_digit (list-get code_array index))
+                            (if (is-digit (list-get code_array index))
                                 (let ([v 0]
                                       [k true])
                                     (while k
                                         (if (or (>= index (- (length code_array) 1))
-                                            (not (is_digit (list-get code_array index))))
+                                            (not (is-digit (list-get code_array index))))
                                             (begin (set! index (- index 1)) (set! k false))
                                             (begin (set! v (+ (* v 10)
                                                 (- (char->ascii (list-get code_array index)) 48)))
@@ -36,7 +36,7 @@
                                             (while k
                                                 (set! index (+ index 1))
                                                 (if (or (>= index (- (length code_array) 1))
-                                                    (not (is_digit (list-get code_array index))))
+                                                    (not (is-digit (list-get code_array index))))
                                                     (begin (set! index (- index 1)) (set! k false))
                                                     (begin (set! x (+ x
                                                         (/ (- (char->ascii (list-get code_array index)) 48) d)))
