@@ -28,6 +28,10 @@ public class DTable extends Token {
         return DTable.valueOf(newTable);
     }
 
+    public DBool containsKey(Token key) {
+        return DBool.valueOf(table.containsKey(key));
+    }
+
     public Token get(Token key) {
         return table.get(key);
     }
