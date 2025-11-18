@@ -6,7 +6,7 @@
     (let ([code_array (string->chars code)]
           [token (list)]
           [index -1])
-        (while (< (begin (set! index (+ index 1)) index) (length code_array))
+          (while (< (begin (set! index (+ index 1)) index) (length code_array))
             (cond [(= (list-get code_array index) "(") (list-add! token "(")]
                   [(= (list-get code_array index) ")") (list-add! token ")")]
                   [(= (list-get code_array index) " ") nil]
