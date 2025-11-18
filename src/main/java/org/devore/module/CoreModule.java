@@ -328,6 +328,17 @@ public class CoreModule extends Module {
                 asts.add(new AstNode(arg));
             return ((DFunction) args.getFirst()).call(asts, env.createChild());
         }), 1, true);
+        dEnv.addTokenFunction("act", ((args, env) -> {
+            if (!(args.getFirst() instanceof DFunction))
+                throw new DevoreCastException(args.getFirst().type(), "function");
+            if (!(args.get(1) instanceof DList temp))
+                throw new DevoreCastException(args.getFirst().type(), "list");
+            List<Token> parameters = temp.toList();
+            AstNode asts = AstNode.nullAst.copy();
+            for (Token arg : parameters)
+                asts.add(new AstNode(arg));
+            return ((DFunction) args.getFirst()).call(asts, env.createChild());
+        }), 2, false);
         dEnv.addTokenFunction(">", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) > 0)), 2, false);
         dEnv.addTokenFunction("<", ((args, env) ->
