@@ -26,6 +26,11 @@ public class TableModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.containsKey(args.get(1));
         }), 2, false);
+        dEnv.addTokenFunction("table-contains-value", ((args, env) -> {
+            if (!(args.getFirst() instanceof DTable table))
+                throw new DevoreCastException(args.getFirst().type(), "table");
+            return table.containsValue(args.get(1));
+        }), 2, false);
         dEnv.addTokenFunction("table-size", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
