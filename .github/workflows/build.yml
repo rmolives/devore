@@ -1,7 +1,9 @@
 name: Build and Release (dev)
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
 
 jobs:
   build-and-release:
