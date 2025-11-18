@@ -504,6 +504,13 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.add(args.get(1), false);
         }), 2, false);
+        dEnv.addTokenFunction("list-insert", ((args, env) -> {
+            if (!(args.getFirst() instanceof DList list))
+                throw new DevoreCastException(args.getFirst().type(), "list");
+            if (!(args.get(1) instanceof DInt index))
+                throw new DevoreCastException(args.getFirst().type(), "int");
+            return list.insert(index.toBigInteger().intValue(), args.get(2), false);
+        }), 3, false);
         dEnv.addTokenFunction("list-set!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
@@ -527,6 +534,13 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.add(args.get(1), true);
         }), 2, false);
+        dEnv.addTokenFunction("list-insert!", ((args, env) -> {
+            if (!(args.getFirst() instanceof DList list))
+                throw new DevoreCastException(args.getFirst().type(), "list");
+            if (!(args.get(1) instanceof DInt index))
+                throw new DevoreCastException(args.getFirst().type(), "int");
+            return list.insert(index.toBigInteger().intValue(), args.get(2), true);
+        }), 3, false);
         dEnv.addTokenFunction("head", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
