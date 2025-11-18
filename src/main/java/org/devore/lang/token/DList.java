@@ -85,7 +85,7 @@ public class DList extends Token {
             return this;
         }
         List<Token> newList = new ArrayList<>(tokens);
-        newList.add(t);
+        newList.remove(t);
         return DList.valueOf(newList);
     }
 
