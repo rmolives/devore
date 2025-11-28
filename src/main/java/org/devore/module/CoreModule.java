@@ -172,9 +172,9 @@ public class CoreModule extends Module {
             env.io.err.print(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addTokenFunction("undef", ((args, env) -> {
-            for (Token arg : args)
-                env.remove(arg.toString());
+        dEnv.addSymbolFunction("undef", ((ast, env) -> {
+            for (AstNode child : ast.children)
+                env.remove(child.op.toString());
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
