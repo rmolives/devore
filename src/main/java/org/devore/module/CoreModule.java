@@ -222,8 +222,11 @@ public class CoreModule extends Module {
                 env.set(ast.getFirst().op.toString(), result);
             } else {
                 List<String> parameters = new ArrayList<>();
-                for (AstNode parameter : ast.getFirst().children)
+                for (AstNode parameter : ast.getFirst().children) {
+                    if (!(parameter.op instanceof DOp))
+                        throw new DevoreCastException(parameter.op.type(), "op");
                     parameters.add(parameter.op.toString());
+                }
                 List<AstNode> asts = new ArrayList<>();
                 for (int i = 1; i < ast.size(); ++i)
                     asts.add(ast.get(i).copy());
