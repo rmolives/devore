@@ -650,7 +650,7 @@ public class CoreModule extends Module {
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
                     parameters.add(((DList) args.get(j + 1)).get(i));
                 }
-                ((DFunction) args.getFirst()).call(parameters.toArray(Token[]::new), env.createChild());
+                result.add(((DFunction) args.getFirst()).call(parameters.toArray(Token[]::new), env.createChild()));
             }
             return DList.valueOf(result);
         }), 2, true);
