@@ -173,11 +173,16 @@ public class CoreModule extends Module {
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addSymbolFunction("undef", ((ast, env) -> {
-            for (AstNode child : ast.children)
+            for (AstNode child : ast.children) {
+                if (!(child.op instanceof DOp))
+                    throw new DevoreCastException(child.op.type(), "op");
                 env.remove(child.op.toString());
+            }
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
+            if (!(ast.getFirst().op instanceof DOp))
+                throw new DevoreCastException(ast.getFirst().op.type(), "op");
             if (ast.getFirst().isEmpty() && ast.getFirst().type != AstNode.AstType.FUNCTION) {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
@@ -204,6 +209,8 @@ public class CoreModule extends Module {
             return DWord.WORD_NIL;
         }), 2, true);
         dEnv.addSymbolFunction("set!", ((ast, env) -> {
+            if (!(ast.getFirst().op instanceof DOp))
+                throw new DevoreCastException(ast.getFirst().op.type(), "op");
             if (ast.getFirst().isEmpty() && ast.getFirst().type != AstNode.AstType.FUNCTION) {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
@@ -236,8 +243,11 @@ public class CoreModule extends Module {
                 if ("apply".equals(node.op.toString())) {
                     List<String> parameters = new ArrayList<>();
                     List<AstNode> asts = new ArrayList<>();
-                    for (AstNode parameterNode : node.getFirst().children)
+                    for (AstNode parameterNode : node.getFirst().children) {
+                        if (!(parameterNode.op instanceof DOp))
+                            throw new DevoreCastException(parameterNode.op.type(), "op");
                         parameters.add(parameterNode.op.toString());
+                    }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
                     newEnv.addTokenFunction(ast.getFirst().op.toString(), ((cArgs, cEnv) -> {
@@ -267,8 +277,11 @@ public class CoreModule extends Module {
                 if ("apply".equals(node.op.toString())) {
                     List<String> parameters = new ArrayList<>();
                     List<AstNode> asts = new ArrayList<>();
-                    for (AstNode parameterNode : node.getFirst().children)
+                    for (AstNode parameterNode : node.getFirst().children) {
+                        if (!(parameterNode.op instanceof DOp))
+                            throw new DevoreCastException(parameterNode.op.type(), "op");
                         parameters.add(parameterNode.op.toString());
+                    }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
                     newEnv.addTokenFunction(ast.getFirst().op.toString(), ((cArgs, cEnv) -> {
@@ -295,8 +308,11 @@ public class CoreModule extends Module {
             List<String> parameters = new ArrayList<>();
             if (!ast.getFirst().isNull()) {
                 parameters.add(ast.getFirst().op.toString());
-                for (AstNode parameter : ast.getFirst().children)
+                for (AstNode parameter : ast.getFirst().children) {
+                    if (!(parameter.op instanceof DOp))
+                        throw new DevoreCastException(parameter.op.type(), "op");
                     parameters.add(parameter.op.toString());
+                }
             }
             List<AstNode> asts = new ArrayList<>();
             for (int i = 1; i < ast.size(); ++i)
