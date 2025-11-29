@@ -752,7 +752,7 @@ public class CoreModule extends Module {
             BigDecimal start, end, step;
             if (args.size() > 1) {
                 start = ((DNumber) args.get(0)).toBigDecimal();
-                end = ((DNumber) args.get(1)).toBigDecimal();
+                end = ((DNumber) args.get(1)).toBigDecimal().subtract(BigDecimal.ONE);
                 step = args.size() > 2 ? ((DNumber) args.get(2)).toBigDecimal() : BigDecimal.ONE;
             } else {
                 start = BigDecimal.ZERO;
