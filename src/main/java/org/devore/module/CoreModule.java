@@ -758,7 +758,7 @@ public class CoreModule extends Module {
                 step = BigDecimal.ONE;
             }
             if (step.compareTo(BigDecimal.ZERO) == 0)
-                throw new DevoreRuntimeException("步长不能为零");
+                throw new DevoreRuntimeException("步长不能为零.");
             List<Token> list = new ArrayList<>();
             if (step.compareTo(BigDecimal.ZERO) > 0) {
                 for (BigDecimal current = start;
