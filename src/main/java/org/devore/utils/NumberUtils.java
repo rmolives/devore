@@ -16,7 +16,7 @@ public class NumberUtils {
     private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
 
     /**
-     * 使用Machin公式将 π 近似为指定精度
+     * 使用Machin公式将 π 近似
      * @return π 近似值
      */
     private static BigDecimal approximatePi() {
