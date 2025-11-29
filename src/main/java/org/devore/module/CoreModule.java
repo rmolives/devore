@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -539,25 +538,12 @@ public class CoreModule extends Module {
             BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.getFirst()).toBigInteger();
             BigInteger end = args.size() == 1 ? ((DInt) args.getFirst()).toBigInteger().subtract(BigInteger.ONE) : ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE);
             Random rand = new Random();
-            int scale = end.toString().length();
-            StringBuilder generated = new StringBuilder();
-            for (int i = 0; i < scale; ++i)
-                generated.append(rand.nextInt(10));
-            BigDecimal inputRangeStart = new BigDecimal("0").setScale(scale, RoundingMode.FLOOR);
-            BigDecimal inputRangeEnd =
-                    new BigDecimal(String.format("%0" + end.toString().length() + "d", 0).replace('0', '9')).setScale(
-                            scale,
-                            RoundingMode.FLOOR
-                    );
-            BigDecimal outputRangeStart = new BigDecimal(start).setScale(scale, RoundingMode.FLOOR);
-            BigDecimal outputRangeEnd = new BigDecimal(end).add(new BigDecimal("1")).setScale(scale, RoundingMode.FLOOR);
-            BigInteger returnInteger = new BigDecimal(new BigInteger(generated.toString())).setScale(scale, RoundingMode.FLOOR)
-                    .subtract(inputRangeStart)
-                    .divide(inputRangeEnd.subtract(inputRangeStart), RoundingMode.FLOOR)
-                    .multiply(outputRangeEnd.subtract(outputRangeStart))
-                    .add(outputRangeStart).setScale(0, RoundingMode.FLOOR).toBigInteger();
-            returnInteger = returnInteger.compareTo(end) > 0 ? end : returnInteger;
-            return DInt.valueOf(returnInteger);
+            BigInteger range = end.subtract(start).add(BigInteger.ONE);
+            BigInteger randomValue;
+            do {
+                randomValue = new BigInteger(range.bitLength(), rand);
+            } while (randomValue.compareTo(range) >= 0);
+            return DInt.valueOf(randomValue.add(start));
         }), 1, true);
         dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 0, true);
         dEnv.addTokenFunction("list-contains", ((args, env) -> {
