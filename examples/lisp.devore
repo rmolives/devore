@@ -1,4 +1,3 @@
-(require "table")
 (def (is-digit n)
     (let ([ascii (char->ascii n)])
         (and (>= ascii 48) (<= ascii 57))))
