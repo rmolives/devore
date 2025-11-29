@@ -11,44 +11,77 @@ import java.math.MathContext;
  */
 public class NumberUtils {
     private static final BigDecimal TWO = BigDecimal.valueOf(2);        // 2
-    private static final BigDecimal PI = BigDecimal.valueOf(Math.PI);   // Pi
+    private static final BigDecimal PI = approximatePi();               // Pi
     private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
 
     /**
-     * 使用泰勒级数展开计算arctan(x)
+     * 将 π 近似
      *
-     * @param x  输入值，|x| ≤ 1时效果最好
-     * @param mc 精度上下文
-     * @return arctan(x)
+     * @return π 近似值
+     */
+    private static BigDecimal approximatePi() {
+        MathContext extendedMc = new MathContext(MathContext.DECIMAL128.getPrecision() + 10, MathContext.DECIMAL128.getRoundingMode());
+        BigDecimal term1 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(5), extendedMc), extendedMc);
+        BigDecimal term2 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(239), extendedMc), extendedMc);
+        BigDecimal pi = BigDecimal.valueOf(4).multiply(
+                BigDecimal.valueOf(4).multiply(term1, extendedMc)
+                        .subtract(term2, extendedMc), extendedMc);
+        return pi.round(MathContext.DECIMAL128);
+    }
+
+    /**
+     * 稳健的arctan计算，适用于所有实数
+     * 使用泰勒级数展开，对于 |x| > 1 的情况使用恒等式转换
+     *
+     * @param x     输入值
+     * @param mc    精度上下文
+     * @return      arctan(x)，范围在 -π/2 到 π/2 之间
      */
     public static BigDecimal arctan(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
-        boolean needAdjust = x.abs().compareTo(BigDecimal.ONE) > 0;
-        BigDecimal workingX = needAdjust ? BigDecimal.ONE.divide(x, mc) : x;
+        if (x.compareTo(BigDecimal.ONE) == 0)
+            return PI.divide(BigDecimal.valueOf(4), mc); // π/4
+        if (x.compareTo(BigDecimal.ONE.negate()) == 0)
+            return PI.divide(BigDecimal.valueOf(4), mc).negate(); // -π/4
+        BigDecimal absX = x.abs();
+        BigDecimal result;
+        if (absX.compareTo(BigDecimal.ONE) <= 0)
+            result = arctanTaylor(absX, mc);
+        else {
+            BigDecimal reciprocal = BigDecimal.ONE.divide(absX, mc);
+            BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), mc);
+            result = piOver2.subtract(arctanTaylor(reciprocal, mc), mc);
+        }
+        if (x.compareTo(BigDecimal.ZERO) < 0)
+            result = result.negate();
+        return result.round(mc);
+    }
+
+    /**
+     * 使用泰勒级数计算arctan(x)，仅适用于 0 ≤ x ≤ 1
+     * arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
+     */
+    private static BigDecimal arctanTaylor(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return BigDecimal.ZERO;
         BigDecimal result = BigDecimal.ZERO;
-        BigDecimal xSquared = workingX.multiply(workingX, mc);
-        BigDecimal term = workingX;
+        BigDecimal xSquared = x.multiply(x, mc);
+        BigDecimal term = x;
         BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
         int n = 0;
         boolean add = true;
         while (term.abs().compareTo(tolerance) >= 0) {
-            result = add ? result.add(term, mc) : result.subtract(term, mc);
+            BigDecimal denominator = BigDecimal.valueOf(2L * n + 1);
+            BigDecimal currentTerm = term.divide(denominator, mc);
+            result = add ? result.add(currentTerm, mc) : result.subtract(currentTerm, mc);
+            term = term.multiply(xSquared, mc);
             n++;
-            term = term.multiply(xSquared, mc)
-                    .multiply(BigDecimal.valueOf(2L * n - 1), mc)
-                    .divide(BigDecimal.valueOf(2L * n + 1), mc);
             add = !add;
-            if (n > mc.getPrecision() * 10)
+            if (n > mc.getPrecision() * 20)
                 break;
         }
-        if (needAdjust) {
-            BigDecimal piOver2 = PI.round(mc).divide(BigDecimal.valueOf(2), mc);
-            result = piOver2.subtract(result, mc);
-            if (x.compareTo(BigDecimal.ZERO) < 0)
-                result = result.negate();
-        }
-        return result.round(mc);
+        return result;
     }
 
     /**
