@@ -69,6 +69,11 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public DNumber arctan() {
+        return DFloat.valueOf(num).arctan();
+    }
+
+    @Override
     public DNumber ceil() {
         return (DNumber) copy();
     }

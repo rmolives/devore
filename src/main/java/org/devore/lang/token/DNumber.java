@@ -10,6 +10,8 @@ public abstract class DNumber extends DArithmetic {
 
     public abstract DNumber tan();
 
+    public abstract DNumber arctan();
+
     public abstract DNumber ceil();
 
     public abstract DNumber floor();

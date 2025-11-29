@@ -12,23 +12,22 @@ import java.math.RoundingMode;
  */
 public class NumberUtils {
     private static final BigDecimal TWO = BigDecimal.valueOf(2);        // 2
-    private static final BigDecimal PI = approximatePi(100);    // 100位Pi
+    private static final BigDecimal PI = approximatePi();    // 100位Pi
     private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
 
     /**
      * 使用Machin公式将 π 近似为指定精度
-     * @param precision 精度小数位数
-     * @return          π 近似值
+     * @return π 近似值
      */
-    private static BigDecimal approximatePi(int precision) {
-        MathContext mc = new MathContext(precision + 2, RoundingMode.HALF_EVEN);
+    private static BigDecimal approximatePi() {
+        MathContext mc = new MathContext(100 + 2, RoundingMode.HALF_EVEN);
         // Machin's formula: π/4 = 4 arctan(1/5) - arctan(1/239)
         BigDecimal term1 = arctan(BigDecimal.ONE.divide(BigDecimal.valueOf(5), MathContext.DECIMAL128), mc);
         BigDecimal term2 = arctan(BigDecimal.ONE.divide(BigDecimal.valueOf(239), MathContext.DECIMAL128), mc);
         BigDecimal pi = BigDecimal.valueOf(4).multiply(
                 BigDecimal.valueOf(4).multiply(term1).subtract(term2)
         );
-        return pi.round(new MathContext(precision, RoundingMode.HALF_EVEN));
+        return pi.round(new MathContext(100, RoundingMode.HALF_EVEN));
     }
 
     /**
@@ -37,7 +36,7 @@ public class NumberUtils {
      * @param mc    精度
      * @return      arctan(x)
      */
-    private static BigDecimal arctan(BigDecimal x, MathContext mc) {
+    public static BigDecimal arctan(BigDecimal x, MathContext mc) {
         BigDecimal result = BigDecimal.ZERO;
         BigDecimal xSquared = x.multiply(x);
         BigDecimal term = x;
