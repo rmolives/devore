@@ -107,6 +107,18 @@ public class DFloat extends DNumber {
     }
 
     @Override
+    public DNumber arcsin() {
+        DFloat result = DFloat.valueOf(NumberUtils.arcsin(num, MathContext.DECIMAL128));
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
+    }
+
+    @Override
+    public DNumber arccos() {
+        DFloat result = DFloat.valueOf(NumberUtils.arccos(num, MathContext.DECIMAL128));
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
+    }
+
+    @Override
     public DNumber ceil() {
         return DInt.valueOf(num.setScale(0, RoundingMode.CEILING));
     }

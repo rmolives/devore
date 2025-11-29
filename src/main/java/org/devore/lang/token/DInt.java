@@ -74,6 +74,16 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public DNumber arcsin() {
+        return DFloat.valueOf(num).arcsin();
+    }
+
+    @Override
+    public DNumber arccos() {
+        return DFloat.valueOf(num).arccos();
+    }
+
+    @Override
     public DNumber ceil() {
         return (DNumber) copy();
     }

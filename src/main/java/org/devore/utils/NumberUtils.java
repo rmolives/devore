@@ -30,6 +30,126 @@ public class NumberUtils {
     }
 
     /**
+     * 计算 atan2(y, x)，返回从正X轴到点(x,y)的角度
+     * 能够正确处理所有象限，返回范围在 [-π, π]
+     *
+     * @param x     X坐标
+     * @param y     Y坐标
+     * @param mc    精度上下文
+     * @return      角度，范围 [-π, π]
+     */
+    public static BigDecimal atan2(BigDecimal x, BigDecimal y, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0) {
+            if (y.compareTo(BigDecimal.ZERO) == 0)
+                return BigDecimal.ZERO;
+            else if (y.compareTo(BigDecimal.ZERO) > 0)
+                return PI.divide(BigDecimal.valueOf(2), mc);
+            else
+                return PI.divide(BigDecimal.valueOf(2), mc).negate();
+        }
+        if (y.compareTo(BigDecimal.ZERO) == 0) {
+            if (x.compareTo(BigDecimal.ZERO) > 0)
+                return BigDecimal.ZERO;
+            else
+                return PI;
+        }
+        BigDecimal ratio = y.divide(x, mc);
+        BigDecimal basicAngle = arctan(ratio.abs(), mc);
+        return x.compareTo(BigDecimal.ZERO) > 0 ? y.compareTo(BigDecimal.ZERO) > 0 ? basicAngle : basicAngle.negate()
+                : y.compareTo(BigDecimal.ZERO) > 0 ? PI.subtract(basicAngle, mc) : basicAngle.subtract(PI, mc);
+    }
+
+    /**
+     * 稳健的arccos计算，适用于定义域 [-1, 1]
+     * 使用恒等式: arccos(x) = π/2 - arcsin(x)
+     * 
+     * @param x     输入值，必须在 [-1, 1] 范围内
+     * @param mc    精度上下文
+     * @return      arccos(x)，范围在 0 到 π 之间
+     */
+    public static BigDecimal arccos(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
+            throw new DevoreRuntimeException("arccos(x) 的定义域为 [-1, 1]，输入值超出范围.");
+        if (x.compareTo(BigDecimal.ONE) == 0)
+            return BigDecimal.ZERO;
+        if (x.compareTo(BigDecimal.ONE.negate()) == 0)
+            return PI;
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return PI.divide(BigDecimal.valueOf(2), mc);
+        BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), mc);
+        BigDecimal arcsinX = arcsin(x, mc);
+        BigDecimal result = piOver2.subtract(arcsinX, mc);
+        if (result.compareTo(BigDecimal.ZERO) < 0)
+            result = result.add(PI, mc);
+        else if (result.compareTo(PI) > 0)
+            result = result.subtract(PI, mc);
+        return result.round(mc);
+    }
+
+    /**
+     * 稳健的arcsin计算，适用于定义域 [-1, 1]
+     * 使用恒等式转换和泰勒级数展开
+     *
+     * @param x     输入值，必须在 [-1, 1] 范围内
+     * @param mc    精度上下文
+     * @return      arcsin(x)，范围在 -π/2 到 π/2 之间
+     */
+    public static BigDecimal arcsin(BigDecimal x, MathContext mc) {
+        // 检查定义域
+        if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
+            throw new DevoreRuntimeException("arcsin(x) 的定义域为 [-1, 1]，输入值超出范围.");
+        if (x.compareTo(BigDecimal.ONE) == 0)
+            return PI.divide(BigDecimal.valueOf(2), mc);
+        if (x.compareTo(BigDecimal.ONE.negate()) == 0)
+            return PI.divide(BigDecimal.valueOf(2), mc).negate();
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return BigDecimal.ZERO;
+        BigDecimal absX = x.abs();
+        BigDecimal result;
+        if (absX.compareTo(new BigDecimal("0.7")) <= 0)
+            result = arcsinTaylor(x, mc);
+        else {
+            BigDecimal transformed = BigDecimal.ONE.subtract(absX)
+                    .divide(BigDecimal.valueOf(2), mc)
+                    .sqrt(mc);
+            result = PI.divide(BigDecimal.valueOf(2), mc)
+                    .subtract(BigDecimal.valueOf(2).multiply(arcsinTaylor(transformed, mc), mc), mc);
+            if (x.compareTo(BigDecimal.ZERO) < 0)
+                result = result.negate();
+        }
+        return result.round(mc);
+    }
+
+    /**
+     * 使用泰勒级数计算arcsin(x)
+     * arcsin(x) = x + (1/2)(x³/3) + (1·3/2·4)(x⁵/5) + (1·3·5/2·4·6)(x⁷/7) + ...
+     */
+    private static BigDecimal arcsinTaylor(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return BigDecimal.ZERO;
+        BigDecimal result = x;
+        BigDecimal xSquared = x.multiply(x, mc);
+        BigDecimal term = x;
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        int n = 1;
+        BigDecimal numerator = BigDecimal.ONE;
+        BigDecimal denominator = BigDecimal.ONE;
+        while (term.abs().compareTo(tolerance) >= 0) {
+            numerator = numerator.multiply(BigDecimal.valueOf(2L * n - 1), mc);
+            denominator = denominator.multiply(BigDecimal.valueOf(2L * n), mc);
+            BigDecimal coefficient = numerator.divide(denominator, mc)
+                    .divide(BigDecimal.valueOf(2L * n + 1), mc);
+            term = term.multiply(xSquared, mc);
+            BigDecimal currentTerm = coefficient.multiply(term, mc);
+            result = result.add(currentTerm, mc);
+            ++n;
+            if (n > mc.getPrecision() * 10)
+                break;
+        }
+        return result;
+    }
+
+    /**
      * 稳健的arctan计算，适用于所有实数
      * 使用泰勒级数展开，对于 |x| > 1 的情况使用恒等式转换
      *

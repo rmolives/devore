@@ -12,6 +12,10 @@ public abstract class DNumber extends DArithmetic {
 
     public abstract DNumber arctan();
 
+    public abstract DNumber arcsin();
+
+    public abstract DNumber arccos();
+
     public abstract DNumber ceil();
 
     public abstract DNumber floor();

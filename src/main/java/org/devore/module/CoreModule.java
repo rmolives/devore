@@ -7,11 +7,13 @@ import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.AstNode;
+import org.devore.utils.NumberUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -120,6 +122,25 @@ public class CoreModule extends Module {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).arctan();
+        }), 1, false);
+        dEnv.addTokenFunction("arcsin", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            return ((DNumber) args.getFirst()).arcsin();
+        }), 1, false);
+        dEnv.addTokenFunction("arccos", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            return ((DNumber) args.getFirst()).arccos();
+        }), 1, false);
+        dEnv.addTokenFunction("atan2", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            if (!(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            BigDecimal result = NumberUtils.atan2(((DNumber) args.getFirst()).toBigDecimal(),
+                    ((DNumber) args.get(1)).toBigDecimal(), MathContext.DECIMAL128);
+            return NumberUtils.isInt(result) ? DInt.valueOf(result) : DFloat.valueOf(result);
         }), 1, false);
         dEnv.addTokenFunction("prime?", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt num))
