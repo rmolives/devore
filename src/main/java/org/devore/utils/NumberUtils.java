@@ -5,31 +5,14 @@ import org.devore.exception.DevoreRuntimeException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.math.RoundingMode;
 
 /**
  * 数学工具
  */
 public class NumberUtils {
     private static final BigDecimal TWO = BigDecimal.valueOf(2);        // 2
-    private static final BigDecimal PI = approximatePi();    // 100位Pi
+    private static final BigDecimal PI = BigDecimal.valueOf(Math.PI);   // Pi
     private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
-
-    /**
-     * 使用Machin公式将 π 近似
-     *
-     * @return π 近似值
-     */
-    private static BigDecimal approximatePi() {
-        MathContext mc = new MathContext(100 + 2, RoundingMode.HALF_EVEN);
-        // Machin's formula: π/4 = 4 arctan(1/5) - arctan(1/239)
-        BigDecimal term1 = arctan(BigDecimal.ONE.divide(BigDecimal.valueOf(5), MathContext.DECIMAL128), mc);
-        BigDecimal term2 = arctan(BigDecimal.ONE.divide(BigDecimal.valueOf(239), MathContext.DECIMAL128), mc);
-        BigDecimal pi = BigDecimal.valueOf(4).multiply(
-                BigDecimal.valueOf(4).multiply(term1).subtract(term2)
-        );
-        return pi.round(new MathContext(100, RoundingMode.HALF_EVEN));
-    }
 
     /**
      * 使用泰勒级数展开计算arctan(x)
@@ -60,7 +43,7 @@ public class NumberUtils {
                 break;
         }
         if (needAdjust) {
-            BigDecimal piOver2 = BigDecimal.valueOf(Math.PI).round(mc).divide(BigDecimal.valueOf(2), mc);
+            BigDecimal piOver2 = PI.round(mc).divide(BigDecimal.valueOf(2), mc);
             result = piOver2.subtract(result, mc);
             if (x.compareTo(BigDecimal.ZERO) < 0)
                 result = result.negate();
