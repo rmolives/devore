@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -741,22 +742,22 @@ public class CoreModule extends Module {
             return DList.valueOf(result);
         }), 2, false);
         dEnv.addTokenFunction("range", ((args, env) -> {
-            if (!(args.getFirst() instanceof DInt))
-                throw new DevoreCastException(args.getFirst().type(), "int");
-            if (args.size() > 1 && !(args.get(1) instanceof DInt))
-                throw new DevoreCastException(args.get(1).type(), "int");
-            if (args.size() > 2 && !(args.get(2) instanceof DInt))
-                throw new DevoreCastException(args.get(2).type(), "int");
-            BigInteger start = args.size() > 1 ? ((DInt) args.getFirst()).toBigInteger() : BigInteger.ZERO;
-            BigInteger end = args.size() > 1 ? ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE)
-                    : ((DInt) args.getFirst()).toBigInteger().subtract(BigInteger.ONE);
-            BigInteger step = args.size() > 2 ? ((DInt) args.get(2)).toBigInteger() : BigInteger.ONE;
-            BigInteger size = end.subtract(start).divide(step);
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            if (args.size() > 1 && !(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            if (args.size() > 2 && !(args.get(2) instanceof DNumber))
+                throw new DevoreCastException(args.get(2).type(), "number");
+            BigDecimal start = args.size() > 1 ? ((DNumber) args.getFirst()).toBigDecimal() : BigDecimal.ZERO;
+            BigDecimal end = args.size() > 1 ? ((DNumber) args.get(1)).toBigDecimal().subtract(BigDecimal.ONE)
+                    : ((DNumber) args.getFirst()).toBigDecimal().subtract(BigDecimal.ONE);
+            BigDecimal step = args.size() > 2 ? ((DNumber) args.get(2)).toBigDecimal() : BigDecimal.ONE;
+            BigDecimal size = end.subtract(start).divide(step, MathContext.DECIMAL128);
             List<Token> list = new ArrayList<>();
-            BigInteger i = BigInteger.ZERO;
+            BigDecimal i = BigDecimal.ZERO;
             while (i.compareTo(size) < 1) {
-                list.add(DInt.valueOf(start.add(i.multiply(step))));
-                i = i.add(BigInteger.ONE);
+                list.add(DFloat.valueOf(start.add(i.multiply(step))));
+                i = i.add(BigDecimal.ONE);
             }
             return DList.valueOf(list);
         }), 1, true);
