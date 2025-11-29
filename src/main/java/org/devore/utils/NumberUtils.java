@@ -17,6 +17,7 @@ public class NumberUtils {
 
     /**
      * 使用Machin公式将 π 近似
+     *
      * @return π 近似值
      */
     private static BigDecimal approximatePi() {
@@ -32,9 +33,10 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算arctan(x)
-     * @param x     输入值，|x| ≤ 1时效果最好
-     * @param mc    精度上下文
-     * @return      arctan(x)
+     *
+     * @param x  输入值，|x| ≤ 1时效果最好
+     * @param mc 精度上下文
+     * @return arctan(x)
      */
     public static BigDecimal arctan(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
@@ -48,7 +50,7 @@ public class NumberUtils {
         int n = 0;
         boolean add = true;
         while (term.abs().compareTo(tolerance) >= 0) {
-            result = add? result.add(term, mc): result.subtract(term, mc);
+            result = add ? result.add(term, mc) : result.subtract(term, mc);
             n++;
             term = term.multiply(xSquared, mc)
                     .multiply(BigDecimal.valueOf(2L * n - 1), mc)
@@ -68,9 +70,10 @@ public class NumberUtils {
 
     /**
      * 将角度缩小到范围[-π，π]
+     *
      * @param angle 角度
      * @param mc    精度
-     * @return      [-π, π]
+     * @return [-π, π]
      */
     private static BigDecimal reduceAngle(BigDecimal angle, MathContext mc) {
         angle = angle.remainder(TWO_PI, mc);
@@ -83,8 +86,9 @@ public class NumberUtils {
 
     /**
      * 判断BigDecimal是否为整数
-     * @param decimal   BigDecimal
-     * @return          结果
+     *
+     * @param decimal BigDecimal
+     * @return 结果
      */
     public static boolean isInt(BigDecimal decimal) {
         BigDecimal stripped = decimal.stripTrailingZeros();
@@ -93,9 +97,10 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算sin(x)
-     * @param x     x
-     * @param mc    精度
-     * @return      sin(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return sin(x)
      */
     public static BigDecimal sin(BigDecimal x, MathContext mc) {
         x = reduceAngle(x, mc);
@@ -116,9 +121,10 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算cos(x)
-     * @param x     x
-     * @param mc    精度
-     * @return      cos(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return cos(x)
      */
     public static BigDecimal cos(BigDecimal x, MathContext mc) {
         x = reduceAngle(x, mc);
@@ -139,9 +145,10 @@ public class NumberUtils {
 
     /**
      * 将tan计算为sin(x)/cos(x)
-     * @param x     x
-     * @param mc    精度
-     * @return      tan(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return tan(x)
      */
     public static BigDecimal tan(BigDecimal x, MathContext mc) {
         BigDecimal cos = cos(x, mc);
@@ -152,9 +159,10 @@ public class NumberUtils {
 
     /**
      * 使用牛顿法计算BigDecimal的平方根
-     * @param x     x
-     * @param mc    精度
-     * @return      √x
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return √x
      */
     public static BigDecimal sqrt(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
@@ -175,10 +183,11 @@ public class NumberUtils {
 
     /**
      * 计算BigDecimal的x^y
-     * @param x     x
-     * @param y     y
-     * @param mc    精度
-     * @return      x^y
+     *
+     * @param x  x
+     * @param y  y
+     * @param mc 精度
+     * @return x^y
      */
     public static BigDecimal pow(BigDecimal x, BigDecimal y, MathContext mc) {
         if (y.compareTo(BigDecimal.ZERO) == 0)
@@ -200,10 +209,11 @@ public class NumberUtils {
 
     /**
      * 计算BigDecimal的x^y, 其中y为整数
-     * @param x     x
-     * @param y     y
-     * @param mc    精度
-     * @return      x^y
+     *
+     * @param x  x
+     * @param y  y
+     * @param mc 精度
+     * @return x^y
      */
     private static BigDecimal powInt(BigDecimal x, BigInteger y, MathContext mc) {
         if (y.compareTo(BigInteger.ZERO) < 0)
@@ -219,9 +229,10 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数计算ln(x)
-     * @param x     x
-     * @param mc    精度
-     * @return      ln(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return ln(x)
      */
     public static BigDecimal ln(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0)
@@ -244,9 +255,10 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数计算e^x
-     * @param x     x
-     * @param mc    精度
-     * @return      e^x
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return e^x
      */
     public static BigDecimal exp(BigDecimal x, MathContext mc) {
         BigDecimal result = BigDecimal.ONE;
