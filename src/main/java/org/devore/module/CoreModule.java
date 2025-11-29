@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -748,16 +747,31 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "number");
             if (args.size() > 2 && !(args.get(2) instanceof DNumber))
                 throw new DevoreCastException(args.get(2).type(), "number");
-            BigDecimal start = args.size() > 1 ? ((DNumber) args.getFirst()).toBigDecimal() : BigDecimal.ZERO;
-            BigDecimal end = args.size() > 1 ? ((DNumber) args.get(1)).toBigDecimal().subtract(BigDecimal.ONE)
-                    : ((DNumber) args.getFirst()).toBigDecimal().subtract(BigDecimal.ONE);
-            BigDecimal step = args.size() > 2 ? ((DNumber) args.get(2)).toBigDecimal() : BigDecimal.ONE;
-            BigDecimal size = end.subtract(start).divide(step, MathContext.DECIMAL128);
+            BigDecimal start, end, step;
+            if (args.size() > 1) {
+                start = ((DNumber) args.get(0)).toBigDecimal();
+                end = ((DNumber) args.get(1)).toBigDecimal();
+                step = args.size() > 2 ? ((DNumber) args.get(2)).toBigDecimal() : BigDecimal.ONE;
+            } else {
+                start = BigDecimal.ZERO;
+                end = ((DNumber) args.getFirst()).toBigDecimal().subtract(BigDecimal.ONE);
+                step = BigDecimal.ONE;
+            }
+            if (step.compareTo(BigDecimal.ZERO) == 0)
+                throw new DevoreRuntimeException("步长不能为零");
             List<Token> list = new ArrayList<>();
-            BigDecimal i = BigDecimal.ZERO;
-            while (i.compareTo(size) < 1) {
-                list.add(DFloat.valueOf(start.add(i.multiply(step))));
-                i = i.add(BigDecimal.ONE);
+            if (step.compareTo(BigDecimal.ZERO) > 0) {
+                for (BigDecimal current = start;
+                     current.compareTo(end) <= 0;
+                     current = current.add(step)) {
+                    list.add(DFloat.valueOf(current));
+                }
+            } else {
+                for (BigDecimal current = start;
+                     current.compareTo(end) >= 0;
+                     current = current.add(step)) {
+                    list.add(DFloat.valueOf(current));
+                }
             }
             return DList.valueOf(list);
         }), 1, true);
