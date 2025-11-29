@@ -752,12 +752,12 @@ public class CoreModule extends Module {
             BigDecimal start, end, step;
             if (args.size() > 1) {
                 start = ((DNumber) args.get(0)).toBigDecimal();
-                end = ((DNumber) args.get(1)).toBigDecimal().subtract(BigDecimal.ONE);
                 step = args.size() > 2 ? ((DNumber) args.get(2)).toBigDecimal() : BigDecimal.ONE;
+                end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
             } else {
                 start = BigDecimal.ZERO;
-                end = ((DNumber) args.getFirst()).toBigDecimal().subtract(BigDecimal.ONE);
                 step = BigDecimal.ONE;
+                end = ((DNumber) args.getFirst()).toBigDecimal().subtract(step);
             }
             if (step.compareTo(BigDecimal.ZERO) == 0)
                 throw new DevoreRuntimeException("步长不能为零.");
