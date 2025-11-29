@@ -7,7 +7,6 @@ import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.AstNode;
-import org.devore.utils.NumberUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -748,6 +747,7 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "number");
             if (args.size() > 2 && !(args.get(2) instanceof DNumber))
                 throw new DevoreCastException(args.get(2).type(), "number");
+            boolean isFloat = args.getFirst() instanceof DFloat || args.get(1) instanceof DFloat || args.get(2) instanceof DFloat;
             BigDecimal start, end, step;
             if (args.size() > 1) {
                 start = ((DNumber) args.get(0)).toBigDecimal();
@@ -765,13 +765,13 @@ public class CoreModule extends Module {
                 for (BigDecimal current = start;
                      current.compareTo(end) <= 0;
                      current = current.add(step)) {
-                    list.add(NumberUtils.isInt(current) ? DInt.valueOf(current) : DFloat.valueOf(current));
+                    list.add(isFloat ? DInt.valueOf(current) : DFloat.valueOf(current));
                 }
             } else {
                 for (BigDecimal current = start;
                      current.compareTo(end) >= 0;
                      current = current.add(step)) {
-                    list.add(NumberUtils.isInt(current) ? DInt.valueOf(current) : DFloat.valueOf(current));
+                    list.add(isFloat ? DInt.valueOf(current) : DFloat.valueOf(current));
                 }
             }
             return DList.valueOf(list);
