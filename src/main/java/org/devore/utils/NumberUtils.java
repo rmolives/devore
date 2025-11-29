@@ -32,26 +32,38 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算arctan(x)
-     * @param x     x
-     * @param mc    精度
+     * @param x     输入值，|x| ≤ 1时效果最好
+     * @param mc    精度上下文
      * @return      arctan(x)
      */
     public static BigDecimal arctan(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return BigDecimal.ZERO;
+        boolean needAdjust = x.abs().compareTo(BigDecimal.ONE) > 0;
+        BigDecimal workingX = needAdjust ? BigDecimal.ONE.divide(x, mc) : x;
         BigDecimal result = BigDecimal.ZERO;
-        BigDecimal xSquared = x.multiply(x);
-        BigDecimal term = x;
-        boolean add = true;
+        BigDecimal xSquared = workingX.multiply(workingX, mc);
+        BigDecimal term = workingX;
         BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
-        for (int i = 1; term.abs().compareTo(tolerance) > 0; i += 2) {
-            if (add)
-                result = result.add(term);
-            else
-                result = result.subtract(term);
-            term = term.multiply(xSquared).divide(
-                    BigDecimal.valueOf(i + 2), mc);
+        int n = 0;
+        boolean add = true;
+        while (term.abs().compareTo(tolerance) >= 0) {
+            result = add? result.add(term, mc): result.subtract(term, mc);
+            n++;
+            term = term.multiply(xSquared, mc)
+                    .multiply(BigDecimal.valueOf(2L * n - 1), mc)
+                    .divide(BigDecimal.valueOf(2L * n + 1), mc);
             add = !add;
+            if (n > mc.getPrecision() * 10)
+                break;
         }
-        return result;
+        if (needAdjust) {
+            BigDecimal piOver2 = BigDecimal.valueOf(Math.PI).round(mc).divide(BigDecimal.valueOf(2), mc);
+            result = piOver2.subtract(result, mc);
+            if (x.compareTo(BigDecimal.ZERO) < 0)
+                result = result.negate();
+        }
+        return result.round(mc);
     }
 
     /**
