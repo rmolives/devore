@@ -24,7 +24,6 @@ public class Devore {
     public static Map<String, Module> moduleTable = new HashMap<>() {
         {
             put("core", new CoreModule());
-            put("table", new TableModule());
         }
     };
 
