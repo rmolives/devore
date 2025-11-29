@@ -141,7 +141,7 @@ public class CoreModule extends Module {
             BigDecimal result = NumberUtils.atan2(((DNumber) args.getFirst()).toBigDecimal(),
                     ((DNumber) args.get(1)).toBigDecimal(), MathContext.DECIMAL128);
             return NumberUtils.isInt(result) ? DInt.valueOf(result) : DFloat.valueOf(result);
-        }), 1, false);
+        }), 2, false);
         dEnv.addTokenFunction("prime?", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt num))
                 throw new DevoreCastException(args.getFirst().type(), "int");
