@@ -266,6 +266,8 @@ public class CoreModule extends Module {
                         return inResult;
                     }), parameters.size(), false);
                 } else {
+                    if (!(node.op instanceof DOp))
+                        throw new DevoreCastException(node.op.type(), "op");
                     Token value = DWord.WORD_NIL;
                     for (AstNode e : node.children)
                         value = Evaluator.eval(env, e.copy());
@@ -300,6 +302,8 @@ public class CoreModule extends Module {
                         return inResult;
                     }), parameters.size(), false);
                 } else {
+                    if (!(node.op instanceof DOp))
+                        throw new DevoreCastException(node.op.type(), "op");
                     Token value = DWord.WORD_NIL;
                     for (AstNode e : node.children)
                         value = Evaluator.eval(newEnv, e.copy());
