@@ -7,6 +7,7 @@ import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.AstNode;
+import org.devore.utils.NumberUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -764,13 +765,13 @@ public class CoreModule extends Module {
                 for (BigDecimal current = start;
                      current.compareTo(end) <= 0;
                      current = current.add(step)) {
-                    list.add(DFloat.valueOf(current));
+                    list.add(NumberUtils.isInt(current) ? DInt.valueOf(current) : DFloat.valueOf(current));
                 }
             } else {
                 for (BigDecimal current = start;
                      current.compareTo(end) >= 0;
                      current = current.add(step)) {
-                    list.add(DFloat.valueOf(current));
+                    list.add(NumberUtils.isInt(current) ? DInt.valueOf(current) : DFloat.valueOf(current));
                 }
             }
             return DList.valueOf(list);
