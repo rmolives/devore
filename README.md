@@ -33,9 +33,9 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
     (def (divides? a b)
         (= (mod b a) 0))
     (def (find-divisor n test-divisor)
-        (cond ((> (sqrt test-divisor) n) n)
-            ((divides? test-divisor n) test-divisor)
-            (else (find-divisor n (+ test-divisor 1)))))
+        (cond [(> (sqrt test-divisor) n) n]
+              [(divides? test-divisor n) test-divisor]
+              [else (find-divisor n (+ test-divisor 1))]))
     (def (smallest-divisor n)
         (find-divisor n 2))
     (= n (smallest-divisor n)))
@@ -46,8 +46,8 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 
 ```lisp
 (def (fib n)
-    (cond ((= n 0) 0)
-        ((= n 1) 1)
-        (else (+ (fib (- n 1)) (fib (- n 2))))))
+    (cond [(= n 0) 0]
+          [(= n 1) 1]
+          [else (+ (fib (- n 1)) (fib (- n 2)))]))
 (println (fib 10))
 ```
