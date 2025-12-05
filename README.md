@@ -12,7 +12,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 
 ### Sqrt
 
-```lisp
+```scheme
 (def (mysqrt x)
     (def (good-enough guess)
         (< (abs (- (pow guess 2) x)) 0.001))
@@ -28,7 +28,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 
 ### Prime?
 
-```lisp
+```scheme
 (def (myprime? n)
     (def (divides? a b)
         (= (mod b a) 0))
@@ -44,7 +44,7 @@ Once a feature is finished and tested, and not considered harmful, I'll copy the
 
 ### Fibonacci
 
-```lisp
+```scheme
 (def (fib n)
     (cond [(= n 0) 0]
           [(= n 1) 1]
