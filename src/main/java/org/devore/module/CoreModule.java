@@ -854,7 +854,7 @@ public class CoreModule extends Module {
             return "true".equals(args.getFirst().toString()) ? DBool.TRUE : DBool.FALSE;
         }), 1, false);
         dEnv.addTokenFunction("->string", ((args, env) -> DString.valueOf(args.getFirst().toString())), 1, false);
-        dEnv.addTokenFunction("string->chars", ((args, env) -> {
+        dEnv.addTokenFunction("string->list", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             char[] chars = args.getFirst().toString().toCharArray();

@@ -2,7 +2,7 @@
     (let ([ascii (char->ascii n)])
         (and (>= ascii 48) (<= ascii 57))))
 (def (lexer code)
-    (let ([code_array (string->chars code)]
+    (let ([code_array (string->list code)]
           [token (list)]
           [index -1])
           (while (< (begin (set! index (+ index 1)) index) (length code_array))
