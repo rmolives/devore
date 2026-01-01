@@ -39,20 +39,12 @@ public class NumberUtils {
      * @return      角度，范围 [-π, π]
      */
     public static BigDecimal atan2(BigDecimal x, BigDecimal y, MathContext mc) {
-        if (x.compareTo(BigDecimal.ZERO) == 0) {
-            if (y.compareTo(BigDecimal.ZERO) == 0)
-                return BigDecimal.ZERO;
-            else if (y.compareTo(BigDecimal.ZERO) > 0)
-                return PI.divide(BigDecimal.valueOf(2), mc);
-            else
-                return PI.divide(BigDecimal.valueOf(2), mc).negate();
-        }
-        if (y.compareTo(BigDecimal.ZERO) == 0) {
-            if (x.compareTo(BigDecimal.ZERO) > 0)
-                return BigDecimal.ZERO;
-            else
-                return PI;
-        }
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return y.compareTo(BigDecimal.ZERO) == 0? BigDecimal.ZERO:
+                    y.compareTo(BigDecimal.ZERO) > 0? PI.divide(BigDecimal.valueOf(2), mc):
+                    PI.divide(BigDecimal.valueOf(2), mc).negate();
+        if (y.compareTo(BigDecimal.ZERO) == 0)
+            return x.compareTo(BigDecimal.ZERO) > 0? BigDecimal.ZERO: PI;
         BigDecimal ratio = y.divide(x, mc);
         BigDecimal basicAngle = arctan(ratio.abs(), mc);
         return x.compareTo(BigDecimal.ZERO) > 0 ? y.compareTo(BigDecimal.ZERO) > 0 ? basicAngle : basicAngle.negate()
