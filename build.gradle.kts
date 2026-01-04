@@ -10,13 +10,11 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-}
+dependencies {}
 
 tasks.jar {
     manifest {
         attributes["Main-Class"] = "org.devore.Main"
     }
-
     from(configurations.runtimeClasspath.get().filter { it.exists() }.map { if (it.isDirectory) it else zipTree(it) })
 }
