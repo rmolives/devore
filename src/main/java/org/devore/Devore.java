@@ -4,7 +4,7 @@ import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
-import org.devore.module.*;
+import org.devore.module.CoreModule;
 import org.devore.module.Module;
 import org.devore.parser.Lexer;
 import org.devore.parser.Parse;
@@ -36,7 +36,8 @@ public class Devore {
 
     /**
      * 添加模块
-     * @param name 名字
+     *
+     * @param name   名字
      * @param module 模块
      */
     public static void addModule(String name, Module module) {
@@ -45,6 +46,7 @@ public class Devore {
 
     /**
      * 添加默认导入的模块
+     *
      * @param name 名字
      */
     public static void addDefaultLoadModule(String name) {
@@ -53,7 +55,8 @@ public class Devore {
 
     /**
      * 执行代码
-     * @param env 环境
+     *
+     * @param env  环境
      * @param code 代码
      * @return 返回值
      */

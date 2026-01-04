@@ -8,7 +8,8 @@ import org.devore.lang.Env;
 public abstract class Module {
     /**
      * 初始化
-     * @param dEnv  环境
+     *
+     * @param dEnv 环境
      */
     public abstract void init(Env dEnv);
 }

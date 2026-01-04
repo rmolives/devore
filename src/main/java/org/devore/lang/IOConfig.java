@@ -13,9 +13,10 @@ public class IOConfig {
 
     /**
      * 创建IO表
-     * @param out   输出流
-     * @param err   错误流
-     * @param in    输入流
+     *
+     * @param out 输出流
+     * @param err 错误流
+     * @param in  输入流
      */
     public IOConfig(PrintStream out, PrintStream err, InputStream in) {
         this.out = out;

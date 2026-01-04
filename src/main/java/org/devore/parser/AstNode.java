@@ -17,7 +17,8 @@ public class AstNode {
 
     /**
      * 创建语法树
-     * @param op    内容
+     *
+     * @param op 内容
      */
     public AstNode(Token op) {
         this.op = op;
@@ -27,6 +28,7 @@ public class AstNode {
 
     /**
      * 创建语法树
+     *
      * @param op    内容
      * @param type  类型
      * @param child 子树
@@ -39,7 +41,8 @@ public class AstNode {
 
     /**
      * 复制
-     * @return  复制
+     *
+     * @return 复制
      */
     public AstNode copy() {
         ArrayList<AstNode> list = new ArrayList<>();
@@ -50,6 +53,7 @@ public class AstNode {
 
     /**
      * 添加子树
+     *
      * @param node 子树
      */
     public void add(AstNode node) {
@@ -58,8 +62,9 @@ public class AstNode {
 
     /**
      * 获取第i位子树
+     *
      * @param i index
-     * @return  子树
+     * @return 子树
      */
     public AstNode get(int i) {
         return this.children.get(i);
@@ -67,7 +72,8 @@ public class AstNode {
 
     /**
      * 获取第1位子树
-     * @return  子树
+     *
+     * @return 子树
      */
     public AstNode getFirst() {
         return get(0);
@@ -82,7 +88,8 @@ public class AstNode {
 
     /**
      * 获取语法树子树数量
-     * @return  数量
+     *
+     * @return 数量
      */
     public int size() {
         return children.size();
@@ -90,7 +97,8 @@ public class AstNode {
 
     /**
      * 判断语法树是否为空
-     * @return  结果
+     *
+     * @return 结果
      */
     public boolean isEmpty() {
         return size() == 0;
@@ -98,7 +106,8 @@ public class AstNode {
 
     /**
      * 判断语法树op是否为null
-     * @return  结果
+     *
+     * @return 结果
      */
     public boolean isNull() {
         return op == null;
@@ -106,7 +115,8 @@ public class AstNode {
 
     /**
      * 转换为字符串
-     * @return  字符串
+     *
+     * @return 字符串
      */
     @Override
     public String toString() {

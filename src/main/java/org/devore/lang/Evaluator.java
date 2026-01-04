@@ -11,9 +11,10 @@ import org.devore.parser.AstNode;
 public class Evaluator {
     /**
      * 求值
-     * @param env   环境
-     * @param ast   语法树
-     * @return      返回值
+     *
+     * @param env 环境
+     * @param ast 语法树
+     * @return 返回值
      */
     public static Token eval(Env env, AstNode ast) {
         while (true) {

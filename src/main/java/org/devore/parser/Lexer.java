@@ -15,8 +15,9 @@ public class Lexer {
     /**
      * 分割代码
      * 例如：把(+ 2 3)(- 4 5)分割成(+ 2 3)和(- 4 5)
-     * @param code  代码
-     * @return      代码片段序列
+     *
+     * @param code 代码
+     * @return 代码片段序列
      */
     public static List<String> splitCode(String code) {
         char[] codeCharArray = code.toCharArray();
@@ -80,8 +81,9 @@ public class Lexer {
 
     /**
      * 词法分析器
-     * @param expression    代码片段
-     * @return              Token序列
+     *
+     * @param expression 代码片段
+     * @return Token序列
      */
     public static List<Token> lexer(String expression) {
         char[] expressionCharArray = expression.toCharArray();

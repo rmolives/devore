@@ -23,9 +23,10 @@ public class Env {
 
     /**
      * 创建环境
-     * @param table     环境表
-     * @param father    父环境
-     * @param io        IO表
+     *
+     * @param table  环境表
+     * @param father 父环境
+     * @param io     IO表
      */
     protected Env(Map<String, Token> table, Env father, IOConfig io) {
         this.table = table;
@@ -37,7 +38,8 @@ public class Env {
 
     /**
      * 创建环境
-     * @return  环境
+     *
+     * @return 环境
      */
     public static Env newEnv() {
         return new Env(new HashMap<>(), null, new IOConfig());
@@ -45,9 +47,10 @@ public class Env {
 
     /**
      * 创建环境
-     * @param father    父环境
-     * @param io        IO表
-     * @return          环境
+     *
+     * @param father 父环境
+     * @param io     IO表
+     * @return 环境
      */
     public static Env newEnv(Env father, IOConfig io) {
         return new Env(new HashMap<>(), father, io);
@@ -55,8 +58,9 @@ public class Env {
 
     /**
      * 创建环境
-     * @param io    IO表
-     * @return      环境
+     *
+     * @param io IO表
+     * @return 环境
      */
     public static Env newEnv(IOConfig io) {
         return new Env(new HashMap<>(), null, io);
@@ -64,9 +68,10 @@ public class Env {
 
     /**
      * 设置KY对
+     *
      * @param key   key
      * @param value value
-     * @return      环境
+     * @return 环境
      */
     public Env put(String key, Token value) {
         if (table.containsKey(key))
@@ -77,11 +82,12 @@ public class Env {
 
     /**
      * 添加Symbol函数
-     * @param key       key
-     * @param function  函数
-     * @param argSize   参数数量
-     * @param vararg    是否为可变参数
-     * @return          环境
+     *
+     * @param key      key
+     * @param function 函数
+     * @param argSize  参数数量
+     * @param vararg   是否为可变参数
+     * @return 环境
      */
     public Env addSymbolFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         if (table.containsKey(key)) {
@@ -94,11 +100,12 @@ public class Env {
 
     /**
      * 添加普通函数
-     * @param key       key
-     * @param function  函数
-     * @param argSize   参数数量
-     * @param vararg    是否为可变参数
-     * @return          环境
+     *
+     * @param key      key
+     * @param function 函数
+     * @param argSize  参数数量
+     * @param vararg   是否为可变参数
+     * @return 环境
      */
     public Env addTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
         BiFunction<AstNode, Env, Token> df = (ast, env) -> {
@@ -119,11 +126,12 @@ public class Env {
 
     /**
      * 设置Symbol函数
-     * @param key       key
-     * @param function  函数
-     * @param argSize   参数数量
-     * @param vararg    是否为可变参数
-     * @return          环境
+     *
+     * @param key      key
+     * @param function 函数
+     * @param argSize  参数数量
+     * @param vararg   是否为可变参数
+     * @return 环境
      */
     public Env setSymbolFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
         Env temp = this;
@@ -135,11 +143,12 @@ public class Env {
 
     /**
      * 设置普通函数
-     * @param key       key
-     * @param function  函数
-     * @param argSize   参数数量
-     * @param vararg    是否为可变参数
-     * @return          环境
+     *
+     * @param key      key
+     * @param function 函数
+     * @param argSize  参数数量
+     * @param vararg   是否为可变参数
+     * @return 环境
      */
     public Env setTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
         Env temp = this;
@@ -159,9 +168,10 @@ public class Env {
 
     /**
      * 设置KY对
+     *
      * @param key   key
      * @param value value
-     * @return      环境
+     * @return 环境
      */
     public Env set(String key, Token value) {
         Env temp = this;
@@ -173,8 +183,9 @@ public class Env {
 
     /**
      * 查看是否包含特定key
-     * @param key   key
-     * @return      结果
+     *
+     * @param key key
+     * @return 结果
      */
     public boolean contains(String key) {
         Env temp = this;
@@ -185,8 +196,9 @@ public class Env {
 
     /**
      * 获取key对应的value
-     * @param key   key
-     * @return      value
+     *
+     * @param key key
+     * @return value
      */
     public Token get(String key) {
         Env temp = this;
@@ -197,8 +209,9 @@ public class Env {
 
     /**
      * 删除KY对
-     * @param key   key
-     * @return      删除的value
+     *
+     * @param key key
+     * @return 删除的value
      */
     public Token remove(String key) {
         Env temp = this;
@@ -216,7 +229,8 @@ public class Env {
 
     /**
      * 创建子环境
-     * @return  子环境
+     *
+     * @return 子环境
      */
     public Env createChild() {
         return newEnv(this, io);
@@ -224,8 +238,9 @@ public class Env {
 
     /**
      * 加载对应名字的模块
-     * @param name  模块名
-     * @return      环境
+     *
+     * @param name 模块名
+     * @return 环境
      */
     public Env load(String name) {
         Devore.moduleTable.get(name).init(this);
