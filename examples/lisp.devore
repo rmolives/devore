@@ -1,5 +1,5 @@
 (def (is-digit n)
-    (let ([ascii (char->ascii n)])
+    (let ([ascii (char->int n)])
         (and (>= ascii 48) (<= ascii 57))))
 (def (lexer code)
     (let ([code_array (string->list code)]
@@ -24,7 +24,7 @@
                                             (not (is-digit (list-get code_array index))))
                                             (begin (set! index (- index 1)) (set! k false))
                                             (begin (set! v (+ (* v 10)
-                                                (- (char->ascii (list-get code_array index)) 48)))
+                                                (- (char->int (list-get code_array index)) 48)))
                                                 (set! index (+ index 1)))))
                                     (if (/= (list-get code_array (+ index 1)) ".")
                                         (list-add! token (if negative (- v (* v 2)) v))
@@ -38,7 +38,7 @@
                                                     (not (is-digit (list-get code_array index))))
                                                     (begin (set! index (- index 1)) (set! k false))
                                                     (begin (set! x (+ x
-                                                        (/ (- (char->ascii (list-get code_array index)) 48) d)))
+                                                        (/ (- (char->int (list-get code_array index)) 48) d)))
                                                         (set! d (* d 10)))))
                                                 (list-add! token (if negative (- x (* x 2)) x)))))
                                   (if (= (list-get code_array index) "\"")

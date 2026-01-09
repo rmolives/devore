@@ -863,12 +863,12 @@ public class CoreModule extends Module {
                 tokens.add(DString.valueOf(String.valueOf(c)));
             return DList.valueOf(tokens);
         }), 1, false);
-        dEnv.addTokenFunction("char->ascii", ((args, env) -> {
+        dEnv.addTokenFunction("char->int", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return DInt.valueOf((int) args.getFirst().toString().charAt(0));
         }), 1, false);
-        dEnv.addTokenFunction("ascii->char", ((args, env) -> {
+        dEnv.addTokenFunction("int->char", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             return DString.valueOf(String.valueOf((char) ((DInt) args.getFirst()).toBigInteger().intValue()));
