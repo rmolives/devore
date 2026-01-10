@@ -18,7 +18,7 @@ public class DMacro extends Token {
         for (int i = 0; i < body.size(); ++i) {
             AstNode temp = body.get(i);
             for (int j = 0; j < params.size(); ++j)
-                if (temp.symbol.toString().equals(params.get(j)) && temp.isEmpty())
+                if (temp.symbol != null && temp.symbol.toString().equals(params.get(j)) && temp.isEmpty())
                     body.set(i, asts.get(j));
             if (!body.get(i).isEmpty())
                 body.set(i, expand(body.get(i), asts));
