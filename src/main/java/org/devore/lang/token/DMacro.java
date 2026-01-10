@@ -5,6 +5,9 @@ import org.devore.parser.AstNode;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 宏
+ */
 public class DMacro extends Token {
     private final List<String> params;
     private final List<AstNode> bodys;
