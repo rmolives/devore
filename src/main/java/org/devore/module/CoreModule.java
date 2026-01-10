@@ -263,7 +263,10 @@ public class CoreModule extends Module {
                     throw new DevoreCastException(param.symbol.type(), "symbol");
                 params.add(param.symbol.toString());
             }
-            env.put(ast.getFirst().symbol.toString(), new DMacro(params, ast.get(1).copy()));
+            List<AstNode> asts = new ArrayList<>();
+            for (int i = 1; i < ast.size(); ++i)
+                asts.add(ast.get(i).copy());
+            env.put(ast.getFirst().symbol.toString(), new DMacro(params, asts));
             return DWord.WORD_NIL;
         }), 2, false);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
