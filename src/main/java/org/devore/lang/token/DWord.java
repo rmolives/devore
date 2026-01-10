@@ -23,7 +23,7 @@ public class DWord extends Token {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         String result = "nil";
         switch (tag) {
             case LB -> result = "(";

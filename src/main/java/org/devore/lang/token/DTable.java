@@ -64,7 +64,7 @@ public class DTable extends Token {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return table.toString();
     }
 

@@ -75,7 +75,7 @@ public class DFunction extends Token {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return "<function>";
     }
 

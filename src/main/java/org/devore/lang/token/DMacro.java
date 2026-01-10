@@ -38,7 +38,7 @@ public class DMacro extends Token {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return "<macro>";
     }
 

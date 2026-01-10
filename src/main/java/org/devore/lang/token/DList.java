@@ -111,7 +111,7 @@ public class DList extends Token {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return tokens.toString();
     }
 

@@ -173,7 +173,7 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return NumberUtils.isInt(num) ? DInt.valueOf(num).toString() : num.toPlainString();
     }
 

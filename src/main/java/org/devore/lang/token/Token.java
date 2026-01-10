@@ -16,7 +16,7 @@ public abstract class Token {
      *
      * @return 字符串
      */
-    public abstract String str();
+    protected abstract String str();
 
     /**
      * 复制当前token

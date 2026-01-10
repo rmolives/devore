@@ -20,7 +20,7 @@ public class DString extends Token {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return str;
     }
 

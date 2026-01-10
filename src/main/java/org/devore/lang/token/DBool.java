@@ -22,7 +22,7 @@ public class DBool extends Token {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return bool ? "true" : "false";
     }
 

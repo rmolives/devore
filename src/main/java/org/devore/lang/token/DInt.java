@@ -134,7 +134,7 @@ public class DInt extends DNumber {
     }
 
     @Override
-    public String str() {
+    protected String str() {
         return num.toString();
     }
 
