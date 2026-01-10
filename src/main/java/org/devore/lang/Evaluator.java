@@ -28,12 +28,7 @@ public class Evaluator {
             AstNode body = ((DMacro) ast.symbol).expand(ast.children);
             ast.symbol = body.symbol;
             ast.children = body.children;
-            while (true) {
-                if (ast.symbol instanceof DSymbol && env.contains(ast.symbol.toString()))
-                    ast.symbol = env.get(ast.symbol.toString());
-                else
-                    break;
-            }
+            return eval(env, ast);
         }
         if (ast.isEmpty() && ast.type != AstNode.AstType.FUNCTION)
             return ast.symbol;
