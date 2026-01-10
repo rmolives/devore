@@ -268,7 +268,7 @@ public class CoreModule extends Module {
                 asts.add(ast.get(i).copy());
             env.put(ast.getFirst().symbol.toString(), new DMacro(params, asts));
             return DWord.WORD_NIL;
-        }), 2, false);
+        }), 2, true);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
             if (!(ast.getFirst().symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
