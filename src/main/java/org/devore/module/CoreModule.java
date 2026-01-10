@@ -266,7 +266,7 @@ public class CoreModule extends Module {
             List<AstNode> asts = new ArrayList<>();
             for (int i = 1; i < ast.size(); ++i)
                 asts.add(ast.get(i).copy());
-            env.put(ast.getFirst().symbol.toString(), new DMacro(params, asts));
+            env.put(ast.getFirst().symbol.toString(), DMacro.newMacro(params, asts));
             return DWord.WORD_NIL;
         }), 2, true);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
