@@ -508,7 +508,7 @@ public class CoreModule extends Module {
             for (AstNode node : ast.children)
                 result = Evaluator.eval(newEnv, node.copy());
             return result;
-        }, 2, true);
+        }, 1, true);
         dEnv.addSymbolFunction("while", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
