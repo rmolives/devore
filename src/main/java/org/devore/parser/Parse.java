@@ -1,7 +1,7 @@
 package org.devore.parser;
 
 import org.devore.exception.DevoreParseException;
-import org.devore.lang.token.DOp;
+import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
 
@@ -34,7 +34,7 @@ public class Parse {
                     continue;
                 }
                 if (tokens.get(index) == DWord.WORD_LB)
-                    tokens.add(index, DOp.valueOf("apply"));
+                    tokens.add(index, DSymbol.valueOf("apply"));
                 temp = new AstNode(tokens.get(index));
                 stack.push(temp);
                 ast = temp;
@@ -51,7 +51,7 @@ public class Parse {
                     continue;
                 }
                 if (tokens.get(index) == DWord.WORD_LB)
-                    tokens.add(index, DOp.valueOf("apply"));
+                    tokens.add(index, DSymbol.valueOf("apply"));
                 temp = new AstNode(tokens.get(index));
                 if (stack.peek() == null) {
                     throw new DevoreParseException("语法解析中栈顶为null.");

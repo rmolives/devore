@@ -111,8 +111,8 @@ public class Env {
         BiFunction<AstNode, Env, Token> df = (ast, env) -> {
             List<Token> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
-                ast.get(i).op = Evaluator.eval(env, ast.get(i).copy());
-                args.add(ast.get(i).op);
+                ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
+                args.add(ast.get(i).symbol);
             }
             return function.apply(args, env);
         };
@@ -157,8 +157,8 @@ public class Env {
         BiFunction<AstNode, Env, Token> df = (ast, env) -> {
             List<Token> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
-                ast.get(i).op = Evaluator.eval(env, ast.get(i).copy());
-                args.add(ast.get(i).op);
+                ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
+                args.add(ast.get(i).symbol);
             }
             return function.apply(args, env);
         };

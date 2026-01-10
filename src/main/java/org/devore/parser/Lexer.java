@@ -184,7 +184,7 @@ public class Lexer {
                     builder.append(expressionCharArray[index]);
                     ++index;
                 }
-                tokens.add(DOp.valueOf(builder.toString()));
+                tokens.add(DSymbol.valueOf(builder.toString()));
             }
         }
         return tokens;

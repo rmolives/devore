@@ -1,7 +1,7 @@
 package org.devore.lang;
 
 import org.devore.lang.token.DFunction;
-import org.devore.lang.token.DOp;
+import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.Token;
 import org.devore.parser.AstNode;
 
@@ -18,17 +18,17 @@ public class Evaluator {
      */
     public static Token eval(Env env, AstNode ast) {
         while (true) {
-            if (ast.op instanceof DOp && env.contains(ast.op.toString()))
-                ast.op = env.get(ast.op.toString());
+            if (ast.symbol instanceof DSymbol && env.contains(ast.symbol.toString()))
+                ast.symbol = env.get(ast.symbol.toString());
             else
                 break;
         }
         if (ast.isEmpty() && ast.type != AstNode.AstType.FUNCTION)
-            return ast.op;
-        if (ast.op instanceof DFunction) {
-            ast.op = ((DFunction) ast.op).call(ast, env);
+            return ast.symbol;
+        if (ast.symbol instanceof DFunction) {
+            ast.symbol = ((DFunction) ast.symbol).call(ast, env);
             ast.clear();
         }
-        return ast.op;
+        return ast.symbol;
     }
 }

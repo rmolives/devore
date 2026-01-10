@@ -11,17 +11,17 @@ import java.util.List;
  */
 public class AstNode {
     public final static AstNode nullAst = new AstNode(null);    // 空白语法树
-    public final List<AstNode> children;                            // 子树
-    public Token op;                                                // 内容
-    public AstType type;                                            // 语法树类型
+    public final List<AstNode> children;                               // 子树
+    public Token symbol;                                               // 内容
+    public AstType type;                                               // 语法树类型
 
     /**
      * 创建语法树
      *
-     * @param op 内容
+     * @param symbol 内容
      */
-    public AstNode(Token op) {
-        this.op = op;
+    public AstNode(Token symbol) {
+        this.symbol = symbol;
         this.type = AstType.BASIC;
         this.children = new ArrayList<>();
     }
@@ -29,12 +29,12 @@ public class AstNode {
     /**
      * 创建语法树
      *
-     * @param op    内容
+     * @param symbol    内容
      * @param type  类型
      * @param child 子树
      */
-    public AstNode(Token op, AstType type, ArrayList<AstNode> child) {
-        this.op = op;
+    public AstNode(Token symbol, AstType type, ArrayList<AstNode> child) {
+        this.symbol = symbol;
         this.type = type;
         this.children = child;
     }
@@ -48,7 +48,7 @@ public class AstNode {
         ArrayList<AstNode> list = new ArrayList<>();
         for (AstNode ast : children)
             list.add(ast.copy());
-        return new AstNode(op, type, list);
+        return new AstNode(symbol, type, list);
     }
 
     /**
@@ -110,7 +110,7 @@ public class AstNode {
      * @return 结果
      */
     public boolean isNull() {
-        return op == null;
+        return symbol == null;
     }
 
     /**
@@ -122,16 +122,16 @@ public class AstNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (isEmpty()) {
-            if (op instanceof DString)
-                builder.append("\"").append(op).append("\"");
+            if (symbol instanceof DString)
+                builder.append("\"").append(symbol).append("\"");
             else
-                builder.append(op);
+                builder.append(symbol);
         } else {
             builder.append("(");
-            if (op instanceof DString)
-                builder.append("\"").append(op).append("\"");
+            if (symbol instanceof DString)
+                builder.append("\"").append(symbol).append("\"");
             else
-                builder.append(op);
+                builder.append(symbol);
             for (AstNode ast : children)
                 builder.append(" ").append(ast.toString());
             builder.append(")");
