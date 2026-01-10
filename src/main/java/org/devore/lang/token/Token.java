@@ -61,6 +61,6 @@ public abstract class Token {
      */
     @Override
     public int hashCode() {
-        return (type() + str()).hashCode();
+        return (type() + this).hashCode();
     }
 }
