@@ -76,7 +76,7 @@ public class DFunction extends Token {
 
     @Override
     public String str() {
-        return "<function>{function=" + function.hashCode() + ",argSize=" + argSize + ",children=" + children + ",vararg=" + vararg + "}";
+        return "<function>";
     }
 
     @Override

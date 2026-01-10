@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class AstNode {
     public final static AstNode nullAst = new AstNode(null);    // 空白语法树
-    public final List<AstNode> children;                               // 子树
+    public List<AstNode> children;                               // 子树
     public Token symbol;                                               // 内容
     public AstType type;                                               // 语法树类型
 
@@ -58,6 +58,16 @@ public class AstNode {
      */
     public void add(AstNode node) {
         children.add(node);
+    }
+
+    /**
+     * 设置子树
+     *
+     * @param i     index
+     * @param node 子树
+     */
+    public void set(int i, AstNode node) {
+        children.set(i, node);
     }
 
     /**

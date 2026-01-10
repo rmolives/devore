@@ -254,6 +254,18 @@ public class CoreModule extends Module {
             }
             return DWord.WORD_NIL;
         }), 1, true);
+        dEnv.addSymbolFunction("def-macro", ((ast, env) -> {
+            if (!(ast.getFirst().symbol instanceof DSymbol))
+                throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
+            List<String> params = new ArrayList<>();
+            for (AstNode param : ast.getFirst().children) {
+                if (!(param.symbol instanceof DSymbol))
+                    throw new DevoreCastException(param.symbol.type(), "symbol");
+                params.add(param.symbol.toString());
+            }
+            env.put(ast.getFirst().symbol.toString(), new DMacro(params, ast.get(1).copy()));
+            return DWord.WORD_NIL;
+        }), 2, false);
         dEnv.addSymbolFunction("def", ((ast, env) -> {
             if (!(ast.getFirst().symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
@@ -264,24 +276,24 @@ public class CoreModule extends Module {
                     result = Evaluator.eval(newEnv, ast.get(i).copy());
                 env.put(ast.getFirst().symbol.toString(), result);
             } else {
-                List<String> parameters = new ArrayList<>();
-                for (AstNode parameter : ast.getFirst().children) {
-                    if (!(parameter.symbol instanceof DSymbol))
-                        throw new DevoreCastException(parameter.symbol.type(), "symbol");
-                    parameters.add(parameter.symbol.toString());
+                List<String> params = new ArrayList<>();
+                for (AstNode param : ast.getFirst().children) {
+                    if (!(param.symbol instanceof DSymbol))
+                        throw new DevoreCastException(param.symbol.type(), "symbol");
+                    params.add(param.symbol.toString());
                 }
                 List<AstNode> asts = new ArrayList<>();
                 for (int i = 1; i < ast.size(); ++i)
                     asts.add(ast.get(i).copy());
                 env.addTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                     Env newEnv = env.createChild();
-                    for (int i = 0; i < parameters.size(); ++i)
-                        newEnv.put(parameters.get(i), cArgs.get(i));
+                    for (int i = 0; i < params.size(); ++i)
+                        newEnv.put(params.get(i), cArgs.get(i));
                     Token result = DWord.WORD_NIL;
                     for (AstNode astNode : asts)
                         result = Evaluator.eval(newEnv, astNode.copy());
                     return result;
-                }), parameters.size(), false);
+                }), params.size(), false);
             }
             return DWord.WORD_NIL;
         }), 2, true);
@@ -295,24 +307,24 @@ public class CoreModule extends Module {
                     result = Evaluator.eval(newEnv, ast.get(i).copy());
                 env.set(ast.getFirst().symbol.toString(), result);
             } else {
-                List<String> parameters = new ArrayList<>();
-                for (AstNode parameter : ast.getFirst().children) {
-                    if (!(parameter.symbol instanceof DSymbol))
-                        throw new DevoreCastException(parameter.symbol.type(), "symbol");
-                    parameters.add(parameter.symbol.toString());
+                List<String> params = new ArrayList<>();
+                for (AstNode param : ast.getFirst().children) {
+                    if (!(param.symbol instanceof DSymbol))
+                        throw new DevoreCastException(param.symbol.type(), "symbol");
+                    params.add(param.symbol.toString());
                 }
                 List<AstNode> asts = new ArrayList<>();
                 for (int i = 1; i < ast.size(); ++i)
                     asts.add(ast.get(i).copy());
                 env.setTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                     Env newEnv = env.createChild();
-                    for (int i = 0; i < parameters.size(); ++i)
-                        newEnv.put(parameters.get(i), cArgs.get(i));
+                    for (int i = 0; i < params.size(); ++i)
+                        newEnv.put(params.get(i), cArgs.get(i));
                     Token result = DWord.WORD_NIL;
                     for (AstNode astNode : asts)
                         result = Evaluator.eval(newEnv, astNode.copy());
                     return result;
-                }), parameters.size(), false);
+                }), params.size(), false);
             }
             return DWord.WORD_NIL;
         }), 2, true);
@@ -321,24 +333,24 @@ public class CoreModule extends Module {
             Token result = DWord.WORD_NIL;
             for (AstNode node : ast.getFirst().children) {
                 if ("apply".equals(node.symbol.toString())) {
-                    List<String> parameters = new ArrayList<>();
+                    List<String> params = new ArrayList<>();
                     List<AstNode> asts = new ArrayList<>();
-                    for (AstNode parameterNode : node.getFirst().children) {
-                        if (!(parameterNode.symbol instanceof DSymbol))
-                            throw new DevoreCastException(parameterNode.symbol.type(), "symbol");
-                        parameters.add(parameterNode.symbol.toString());
+                    for (AstNode paramNode : node.getFirst().children) {
+                        if (!(paramNode.symbol instanceof DSymbol))
+                            throw new DevoreCastException(paramNode.symbol.type(), "symbol");
+                        params.add(paramNode.symbol.toString());
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
                     newEnv.addTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = env.createChild();
-                        for (int i = 0; i < parameters.size(); ++i)
-                            newInEnv.put(parameters.get(i), cArgs.get(i));
+                        for (int i = 0; i < params.size(); ++i)
+                            newInEnv.put(params.get(i), cArgs.get(i));
                         Token inResult = DWord.WORD_NIL;
                         for (AstNode astNode : asts)
                             inResult = Evaluator.eval(newInEnv, astNode.copy());
                         return inResult;
-                    }), parameters.size(), false);
+                    }), params.size(), false);
                 } else {
                     if (!(node.symbol instanceof DSymbol))
                         throw new DevoreCastException(node.symbol.type(), "symbol");
@@ -357,24 +369,24 @@ public class CoreModule extends Module {
             Token result = DWord.WORD_NIL;
             for (AstNode node : ast.getFirst().children) {
                 if ("apply".equals(node.symbol.toString())) {
-                    List<String> parameters = new ArrayList<>();
+                    List<String> params = new ArrayList<>();
                     List<AstNode> asts = new ArrayList<>();
-                    for (AstNode parameterNode : node.getFirst().children) {
-                        if (!(parameterNode.symbol instanceof DSymbol))
-                            throw new DevoreCastException(parameterNode.symbol.type(), "symbol");
-                        parameters.add(parameterNode.symbol.toString());
+                    for (AstNode paramNode : node.getFirst().children) {
+                        if (!(paramNode.symbol instanceof DSymbol))
+                            throw new DevoreCastException(paramNode.symbol.type(), "symbol");
+                        params.add(paramNode.symbol.toString());
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
                     newEnv.addTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = newEnv.createChild();
-                        for (int i = 0; i < parameters.size(); ++i)
-                            newInEnv.put(parameters.get(i), cArgs.get(i));
+                        for (int i = 0; i < params.size(); ++i)
+                            newInEnv.put(params.get(i), cArgs.get(i));
                         Token inResult = DWord.WORD_NIL;
                         for (AstNode astNode : asts)
                             inResult = Evaluator.eval(newInEnv, astNode.copy());
                         return inResult;
-                    }), parameters.size(), false);
+                    }), params.size(), false);
                 } else {
                     if (!(node.symbol instanceof DSymbol))
                         throw new DevoreCastException(node.symbol.type(), "symbol");
@@ -389,15 +401,15 @@ public class CoreModule extends Module {
             return result;
         }), 2, true);
         dEnv.addSymbolFunction("lambda", ((ast, env) -> {
-            List<String> parameters = new ArrayList<>();
+            List<String> params = new ArrayList<>();
             if (!ast.getFirst().isNull()) {
                 if (!(ast.getFirst().symbol instanceof DSymbol))
                     throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
-                parameters.add(ast.getFirst().symbol.toString());
-                for (AstNode parameter : ast.getFirst().children) {
-                    if (!(parameter.symbol instanceof DSymbol))
-                        throw new DevoreCastException(parameter.symbol.type(), "symbol");
-                    parameters.add(parameter.symbol.toString());
+                params.add(ast.getFirst().symbol.toString());
+                for (AstNode param : ast.getFirst().children) {
+                    if (!(param.symbol instanceof DSymbol))
+                        throw new DevoreCastException(param.symbol.type(), "symbol");
+                    params.add(param.symbol.toString());
                 }
             }
             List<AstNode> asts = new ArrayList<>();
@@ -410,23 +422,23 @@ public class CoreModule extends Module {
                     args.add(inAst.get(i).symbol);
                 }
                 Env newInEnv = env.createChild();
-                for (int i = 0; i < parameters.size(); ++i)
-                    newInEnv.put(parameters.get(i), args.get(i));
+                for (int i = 0; i < params.size(); ++i)
+                    newInEnv.put(params.get(i), args.get(i));
                 Token inResult = DWord.WORD_NIL;
                 for (AstNode astNode : asts)
                     inResult = Evaluator.eval(newInEnv, astNode.copy());
                 return inResult;
             };
-            return DFunction.newFunction(df, parameters.size(), false);
+            return DFunction.newFunction(df, params.size(), false);
         }), 2, true);
         dEnv.addTokenFunction("apply", ((args, env) -> {
             if (!(args.getFirst() instanceof DFunction))
                 throw new DevoreCastException(args.getFirst().type(), "function");
-            List<Token> parameters = new ArrayList<>();
+            List<Token> params = new ArrayList<>();
             for (int i = 1; i < args.size(); ++i)
-                parameters.add(args.get(i));
+                params.add(args.get(i));
             AstNode asts = AstNode.nullAst.copy();
-            for (Token arg : parameters)
+            for (Token arg : params)
                 asts.add(new AstNode(arg));
             return ((DFunction) args.getFirst()).call(asts, env.createChild());
         }), 1, true);
@@ -435,9 +447,9 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "function");
             if (!(args.get(1) instanceof DList temp))
                 throw new DevoreCastException(args.getFirst().type(), "list");
-            List<Token> parameters = temp.toList();
+            List<Token> params = temp.toList();
             AstNode asts = AstNode.nullAst.copy();
-            for (Token arg : parameters)
+            for (Token arg : params)
                 asts.add(new AstNode(arg));
             return ((DFunction) args.getFirst()).call(asts, env.createChild());
         }), 2, false);
@@ -732,14 +744,14 @@ public class CoreModule extends Module {
             List<Token> result = new ArrayList<>();
             List<Token> tokens = ((DList) args.get(1)).toList();
             for (int i = 0; i < tokens.size(); ++i) {
-                List<Token> parameters = new ArrayList<>();
-                parameters.add(tokens.get(i));
+                List<Token> params = new ArrayList<>();
+                params.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
                     if (!(args.get(j + 1) instanceof DList))
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
-                    parameters.add(((DList) args.get(j + 1)).get(i));
+                    params.add(((DList) args.get(j + 1)).get(i));
                 }
-                result.add(((DFunction) args.getFirst()).call(parameters.toArray(Token[]::new), env.createChild()));
+                result.add(((DFunction) args.getFirst()).call(params.toArray(Token[]::new), env.createChild()));
             }
             return DList.valueOf(result);
         }), 2, true);
@@ -750,14 +762,14 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(1).type(), "list");
             List<Token> tokens = ((DList) args.get(1)).toList();
             for (int i = 0; i < tokens.size(); ++i) {
-                List<Token> parameters = new ArrayList<>();
-                parameters.add(tokens.get(i));
+                List<Token> params = new ArrayList<>();
+                params.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
                     if (!(args.get(j + 1) instanceof DList))
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
-                    parameters.add(((DList) args.get(j + 1)).get(i));
+                    params.add(((DList) args.get(j + 1)).get(i));
                 }
-                ((DFunction) args.getFirst()).call(parameters.toArray(Token[]::new), env.createChild());
+                ((DFunction) args.getFirst()).call(params.toArray(Token[]::new), env.createChild());
             }
             return DWord.WORD_NIL;
         }), 2, true);

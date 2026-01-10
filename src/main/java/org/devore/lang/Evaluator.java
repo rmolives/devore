@@ -1,6 +1,7 @@
 package org.devore.lang;
 
 import org.devore.lang.token.DFunction;
+import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.Token;
 import org.devore.parser.AstNode;
@@ -22,6 +23,17 @@ public class Evaluator {
                 ast.symbol = env.get(ast.symbol.toString());
             else
                 break;
+        }
+        if (ast.symbol instanceof DMacro) {
+            AstNode body = ((DMacro) ast.symbol).expand(ast.children);
+            ast.symbol = body.symbol;
+            ast.children = body.children;
+            while (true) {
+                if (ast.symbol instanceof DSymbol && env.contains(ast.symbol.toString()))
+                    ast.symbol = env.get(ast.symbol.toString());
+                else
+                    break;
+            }
         }
         if (ast.isEmpty() && ast.type != AstNode.AstType.FUNCTION)
             return ast.symbol;
