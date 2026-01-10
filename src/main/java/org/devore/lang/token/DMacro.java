@@ -7,11 +7,11 @@ import java.util.List;
 
 public class DMacro extends Token {
     private final List<String> params;
-    private final AstNode body;
+    private final List<AstNode> bodys;
 
-    public DMacro(List<String> params, AstNode body) {
+    public DMacro(List<String> params, List<AstNode> bodys) {
         this.params = params;
-        this.body = body;
+        this.bodys = bodys;
     }
 
     private AstNode expand(AstNode body, List<AstNode> asts) {
@@ -26,8 +26,10 @@ public class DMacro extends Token {
         return body;
     }
 
-    public AstNode expand(List<AstNode> asts) {
-        return expand(body.copy(), asts);
+    public List<AstNode> expand(List<AstNode> asts) {
+        List<AstNode> result = new ArrayList<>();
+        for (AstNode body : bodys) result.add(expand(body.copy(), asts));
+        return result;
     }
 
     @Override
@@ -42,7 +44,10 @@ public class DMacro extends Token {
 
     @Override
     public Token copy() {
-        return new DMacro(new ArrayList<>(params), body.copy());
+        List<AstNode> temp = new ArrayList<>();
+        for (AstNode body : bodys)
+            temp.add(body.copy());
+        return new DMacro(new ArrayList<>(params), temp);
     }
 
     @Override

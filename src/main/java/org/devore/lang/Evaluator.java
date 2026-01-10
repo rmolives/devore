@@ -6,6 +6,8 @@ import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.Token;
 import org.devore.parser.AstNode;
 
+import java.util.List;
+
 /**
  * 求值器
  */
@@ -25,9 +27,9 @@ public class Evaluator {
                 break;
         }
         if (ast.symbol instanceof DMacro) {
-            AstNode body = ((DMacro) ast.symbol).expand(ast.children);
-            ast.symbol = body.symbol;
-            ast.children = body.children;
+            List<AstNode> bodys = ((DMacro) ast.symbol).expand(ast.children);
+            ast.symbol = DSymbol.valueOf("begin");
+            ast.children = bodys;
             return eval(env, ast);
         }
         if (ast.isEmpty() && ast.type != AstNode.AstType.FUNCTION)
