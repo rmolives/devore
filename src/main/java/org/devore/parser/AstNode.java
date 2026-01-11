@@ -63,7 +63,7 @@ public class AstNode {
     /**
      * 添加子树
      *
-     * @param i    位置
+     * @param i     位置
      * @param node 子树
      */
     public void add(int i, AstNode node) {
