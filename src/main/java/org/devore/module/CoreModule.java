@@ -868,16 +868,6 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return DInt.valueOf(new BigInteger(args.getFirst().toString()));
         }), 1, false);
-        dEnv.addTokenFunction("string->symbol", ((args, env) -> {
-            if (!(args.getFirst() instanceof DString))
-                throw new DevoreCastException(args.getFirst().type(), "string");
-            return DSymbol.valueOf(args.getFirst().toString());
-        }), 1, false);
-        dEnv.addTokenFunction("symbol->string", ((args, env) -> {
-            if (!(args.getFirst() instanceof DSymbol))
-                throw new DevoreCastException(args.getFirst().type(), "symbol");
-            return DString.valueOf(args.getFirst().toString());
-        }), 1, false);
         dEnv.addTokenFunction("string->float", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
