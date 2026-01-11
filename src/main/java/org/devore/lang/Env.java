@@ -15,12 +15,12 @@ import java.util.function.BiFunction;
 
 /**
  * 环境
+ *
+ * @param io     IO表
+ * @param table  环境表
+ * @param father 父环境
  */
-public class Env {
-    public final IOConfig io;               // IO表
-    public final Map<String, Token> table;  // 环境表
-    public final Env father;                // 父环境
-
+public record Env(Map<String, Token> table, Env father, IOConfig io) {
     /**
      * 创建环境
      *
@@ -28,7 +28,7 @@ public class Env {
      * @param father 父环境
      * @param io     IO表
      */
-    protected Env(Map<String, Token> table, Env father, IOConfig io) {
+    public Env(Map<String, Token> table, Env father, IOConfig io) {
         this.table = table;
         this.father = father;
         this.io = io;
