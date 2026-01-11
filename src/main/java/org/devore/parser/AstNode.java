@@ -61,12 +61,12 @@ public class AstNode {
     }
 
     /**
-     * 添加子树
+     * 插入子树
      *
      * @param i     位置
      * @param node 子树
      */
-    public void add(int i, AstNode node) {
+    public void insert(int i, AstNode node) {
         children.add(i, node);
     }
 

@@ -25,7 +25,7 @@ public class DMacro extends Token {
         for (int j = 0; j < params.size(); ++j)
             if (body.symbol != null && body.symbol.toString().equals(params.get(j))) {
                 body.symbol = DSymbol.valueOf("apply");
-                body.add(0, asts.get(j));
+                body.insert(0, asts.get(j));
             }
         for (int i = 0; i < body.size(); ++i) {
             AstNode temp = body.get(i);
