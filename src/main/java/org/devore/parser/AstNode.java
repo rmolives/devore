@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class AstNode {
     public final static AstNode nullAst = new AstNode(null);    // 空白语法树
-    public List<AstNode> children;                               // 子树
+    public List<AstNode> children;                                     // 子树
     public Token symbol;                                               // 内容
     public AstType type;                                               // 语法树类型
 
