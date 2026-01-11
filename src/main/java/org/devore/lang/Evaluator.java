@@ -38,6 +38,8 @@ public class Evaluator {
             ast.symbol = ((DFunction) ast.symbol).call(ast, env);
             ast.clear();
         }
+        if (ast.symbol instanceof DSymbol)
+            return eval(env, ast);
         return ast.symbol;
     }
 }
