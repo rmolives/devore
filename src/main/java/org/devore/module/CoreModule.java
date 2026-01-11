@@ -967,5 +967,29 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return DList.valueOf(new ArrayList<>(table.keys()));
         }), 1, false);
+        dEnv.addTokenProcedure("arithmetic?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DArithmetic)), 1, false);
+        dEnv.addTokenProcedure("bool?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DBool)), 1, false);
+        dEnv.addTokenProcedure("float?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DFloat)), 1, false);
+        dEnv.addTokenProcedure("int?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DInt)), 1, false);
+        dEnv.addTokenProcedure("list?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DList)), 1, false);
+        dEnv.addTokenProcedure("macro?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DMacro)), 1, false);
+        dEnv.addTokenProcedure("number?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DNumber)), 1, false);
+        dEnv.addTokenProcedure("procedure?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DProcedure)), 1, false);
+        dEnv.addTokenProcedure("string?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DString)), 1, false);
+        dEnv.addTokenProcedure("symbol?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DSymbol)), 1, false);
+        dEnv.addTokenProcedure("table?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DTable)), 1, false);
+        dEnv.addTokenProcedure("word?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DWord)), 1, false);
     }
 }
