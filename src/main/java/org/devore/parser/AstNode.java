@@ -33,7 +33,7 @@ public class AstNode {
      * @param type  类型
      * @param child 子树
      */
-    public AstNode(Token symbol, AstType type, ArrayList<AstNode> child) {
+    public AstNode(Token symbol, AstType type, List<AstNode> child) {
         this.symbol = symbol;
         this.type = type;
         this.children = child;
@@ -45,7 +45,7 @@ public class AstNode {
      * @return 复制
      */
     public AstNode copy() {
-        ArrayList<AstNode> list = new ArrayList<>();
+        List<AstNode> list = new ArrayList<>();
         for (AstNode ast : children)
             list.add(ast.copy());
         return new AstNode(symbol, type, list);
