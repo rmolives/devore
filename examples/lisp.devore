@@ -130,7 +130,7 @@
                     (if (table-contains-key env (->string k))
                         (list-set! ast index (table-get env (->string k))))
                     (list-set! ast index (eval env k))))) (range (length ast)))
-    (if (= (type (head ast)) "function")
+    (if (= (type (head ast)) "procedure")
         (act (head ast) (list-remove ast 0))
         (head ast)))
 (def env (table))
