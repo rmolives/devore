@@ -476,10 +476,20 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(condition.type(), "bool");
             if (((DBool) condition).bool)
                 result = Evaluator.eval(newEnv, ast.get(1).copy());
-            else if (ast.size() > 2)
+            return result;
+        }, 2, false);
+        dEnv.addSymbolFunction("if", (ast, env) -> {
+            Token result;
+            Env newEnv = env.createChild();
+            Token condition = Evaluator.eval(newEnv, ast.getFirst().copy());
+            if (!(condition instanceof DBool))
+                throw new DevoreCastException(condition.type(), "bool");
+            if (((DBool) condition).bool)
+                result = Evaluator.eval(newEnv, ast.get(1).copy());
+            else
                 result = Evaluator.eval(newEnv, ast.get(2).copy());
             return result;
-        }, 2, true);
+        }, 3, false);
         dEnv.addSymbolFunction("cond", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
