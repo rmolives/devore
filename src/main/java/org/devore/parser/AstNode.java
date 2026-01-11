@@ -30,8 +30,8 @@ public class AstNode {
      * 创建语法树
      *
      * @param symbol    内容
-     * @param type  类型
-     * @param child 子树
+     * @param type      类型
+     * @param child     子树
      */
     public AstNode(Token symbol, AstType type, List<AstNode> child) {
         this.symbol = symbol;
