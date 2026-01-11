@@ -11,37 +11,37 @@ import java.util.function.BiFunction;
 /**
  * 函数
  */
-public class DFunction extends Token {
-    private final BiFunction<AstNode, Env, Token> function;
+public class DProcedure extends Token {
+    private final BiFunction<AstNode, Env, Token> procedure;
     private final int argSize;
-    private final List<DFunction> children;
+    private final List<DProcedure> children;
     private final boolean vararg;
 
-    private DFunction(BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
-        this.function = function;
+    private DProcedure(BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
+        this.procedure = procedure;
         this.argSize = argSize;
         this.children = new ArrayList<>();
         this.vararg = vararg;
     }
 
-    public static DFunction newFunction(BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
-        return new DFunction(function, argSize, vararg);
+    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+        return new DProcedure(function, argSize, vararg);
     }
 
-    public DFunction addFunction(DFunction function) {
-        if (!isEqArgs(function.argSize))
-            throw new DevoreRuntimeException("函数定义冲突");
-        this.children.add(function);
+    public DProcedure addProcedure(DProcedure procedure) {
+        if (!isEqArgs(procedure.argSize))
+            throw new DevoreRuntimeException("过程定义冲突");
+        this.children.add(procedure);
         return this;
     }
 
-    private DFunction match(int argSize) {
-        DFunction function = null;
+    private DProcedure match(int argSize) {
+        DProcedure function = null;
         if (this.argSize == argSize || (this.vararg && argSize >= this.argSize))
             function = this;
         else {
-            for (DFunction df : children) {
-                DFunction temp = df.match(argSize);
+            for (DProcedure df : children) {
+                DProcedure temp = df.match(argSize);
                 if (temp != null)
                     function = temp;
             }
@@ -50,19 +50,19 @@ public class DFunction extends Token {
     }
 
     public Token call(AstNode ast, Env env) {
-        DFunction df = match(ast.size());
+        DProcedure df = match(ast.size());
         if (df == null)
-            throw new DevoreRuntimeException("找不到匹配条件的函数.");
-        return df.function.apply(ast, env);
+            throw new DevoreRuntimeException("找不到匹配条件的过程.");
+        return df.procedure.apply(ast, env);
     }
 
     public Token call(Token[] args, Env env) {
-        DFunction df = match(args.length);
+        DProcedure df = match(args.length);
         if (df == null)
-            throw new DevoreRuntimeException("找不到匹配条件的函数.");
+            throw new DevoreRuntimeException("找不到匹配条件的过程.");
         AstNode ast = AstNode.nullAst.copy();
         for (Token arg : args) ast.add(new AstNode(arg));
-        return df.function.apply(ast, env);
+        return df.procedure.apply(ast, env);
     }
 
     private boolean isEqArgs(int argSize) {
@@ -71,22 +71,22 @@ public class DFunction extends Token {
 
     @Override
     public String type() {
-        return "function";
+        return "procedure";
     }
 
     @Override
     protected String str() {
-        return "<function>";
+        return "<procedure>";
     }
 
     @Override
     public Token copy() {
-        return newFunction(function, argSize, vararg);
+        return newProcedure(procedure, argSize, vararg);
     }
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DFunction func && func.function.equals(this.function)
+        return t instanceof DProcedure func && func.procedure.equals(this.procedure)
                 && func.argSize == this.argSize && func.children.equals(this.children)
                 && func.vararg == this.vararg ? 0 : -1;
     }

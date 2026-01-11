@@ -65,7 +65,7 @@ public class Parse {
                 if (index >= 2 && tokens.get(index - 2) == DWord.WORD_LB) {
                     if (stack.peek() == null)
                         throw new DevoreParseException("语法解析中栈顶为null.");
-                    stack.peek().type = AstNode.AstType.FUNCTION;
+                    stack.peek().type = AstNode.AstType.PROCEDURE;
                 }
                 if (stack.isEmpty())
                     throw new DevoreParseException("语法解析中栈顶为空.");

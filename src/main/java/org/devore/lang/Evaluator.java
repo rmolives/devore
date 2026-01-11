@@ -1,6 +1,6 @@
 package org.devore.lang;
 
-import org.devore.lang.token.DFunction;
+import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.Token;
@@ -32,10 +32,10 @@ public class Evaluator {
             ast.children = bodys;
             return eval(env, ast);
         }
-        if (ast.isEmpty() && ast.type != AstNode.AstType.FUNCTION)
+        if (ast.isEmpty() && ast.type != AstNode.AstType.PROCEDURE)
             return ast.symbol;
-        if (ast.symbol instanceof DFunction) {
-            ast.symbol = ((DFunction) ast.symbol).call(ast, env);
+        if (ast.symbol instanceof DProcedure) {
+            ast.symbol = ((DProcedure) ast.symbol).call(ast, env);
             ast.clear();
         }
         if (ast.symbol instanceof DSymbol)

@@ -163,7 +163,7 @@ public class AstNode {
      * 子树类型
      */
     public enum AstType {
-        FUNCTION,   // 函数
-        BASIC       // 普通
+        PROCEDURE,   // 过程
+        BASIC        // 普通
     }
 }

@@ -2,7 +2,7 @@ package org.devore.lang;
 
 import org.devore.Devore;
 import org.devore.exception.DevoreRuntimeException;
-import org.devore.lang.token.DFunction;
+import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
 import org.devore.parser.AstNode;
@@ -81,76 +81,76 @@ public class Env {
     }
 
     /**
-     * 添加Symbol函数
+     * 添加Symbol过程
      *
-     * @param key      key
-     * @param function 函数
-     * @param argSize  参数数量
-     * @param vararg   是否为可变参数
+     * @param key       key
+     * @param procedure 过程
+     * @param argSize   参数数量
+     * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addSymbolFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+    public Env addSymbolProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
         if (table.containsKey(key)) {
-            table.put(key, ((DFunction) table.get(key)).addFunction(DFunction.newFunction(function, argSize, vararg)));
+            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argSize, vararg)));
             return this;
         }
-        table.put(key, DFunction.newFunction(function, argSize, vararg));
+        table.put(key, DProcedure.newProcedure(procedure, argSize, vararg));
         return this;
     }
 
     /**
-     * 添加普通函数
+     * 添加普通过程
      *
-     * @param key      key
-     * @param function 函数
-     * @param argSize  参数数量
-     * @param vararg   是否为可变参数
+     * @param key       key
+     * @param procedure 过程
+     * @param argSize   参数数量
+     * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
+    public Env addTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argSize, boolean vararg) {
         BiFunction<AstNode, Env, Token> df = (ast, env) -> {
             List<Token> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
                 ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
                 args.add(ast.get(i).symbol);
             }
-            return function.apply(args, env);
+            return procedure.apply(args, env);
         };
         if (table.containsKey(key)) {
-            table.put(key, ((DFunction) table.get(key)).addFunction(DFunction.newFunction(df, argSize, vararg)));
+            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(df, argSize, vararg)));
             return this;
         }
-        table.put(key, DFunction.newFunction(df, argSize, vararg));
+        table.put(key, DProcedure.newProcedure(df, argSize, vararg));
         return this;
     }
 
     /**
-     * 设置Symbol函数
+     * 设置Symbol过程
      *
-     * @param key      key
-     * @param function 函数
-     * @param argSize  参数数量
-     * @param vararg   是否为可变参数
+     * @param key       key
+     * @param procedure 过程
+     * @param argSize   参数数量
+     * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setSymbolFunction(String key, BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
+    public Env setSymbolProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        temp.table.put(key, DFunction.newFunction(function, argSize, vararg));
+        temp.table.put(key, DProcedure.newProcedure(procedure, argSize, vararg));
         return this;
     }
 
     /**
-     * 设置普通函数
+     * 设置普通过程
      *
-     * @param key      key
-     * @param function 函数
-     * @param argSize  参数数量
-     * @param vararg   是否为可变参数
+     * @param key       key
+     * @param procedure 过程
+     * @param argSize   参数数量
+     * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setTokenFunction(String key, BiFunction<List<Token>, Env, Token> function, int argSize, boolean vararg) {
+    public Env setTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argSize, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
@@ -160,9 +160,9 @@ public class Env {
                 ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
                 args.add(ast.get(i).symbol);
             }
-            return function.apply(args, env);
+            return procedure.apply(args, env);
         };
-        temp.table.put(key, DFunction.newFunction(df, argSize, vararg));
+        temp.table.put(key, DProcedure.newProcedure(df, argSize, vararg));
         return this;
     }
 

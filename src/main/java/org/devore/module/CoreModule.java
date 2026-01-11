@@ -28,7 +28,7 @@ public class CoreModule extends Module {
         dEnv.put("nil", DWord.WORD_NIL);
         dEnv.put("true", DBool.TRUE);
         dEnv.put("false", DBool.FALSE);
-        dEnv.addTokenFunction("+", ((args, env) -> {
+        dEnv.addTokenProcedure("+", ((args, env) -> {
             if (!(args.getFirst() instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.getFirst().type(), "arithmetic");
             for (int i = 1; i < args.size(); ++i) {
@@ -38,7 +38,7 @@ public class CoreModule extends Module {
             }
             return arithmetic;
         }), 1, true);
-        dEnv.addTokenFunction("-", ((args, env) -> {
+        dEnv.addTokenProcedure("-", ((args, env) -> {
             if (!(args.getFirst() instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.getFirst().type(), "arithmetic");
             if (args.size() == 1)
@@ -50,7 +50,7 @@ public class CoreModule extends Module {
             }
             return arithmetic;
         }), 1, true);
-        dEnv.addTokenFunction("*", ((args, env) -> {
+        dEnv.addTokenProcedure("*", ((args, env) -> {
             if (!(args.getFirst() instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.getFirst().type(), "arithmetic");
             for (int i = 1; i < args.size(); ++i) {
@@ -60,7 +60,7 @@ public class CoreModule extends Module {
             }
             return arithmetic;
         }), 1, true);
-        dEnv.addTokenFunction("/", ((args, env) -> {
+        dEnv.addTokenProcedure("/", ((args, env) -> {
             if (!(args.getFirst() instanceof DArithmetic arithmetic))
                 throw new DevoreCastException(args.getFirst().type(), "arithmetic");
             for (int i = 1; i < args.size(); ++i) {
@@ -70,14 +70,14 @@ public class CoreModule extends Module {
             }
             return arithmetic;
         }), 1, true);
-        dEnv.addTokenFunction("pow", ((args, env) -> {
+        dEnv.addTokenProcedure("pow", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             if (!(args.get(1) instanceof DNumber))
                 throw new DevoreCastException(args.get(1).type(), "number");
             return ((DNumber) args.getFirst()).pow(((DNumber) args.get(1)));
         }), 2, false);
-        dEnv.addTokenFunction("average", ((args, env) -> {
+        dEnv.addTokenProcedure("average", ((args, env) -> {
             DFloat num = DFloat.valueOf(0);
             for (Token arg : args) {
                 if (!(arg instanceof DNumber))
@@ -86,54 +86,54 @@ public class CoreModule extends Module {
             }
             return num.div(DFloat.valueOf(args.size()));
         }), 1, true);
-        dEnv.addTokenFunction("mod", ((args, env) -> {
+        dEnv.addTokenProcedure("mod", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             return ((DInt) args.getFirst()).mod(((DInt) args.get(1)));
         }), 2, false);
-        dEnv.addTokenFunction("abs", ((args, env) -> {
+        dEnv.addTokenProcedure("abs", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).abs();
         }), 1, false);
-        dEnv.addTokenFunction("sqrt", ((args, env) -> {
+        dEnv.addTokenProcedure("sqrt", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).sqrt();
         }), 1, false);
-        dEnv.addTokenFunction("sin", ((args, env) -> {
+        dEnv.addTokenProcedure("sin", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).sin();
         }), 1, false);
-        dEnv.addTokenFunction("cos", ((args, env) -> {
+        dEnv.addTokenProcedure("cos", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).cos();
         }), 1, false);
-        dEnv.addTokenFunction("tan", ((args, env) -> {
+        dEnv.addTokenProcedure("tan", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).tan();
         }), 1, false);
-        dEnv.addTokenFunction("arctan", ((args, env) -> {
+        dEnv.addTokenProcedure("arctan", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).arctan();
         }), 1, false);
-        dEnv.addTokenFunction("arcsin", ((args, env) -> {
+        dEnv.addTokenProcedure("arcsin", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).arcsin();
         }), 1, false);
-        dEnv.addTokenFunction("arccos", ((args, env) -> {
+        dEnv.addTokenProcedure("arccos", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).arccos();
         }), 1, false);
-        dEnv.addTokenFunction("atan2", ((args, env) -> {
+        dEnv.addTokenProcedure("atan2", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             if (!(args.get(1) instanceof DNumber))
@@ -142,19 +142,19 @@ public class CoreModule extends Module {
                     ((DNumber) args.get(1)).toBigDecimal(), MathContext.DECIMAL128);
             return NumberUtils.isInt(result) ? DInt.valueOf(result) : DFloat.valueOf(result);
         }), 2, false);
-        dEnv.addTokenFunction("prime?", ((args, env) -> {
+        dEnv.addTokenProcedure("prime?", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt num))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             return DBool.valueOf(num.toBigInteger().isProbablePrime(100));
         }), 1, false);
-        dEnv.addTokenFunction("prime?", ((args, env) -> {
+        dEnv.addTokenProcedure("prime?", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt num))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             if (!(args.get(1) instanceof DInt certainty))
                 throw new DevoreCastException(args.get(1).type(), "int");
             return DBool.valueOf(num.toBigInteger().isProbablePrime(certainty.toBigInteger().intValue()));
         }), 2, false);
-        dEnv.addTokenFunction("gcd", ((args, env) -> {
+        dEnv.addTokenProcedure("gcd", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt n1))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             if (!(args.get(1) instanceof DInt n2))
@@ -165,7 +165,7 @@ public class CoreModule extends Module {
                     return DInt.valueOf(i);
             return DInt.valueOf(1);
         }), 2, false);
-        dEnv.addTokenFunction("lcm", ((args, env) -> {
+        dEnv.addTokenProcedure("lcm", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt n1))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             if (!(args.get(1) instanceof DInt n2))
@@ -181,27 +181,27 @@ public class CoreModule extends Module {
                 return DInt.valueOf(0);
             return DInt.valueOf(n1.toBigInteger().multiply(n2.toBigInteger()).divide(gcd));
         }), 2, false);
-        dEnv.addTokenFunction("ln", ((args, env) -> {
+        dEnv.addTokenProcedure("ln", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).ln();
         }), 1, false);
-        dEnv.addTokenFunction("exp", ((args, env) -> {
+        dEnv.addTokenProcedure("exp", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).exp();
         }), 1, false);
-        dEnv.addTokenFunction("ceil", ((args, env) -> {
+        dEnv.addTokenProcedure("ceil", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).ceil();
         }), 1, false);
-        dEnv.addTokenFunction("floor", ((args, env) -> {
+        dEnv.addTokenProcedure("floor", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).floor();
         }), 1, false);
-        dEnv.addTokenFunction("require", ((args, env) -> {
+        dEnv.addTokenProcedure("require", ((args, env) -> {
             for (Token t : args) {
                 if (Devore.moduleTable.containsKey(t.toString()))
                     env.load(t.toString());
@@ -218,35 +218,35 @@ public class CoreModule extends Module {
             }
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addTokenFunction("println", ((args, env) -> {
+        dEnv.addTokenProcedure("println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
             env.io.out.println(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addTokenFunction("print", ((args, env) -> {
+        dEnv.addTokenProcedure("print", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
             env.io.out.print(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addTokenFunction("error-println", ((args, env) -> {
+        dEnv.addTokenProcedure("error-println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
             env.io.err.println(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addTokenFunction("error-print", ((args, env) -> {
+        dEnv.addTokenProcedure("error-print", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token arg : args)
                 builder.append(arg);
             env.io.err.print(builder);
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addSymbolFunction("undef", ((ast, env) -> {
+        dEnv.addSymbolProcedure("undef", ((ast, env) -> {
             for (AstNode child : ast.children) {
                 if (!(child.symbol instanceof DSymbol))
                     throw new DevoreCastException(child.symbol.type(), "symbol");
@@ -254,7 +254,7 @@ public class CoreModule extends Module {
             }
             return DWord.WORD_NIL;
         }), 1, true);
-        dEnv.addSymbolFunction("def-macro", ((ast, env) -> {
+        dEnv.addSymbolProcedure("def-macro", ((ast, env) -> {
             if (!(ast.getFirst().symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
             List<String> params = new ArrayList<>();
@@ -269,10 +269,10 @@ public class CoreModule extends Module {
             env.put(ast.getFirst().symbol.toString(), DMacro.newMacro(params, asts));
             return DWord.WORD_NIL;
         }), 2, true);
-        dEnv.addSymbolFunction("def", ((ast, env) -> {
+        dEnv.addSymbolProcedure("def", ((ast, env) -> {
             if (!(ast.getFirst().symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
-            if (ast.getFirst().isEmpty() && ast.getFirst().type != AstNode.AstType.FUNCTION) {
+            if (ast.getFirst().isEmpty() && ast.getFirst().type != AstNode.AstType.PROCEDURE) {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
                 for (int i = 1; i < ast.size(); ++i)
@@ -288,7 +288,7 @@ public class CoreModule extends Module {
                 List<AstNode> asts = new ArrayList<>();
                 for (int i = 1; i < ast.size(); ++i)
                     asts.add(ast.get(i).copy());
-                env.addTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
+                env.addTokenProcedure(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                     Env newEnv = env.createChild();
                     for (int i = 0; i < params.size(); ++i)
                         newEnv.put(params.get(i), cArgs.get(i));
@@ -300,10 +300,10 @@ public class CoreModule extends Module {
             }
             return DWord.WORD_NIL;
         }), 2, true);
-        dEnv.addSymbolFunction("set!", ((ast, env) -> {
+        dEnv.addSymbolProcedure("set!", ((ast, env) -> {
             if (!(ast.getFirst().symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
-            if (ast.getFirst().isEmpty() && ast.getFirst().type != AstNode.AstType.FUNCTION) {
+            if (ast.getFirst().isEmpty() && ast.getFirst().type != AstNode.AstType.PROCEDURE) {
                 Env newEnv = env.createChild();
                 Token result = DWord.WORD_NIL;
                 for (int i = 1; i < ast.size(); ++i)
@@ -319,7 +319,7 @@ public class CoreModule extends Module {
                 List<AstNode> asts = new ArrayList<>();
                 for (int i = 1; i < ast.size(); ++i)
                     asts.add(ast.get(i).copy());
-                env.setTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
+                env.setTokenProcedure(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                     Env newEnv = env.createChild();
                     for (int i = 0; i < params.size(); ++i)
                         newEnv.put(params.get(i), cArgs.get(i));
@@ -331,7 +331,7 @@ public class CoreModule extends Module {
             }
             return DWord.WORD_NIL;
         }), 2, true);
-        dEnv.addSymbolFunction("let", ((ast, env) -> {
+        dEnv.addSymbolProcedure("let", ((ast, env) -> {
             Env newEnv = env.createChild();
             Token result = DWord.WORD_NIL;
             for (AstNode node : ast.getFirst().children) {
@@ -345,7 +345,7 @@ public class CoreModule extends Module {
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
-                    newEnv.addTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
+                    newEnv.addTokenProcedure(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = env.createChild();
                         for (int i = 0; i < params.size(); ++i)
                             newInEnv.put(params.get(i), cArgs.get(i));
@@ -367,7 +367,7 @@ public class CoreModule extends Module {
                 result = Evaluator.eval(newEnv, ast.get(i).copy());
             return result;
         }), 2, true);
-        dEnv.addSymbolFunction("let*", ((ast, env) -> {
+        dEnv.addSymbolProcedure("let*", ((ast, env) -> {
             Env newEnv = env.createChild();
             Token result = DWord.WORD_NIL;
             for (AstNode node : ast.getFirst().children) {
@@ -381,7 +381,7 @@ public class CoreModule extends Module {
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
-                    newEnv.addTokenFunction(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
+                    newEnv.addTokenProcedure(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = newEnv.createChild();
                         for (int i = 0; i < params.size(); ++i)
                             newInEnv.put(params.get(i), cArgs.get(i));
@@ -403,7 +403,7 @@ public class CoreModule extends Module {
                 result = Evaluator.eval(newEnv, ast.get(i).copy());
             return result;
         }), 2, true);
-        dEnv.addSymbolFunction("lambda", ((ast, env) -> {
+        dEnv.addSymbolProcedure("lambda", ((ast, env) -> {
             List<String> params = new ArrayList<>();
             if (!ast.getFirst().isNull()) {
                 if (!(ast.getFirst().symbol instanceof DSymbol))
@@ -432,43 +432,43 @@ public class CoreModule extends Module {
                     inResult = Evaluator.eval(newInEnv, astNode.copy());
                 return inResult;
             };
-            return DFunction.newFunction(df, params.size(), false);
+            return DProcedure.newProcedure(df, params.size(), false);
         }), 2, true);
-        dEnv.addTokenFunction("apply", ((args, env) -> {
-            if (!(args.getFirst() instanceof DFunction))
-                throw new DevoreCastException(args.getFirst().type(), "function");
+        dEnv.addTokenProcedure("apply", ((args, env) -> {
+            if (!(args.getFirst() instanceof DProcedure))
+                throw new DevoreCastException(args.getFirst().type(), "procedure");
             List<Token> params = new ArrayList<>();
             for (int i = 1; i < args.size(); ++i)
                 params.add(args.get(i));
             AstNode asts = AstNode.nullAst.copy();
             for (Token arg : params)
                 asts.add(new AstNode(arg));
-            return ((DFunction) args.getFirst()).call(asts, env.createChild());
+            return ((DProcedure) args.getFirst()).call(asts, env.createChild());
         }), 1, true);
-        dEnv.addTokenFunction("act", ((args, env) -> {
-            if (!(args.getFirst() instanceof DFunction))
-                throw new DevoreCastException(args.getFirst().type(), "function");
+        dEnv.addTokenProcedure("act", ((args, env) -> {
+            if (!(args.getFirst() instanceof DProcedure))
+                throw new DevoreCastException(args.getFirst().type(), "procedure");
             if (!(args.get(1) instanceof DList temp))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             List<Token> params = temp.toList();
             AstNode asts = AstNode.nullAst.copy();
             for (Token arg : params)
                 asts.add(new AstNode(arg));
-            return ((DFunction) args.getFirst()).call(asts, env.createChild());
+            return ((DProcedure) args.getFirst()).call(asts, env.createChild());
         }), 2, false);
-        dEnv.addTokenFunction(">", ((args, env) ->
+        dEnv.addTokenProcedure(">", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) > 0)), 2, false);
-        dEnv.addTokenFunction("<", ((args, env) ->
+        dEnv.addTokenProcedure("<", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) < 0)), 2, false);
-        dEnv.addTokenFunction("=", ((args, env) ->
+        dEnv.addTokenProcedure("=", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) == 0)), 2, false);
-        dEnv.addTokenFunction("/=", ((args, env) ->
+        dEnv.addTokenProcedure("/=", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) != 0)), 2, false);
-        dEnv.addTokenFunction(">=", ((args, env) ->
+        dEnv.addTokenProcedure(">=", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) >= 0)), 2, false);
-        dEnv.addTokenFunction("<=", ((args, env) ->
+        dEnv.addTokenProcedure("<=", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) <= 0)), 2, false);
-        dEnv.addSymbolFunction("if", (ast, env) -> {
+        dEnv.addSymbolProcedure("if", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             Token condition = Evaluator.eval(newEnv, ast.getFirst().copy());
@@ -478,7 +478,7 @@ public class CoreModule extends Module {
                 result = Evaluator.eval(newEnv, ast.get(1).copy());
             return result;
         }, 2, false);
-        dEnv.addSymbolFunction("if", (ast, env) -> {
+        dEnv.addSymbolProcedure("if", (ast, env) -> {
             Token result;
             Env newEnv = env.createChild();
             Token condition = Evaluator.eval(newEnv, ast.getFirst().copy());
@@ -490,7 +490,7 @@ public class CoreModule extends Module {
                 result = Evaluator.eval(newEnv, ast.get(2).copy());
             return result;
         }, 3, false);
-        dEnv.addSymbolFunction("cond", (ast, env) -> {
+        dEnv.addSymbolProcedure("cond", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             for (AstNode node : ast.children) {
@@ -512,14 +512,14 @@ public class CoreModule extends Module {
             }
             return result;
         }, 2, true);
-        dEnv.addSymbolFunction("begin", (ast, env) -> {
+        dEnv.addSymbolProcedure("begin", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             for (AstNode node : ast.children)
                 result = Evaluator.eval(newEnv, node.copy());
             return result;
         }, 1, true);
-        dEnv.addSymbolFunction("while", (ast, env) -> {
+        dEnv.addSymbolProcedure("while", (ast, env) -> {
             Token result = DWord.WORD_NIL;
             Env newEnv = env.createChild();
             Token condition = Evaluator.eval(newEnv, ast.getFirst().copy());
@@ -532,25 +532,25 @@ public class CoreModule extends Module {
             }
             return result;
         }, 2, true);
-        dEnv.addTokenFunction("read-line", ((args, env) ->
+        dEnv.addTokenProcedure("read-line", ((args, env) ->
                 DString.valueOf(new Scanner(env.io.in).nextLine())), 0, false);
-        dEnv.addTokenFunction("read-int", ((args, env) ->
+        dEnv.addTokenProcedure("read-int", ((args, env) ->
                 DInt.valueOf(new Scanner(env.io.in).nextBigInteger())), 0, false);
-        dEnv.addTokenFunction("read-float", ((args, env) ->
+        dEnv.addTokenProcedure("read-float", ((args, env) ->
                 DFloat.valueOf(new Scanner(env.io.in).nextBigDecimal())), 0, false);
-        dEnv.addTokenFunction("read-bool", ((args, env) ->
+        dEnv.addTokenProcedure("read-bool", ((args, env) ->
                 DBool.valueOf(new Scanner(env.io.in).nextBoolean())), 0, false);
-        dEnv.addTokenFunction("read", ((args, env) ->
+        dEnv.addTokenProcedure("read", ((args, env) ->
                 DString.valueOf(new Scanner(env.io.in).next())), 0, false);
-        dEnv.addTokenFunction("newline", ((args, env) -> {
+        dEnv.addTokenProcedure("newline", ((args, env) -> {
             env.io.out.println();
             return DWord.WORD_NIL;
         }), 0, false);
-        dEnv.addTokenFunction("error-newline", ((args, env) -> {
+        dEnv.addTokenProcedure("error-newline", ((args, env) -> {
             env.io.err.println();
             return DWord.WORD_NIL;
         }), 0, false);
-        dEnv.addTokenFunction("and", ((args, env) -> {
+        dEnv.addTokenProcedure("and", ((args, env) -> {
             for (Token arg : args) {
                 if (!(arg instanceof DBool))
                     throw new DevoreCastException(arg.type(), "bool");
@@ -559,7 +559,7 @@ public class CoreModule extends Module {
             }
             return DBool.TRUE;
         }), 1, true);
-        dEnv.addTokenFunction("or", ((args, env) -> {
+        dEnv.addTokenProcedure("or", ((args, env) -> {
             for (Token arg : args) {
                 if (!(arg instanceof DBool))
                     throw new DevoreCastException(arg.type(), "bool");
@@ -568,14 +568,14 @@ public class CoreModule extends Module {
             }
             return DBool.FALSE;
         }), 1, true);
-        dEnv.addTokenFunction("not", ((args, env) -> {
+        dEnv.addTokenProcedure("not", ((args, env) -> {
             if (!(args.getFirst() instanceof DBool))
                 throw new DevoreCastException(args.getFirst().type(), "bool");
             if (((DBool) args.getFirst()).bool)
                 return DBool.FALSE;
             return DBool.TRUE;
         }), 1, false);
-        dEnv.addTokenFunction("random", ((args, env) -> {
+        dEnv.addTokenProcedure("random", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             if (args.size() > 1)
@@ -591,13 +591,13 @@ public class CoreModule extends Module {
             } while (randomValue.compareTo(range) >= 0);
             return DInt.valueOf(randomValue.add(start));
         }), 1, true);
-        dEnv.addTokenFunction("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 0, true);
-        dEnv.addTokenFunction("list-contains", ((args, env) -> {
+        dEnv.addTokenProcedure("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 0, true);
+        dEnv.addTokenProcedure("list-contains", ((args, env) -> {
             if (!(args.getFirst() instanceof DList))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return DBool.valueOf(((DList) args.getFirst()).contains(args.get(1)));
         }), 2, false);
-        dEnv.addTokenFunction("list-get", ((args, env) -> {
+        dEnv.addTokenProcedure("list-get", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt))
@@ -606,7 +606,7 @@ public class CoreModule extends Module {
                 return DWord.WORD_NIL;
             return list.get(((DInt) args.get(1)).toBigInteger().intValue());
         }), 2, false);
-        dEnv.addTokenFunction("list-set", ((args, env) -> {
+        dEnv.addTokenProcedure("list-set", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt))
@@ -615,7 +615,7 @@ public class CoreModule extends Module {
                 return DWord.WORD_NIL;
             return list.set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), false);
         }), 3, false);
-        dEnv.addTokenFunction("list-remove", ((args, env) -> {
+        dEnv.addTokenProcedure("list-remove", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (list.size() == 0)
@@ -624,19 +624,19 @@ public class CoreModule extends Module {
                 return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), false);
             return list.remove(args.get(1), false);
         }), 2, false);
-        dEnv.addTokenFunction("list-add", ((args, env) -> {
+        dEnv.addTokenProcedure("list-add", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.add(args.get(1), false);
         }), 2, false);
-        dEnv.addTokenFunction("list-insert", ((args, env) -> {
+        dEnv.addTokenProcedure("list-insert", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt index))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             return list.insert(index.toBigInteger().intValue(), args.get(2), false);
         }), 3, false);
-        dEnv.addTokenFunction("list-set!", ((args, env) -> {
+        dEnv.addTokenProcedure("list-set!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt))
@@ -645,7 +645,7 @@ public class CoreModule extends Module {
                 return DWord.WORD_NIL;
             return list.set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), true);
         }), 3, false);
-        dEnv.addTokenFunction("list-remove!", ((args, env) -> {
+        dEnv.addTokenProcedure("list-remove!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (list.size() == 0)
@@ -654,48 +654,48 @@ public class CoreModule extends Module {
                 return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), true);
             return list.remove(args.get(1), false);
         }), 2, false);
-        dEnv.addTokenFunction("list-add!", ((args, env) -> {
+        dEnv.addTokenProcedure("list-add!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.add(args.get(1), true);
         }), 2, false);
-        dEnv.addTokenFunction("list-insert!", ((args, env) -> {
+        dEnv.addTokenProcedure("list-insert!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt index))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             return list.insert(index.toBigInteger().intValue(), args.get(2), true);
         }), 3, false);
-        dEnv.addTokenFunction("head", ((args, env) -> {
+        dEnv.addTokenProcedure("head", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             return list.getFirst();
         }), 1, false);
-        dEnv.addTokenFunction("last", ((args, env) -> {
+        dEnv.addTokenProcedure("last", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (list.size() == 0)
                 return DWord.WORD_NIL;
             return list.get(list.size() - 1);
         }), 1, false);
-        dEnv.addTokenFunction("tail", ((args, env) -> {
+        dEnv.addTokenProcedure("tail", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.subList(1, list.size());
         }), 1, false);
-        dEnv.addTokenFunction("init", ((args, env) -> {
+        dEnv.addTokenProcedure("init", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.subList(0, list.size() - 1);
         }), 1, false);
-        dEnv.addTokenFunction("length", ((args, env) -> {
+        dEnv.addTokenProcedure("length", ((args, env) -> {
             if (!(args.getFirst() instanceof DList))
                 return DInt.valueOf(args.getFirst().toString().length());
             return DInt.valueOf(((DList) args.getFirst()).size());
         }), 1, false);
-        dEnv.addTokenFunction("reverse", ((args, env) -> {
+        dEnv.addTokenProcedure("reverse", ((args, env) -> {
             if (!(args.getFirst() instanceof DList tokens))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             List<Token> temp = new ArrayList<>();
@@ -703,7 +703,7 @@ public class CoreModule extends Module {
                 temp.add(tokens.get(i));
             return DList.valueOf(new ArrayList<>(temp));
         }), 1, false);
-        dEnv.addTokenFunction("reverse!", ((args, env) -> {
+        dEnv.addTokenProcedure("reverse!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList tokens))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             List<Token> temp = new ArrayList<>();
@@ -714,17 +714,17 @@ public class CoreModule extends Module {
                 tokens.add(t, true);
             return tokens;
         }), 1, false);
-        dEnv.addTokenFunction("sort", ((args, env) -> {
+        dEnv.addTokenProcedure("sort", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.sort(false);
         }), 1, false);
-        dEnv.addTokenFunction("sort!", ((args, env) -> {
+        dEnv.addTokenProcedure("sort!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.sort(true);
         }), 1, true);
-        dEnv.addTokenFunction("++", ((args, env) -> {
+        dEnv.addTokenProcedure("++", ((args, env) -> {
             boolean flag = false;
             for (Token arg : args)
                 if (arg instanceof DList) {
@@ -749,9 +749,9 @@ public class CoreModule extends Module {
             }
             return result;
         }), 1, true);
-        dEnv.addTokenFunction("map", ((args, env) -> {
-            if (!(args.getFirst() instanceof DFunction))
-                throw new DevoreCastException(args.getFirst().type(), "function");
+        dEnv.addTokenProcedure("map", ((args, env) -> {
+            if (!(args.getFirst() instanceof DProcedure))
+                throw new DevoreCastException(args.getFirst().type(), "procedure");
             if (!(args.get(1) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             List<Token> result = new ArrayList<>();
@@ -764,13 +764,13 @@ public class CoreModule extends Module {
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
                     params.add(((DList) args.get(j + 1)).get(i));
                 }
-                result.add(((DFunction) args.getFirst()).call(params.toArray(Token[]::new), env.createChild()));
+                result.add(((DProcedure) args.getFirst()).call(params.toArray(Token[]::new), env.createChild()));
             }
             return DList.valueOf(result);
         }), 2, true);
-        dEnv.addTokenFunction("for-each", ((args, env) -> {
-            if (!(args.getFirst() instanceof DFunction))
-                throw new DevoreCastException(args.getFirst().type(), "function");
+        dEnv.addTokenProcedure("for-each", ((args, env) -> {
+            if (!(args.getFirst() instanceof DProcedure))
+                throw new DevoreCastException(args.getFirst().type(), "procedure");
             if (!(args.get(1) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             List<Token> tokens = ((DList) args.get(1)).toList();
@@ -782,35 +782,35 @@ public class CoreModule extends Module {
                         throw new DevoreCastException(args.get(j + 1).type(), "list");
                     params.add(((DList) args.get(j + 1)).get(i));
                 }
-                ((DFunction) args.getFirst()).call(params.toArray(Token[]::new), env.createChild());
+                ((DProcedure) args.getFirst()).call(params.toArray(Token[]::new), env.createChild());
             }
             return DWord.WORD_NIL;
         }), 2, true);
-        dEnv.addTokenFunction("foldr", ((args, env) -> {
-            if (!(args.getFirst() instanceof DFunction))
-                throw new DevoreCastException(args.getFirst().type(), "function");
+        dEnv.addTokenProcedure("foldr", ((args, env) -> {
+            if (!(args.getFirst() instanceof DProcedure))
+                throw new DevoreCastException(args.getFirst().type(), "procedure");
             if (!(args.get(2) instanceof DList))
                 throw new DevoreCastException(args.get(2).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
             for (int i = tokens.size() - 1; i >= 0; --i)
-                result = ((DFunction) args.getFirst()).call(new Token[]{tokens.get(i), result}, env.createChild());
+                result = ((DProcedure) args.getFirst()).call(new Token[]{tokens.get(i), result}, env.createChild());
             return result;
         }), 3, false);
-        dEnv.addTokenFunction("foldl", ((args, env) -> {
-            if (!(args.getFirst() instanceof DFunction))
-                throw new DevoreCastException(args.getFirst().type(), "function");
+        dEnv.addTokenProcedure("foldl", ((args, env) -> {
+            if (!(args.getFirst() instanceof DProcedure))
+                throw new DevoreCastException(args.getFirst().type(), "procedure");
             if (!(args.get(2) instanceof DList))
                 throw new DevoreCastException(args.get(2).type(), "list");
             var result = args.get(1);
             List<Token> tokens = ((DList) args.get(2)).toList();
             for (int i = tokens.size() - 1; i >= 0; --i)
-                result = ((DFunction) args.getFirst()).call(new Token[]{result, tokens.get(i)}, env.createChild());
+                result = ((DProcedure) args.getFirst()).call(new Token[]{result, tokens.get(i)}, env.createChild());
             return result;
         }), 3, false);
-        dEnv.addTokenFunction("filter", ((args, env) -> {
-            if (!(args.getFirst() instanceof DFunction))
-                throw new DevoreCastException(args.getFirst().type(), "function");
+        dEnv.addTokenProcedure("filter", ((args, env) -> {
+            if (!(args.getFirst() instanceof DProcedure))
+                throw new DevoreCastException(args.getFirst().type(), "procedure");
             if (!(args.get(1) instanceof DList))
                 throw new DevoreCastException(args.get(1).type(), "list");
             List<Token> result = new ArrayList<>();
@@ -818,7 +818,7 @@ public class CoreModule extends Module {
             for (Token token : tokens) {
                 AstNode asts = AstNode.nullAst.copy();
                 asts.add(new AstNode(token));
-                Token condition = ((DFunction) args.getFirst()).call(asts, env.createChild());
+                Token condition = ((DProcedure) args.getFirst()).call(asts, env.createChild());
                 if (!(condition instanceof DBool))
                     throw new DevoreCastException(condition.type(), "list");
                 if (((DBool) condition).bool)
@@ -826,7 +826,7 @@ public class CoreModule extends Module {
             }
             return DList.valueOf(result);
         }), 2, false);
-        dEnv.addTokenFunction("range", ((args, env) -> {
+        dEnv.addTokenProcedure("range", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             if (args.size() > 1 && !(args.get(1) instanceof DNumber))
@@ -863,28 +863,28 @@ public class CoreModule extends Module {
             }
             return DList.valueOf(list);
         }), 1, true);
-        dEnv.addTokenFunction("string->int", ((args, env) -> {
+        dEnv.addTokenProcedure("string->int", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return DInt.valueOf(new BigInteger(args.getFirst().toString()));
         }), 1, false);
-        dEnv.addTokenFunction("string->symbol", ((args, env) -> {
+        dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return DSymbol.valueOf(args.getFirst().toString());
         }), 1, false);
-        dEnv.addTokenFunction("string->float", ((args, env) -> {
+        dEnv.addTokenProcedure("string->float", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return DFloat.valueOf(new BigDecimal(args.getFirst().toString()));
         }), 1, false);
-        dEnv.addTokenFunction("string->bool", ((args, env) -> {
+        dEnv.addTokenProcedure("string->bool", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return "true".equals(args.getFirst().toString()) ? DBool.TRUE : DBool.FALSE;
         }), 1, false);
-        dEnv.addTokenFunction("->string", ((args, env) -> DString.valueOf(args.getFirst().toString())), 1, false);
-        dEnv.addTokenFunction("string->list", ((args, env) -> {
+        dEnv.addTokenProcedure("->string", ((args, env) -> DString.valueOf(args.getFirst().toString())), 1, false);
+        dEnv.addTokenProcedure("string->list", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             char[] chars = args.getFirst().toString().toCharArray();
@@ -893,23 +893,23 @@ public class CoreModule extends Module {
                 tokens.add(DString.valueOf(String.valueOf(c)));
             return DList.valueOf(tokens);
         }), 1, false);
-        dEnv.addTokenFunction("char->int", ((args, env) -> {
+        dEnv.addTokenProcedure("char->int", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return DInt.valueOf((int) args.getFirst().toString().charAt(0));
         }), 1, false);
-        dEnv.addTokenFunction("int->char", ((args, env) -> {
+        dEnv.addTokenProcedure("int->char", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             return DString.valueOf(String.valueOf((char) ((DInt) args.getFirst()).toBigInteger().intValue()));
         }), 1, false);
-        dEnv.addTokenFunction("exit", ((args, env) -> {
+        dEnv.addTokenProcedure("exit", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             System.exit(((DInt) args.getFirst()).toBigInteger().intValue());
             return args.getFirst();
         }), 1, false);
-        dEnv.addTokenFunction("sleep", ((args, env) -> {
+        dEnv.addTokenProcedure("sleep", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             try {
@@ -919,50 +919,50 @@ public class CoreModule extends Module {
             }
             return args.getFirst();
         }), 1, false);
-        dEnv.addTokenFunction("type", ((args, env) -> DString.valueOf(args.getFirst().type())), 1, false);
-        dEnv.addTokenFunction("time", ((args, env) -> DInt.valueOf(System.currentTimeMillis())), 0, false);
-        dEnv.addTokenFunction("table", ((args, env) -> DTable.valueOf(new HashMap<>())), 0, false);
-        dEnv.addTokenFunction("table-get", ((args, env) -> {
+        dEnv.addTokenProcedure("type", ((args, env) -> DString.valueOf(args.getFirst().type())), 1, false);
+        dEnv.addTokenProcedure("time", ((args, env) -> DInt.valueOf(System.currentTimeMillis())), 0, false);
+        dEnv.addTokenProcedure("table", ((args, env) -> DTable.valueOf(new HashMap<>())), 0, false);
+        dEnv.addTokenProcedure("table-get", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.get(args.get(1));
         }), 2, false);
-        dEnv.addTokenFunction("table-contains-key", ((args, env) -> {
+        dEnv.addTokenProcedure("table-contains-key", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.containsKey(args.get(1));
         }), 2, false);
-        dEnv.addTokenFunction("table-contains-value", ((args, env) -> {
+        dEnv.addTokenProcedure("table-contains-value", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.containsValue(args.get(1));
         }), 2, false);
-        dEnv.addTokenFunction("table-size", ((args, env) -> {
+        dEnv.addTokenProcedure("table-size", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return DInt.valueOf(table.size());
         }), 1, false);
-        dEnv.addTokenFunction("table-put", ((args, env) -> {
+        dEnv.addTokenProcedure("table-put", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.put(args.get(1), args.get(2), false);
         }), 3, false);
-        dEnv.addTokenFunction("table-put!", ((args, env) -> {
+        dEnv.addTokenProcedure("table-put!", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.put(args.get(1), args.get(2), true);
         }), 3, false);
-        dEnv.addTokenFunction("table-remove", ((args, env) -> {
+        dEnv.addTokenProcedure("table-remove", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.remove(args.get(1), false);
         }), 2, false);
-        dEnv.addTokenFunction("table-remove!", ((args, env) -> {
+        dEnv.addTokenProcedure("table-remove!", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return table.remove(args.get(1), true);
         }), 2, false);
-        dEnv.addTokenFunction("table-keys", ((args, env) -> {
+        dEnv.addTokenProcedure("table-keys", ((args, env) -> {
             if (!(args.getFirst() instanceof DTable table))
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return DList.valueOf(new ArrayList<>(table.keys()));
