@@ -38,6 +38,13 @@ public class Evaluator {
             ast.symbol = ((DFunction) ast.symbol).call(ast, env);
             ast.clear();
         }
+        if (ast.symbol instanceof DSymbol)
+            while (true) {
+                if (ast.symbol instanceof DSymbol && env.contains(ast.symbol.toString()))
+                    ast.symbol = env.get(ast.symbol.toString());
+                else
+                    break;
+            }
         return ast.symbol;
     }
 }
