@@ -13,54 +13,6 @@ import java.util.List;
  */
 public class Lexer {
     /**
-     * 预处理
-     *
-     * @param code  代码
-     * @return      预处理完的代码
-     */
-    public static String preprocessor(String code) {
-        char[] codeCharArray = code.toCharArray();
-        StringBuilder builder = new StringBuilder();
-        int index = 0;
-        while (index < codeCharArray.length) {
-            if (codeCharArray[index] == '\"') {
-                builder.append("\"");
-                StringBuilder value = new StringBuilder();
-                boolean skip = false;
-                while (true) {
-                    ++index;
-                    if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
-                        if (skip) {
-                            skip = false;
-                            value.append("\\\\");
-                        } else
-                            skip = true;
-                        continue;
-                    } else if (index >= codeCharArray.length - 1 || codeCharArray[index] == '\"') {
-                        if (skip) {
-                            skip = false;
-                            value.append("\\\"");
-                            continue;
-                        } else
-                            break;
-                    } else if (skip) {
-                        value.append("\\").append(codeCharArray[index]);
-                        skip = false;
-                        continue;
-                    }
-                    value.append(codeCharArray[index]);
-                }
-                builder.append(value.append("\""));
-                ++index;
-                continue;
-            }
-            builder.append((codeCharArray[index] == '\n' || codeCharArray[index] == '\r') ? ' ' : codeCharArray[index]);
-            ++index;
-        }
-        return builder.toString();
-    }
-
-    /**
      * 分割代码
      * 例如：把(+ 2 3)(- 4 5)分割成(+ 2 3)和(- 4 5)
      *
@@ -110,6 +62,8 @@ public class Lexer {
                     ++index;
                     continue;
                 }
+                if (codeCharArray[index] == '\n' || codeCharArray[index] == '\r')
+                    codeCharArray[index] = ' ';
                 while (index < codeCharArray.length - 1 && (codeCharArray[index] == ' ' || codeCharArray[index] == '\t')
                         && ((codeCharArray[index + 1] == ' ' || codeCharArray[index + 1] == '\t')
                         || codeCharArray[index + 1] == ')' || codeCharArray[index + 1] == ']'))
