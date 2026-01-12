@@ -1,6 +1,5 @@
 package org.devore.lang;
 
-import org.devore.Devore;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DWord;
@@ -32,8 +31,7 @@ public record Env(Map<String, Token> table, Env father, IOConfig io) {
         this.table = table;
         this.father = father;
         this.io = io;
-        for (String name : Devore.initModule)
-            load(name);
+        Core.init(this);
     }
 
     /**
@@ -234,16 +232,5 @@ public record Env(Map<String, Token> table, Env father, IOConfig io) {
      */
     public Env createChild() {
         return newEnv(this, io);
-    }
-
-    /**
-     * 加载对应名字的模块
-     *
-     * @param name 模块名
-     * @return 环境
-     */
-    public Env load(String name) {
-        Devore.moduleTable.get(name).init(this);
-        return this;
     }
 }

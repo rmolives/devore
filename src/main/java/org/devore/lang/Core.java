@@ -1,30 +1,22 @@
-package org.devore.module;
+package org.devore.lang;
 
-import org.devore.Devore;
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
-import org.devore.lang.Env;
-import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.AstNode;
 import org.devore.utils.NumberUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 
 /**
- * 核心模块
+ * 核心
  */
-public class CoreModule extends Module {
-    @Override
-    public void init(Env dEnv) {
+public class Core {
+    public static void init(Env dEnv) {
         dEnv.put("nil", DWord.WORD_NIL);
         dEnv.put("true", DBool.TRUE);
         dEnv.put("false", DBool.FALSE);
@@ -201,23 +193,6 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).floor();
         }), 1, false);
-        dEnv.addTokenProcedure("require", ((args, env) -> {
-            for (Token t : args) {
-                if (Devore.moduleTable.containsKey(t.toString()))
-                    env.load(t.toString());
-                else {
-                    File file = new File(System.getProperty("user.dir") + File.separator + t.toString().replaceAll("\\.", File.separator) + ".devore");
-                    if (file.exists()) {
-                        try {
-                            Devore.call(env, Files.readString(Path.of(file.toURI())));
-                        } catch (IOException e) {
-                            throw new DevoreRuntimeException("加载模块[" + e + "]失败.");
-                        }
-                    }
-                }
-            }
-            return DWord.WORD_NIL;
-        }), 1, true);
         dEnv.addTokenProcedure("println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
