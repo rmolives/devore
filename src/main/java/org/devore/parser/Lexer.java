@@ -21,17 +21,8 @@ public class Lexer {
     public static String preprocessor(String code) {
         char[] codeCharArray = code.toCharArray();
         StringBuilder builder = new StringBuilder();
-        boolean skip = false;
-        for (char c : codeCharArray) {
-            if (skip && (c == '\n' || c == '\r'))
-                skip = false;
-            if (!skip) {
-                if (c == ';')
-                    skip = true;
-                else
-                    builder.append(c);
-            }
-        }
+        for (char c : codeCharArray)
+            builder.append((c == '\n' || c == '\r') ? ' ' : c);
         return builder.toString();
     }
 
@@ -85,10 +76,8 @@ public class Lexer {
                     ++index;
                     continue;
                 }
-                while (index < codeCharArray.length - 1 && (codeCharArray[index] == ' '
-                        || codeCharArray[index] == '\n' || codeCharArray[index] == '\r' || codeCharArray[index] == '\t')
-                        && ((codeCharArray[index + 1] == ' '
-                        || codeCharArray[index + 1] == '\n' || codeCharArray[index + 1] == '\r' || codeCharArray[index + 1] == '\t')
+                while (index < codeCharArray.length - 1 && (codeCharArray[index] == ' ' || codeCharArray[index] == '\t')
+                        && ((codeCharArray[index + 1] == ' ' || codeCharArray[index + 1] == '\t')
                         || codeCharArray[index + 1] == ')' || codeCharArray[index + 1] == ']'))
                     ++index;
                 if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
