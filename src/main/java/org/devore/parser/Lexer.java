@@ -25,10 +25,12 @@ public class Lexer {
         for (char c : codeCharArray) {
             if (skip && c == '\n')
                 skip = false;
-            if (!skip && c == ';')
-                skip = true;
-            if (!skip)
-                builder.append(c);
+            if (!skip) {
+                if (c == ';')
+                    skip = true;
+                else
+                    builder.append(c);
+            }
         }
         return builder.toString();
     }
