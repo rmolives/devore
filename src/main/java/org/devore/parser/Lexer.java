@@ -23,7 +23,7 @@ public class Lexer {
         StringBuilder builder = new StringBuilder();
         boolean skip = false;
         for (char c : codeCharArray) {
-            if (skip && c == '\n')
+            if (skip && (c == '\n' || c == '\r'))
                 skip = false;
             if (!skip) {
                 if (c == ';')
