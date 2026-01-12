@@ -418,7 +418,7 @@ public class Core {
             AstNode asts = AstNode.nullAst.copy();
             for (Token arg : params)
                 asts.add(new AstNode(arg));
-            return ((DProcedure) args.getFirst()).call(asts, env.createChild());
+            return ((DProcedure) args.getFirst()).call(asts, env);
         }), 1, true);
         dEnv.addTokenProcedure("act", ((args, env) -> {
             if (!(args.getFirst() instanceof DProcedure))
@@ -429,7 +429,7 @@ public class Core {
             AstNode asts = AstNode.nullAst.copy();
             for (Token arg : params)
                 asts.add(new AstNode(arg));
-            return ((DProcedure) args.getFirst()).call(asts, env.createChild());
+            return ((DProcedure) args.getFirst()).call(asts, env);
         }), 2, false);
         dEnv.addTokenProcedure(">", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) > 0)), 2, false);
