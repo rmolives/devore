@@ -30,9 +30,8 @@ public class Lexer {
                 if (codeCharArray[index] == ';') {
                     while (index < codeCharArray.length &&
                             codeCharArray[index] != '\n' &&
-                            codeCharArray[index] != '\r') {
+                            codeCharArray[index] != '\r')
                         ++index;
-                    }
                 } else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
                     break;
                 else
@@ -44,9 +43,8 @@ public class Lexer {
                 if (codeCharArray[index] == ';') {
                     while (index < codeCharArray.length &&
                             codeCharArray[index] != '\n' &&
-                            codeCharArray[index] != '\r') {
+                            codeCharArray[index] != '\r')
                         ++index;
-                    }
                     continue;
                 }
                 if (codeCharArray[index] == '\"') {
