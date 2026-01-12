@@ -26,11 +26,29 @@ public class Lexer {
         while (index < codeCharArray.length) {
             int flag = 0;
             StringBuilder builder = new StringBuilder();
-            while (index < codeCharArray.length && codeCharArray[index] != '(' && codeCharArray[index] != '[')
-                ++index;
+            while (index < codeCharArray.length) {
+                if (codeCharArray[index] == ';') {
+                    while (index < codeCharArray.length &&
+                            codeCharArray[index] != '\n' &&
+                            codeCharArray[index] != '\r') {
+                        ++index;
+                    }
+                } else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
+                    break;
+                else
+                    ++index;
+            }
             if (index >= codeCharArray.length)
                 return expressions;
             do {
+                if (codeCharArray[index] == ';') {
+                    while (index < codeCharArray.length &&
+                            codeCharArray[index] != '\n' &&
+                            codeCharArray[index] != '\r') {
+                        ++index;
+                    }
+                    continue;
+                }
                 if (codeCharArray[index] == '\"') {
                     builder.append("\"");
                     StringBuilder value = new StringBuilder();
@@ -58,15 +76,17 @@ public class Lexer {
                         }
                         value.append(codeCharArray[index]);
                     }
-                    builder.append(value.append("\""));
+                    builder.append(value).append("\"");
                     ++index;
                     continue;
                 }
                 if (codeCharArray[index] == '\n' || codeCharArray[index] == '\r')
                     codeCharArray[index] = ' ';
-                while (index < codeCharArray.length - 1 && (codeCharArray[index] == ' ' || codeCharArray[index] == '\t')
-                        && ((codeCharArray[index + 1] == ' ' || codeCharArray[index + 1] == '\t')
-                        || codeCharArray[index + 1] == ')' || codeCharArray[index + 1] == ']'))
+                while (index < codeCharArray.length - 1 &&
+                        (codeCharArray[index] == ' ' || codeCharArray[index] == '\t') &&
+                        ((codeCharArray[index + 1] == ' ' || codeCharArray[index + 1] == '\t')
+                                || codeCharArray[index + 1] == ')'
+                                || codeCharArray[index + 1] == ']'))
                     ++index;
                 if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
                     ++flag;
