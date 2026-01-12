@@ -197,28 +197,28 @@ public class Core {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
-            env.io().out.println(builder);
+            env.io().out().println(builder);
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addTokenProcedure("print", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
-            env.io().out.print(builder);
+            env.io().out().print(builder);
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addTokenProcedure("error-println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
-            env.io().err.println(builder);
+            env.io().err().println(builder);
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addTokenProcedure("error-print", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token arg : args)
                 builder.append(arg);
-            env.io().err.print(builder);
+            env.io().err().print(builder);
             return DWord.WORD_NIL;
         }), 1, true);
         dEnv.addSymbolProcedure("undef", ((ast, env) -> {
@@ -508,21 +508,21 @@ public class Core {
             return result;
         }, 2, true);
         dEnv.addTokenProcedure("read-line", ((args, env) ->
-                DString.valueOf(new Scanner(env.io().in).nextLine())), 0, false);
+                DString.valueOf(new Scanner(env.io().in()).nextLine())), 0, false);
         dEnv.addTokenProcedure("read-int", ((args, env) ->
-                DInt.valueOf(new Scanner(env.io().in).nextBigInteger())), 0, false);
+                DInt.valueOf(new Scanner(env.io().in()).nextBigInteger())), 0, false);
         dEnv.addTokenProcedure("read-float", ((args, env) ->
-                DFloat.valueOf(new Scanner(env.io().in).nextBigDecimal())), 0, false);
+                DFloat.valueOf(new Scanner(env.io().in()).nextBigDecimal())), 0, false);
         dEnv.addTokenProcedure("read-bool", ((args, env) ->
-                DBool.valueOf(new Scanner(env.io().in).nextBoolean())), 0, false);
+                DBool.valueOf(new Scanner(env.io().in()).nextBoolean())), 0, false);
         dEnv.addTokenProcedure("read", ((args, env) ->
-                DString.valueOf(new Scanner(env.io().in).next())), 0, false);
+                DString.valueOf(new Scanner(env.io().in()).next())), 0, false);
         dEnv.addTokenProcedure("newline", ((args, env) -> {
-            env.io().out.println();
+            env.io().out().println();
             return DWord.WORD_NIL;
         }), 0, false);
         dEnv.addTokenProcedure("error-newline", ((args, env) -> {
-            env.io().err.println();
+            env.io().err().println();
             return DWord.WORD_NIL;
         }), 0, false);
         dEnv.addTokenProcedure("and", ((args, env) -> {

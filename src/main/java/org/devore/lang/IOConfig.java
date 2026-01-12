@@ -5,12 +5,12 @@ import java.io.PrintStream;
 
 /**
  * IO表
+ *
+ * @param out 输出流
+ * @param err 错误流
+ * @param in  输入流
  */
-public class IOConfig {
-    public final PrintStream out;   // 输出流
-    public final PrintStream err;   // 错误流
-    public final InputStream in;    // 输入流
-
+public record IOConfig(PrintStream out, PrintStream err, InputStream in) {
     /**
      * 创建IO表
      *
@@ -18,18 +18,13 @@ public class IOConfig {
      * @param err 错误流
      * @param in  输入流
      */
-    public IOConfig(PrintStream out, PrintStream err, InputStream in) {
-        this.out = out;
-        this.err = err;
-        this.in = in;
+    public IOConfig {
     }
 
     /**
      * 创建IO表
      */
     public IOConfig() {
-        this.out = System.out;
-        this.err = System.err;
-        this.in = System.in;
+        this(System.out, System.err, System.in);
     }
 }
