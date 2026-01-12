@@ -21,8 +21,42 @@ public class Lexer {
     public static String preprocessor(String code) {
         char[] codeCharArray = code.toCharArray();
         StringBuilder builder = new StringBuilder();
-        for (char c : codeCharArray)
-            builder.append((c == '\n' || c == '\r') ? ' ' : c);
+        int index = 0;
+        while (index < codeCharArray.length) {
+            if (codeCharArray[index] == '\"') {
+                builder.append("\"");
+                StringBuilder value = new StringBuilder();
+                boolean skip = false;
+                while (true) {
+                    ++index;
+                    if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
+                        if (skip) {
+                            skip = false;
+                            value.append("\\\\");
+                        } else
+                            skip = true;
+                        continue;
+                    } else if (index >= codeCharArray.length - 1 || codeCharArray[index] == '\"') {
+                        if (skip) {
+                            skip = false;
+                            value.append("\\\"");
+                            continue;
+                        } else
+                            break;
+                    } else if (skip) {
+                        value.append("\\").append(codeCharArray[index]);
+                        skip = false;
+                        continue;
+                    }
+                    value.append(codeCharArray[index]);
+                }
+                builder.append(value.append("\""));
+                ++index;
+                continue;
+            }
+            builder.append((codeCharArray[index] == '\n' || codeCharArray[index] == '\r') ? ' ' : codeCharArray[index]);
+            ++index;
+        }
         return builder.toString();
     }
 
