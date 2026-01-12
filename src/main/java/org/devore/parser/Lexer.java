@@ -13,6 +13,27 @@ import java.util.List;
  */
 public class Lexer {
     /**
+     * 预处理
+     *
+     * @param code  代码
+     * @return      预处理完的代码
+     */
+    public static String preprocessor(String code) {
+        char[] codeCharArray = code.toCharArray();
+        StringBuilder builder = new StringBuilder();
+        boolean skip = false;
+        for (char c : codeCharArray) {
+            if (skip && c == '\n')
+                skip = false;
+            if (!skip && c == ';')
+                skip = true;
+            if (!skip)
+                builder.append(c);
+        }
+        return builder.toString();
+    }
+
+    /**
      * 分割代码
      * 例如：把(+ 2 3)(- 4 5)分割成(+ 2 3)和(- 4 5)
      *
