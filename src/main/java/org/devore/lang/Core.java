@@ -489,9 +489,8 @@ public class Core {
         }, 2, true);
         dEnv.addSymbolProcedure("begin", (ast, env) -> {
             Token result = DWord.WORD_NIL;
-            Env newEnv = env.createChild();
             for (AstNode node : ast.children)
-                result = Evaluator.eval(newEnv, node);
+                result = Evaluator.eval(env, node.copy());
             return result;
         }, 1, true);
         dEnv.addSymbolProcedure("while", (ast, env) -> {
