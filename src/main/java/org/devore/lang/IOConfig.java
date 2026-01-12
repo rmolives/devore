@@ -13,16 +13,6 @@ import java.io.PrintStream;
 public record IOConfig(PrintStream out, PrintStream err, InputStream in) {
     /**
      * 创建IO表
-     *
-     * @param out 输出流
-     * @param err 错误流
-     * @param in  输入流
-     */
-    public IOConfig {
-    }
-
-    /**
-     * 创建IO表
      */
     public IOConfig() {
         this(System.out, System.err, System.in);
