@@ -1,7 +1,7 @@
 package org.devore.lang;
 
-import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DMacro;
+import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.Token;
 import org.devore.parser.AstNode;

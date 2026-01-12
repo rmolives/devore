@@ -29,9 +29,9 @@ public class AstNode {
     /**
      * 创建语法树
      *
-     * @param symbol    内容
-     * @param type      类型
-     * @param child     子树
+     * @param symbol 内容
+     * @param type   类型
+     * @param child  子树
      */
     public AstNode(Token symbol, AstType type, List<AstNode> child) {
         this.symbol = symbol;
@@ -63,7 +63,7 @@ public class AstNode {
     /**
      * 插入子树
      *
-     * @param i     位置
+     * @param i    位置
      * @param node 子树
      */
     public void insert(int i, AstNode node) {
@@ -73,7 +73,7 @@ public class AstNode {
     /**
      * 设置子树
      *
-     * @param i     index
+     * @param i    index
      * @param node 子树
      */
     public void set(int i, AstNode node) {
