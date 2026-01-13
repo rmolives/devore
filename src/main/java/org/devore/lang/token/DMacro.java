@@ -23,7 +23,9 @@ public class DMacro extends Token {
 
     private AstNode expand(AstNode body, List<AstNode> asts) {
         for (int j = 0; j < params.size(); ++j)
-            if (!body.isNull() && body.symbol.toString().equals(params.get(j))) {
+            if (!body.isNull()
+                    && body.symbol instanceof DSymbol
+                    && body.symbol.toString().equals(params.get(j))) {
                 body.symbol = DSymbol.valueOf("apply");
                 body.insert(0, asts.get(j));
             }
@@ -31,6 +33,7 @@ public class DMacro extends Token {
             AstNode temp = body.get(i);
             for (int j = 0; j < params.size(); ++j)
                 if (temp.symbol != null
+                        && body.symbol instanceof DSymbol
                         && temp.symbol.toString().equals(params.get(j))
                         && temp.isEmpty())
                     body.set(i, asts.get(j));
