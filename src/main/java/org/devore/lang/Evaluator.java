@@ -1,9 +1,6 @@
 package org.devore.lang;
 
-import org.devore.lang.token.DMacro;
-import org.devore.lang.token.DProcedure;
-import org.devore.lang.token.DSymbol;
-import org.devore.lang.token.Token;
+import org.devore.lang.token.*;
 import org.devore.parser.AstNode;
 
 import java.util.List;
@@ -28,9 +25,10 @@ public class Evaluator {
         }
         if (ast.symbol instanceof DMacro) {
             List<AstNode> bodys = ((DMacro) ast.symbol).expand(ast.children);
-            ast.symbol = DSymbol.valueOf("begin");
-            ast.children = bodys;
-            return eval(env, ast);
+            Token result = DWord.WORD_NIL;
+            for (AstNode temp : bodys)
+                result = eval(env, temp);
+            return result;
         }
         if (ast.isEmpty() && ast.type != AstNode.AstType.PROCEDURE)
             return ast.symbol;
