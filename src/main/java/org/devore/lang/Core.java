@@ -455,31 +455,29 @@ public class Core {
         }, 2, false);
         dEnv.addSymbolProcedure("if", (ast, env) -> {
             Token result;
-            Env newEnv = env.createChild();
-            Token condition = Evaluator.eval(newEnv, ast.getFirst().copy());
+            Token condition = Evaluator.eval(env, ast.getFirst().copy());
             if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
             if (((DBool) condition).bool)
-                result = Evaluator.eval(newEnv, ast.get(1).copy());
+                result = Evaluator.eval(env, ast.get(1).copy());
             else
-                result = Evaluator.eval(newEnv, ast.get(2).copy());
+                result = Evaluator.eval(env, ast.get(2).copy());
             return result;
         }, 3, false);
         dEnv.addSymbolProcedure("cond", (ast, env) -> {
             Token result = DWord.WORD_NIL;
-            Env newEnv = env.createChild();
             for (AstNode node : ast.children) {
                 if (node.symbol instanceof DSymbol && "else".equals(node.symbol.toString())) {
-                    result = Evaluator.eval(newEnv, node.getFirst().copy());
+                    result = Evaluator.eval(env, node.getFirst().copy());
                     break;
                 } else {
-                    Token condition = Evaluator.eval(newEnv, node.getFirst().copy());
+                    Token condition = Evaluator.eval(env, node.getFirst().copy());
                     if (!(condition instanceof DBool))
                         throw new DevoreCastException(condition.type(), "bool");
                     if (((DBool) condition).bool) {
                         Token r = DWord.WORD_NIL;
                         for (int i = 1; i < node.size(); ++i)
-                            r = Evaluator.eval(newEnv, node.get(i).copy());
+                            r = Evaluator.eval(env, node.get(i).copy());
                         result = r;
                         break;
                     }
