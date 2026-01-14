@@ -27,7 +27,7 @@ public class Parse {
         while (index < tokens.size()) {
             if (state == 1) {
                 if (tokens.get(index) == DWord.RB) {
-                    temp = AstNode.nullAst;
+                    temp = AstNode.nullAst.copy();
                     stack.push(temp);
                     state = -1;
                     ++index;
@@ -41,7 +41,7 @@ public class Parse {
                 state = -1;
             } else if (state == 2) {
                 if (tokens.get(index) == DWord.RB) {
-                    temp = AstNode.nullAst;
+                    temp = AstNode.nullAst.copy();
                     if (stack.peek() == null) {
                         throw new DevoreParseException("语法解析中栈顶为null.");
                     }
