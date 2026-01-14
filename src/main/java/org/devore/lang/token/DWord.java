@@ -7,13 +7,13 @@ public class DWord extends Token {
     public static final DWord LB = DWord.valueOf(WordTags.LB);     // (
     public static final DWord RB = DWord.valueOf(WordTags.RB);     // )
     public static final DWord NIL = DWord.valueOf(WordTags.NIL);   // nil
-    public final WordTags tag;
+    private final WordTags tag;
 
-    protected DWord(WordTags tag) {
+    private DWord(WordTags tag) {
         this.tag = tag;
     }
 
-    public static DWord valueOf(WordTags tag) {
+    private static DWord valueOf(WordTags tag) {
         return new DWord(tag);
     }
 
@@ -42,7 +42,7 @@ public class DWord extends Token {
         return t instanceof DWord w && w.tag.equals(this.tag) ? 0 : -1;
     }
 
-    public enum WordTags {
+    private enum WordTags {
         LB, RB, NIL
     }
 }
