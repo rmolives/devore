@@ -820,12 +820,12 @@ public class Core {
             return DList.valueOf(result);
         }), 2, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
-            if (!(args.getFirst() instanceof DNumber))
-                throw new DevoreCastException(args.getFirst().type(), "number");
-            if (args.size() > 1 && !(args.get(1) instanceof DNumber))
-                throw new DevoreCastException(args.get(1).type(), "number");
-            if (args.size() > 2 && !(args.get(2) instanceof DNumber))
-                throw new DevoreCastException(args.get(2).type(), "number");
+            if (!(args.getFirst() instanceof DArithmetic))
+                throw new DevoreCastException(args.getFirst().type(), "arithmetic");
+            if (args.size() > 1 && !(args.get(1) instanceof DArithmetic))
+                throw new DevoreCastException(args.get(1).type(), "arithmetic");
+            if (args.size() > 2 && !(args.get(2) instanceof DArithmetic))
+                throw new DevoreCastException(args.get(2).type(), "arithmetic");
             boolean isFloat = args.getFirst() instanceof DFloat ||
                     (args.size() > 1 && args.get(1) instanceof DFloat) || (args.size() > 2 && args.get(2) instanceof DFloat);
             BigDecimal start, end, step;
@@ -987,7 +987,7 @@ public class Core {
         dEnv.addTokenProcedure("nil?", ((args, env)
                 -> DBool.valueOf(args.getFirst() instanceof DWord word && word == DWord.NIL)), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env)
-                -> DBool.valueOf(args.getFirst() instanceof DNumber number
-                && number.toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
+                -> DBool.valueOf(args.getFirst() instanceof DArithmetic arithmetic
+                && arithmetic.toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
     }
 }
