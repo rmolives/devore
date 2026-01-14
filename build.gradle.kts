@@ -15,7 +15,7 @@ dependencies {}
 tasks.jar {
     manifest {
         attributes["Main-Class"] = "org.devore.Main"
-        attributes["Implementation-Version"] = version
+        attributes["Implementation-Version"] = project.version
     }
     from(configurations.runtimeClasspath.get().filter { it.exists() }.map { if (it.isDirectory) it else zipTree(it) })
 }
