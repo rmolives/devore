@@ -34,22 +34,22 @@ public class DInt extends DNumber {
     }
 
     @Override
-    public DArithmetic add(DArithmetic a) {
+    public DNumber add(DNumber a) {
         return DFloat.valueOf(num).add(a);
     }
 
     @Override
-    public DArithmetic sub(DArithmetic a) {
+    public DNumber sub(DNumber a) {
         return DFloat.valueOf(num).sub(a);
     }
 
     @Override
-    public DArithmetic mul(DArithmetic a) {
+    public DNumber mul(DNumber a) {
         return DFloat.valueOf(num).mul(a);
     }
 
     @Override
-    public DArithmetic div(DArithmetic a) {
+    public DNumber div(DNumber a) {
         return DFloat.valueOf(this.toBigInteger()).div(a);
     }
 

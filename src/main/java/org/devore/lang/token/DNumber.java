@@ -1,9 +1,12 @@
 package org.devore.lang.token;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
- * 复杂数学相关
+ * 数字
  */
-public abstract class DNumber extends DArithmetic {
+public abstract class DNumber extends Token {
     public abstract DNumber sin();
 
     public abstract DNumber cos();
@@ -29,4 +32,16 @@ public abstract class DNumber extends DArithmetic {
     public abstract DNumber ln();
 
     public abstract DNumber exp();
+
+    public abstract DNumber add(DNumber a);
+
+    public abstract DNumber sub(DNumber a);
+
+    public abstract DNumber mul(DNumber a);
+
+    public abstract DNumber div(DNumber a);
+
+    public abstract BigInteger toBigInteger();
+
+    public abstract BigDecimal toBigDecimal();
 }

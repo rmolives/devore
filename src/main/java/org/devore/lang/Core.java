@@ -21,46 +21,46 @@ public class Core {
         dEnv.put("true", DBool.TRUE);
         dEnv.put("false", DBool.FALSE);
         dEnv.addTokenProcedure("+", ((args, env) -> {
-            if (!(args.getFirst() instanceof DArithmetic arithmetic))
-                throw new DevoreCastException(args.getFirst().type(), "arithmetic");
+            if (!(args.getFirst() instanceof DNumber number))
+                throw new DevoreCastException(args.getFirst().type(), "number");
             for (int i = 1; i < args.size(); ++i) {
-                if (!(args.get(i) instanceof DArithmetic))
-                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
-                arithmetic = arithmetic.add((DArithmetic) args.get(i));
+                if (!(args.get(i) instanceof DNumber))
+                    throw new DevoreCastException(args.get(i).type(), "number");
+                number = number.add((DNumber) args.get(i));
             }
-            return arithmetic;
+            return number;
         }), 1, true);
         dEnv.addTokenProcedure("-", ((args, env) -> {
-            if (!(args.getFirst() instanceof DArithmetic arithmetic))
-                throw new DevoreCastException(args.getFirst().type(), "arithmetic");
+            if (!(args.getFirst() instanceof DNumber number))
+                throw new DevoreCastException(args.getFirst().type(), "number");
             if (args.size() == 1)
-                return DInt.valueOf(0).sub(arithmetic);
+                return DInt.valueOf(0).sub(number);
             for (int i = 1; i < args.size(); ++i) {
-                if (!(args.get(i) instanceof DArithmetic))
-                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
-                arithmetic = arithmetic.sub((DArithmetic) args.get(i));
+                if (!(args.get(i) instanceof DNumber))
+                    throw new DevoreCastException(args.get(i).type(), "number");
+                number = number.sub((DNumber) args.get(i));
             }
-            return arithmetic;
+            return number;
         }), 1, true);
         dEnv.addTokenProcedure("*", ((args, env) -> {
-            if (!(args.getFirst() instanceof DArithmetic arithmetic))
-                throw new DevoreCastException(args.getFirst().type(), "arithmetic");
+            if (!(args.getFirst() instanceof DNumber number))
+                throw new DevoreCastException(args.getFirst().type(), "number");
             for (int i = 1; i < args.size(); ++i) {
-                if (!(args.get(i) instanceof DArithmetic))
-                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
-                arithmetic = arithmetic.mul((DArithmetic) args.get(i));
+                if (!(args.get(i) instanceof DNumber))
+                    throw new DevoreCastException(args.get(i).type(), "number");
+                number = number.mul((DNumber) args.get(i));
             }
-            return arithmetic;
+            return number;
         }), 1, true);
         dEnv.addTokenProcedure("/", ((args, env) -> {
-            if (!(args.getFirst() instanceof DArithmetic arithmetic))
-                throw new DevoreCastException(args.getFirst().type(), "arithmetic");
+            if (!(args.getFirst() instanceof DNumber number))
+                throw new DevoreCastException(args.getFirst().type(), "number");
             for (int i = 1; i < args.size(); ++i) {
-                if (!(args.get(i) instanceof DArithmetic))
-                    throw new DevoreCastException(args.get(i).type(), "arithmetic");
-                arithmetic = arithmetic.div((DArithmetic) args.get(i));
+                if (!(args.get(i) instanceof DNumber))
+                    throw new DevoreCastException(args.get(i).type(), "number");
+                number = number.div((DNumber) args.get(i));
             }
-            return arithmetic;
+            return number;
         }), 1, true);
         dEnv.addTokenProcedure("pow", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
@@ -820,12 +820,12 @@ public class Core {
             return DList.valueOf(result);
         }), 2, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
-            if (!(args.getFirst() instanceof DArithmetic))
-                throw new DevoreCastException(args.getFirst().type(), "arithmetic");
-            if (args.size() > 1 && !(args.get(1) instanceof DArithmetic))
-                throw new DevoreCastException(args.get(1).type(), "arithmetic");
-            if (args.size() > 2 && !(args.get(2) instanceof DArithmetic))
-                throw new DevoreCastException(args.get(2).type(), "arithmetic");
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            if (args.size() > 1 && !(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            if (args.size() > 2 && !(args.get(2) instanceof DNumber))
+                throw new DevoreCastException(args.get(2).type(), "number");
             boolean isFloat = args.getFirst() instanceof DFloat ||
                     (args.size() > 1 && args.get(1) instanceof DFloat) || (args.size() > 2 && args.get(2) instanceof DFloat);
             BigDecimal start, end, step;
@@ -960,8 +960,6 @@ public class Core {
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return DList.valueOf(new ArrayList<>(table.keys()));
         }), 1, false);
-        dEnv.addTokenProcedure("arithmetic?", ((args, env)
-                -> DBool.valueOf(args.getFirst() instanceof DArithmetic)), 1, false);
         dEnv.addTokenProcedure("bool?", ((args, env)
                 -> DBool.valueOf(args.getFirst() instanceof DBool)), 1, false);
         dEnv.addTokenProcedure("float?", ((args, env)
@@ -987,7 +985,7 @@ public class Core {
         dEnv.addTokenProcedure("nil?", ((args, env)
                 -> DBool.valueOf(args.getFirst() instanceof DWord word && word == DWord.NIL)), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env)
-                -> DBool.valueOf(args.getFirst() instanceof DArithmetic arithmetic
-                && arithmetic.toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
+                -> DBool.valueOf(args.getFirst() instanceof DNumber number
+                && number.toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
     }
 }

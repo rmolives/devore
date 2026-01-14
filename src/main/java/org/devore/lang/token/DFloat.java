@@ -35,7 +35,7 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public DArithmetic add(DArithmetic a) {
+    public DNumber add(DNumber a) {
         DFloat result;
         if (a instanceof DInt n)
             result = DFloat.valueOf(num.add(new BigDecimal(n.num)));
@@ -47,7 +47,7 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public DArithmetic sub(DArithmetic a) {
+    public DNumber sub(DNumber a) {
         DFloat result;
         if (a instanceof DInt n)
             result = DFloat.valueOf(num.subtract(new BigDecimal(n.num)));
@@ -59,7 +59,7 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public DArithmetic mul(DArithmetic a) {
+    public DNumber mul(DNumber a) {
         DFloat result;
         if (a instanceof DInt n)
             result = DFloat.valueOf(num.multiply(new BigDecimal(n.num)));
@@ -71,7 +71,7 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public DArithmetic div(DArithmetic a) {
+    public DNumber div(DNumber a) {
         DFloat result;
         if (a instanceof DInt n)
             result = DFloat.valueOf(num.divide(new BigDecimal(n.num), MathContext.DECIMAL128));
