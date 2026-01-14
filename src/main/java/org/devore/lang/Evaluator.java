@@ -25,7 +25,7 @@ public class Evaluator {
         }
         if (ast.symbol instanceof DMacro) {
             List<AstNode> bodys = ((DMacro) ast.symbol).expand(ast.children);
-            Token result = DWord.WORD_NIL;
+            Token result = DWord.NIL;
             for (AstNode temp : bodys)
                 result = eval(env, temp);
             return result;

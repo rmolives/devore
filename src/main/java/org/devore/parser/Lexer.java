@@ -110,11 +110,11 @@ public class Lexer {
         while (++index < expressionCharArray.length) {
             switch (expressionCharArray[index]) {
                 case '(', '[' -> {
-                    tokens.add(DWord.WORD_LB);
+                    tokens.add(DWord.LB);
                     continue;
                 }
                 case ')', ']' -> {
-                    tokens.add(DWord.WORD_RB);
+                    tokens.add(DWord.RB);
                     continue;
                 }
                 case ' ' -> {

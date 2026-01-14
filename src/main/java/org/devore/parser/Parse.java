@@ -26,21 +26,21 @@ public class Parse {
         int index = 0;
         while (index < tokens.size()) {
             if (state == 1) {
-                if (tokens.get(index) == DWord.WORD_RB) {
+                if (tokens.get(index) == DWord.RB) {
                     temp = AstNode.nullAst;
                     stack.push(temp);
                     state = -1;
                     ++index;
                     continue;
                 }
-                if (tokens.get(index) == DWord.WORD_LB)
+                if (tokens.get(index) == DWord.LB)
                     tokens.add(index, DSymbol.valueOf("apply"));
                 temp = new AstNode(tokens.get(index));
                 stack.push(temp);
                 ast = temp;
                 state = -1;
             } else if (state == 2) {
-                if (tokens.get(index) == DWord.WORD_RB) {
+                if (tokens.get(index) == DWord.RB) {
                     temp = AstNode.nullAst;
                     if (stack.peek() == null) {
                         throw new DevoreParseException("语法解析中栈顶为null.");
@@ -50,7 +50,7 @@ public class Parse {
                     ++index;
                     continue;
                 }
-                if (tokens.get(index) == DWord.WORD_LB)
+                if (tokens.get(index) == DWord.LB)
                     tokens.add(index, DSymbol.valueOf("apply"));
                 temp = new AstNode(tokens.get(index));
                 if (stack.peek() == null) {
@@ -59,10 +59,10 @@ public class Parse {
                 stack.peek().add(temp);
                 stack.push(temp);
                 state = -1;
-            } else if (tokens.get(index) == DWord.WORD_LB)
+            } else if (tokens.get(index) == DWord.LB)
                 state = stack.isEmpty() ? 1 : 2;
-            else if (tokens.get(index) == DWord.WORD_RB) {
-                if (index >= 2 && tokens.get(index - 2) == DWord.WORD_LB) {
+            else if (tokens.get(index) == DWord.RB) {
+                if (index >= 2 && tokens.get(index - 2) == DWord.LB) {
                     if (stack.peek() == null)
                         throw new DevoreParseException("语法解析中栈顶为null.");
                     stack.peek().type = AstNode.AstType.PROCEDURE;

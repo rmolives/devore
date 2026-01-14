@@ -202,7 +202,7 @@ public record Env(Map<String, Token> table, Env father, IOConfig io) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        return temp.contains(key) ? temp.table.get(key) : DWord.WORD_NIL;
+        return temp.contains(key) ? temp.table.get(key) : DWord.NIL;
     }
 
     /**
@@ -215,7 +215,7 @@ public record Env(Map<String, Token> table, Env father, IOConfig io) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        return temp.contains(key) ? temp.table.remove(key) : DWord.WORD_NIL;
+        return temp.contains(key) ? temp.table.remove(key) : DWord.NIL;
     }
 
     /**

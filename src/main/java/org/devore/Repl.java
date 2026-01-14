@@ -74,7 +74,7 @@ public class Repl {
             if (flag == 0) {
                 Token result = Devore.call(env, codeBuilder.toString());
                 codeBuilder = new StringBuilder();
-                if (result != DWord.WORD_NIL)
+                if (result != DWord.NIL)
                     out.println(result.toString());
             }
             size = flag;
