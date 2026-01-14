@@ -30,7 +30,7 @@ public class DProcedure extends Token {
 
     public DProcedure addProcedure(DProcedure procedure) {
         if (!isEqArgs(procedure.argSize))
-            throw new DevoreRuntimeException("过程定义冲突");
+            throw new DevoreRuntimeException("过程定义冲突.");
         this.children.add(procedure);
         return this;
     }
