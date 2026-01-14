@@ -6,6 +6,7 @@ import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
 
 import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public class Parse {
      */
     public static AstNode parse(List<Token> tokens) {
         AstNode ast = null;
-        ArrayDeque<AstNode> stack = new ArrayDeque<>();
+        Deque<AstNode> stack = new ArrayDeque<>();
         int state = -1;
         AstNode temp;
         int index = 0;
