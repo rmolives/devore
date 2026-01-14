@@ -42,9 +42,8 @@ public class Parse {
             } else if (state == 2) {
                 if (tokens.get(index) == DWord.RB) {
                     temp = AstNode.nullAst.copy();
-                    if (stack.peek() == null) {
+                    if (stack.peek() == null)
                         throw new DevoreParseException("语法解析中栈顶为null.");
-                    }
                     stack.peek().add(temp);
                     state = -1;
                     ++index;
@@ -53,9 +52,8 @@ public class Parse {
                 if (tokens.get(index) == DWord.LB)
                     tokens.add(index, DSymbol.valueOf("apply"));
                 temp = new AstNode(tokens.get(index));
-                if (stack.peek() == null) {
+                if (stack.peek() == null)
                     throw new DevoreParseException("语法解析中栈顶为null.");
-                }
                 stack.peek().add(temp);
                 stack.push(temp);
                 state = -1;
