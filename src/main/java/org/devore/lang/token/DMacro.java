@@ -32,7 +32,7 @@ public class DMacro extends Token {
         for (int i = 0; i < body.size(); ++i) {
             AstNode temp = body.get(i);
             for (int j = 0; j < params.size(); ++j)
-                if (temp.symbol != null
+                if (body.isNotNil()
                         && body.symbol instanceof DSymbol
                         && temp.symbol.toString().equals(params.get(j))
                         && temp.isEmpty())
