@@ -23,7 +23,7 @@ public class DMacro extends Token {
 
     private AstNode expand(AstNode body, List<AstNode> asts) {
         for (int j = 0; j < params.size(); ++j)
-            if (!body.isNull()
+            if (body.isNotNil()
                     && body.symbol instanceof DSymbol
                     && body.symbol.toString().equals(params.get(j))) {
                 body.symbol = DSymbol.valueOf("apply");

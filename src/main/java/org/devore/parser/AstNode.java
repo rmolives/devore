@@ -1,6 +1,7 @@
 package org.devore.parser;
 
 import org.devore.lang.token.DString;
+import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
  * 抽象语法树
  */
 public class AstNode {
-    public final static AstNode nullAst = new AstNode(null);    // 空白语法树
+    public final static AstNode nullAst = new AstNode(DWord.NIL);      // 空白语法树
     public List<AstNode> children;                                     // 子树
     public Token symbol;                                               // 内容
     public AstType type;                                               // 语法树类型
@@ -125,12 +126,12 @@ public class AstNode {
     }
 
     /**
-     * 判断语法树op是否为null
+     * 判断语法树symbol是否为nil
      *
      * @return 结果
      */
-    public boolean isNull() {
-        return symbol == null;
+    public boolean isNotNil() {
+        return symbol != DWord.NIL;
     }
 
     /**

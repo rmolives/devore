@@ -380,7 +380,7 @@ public class Core {
         }), 2, true);
         dEnv.addSymbolProcedure("lambda", ((ast, env) -> {
             List<String> params = new ArrayList<>();
-            if (!ast.getFirst().isNull()) {
+            if (ast.getFirst().isNotNil()) {
                 if (!(ast.getFirst().symbol instanceof DSymbol))
                     throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
                 params.add(ast.getFirst().symbol.toString());
