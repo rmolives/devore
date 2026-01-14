@@ -1,11 +1,13 @@
 package org.devore.lang.token;
 
 /**
- * 关键字
+ * 符号
  */
-public class DSymbol extends DString {
+public class DSymbol extends Token {
+    public final String symbol;
+
     protected DSymbol(String symbol) {
-        super(symbol);
+        this.symbol = symbol;
     }
 
     public static DSymbol valueOf(String symbol) {
@@ -15,5 +17,20 @@ public class DSymbol extends DString {
     @Override
     public String type() {
         return "symbol";
+    }
+
+    @Override
+    protected String str() {
+        return symbol;
+    }
+
+    @Override
+    public Token copy() {
+        return DSymbol.valueOf(symbol);
+    }
+
+    @Override
+    public int compareTo(Token t) {
+        return symbol.compareTo(t.toString());
     }
 }
