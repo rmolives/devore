@@ -41,50 +41,21 @@
                                                         (/ (- (char->int (list-get code_array index)) 48) d)))
                                                         (set! d (* d 10)))))
                                                 (list-add! token (if negative (- x (* x 2)) x)))))
-                                  (if (= (list-get code_array index) "\"")
+                                (if (and (/= (list-get code_array index) " ")
+                                         (/= (list-get code_array index) "(")
+                                         (/= (list-get code_array index) ")"))
                                     (let ([builder ""]
                                           [skip false]
                                           [k true])
-                                            (while k
-                                                (set! index (+ index 1))
-                                                (if (and (< index (- (length code_array) 1))
-                                                         (= (list-get code_array index) "\\"))
-                                                    (if skip
-                                                        (begin (set! skip false)
-                                                               (set! builder (++ builder "\\")))
-                                                        (set! skip true))
-                                                    (if (and (< index (- (length code_array) 1))
-                                                         (= (list-get code_array index) "\""))
-                                                        (if skip
-                                                            (begin (set! skip false)
-                                                                   (set! builder (++ builder "\"")))
-                                                            (set! k false))
-                                                        (if skip
-                                                            (begin
-                                                                (set! skip false)
-                                                                (set! builder (++ builder
-                                                                    (cond [(= (list-get code_array index) "n") "\n"]
-                                                                          [(= (list-get code_array index) "r") "\r"]
-                                                                          [(= (list-get code_array index) "t") "\t"]
-                                                                          [(= (list-get code_array index) "b") "\b"]
-                                                                          [else (++ "\\\\" (list-get code_array index))]))))
-                                                            (set! builder (++ builder (list-get code_array index)))))))
-                                    (list-add! token builder))
-                                    (if (and (/= (list-get code_array index) " ")
-                                             (/= (list-get code_array index) "(")
-                                             (/= (list-get code_array index) ")"))
-                                        (let ([builder ""]
-                                              [skip false]
-                                              [k true])
-                                              (while k
-                                                (if (or (>= index (- (length code_array) 1))
-                                                        (= (list-get code_array index) " ")
-                                                        (= (list-get code_array index) ")"))
-                                                    (begin (set! index (- index 1)) (set! k false))
-                                                    (begin
-                                                        (set! builder (++ builder (list-get code_array index)))
-                                                        (set! index (+ index 1)))))
-                                            (list-add! token builder)))))]))) token))
+                                        (while k
+                                            (if (or (>= index (- (length code_array) 1))
+                                                    (= (list-get code_array index) " ")
+                                                    (= (list-get code_array index) ")"))
+                                                (begin (set! index (- index 1)) (set! k false))
+                                                (begin
+                                                    (set! builder (++ builder (list-get code_array index)))
+                                                    (set! index (+ index 1)))))
+                                        (list-add! token builder))))]))) token))
 (def (parse tokens)
     (let ([ast (list)]
           [stack (list)]
