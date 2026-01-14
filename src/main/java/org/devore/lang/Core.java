@@ -443,6 +443,17 @@ public class Core {
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) >= 0)), 2, false);
         dEnv.addTokenProcedure("<=", ((args, env) ->
                 DBool.valueOf(args.getFirst().compareTo(args.get(1)) <= 0)), 2, false);
+        dEnv.addSymbolProcedure("unless", (ast, env) -> {
+            Token result = DWord.NIL;
+            Token condition = Evaluator.eval(env, ast.getFirst().copy());
+            if (!(condition instanceof DBool))
+                throw new DevoreCastException(condition.type(), "bool");
+            if (!((DBool) condition).bool) {
+                for (int i = 1; i < ast.size(); ++i)
+                    result = Evaluator.eval(env, ast.get(i).copy());
+            }
+            return result;
+        }, 2, true);
         dEnv.addSymbolProcedure("if", (ast, env) -> {
             Token result = DWord.NIL;
             Token condition = Evaluator.eval(env, ast.getFirst().copy());
@@ -962,5 +973,10 @@ public class Core {
                 -> DBool.valueOf(args.getFirst() instanceof DTable)), 1, false);
         dEnv.addTokenProcedure("word?", ((args, env)
                 -> DBool.valueOf(args.getFirst() instanceof DWord)), 1, false);
+        dEnv.addTokenProcedure("nil?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DWord word && word == DWord.NIL)), 1, false);
+        dEnv.addTokenProcedure("zero?", ((args, env)
+                -> DBool.valueOf(args.getFirst() instanceof DNumber number
+                && number.toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
     }
 }
