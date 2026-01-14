@@ -454,6 +454,17 @@ public class Core {
             }
             return result;
         }, 2, true);
+        dEnv.addSymbolProcedure("when", (ast, env) -> {
+            Token result = DWord.NIL;
+            Token condition = Evaluator.eval(env, ast.getFirst().copy());
+            if (!(condition instanceof DBool))
+                throw new DevoreCastException(condition.type(), "bool");
+            if (((DBool) condition).bool) {
+                for (int i = 1; i < ast.size(); ++i)
+                    result = Evaluator.eval(env, ast.get(i).copy());
+            }
+            return result;
+        }, 2, true);
         dEnv.addSymbolProcedure("if", (ast, env) -> {
             Token result = DWord.NIL;
             Token condition = Evaluator.eval(env, ast.getFirst().copy());
