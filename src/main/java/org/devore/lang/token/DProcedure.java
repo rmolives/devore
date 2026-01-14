@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 /**
- * 函数
+ * 过程
  */
 public class DProcedure extends Token {
     private final BiFunction<AstNode, Env, Token> procedure;
