@@ -97,7 +97,7 @@
     (for-each
         (lambda index
             (let ([k (list-get ast index)])
-                (if (/= (type k) "list")
+                (if (not (list? k))
                     (if (table-contains-key env (->string k))
                         (list-set! ast index (table-get env (->string k))))
                     (list-set! ast index (eval env k))))) (range (length ast)))
