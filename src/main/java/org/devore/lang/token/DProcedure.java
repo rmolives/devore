@@ -60,7 +60,7 @@ public class DProcedure extends Token {
         DProcedure df = match(args.length);
         if (df == null)
             throw new DevoreRuntimeException("找不到匹配条件的过程.");
-        AstNode ast = AstNode.nullAst.copy();
+        AstNode ast = AstNode.emptyAst.copy();
         for (Token arg : args) ast.add(new AstNode(arg));
         return df.procedure.apply(ast, env);
     }

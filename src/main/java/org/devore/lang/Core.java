@@ -415,7 +415,7 @@ public class Core {
             List<Token> params = new ArrayList<>();
             for (int i = 1; i < args.size(); ++i)
                 params.add(args.get(i));
-            AstNode asts = AstNode.nullAst.copy();
+            AstNode asts = AstNode.emptyAst.copy();
             for (Token arg : params)
                 asts.add(new AstNode(arg));
             return ((DProcedure) args.getFirst()).call(asts, env);
@@ -426,7 +426,7 @@ public class Core {
             if (!(args.get(1) instanceof DList temp))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             List<Token> params = temp.toList();
-            AstNode asts = AstNode.nullAst.copy();
+            AstNode asts = AstNode.emptyAst.copy();
             for (Token arg : params)
                 asts.add(new AstNode(arg));
             return ((DProcedure) args.getFirst()).call(asts, env);
@@ -808,7 +808,7 @@ public class Core {
             List<Token> result = new ArrayList<>();
             List<Token> tokens = ((DList) args.get(1)).toList();
             for (Token token : tokens) {
-                AstNode asts = AstNode.nullAst.copy();
+                AstNode asts = AstNode.emptyAst.copy();
                 asts.add(new AstNode(token));
                 Token condition = ((DProcedure) args.getFirst()).call(asts, env.createChild());
                 if (!(condition instanceof DBool))

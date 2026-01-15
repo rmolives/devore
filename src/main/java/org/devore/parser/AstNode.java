@@ -11,7 +11,7 @@ import java.util.List;
  * 抽象语法树
  */
 public class AstNode {
-    public final static AstNode nullAst = new AstNode(DWord.NIL);      // 空白语法树
+    public final static AstNode emptyAst = new AstNode(DWord.NIL);     // 空白语法树
     public List<AstNode> children;                                     // 子树
     public Token symbol;                                               // 内容
     public AstType type;                                               // 语法树类型
