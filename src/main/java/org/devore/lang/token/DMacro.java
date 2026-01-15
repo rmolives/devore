@@ -21,7 +21,7 @@ public class DMacro extends Token {
     }
 
     public DMacro addMacro(DMacro macro) {
-        if (!isEqArgs(macro.params.size()))
+        if (match(macro.params.size()) != null)
             throw new DevoreRuntimeException("宏定义冲突.");
         this.children.add(macro);
         return this;
@@ -39,10 +39,6 @@ public class DMacro extends Token {
             }
         }
         return macro;
-    }
-
-    private boolean isEqArgs(int argSize) {
-        return match(argSize) == null;
     }
 
     public static DMacro newMacro(List<String> params, List<AstNode> bodys) {

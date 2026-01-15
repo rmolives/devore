@@ -29,7 +29,7 @@ public class DProcedure extends Token {
     }
 
     public DProcedure addProcedure(DProcedure procedure) {
-        if (!isEqArgs(procedure.argSize))
+        if (match(procedure.argSize) != null)
             throw new DevoreRuntimeException("过程定义冲突.");
         this.children.add(procedure);
         return this;
@@ -63,10 +63,6 @@ public class DProcedure extends Token {
         AstNode ast = AstNode.emptyAst.copy();
         for (Token arg : args) ast.add(new AstNode(arg));
         return df.procedure.apply(ast, env);
-    }
-
-    private boolean isEqArgs(int argSize) {
-        return match(argSize) == null;
     }
 
     @Override
