@@ -514,14 +514,13 @@ public class Core {
         }, 1, true);
         dEnv.addSymbolProcedure("while", (ast, env) -> {
             Token result = DWord.NIL;
-            Env newEnv = env.createChild();
-            Token condition = Evaluator.eval(newEnv, ast.getFirst().copy());
+            Token condition = Evaluator.eval(env, ast.getFirst().copy());
             if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
             while (((DBool) condition).bool) {
                 for (int i = 1; i < ast.size(); ++i)
-                    result = Evaluator.eval(newEnv, ast.get(i).copy());
-                condition = Evaluator.eval(newEnv, ast.getFirst().copy());
+                    result = Evaluator.eval(env, ast.get(i).copy());
+                condition = Evaluator.eval(env, ast.getFirst().copy());
             }
             return result;
         }, 2, true);
