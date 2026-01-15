@@ -32,8 +32,8 @@ public class DMacro extends Token {
         if (this.params.size() == argSize)
             macro = this;
         else {
-            for (DMacro df : children) {
-                DMacro temp = df.match(argSize);
+            for (DMacro dm : children) {
+                DMacro temp = dm.match(argSize);
                 if (temp != null)
                     macro = temp;
             }
@@ -72,11 +72,12 @@ public class DMacro extends Token {
     }
 
     public List<AstNode> expand(List<AstNode> asts) {
-        DMacro df = match(asts.size());
-        if (df == null)
+        DMacro dm = match(asts.size());
+        if (dm == null)
             throw new DevoreRuntimeException("找不到匹配条件的宏.");
         List<AstNode> result = new ArrayList<>();
-        for (AstNode body : bodys) result.add(expand(body.copy(), asts));
+        for (AstNode body : dm.bodys)
+            result.add(dm.expand(body.copy(), asts));
         return result;
     }
 
