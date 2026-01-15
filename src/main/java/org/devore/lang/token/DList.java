@@ -41,7 +41,7 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
-    public DList insert(int index, Token t, boolean force) {
+    public DList add(int index, Token t, boolean force) {
         if (force) {
             tokens.add(index, t);
             return this;

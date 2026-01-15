@@ -621,12 +621,12 @@ public class Core {
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.add(args.get(1), false);
         }), 2, false);
-        dEnv.addTokenProcedure("list-insert", ((args, env) -> {
+        dEnv.addTokenProcedure("list-add", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt index))
                 throw new DevoreCastException(args.getFirst().type(), "int");
-            return list.insert(index.toBigInteger().intValue(), args.get(2), false);
+            return list.add(index.toBigInteger().intValue(), args.get(2), false);
         }), 3, false);
         dEnv.addTokenProcedure("list-set!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
@@ -651,12 +651,12 @@ public class Core {
                 throw new DevoreCastException(args.getFirst().type(), "list");
             return list.add(args.get(1), true);
         }), 2, false);
-        dEnv.addTokenProcedure("list-insert!", ((args, env) -> {
+        dEnv.addTokenProcedure("list-add!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
                 throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt index))
                 throw new DevoreCastException(args.getFirst().type(), "int");
-            return list.insert(index.toBigInteger().intValue(), args.get(2), true);
+            return list.add(index.toBigInteger().intValue(), args.get(2), true);
         }), 3, false);
         dEnv.addTokenProcedure("head", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list))
