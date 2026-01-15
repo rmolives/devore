@@ -11,7 +11,7 @@ import java.io.PrintStream;
  */
 public record IOConfig(PrintStream out, InputStream in) {
     /**
-     * 创建IO表
+     * 创建默认IO表
      */
     public IOConfig() {
         this(System.out, System.in);
