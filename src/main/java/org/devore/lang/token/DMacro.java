@@ -1,5 +1,6 @@
 package org.devore.lang.token;
 
+import org.devore.exception.DevoreRuntimeException;
 import org.devore.parser.AstNode;
 
 import java.util.ArrayList;
@@ -11,10 +12,37 @@ import java.util.List;
 public class DMacro extends Token {
     private final List<String> params;
     private final List<AstNode> bodys;
+    private final List<DMacro> children;
 
     private DMacro(List<String> params, List<AstNode> bodys) {
         this.params = params;
         this.bodys = bodys;
+        this.children = new ArrayList<>();
+    }
+
+    public DMacro addMacro(DMacro macro) {
+        if (!isEqArgs(macro.params.size()))
+            throw new DevoreRuntimeException("宏定义冲突.");
+        this.children.add(macro);
+        return this;
+    }
+
+    private DMacro match(int argSize) {
+        DMacro macro = null;
+        if (this.params.size() == argSize)
+            macro = this;
+        else {
+            for (DMacro df : children) {
+                DMacro temp = df.match(argSize);
+                if (temp != null)
+                    macro = temp;
+            }
+        }
+        return macro;
+    }
+
+    private boolean isEqArgs(int argSize) {
+        return match(argSize) == null;
     }
 
     public static DMacro newMacro(List<String> params, List<AstNode> bodys) {
@@ -44,6 +72,9 @@ public class DMacro extends Token {
     }
 
     public List<AstNode> expand(List<AstNode> asts) {
+        DMacro df = match(asts.size());
+        if (df == null)
+            throw new DevoreRuntimeException("找不到匹配条件的宏.");
         List<AstNode> result = new ArrayList<>();
         for (AstNode body : bodys) result.add(expand(body.copy(), asts));
         return result;

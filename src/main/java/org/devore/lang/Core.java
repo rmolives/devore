@@ -227,7 +227,7 @@ public class Core {
             List<AstNode> asts = new ArrayList<>();
             for (int i = 1; i < ast.size(); ++i)
                 asts.add(ast.get(i).copy());
-            env.put(ast.getFirst().symbol.toString(), DMacro.newMacro(params, asts));
+            env.addMacro(ast.getFirst().symbol.toString(), DMacro.newMacro(params, asts));
             return DWord.NIL;
         }), 2, true);
         dEnv.addSymbolProcedure("def", ((ast, env) -> {

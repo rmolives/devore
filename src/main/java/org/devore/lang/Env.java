@@ -1,6 +1,7 @@
 package org.devore.lang;
 
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
@@ -75,6 +76,22 @@ public record Env(Map<String, Token> table, Env father, IOConfig io) {
         if (table.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
         table.put(key, value);
+        return this;
+    }
+
+    /**
+     * 添加宏
+     *
+     * @param key   key
+     * @param macro 宏
+     * @return 环境
+     */
+    public Env addMacro(String key, DMacro macro) {
+        if (table.containsKey(key)) {
+            table.put(key, ((DMacro) table.get(key)).addMacro(macro));
+            return this;
+        }
+        table.put(key, macro);
         return this;
     }
 
