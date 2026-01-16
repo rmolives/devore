@@ -181,6 +181,8 @@ public class Lexer {
                             case 'n' -> builder.append("\n");
                             case 'r' -> builder.append("\r");
                             case 't' -> builder.append("\t");
+                            case 'b'  -> builder.append("\b");
+                            case 'f'  -> builder.append("\f");
                             default -> builder.append("\\").append(expressionCharArray[index]);
                         }
                     } else
