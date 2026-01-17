@@ -20,6 +20,10 @@ public class DMacro extends Token {
         this.children = new ArrayList<>();
     }
 
+    public static DMacro newMacro(List<String> params, List<AstNode> bodys) {
+        return new DMacro(params, bodys);
+    }
+
     public DMacro addMacro(DMacro macro) {
         if (match(macro.params.size()) != null)
             throw new DevoreRuntimeException("宏定义冲突.");
@@ -39,10 +43,6 @@ public class DMacro extends Token {
             }
         }
         return macro;
-    }
-
-    public static DMacro newMacro(List<String> params, List<AstNode> bodys) {
-        return new DMacro(params, bodys);
     }
 
     private AstNode expand(AstNode body, List<AstNode> asts) {
