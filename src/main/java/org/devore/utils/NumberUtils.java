@@ -35,7 +35,7 @@ public class NumberUtils {
      *
      * @param y  Y坐标
      * @param x  X坐标
-     * @param mc 精度上下文
+     * @param mc 精度
      * @return 角度，范围 [-π, π]
      */
     public static BigDecimal atan2(BigDecimal y, BigDecimal x, MathContext mc) {
@@ -66,7 +66,7 @@ public class NumberUtils {
      * 使用恒等式: arccos(x) = π/2 - arcsin(x)
      *
      * @param x  输入值，必须在 [-1, 1] 范围内
-     * @param mc 精度上下文
+     * @param mc 精度
      * @return arccos(x)，范围在 0 到 π 之间
      */
     public static BigDecimal arccos(BigDecimal x, MathContext mc) {
@@ -93,7 +93,7 @@ public class NumberUtils {
      * 使用恒等式转换和泰勒级数展开
      *
      * @param x  输入值，必须在 [-1, 1] 范围内
-     * @param mc 精度上下文
+     * @param mc 精度
      * @return arcsin(x)，范围在 -π/2 到 π/2 之间
      */
     public static BigDecimal arcsin(BigDecimal x, MathContext mc) {
@@ -156,7 +156,7 @@ public class NumberUtils {
      * 使用泰勒级数展开，对于 |x| > 1 的情况使用恒等式转换
      *
      * @param x  输入值
-     * @param mc 精度上下文
+     * @param mc 精度
      * @return arctan(x)，范围在 -π/2 到 π/2 之间
      */
     public static BigDecimal arctan(BigDecimal x, MathContext mc) {
