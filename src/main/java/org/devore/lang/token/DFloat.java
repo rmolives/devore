@@ -119,13 +119,25 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public DNumber ceil() {
+    public DNumber ceiling() {
         return DInt.valueOf(num.setScale(0, RoundingMode.CEILING));
     }
 
     @Override
     public DNumber floor() {
         return DInt.valueOf(num.setScale(0, RoundingMode.FLOOR));
+    }
+
+    @Override
+    public DNumber truncate() {
+        return DInt.valueOf(num.signum() >= 0
+                ? num.setScale(0, RoundingMode.FLOOR)
+                : num.setScale(0, RoundingMode.CEILING));
+    }
+
+    @Override
+    public DNumber round() {
+        return DInt.valueOf(num.setScale(0, RoundingMode.HALF_UP));
     }
 
     @Override

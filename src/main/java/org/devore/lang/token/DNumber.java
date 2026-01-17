@@ -19,9 +19,13 @@ public abstract class DNumber extends Token {
 
     public abstract DNumber arccos();
 
-    public abstract DNumber ceil();
+    public abstract DNumber ceiling();
 
     public abstract DNumber floor();
+
+    public abstract DNumber truncate();
+
+    public abstract DNumber round();
 
     public abstract DNumber sqrt();
 

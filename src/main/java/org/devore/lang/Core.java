@@ -183,15 +183,25 @@ public class Core {
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).exp();
         }), 1, false);
-        dEnv.addTokenProcedure("ceil", ((args, env) -> {
+        dEnv.addTokenProcedure("ceiling", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
-            return ((DNumber) args.getFirst()).ceil();
+            return ((DNumber) args.getFirst()).ceiling();
         }), 1, false);
         dEnv.addTokenProcedure("floor", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
             return ((DNumber) args.getFirst()).floor();
+        }), 1, false);
+        dEnv.addTokenProcedure("truncate", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            return ((DNumber) args.getFirst()).truncate();
+        }), 1, false);
+        dEnv.addTokenProcedure("round", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            return ((DNumber) args.getFirst()).round();
         }), 1, false);
         dEnv.addTokenProcedure("println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();

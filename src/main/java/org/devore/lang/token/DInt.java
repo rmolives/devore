@@ -84,12 +84,22 @@ public class DInt extends DNumber {
     }
 
     @Override
-    public DNumber ceil() {
+    public DNumber ceiling() {
         return (DNumber) copy();
     }
 
     @Override
     public DNumber floor() {
+        return (DNumber) copy();
+    }
+
+    @Override
+    public DNumber truncate() {
+        return (DNumber) copy();
+    }
+
+    @Override
+    public DNumber round() {
         return (DNumber) copy();
     }
 
