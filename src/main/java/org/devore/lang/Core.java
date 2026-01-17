@@ -892,12 +892,12 @@ public class Core {
                 tokens.add(DString.valueOf(String.valueOf(c)));
             return DList.valueOf(tokens);
         }), 1, false);
-        dEnv.addTokenProcedure("char->int", ((args, env) -> {
+        dEnv.addTokenProcedure("char->unicode", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
             return DInt.valueOf((int) args.getFirst().toString().charAt(0));
         }), 1, false);
-        dEnv.addTokenProcedure("int->char", ((args, env) -> {
+        dEnv.addTokenProcedure("unicode->char", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             return DString.valueOf(String.valueOf((char) ((DInt) args.getFirst()).toBigInteger().intValue()));
