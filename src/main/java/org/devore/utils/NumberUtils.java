@@ -30,7 +30,7 @@ public class NumberUtils {
     }
 
     /**
-     * 计算 atan2(y, x)，返回从正X轴到点(x,y)的角度
+     * 计算 atan2(y, x)，返回从正X轴到点(x, y)的角度
      * 能够正确处理所有象限，返回范围在 [-π, π]
      *
      * @param y  Y坐标
@@ -123,7 +123,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数计算arcsin(x)
+     * 使用泰勒级数计算 arcsin(x)
      * arcsin(x) = x + (1/2)(x³/3) + (1·3/2·4)(x⁵/5) + (1·3·5/2·4·6)(x⁷/7) + ...
      */
     private static BigDecimal arcsinTaylor(BigDecimal x, MathContext mc) {
@@ -181,7 +181,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数计算arctan(x)，仅适用于 0 ≤ x ≤ 1
+     * 使用泰勒级数计算 arctan(x)，仅适用于 0 ≤ x ≤ 1
      * arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
      */
     private static BigDecimal arctanTaylor(BigDecimal x, MathContext mc) {
@@ -207,7 +207,7 @@ public class NumberUtils {
     }
 
     /**
-     * 将角度缩小到范围[-π，π]
+     * 将角度缩小到范围 [-π，π]
      *
      * @param angle 角度
      * @param mc    精度
@@ -234,7 +234,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数展开计算sin(x)
+     * 使用泰勒级数展开计算 sin(x)
      *
      * @param x  x
      * @param mc 精度
@@ -258,7 +258,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数展开计算cos(x)
+     * 使用泰勒级数展开计算 cos(x)
      *
      * @param x  x
      * @param mc 精度
@@ -282,7 +282,7 @@ public class NumberUtils {
     }
 
     /**
-     * 将tan计算为sin(x)/cos(x)
+     * 将tan计算为 sin(x)/cos(x)
      *
      * @param x  x
      * @param mc 精度
@@ -320,7 +320,7 @@ public class NumberUtils {
     }
 
     /**
-     * 计算BigDecimal的x^y
+     * 计算BigDecimal的 x^y
      *
      * @param x  x
      * @param y  y
@@ -346,7 +346,7 @@ public class NumberUtils {
     }
 
     /**
-     * 计算BigDecimal的x^y, 其中y为整数
+     * 计算BigDecimal的 x^y, 其中 y 为整数
      *
      * @param x  x
      * @param y  y
@@ -366,7 +366,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数计算ln(x)
+     * 使用泰勒级数计算 ln(x)
      *
      * @param x  x
      * @param mc 精度
@@ -410,7 +410,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数计算e^x
+     * 使用泰勒级数计算 e^x
      *
      * @param x  x
      * @param mc 精度
