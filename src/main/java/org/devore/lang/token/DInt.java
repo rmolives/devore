@@ -129,6 +129,11 @@ public class DInt extends DNumber {
     }
 
     @Override
+    public DNumber atan2(DNumber y) {
+        return DFloat.valueOf(num).atan2(y);
+    }
+
+    @Override
     public DNumber exp() {
         return DFloat.valueOf(num).exp();
     }
