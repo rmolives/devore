@@ -382,6 +382,24 @@ public class NumberUtils {
     }
 
     /**
+     * 以 b 为底的 a 的对数：log_b(a)
+     *
+     * @param a  a
+     * @param b  b
+     * @param mc 精度
+     * @return log_b(a)
+     */
+    public static BigDecimal log(BigDecimal a, BigDecimal b, MathContext mc) {
+        if (a.compareTo(BigDecimal.ZERO) <= 0)
+            throw new DevoreRuntimeException("log_b(a) 要求a必须大于0.");
+        if (b.compareTo(BigDecimal.ZERO) <= 0)
+            throw new DevoreRuntimeException("log_b(a) 要求b必须大于0.");
+        if (b.compareTo(BigDecimal.ONE) == 0)
+            throw new DevoreRuntimeException("log_b(a) 要求底数b不能为1.");
+        return ln(a, mc).divide(ln(b, mc), mc);
+    }
+
+    /**
      * 使用泰勒级数计算e^x
      *
      * @param x  x

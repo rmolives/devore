@@ -119,8 +119,13 @@ public class DInt extends DNumber {
     }
 
     @Override
-    public DNumber ln() {
-        return DFloat.valueOf(num).ln();
+    public DNumber log() {
+        return DFloat.valueOf(num).log();
+    }
+
+    @Override
+    public DNumber log(DNumber b) {
+        return DFloat.valueOf(num).log(b);
     }
 
     @Override

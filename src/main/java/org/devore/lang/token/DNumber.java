@@ -33,7 +33,9 @@ public abstract class DNumber extends Token {
 
     public abstract DNumber abs();
 
-    public abstract DNumber ln();
+    public abstract DNumber log();
+
+    public abstract DNumber log(DNumber b);
 
     public abstract DNumber exp();
 

@@ -173,11 +173,18 @@ public class Core {
                 return DInt.valueOf(0);
             return DInt.valueOf(n1.toBigInteger().multiply(n2.toBigInteger()).divide(gcd));
         }), 2, false);
-        dEnv.addTokenProcedure("ln", ((args, env) -> {
+        dEnv.addTokenProcedure("log", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
-            return ((DNumber) args.getFirst()).ln();
+            return ((DNumber) args.getFirst()).log();
         }), 1, false);
+        dEnv.addTokenProcedure("log", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            if (!(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            return ((DNumber) args.getFirst()).log((DNumber) args.get(1));
+        }), 2, false);
         dEnv.addTokenProcedure("exp", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");

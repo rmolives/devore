@@ -158,8 +158,14 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public DNumber ln() {
+    public DNumber log() {
         DFloat result = DFloat.valueOf(NumberUtils.ln(this.toBigDecimal(), MathContext.DECIMAL128));
+        return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
+    }
+
+    @Override
+    public DNumber log(DNumber b) {
+        DFloat result = DFloat.valueOf(NumberUtils.log(num, b.toBigDecimal(), MathContext.DECIMAL128));
         return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
