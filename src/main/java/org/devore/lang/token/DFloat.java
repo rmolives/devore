@@ -170,8 +170,8 @@ public class DFloat extends DNumber {
     }
 
     @Override
-    public DNumber atan2(DNumber y) {
-        DFloat result = DFloat.valueOf(NumberUtils.atan2(num, y.toBigDecimal(), MathContext.DECIMAL128));
+    public DNumber atan2(DNumber x) {
+        DFloat result = DFloat.valueOf(NumberUtils.atan2(num, x.toBigDecimal(), MathContext.DECIMAL128));
         return NumberUtils.isInt(result.num) ? DInt.valueOf(result.num) : result;
     }
 
