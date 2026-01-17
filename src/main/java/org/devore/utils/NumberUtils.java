@@ -33,22 +33,32 @@ public class NumberUtils {
      * 计算 atan2(y, x)，返回从正X轴到点(x,y)的角度
      * 能够正确处理所有象限，返回范围在 [-π, π]
      *
-     * @param x  X坐标
      * @param y  Y坐标
+     * @param x  X坐标
      * @param mc 精度上下文
      * @return 角度，范围 [-π, π]
      */
-    public static BigDecimal atan2(BigDecimal x, BigDecimal y, MathContext mc) {
+    public static BigDecimal atan2(BigDecimal y, BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0 &&
+                y.compareTo(BigDecimal.ZERO) == 0)
+            return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            return y.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO :
-                    y.compareTo(BigDecimal.ZERO) > 0 ? PI.divide(BigDecimal.valueOf(2), mc) :
-                            PI.divide(BigDecimal.valueOf(2), mc).negate();
+            return y.compareTo(BigDecimal.ZERO) > 0
+                    ? PI.divide(BigDecimal.valueOf(2), mc)
+                    : PI.divide(BigDecimal.valueOf(2), mc).negate();
         if (y.compareTo(BigDecimal.ZERO) == 0)
-            return x.compareTo(BigDecimal.ZERO) > 0 ? BigDecimal.ZERO : PI;
+            return x.compareTo(BigDecimal.ZERO) > 0
+                    ? BigDecimal.ZERO
+                    : PI;
         BigDecimal ratio = y.divide(x, mc);
         BigDecimal basicAngle = arctan(ratio.abs(), mc);
-        return x.compareTo(BigDecimal.ZERO) > 0 ? y.compareTo(BigDecimal.ZERO) > 0 ? basicAngle : basicAngle.negate()
-                : y.compareTo(BigDecimal.ZERO) > 0 ? PI.subtract(basicAngle, mc) : basicAngle.subtract(PI, mc);
+        return x.compareTo(BigDecimal.ZERO) > 0 ?
+                y.compareTo(BigDecimal.ZERO) > 0
+                        ? basicAngle
+                        : basicAngle.negate()
+                : y.compareTo(BigDecimal.ZERO) > 0
+                ? PI.subtract(basicAngle, mc)
+                : basicAngle.subtract(PI, mc);
     }
 
     /**
