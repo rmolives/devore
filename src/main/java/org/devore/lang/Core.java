@@ -319,6 +319,8 @@ public class Core {
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
+                    if (!(ast.getFirst().symbol instanceof DSymbol))
+                        throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
                     newEnv.addTokenProcedure(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = env.createChild();
                         for (int i = 0; i < params.size(); ++i)
@@ -355,6 +357,8 @@ public class Core {
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
+                    if (!(ast.getFirst().symbol instanceof DSymbol))
+                        throw new DevoreCastException(ast.getFirst().symbol.type(), "symbol");
                     newEnv.addTokenProcedure(ast.getFirst().symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = newEnv.createChild();
                         for (int i = 0; i < params.size(); ++i)
@@ -520,6 +524,8 @@ public class Core {
                 for (int i = 1; i < ast.size(); ++i)
                     result = Evaluator.eval(env, ast.get(i).copy());
                 condition = Evaluator.eval(env, ast.getFirst().copy());
+                if (!(condition instanceof DBool))
+                    throw new DevoreCastException(condition.type(), "bool");
             }
             return result;
         }, 2, true);
@@ -932,7 +938,7 @@ public class Core {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
             System.exit(((DInt) args.getFirst()).toBigInteger().intValue());
-            return args.getFirst();
+            return DWord.NIL;
         }), 1, false);
         dEnv.addTokenProcedure("sleep", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
@@ -940,9 +946,9 @@ public class Core {
             try {
                 Thread.sleep(((DInt) args.getFirst()).toBigInteger().longValue());
             } catch (InterruptedException e) {
-                return args.getFirst();
+                return DWord.NIL;
             }
-            return args.getFirst();
+            return DWord.NIL;
         }), 1, false);
         dEnv.addTokenProcedure("type", ((args, env) -> DString.valueOf(args.getFirst().type())), 1, false);
         dEnv.addTokenProcedure("time", ((args, env) -> DInt.valueOf(System.currentTimeMillis())), 0, false);
