@@ -565,11 +565,8 @@ public class Core {
         dEnv.addTokenProcedure("random", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
-            if (args.size() > 1)
-                if (!(args.get(1) instanceof DInt))
-                    throw new DevoreCastException(args.get(1).type(), "int");
-            BigInteger start = args.size() == 1 ? BigInteger.ZERO : ((DInt) args.getFirst()).toBigInteger();
-            BigInteger end = args.size() == 1 ? ((DInt) args.getFirst()).toBigInteger().subtract(BigInteger.ONE) : ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE);
+            BigInteger start =  BigInteger.ZERO;
+            BigInteger end = ((DInt) args.getFirst()).toBigInteger().subtract(BigInteger.ONE);
             Random rand = new Random();
             BigInteger range = end.subtract(start).add(BigInteger.ONE);
             BigInteger randomValue;
@@ -577,7 +574,22 @@ public class Core {
                 randomValue = new BigInteger(range.bitLength(), rand);
             } while (randomValue.compareTo(range) >= 0);
             return DInt.valueOf(randomValue.add(start));
-        }), 1, true);
+        }), 1, false);
+        dEnv.addTokenProcedure("random", ((args, env) -> {
+            if (!(args.getFirst() instanceof DInt))
+                throw new DevoreCastException(args.getFirst().type(), "int");
+            if (!(args.get(1) instanceof DInt))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            BigInteger start = ((DInt) args.getFirst()).toBigInteger();
+            BigInteger end = ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE);
+            Random rand = new Random();
+            BigInteger range = end.subtract(start).add(BigInteger.ONE);
+            BigInteger randomValue;
+            do {
+                randomValue = new BigInteger(range.bitLength(), rand);
+            } while (randomValue.compareTo(range) >= 0);
+            return DInt.valueOf(randomValue.add(start));
+        }), 2, false);
         dEnv.addTokenProcedure("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 0, true);
         dEnv.addTokenProcedure("list-contains", ((args, env) -> {
             if (!(args.getFirst() instanceof DList))
