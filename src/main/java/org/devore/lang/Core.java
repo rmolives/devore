@@ -565,7 +565,7 @@ public class Core {
         dEnv.addTokenProcedure("random", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt))
                 throw new DevoreCastException(args.getFirst().type(), "int");
-            BigInteger start =  BigInteger.ZERO;
+            BigInteger start = BigInteger.ZERO;
             BigInteger end = ((DInt) args.getFirst()).toBigInteger().subtract(BigInteger.ONE);
             Random rand = new Random();
             BigInteger range = end.subtract(start).add(BigInteger.ONE);
@@ -828,22 +828,48 @@ public class Core {
         dEnv.addTokenProcedure("range", ((args, env) -> {
             if (!(args.getFirst() instanceof DNumber))
                 throw new DevoreCastException(args.getFirst().type(), "number");
-            if (args.size() > 1 && !(args.get(1) instanceof DNumber))
-                throw new DevoreCastException(args.get(1).type(), "number");
-            if (args.size() > 2 && !(args.get(2) instanceof DNumber))
-                throw new DevoreCastException(args.get(2).type(), "number");
-            boolean isFloat = args.getFirst() instanceof DFloat ||
-                    (args.size() > 1 && args.get(1) instanceof DFloat) || (args.size() > 2 && args.get(2) instanceof DFloat);
-            BigDecimal start, end, step;
-            if (args.size() > 1) {
-                start = ((DNumber) args.get(0)).toBigDecimal();
-                step = args.size() > 2 ? ((DNumber) args.get(2)).toBigDecimal() : BigDecimal.ONE;
-                end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
-            } else {
-                start = BigDecimal.ZERO;
-                step = BigDecimal.ONE;
-                end = ((DNumber) args.getFirst()).toBigDecimal().subtract(step);
+            boolean isFloat = args.getFirst() instanceof DFloat;
+            BigDecimal start = BigDecimal.ZERO;
+            BigDecimal step = BigDecimal.ONE;
+            BigDecimal end = ((DNumber) args.getFirst()).toBigDecimal().subtract(step);
+            List<Token> list = new ArrayList<>();
+            for (BigDecimal current = start;
+                 current.compareTo(end) <= 0;
+                 current = current.add(step)) {
+                list.add(!isFloat ? DInt.valueOf(current) : DFloat.valueOf(current));
             }
+            return DList.valueOf(list);
+        }), 1, false);
+        dEnv.addTokenProcedure("range", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            if (!(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            boolean isFloat = args.getFirst() instanceof DFloat || args.get(1) instanceof DFloat;
+            BigDecimal start = ((DNumber) args.get(0)).toBigDecimal();
+            BigDecimal step = BigDecimal.ONE;
+            BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
+            List<Token> list = new ArrayList<>();
+            for (BigDecimal current = start;
+                 current.compareTo(end) <= 0;
+                 current = current.add(step)) {
+                list.add(!isFloat ? DInt.valueOf(current) : DFloat.valueOf(current));
+            }
+            return DList.valueOf(list);
+        }), 2, false);
+        dEnv.addTokenProcedure("range", ((args, env) -> {
+            if (!(args.getFirst() instanceof DNumber))
+                throw new DevoreCastException(args.getFirst().type(), "number");
+            if (!(args.get(1) instanceof DNumber))
+                throw new DevoreCastException(args.get(1).type(), "number");
+            if (!(args.get(2) instanceof DNumber))
+                throw new DevoreCastException(args.get(2).type(), "number");
+            boolean isFloat = args.getFirst() instanceof DFloat
+                    || args.get(1) instanceof DFloat
+                    || args.get(2) instanceof DFloat;
+            BigDecimal start = ((DNumber) args.get(0)).toBigDecimal();
+            BigDecimal step = ((DNumber) args.get(2)).toBigDecimal();
+            BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
             if (step.compareTo(BigDecimal.ZERO) == 0)
                 throw new DevoreRuntimeException("步长不能为零.");
             List<Token> list = new ArrayList<>();
@@ -861,7 +887,7 @@ public class Core {
                 }
             }
             return DList.valueOf(list);
-        }), 1, true);
+        }), 3, false);
         dEnv.addTokenProcedure("string->int", ((args, env) -> {
             if (!(args.getFirst() instanceof DString))
                 throw new DevoreCastException(args.getFirst().type(), "string");
