@@ -131,6 +131,6 @@ public abstract class DNumber extends Token {
 
     @Override
     protected String str() {
-        return NumberUtils.isInt(this.toBigDecimal()) ? this.toBigDecimal().toBigInteger().toString() : this.toBigDecimal().toPlainString();
+        return NumberUtils.isInt(this.toBigDecimal()) ? this.toBigInteger().toString() : this.toBigDecimal().toPlainString();
     }
 }
