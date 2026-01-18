@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public class Env {
-    public final Map<String, Token> table;
-    public final Env father;
-    public final IOConfig io;
+    public final Map<String, Token> table;  // 环境表
+    public final Env father;                // 父环境
+    public final IOConfig io;               // IO表
 
     /**
      * 创建环境

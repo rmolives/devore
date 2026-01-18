@@ -183,14 +183,14 @@ public class Core {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
-            env.io.out().println(builder);
+            env.io.out.println(builder);
             return DWord.NIL;
         }), 1, true);
         dEnv.addTokenProcedure("print", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (Token t : args)
                 builder.append(t);
-            env.io.out().print(builder);
+            env.io.out.print(builder);
             return DWord.NIL;
         }), 1, true);
         dEnv.addSymbolProcedure("undef", ((ast, env) -> {
@@ -488,17 +488,17 @@ public class Core {
             return result;
         }, 2, true);
         dEnv.addTokenProcedure("read-line", ((args, env) ->
-                DString.valueOf(new Scanner(env.io.in()).nextLine())), 0, false);
+                DString.valueOf(new Scanner(env.io.in).nextLine())), 0, false);
         dEnv.addTokenProcedure("read-int", ((args, env) ->
-                DNumber.valueOf(new Scanner(env.io.in()).nextBigInteger())), 0, false);
+                DNumber.valueOf(new Scanner(env.io.in).nextBigInteger())), 0, false);
         dEnv.addTokenProcedure("read-float", ((args, env) ->
-                DNumber.valueOf(new Scanner(env.io.in()).nextBigDecimal())), 0, false);
+                DNumber.valueOf(new Scanner(env.io.in).nextBigDecimal())), 0, false);
         dEnv.addTokenProcedure("read-bool", ((args, env) ->
-                DBool.valueOf(new Scanner(env.io.in()).nextBoolean())), 0, false);
+                DBool.valueOf(new Scanner(env.io.in).nextBoolean())), 0, false);
         dEnv.addTokenProcedure("read", ((args, env) ->
-                DString.valueOf(new Scanner(env.io.in()).next())), 0, false);
+                DString.valueOf(new Scanner(env.io.in).next())), 0, false);
         dEnv.addTokenProcedure("newline", ((args, env) -> {
-            env.io.out().println();
+            env.io.out.println();
             return DWord.NIL;
         }), 0, false);
         dEnv.addTokenProcedure("and", ((args, env) -> {
