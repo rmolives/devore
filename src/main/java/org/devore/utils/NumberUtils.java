@@ -229,8 +229,7 @@ public class NumberUtils {
      * @return 结果
      */
     public static boolean isInt(BigDecimal decimal) {
-        BigDecimal stripped = decimal.stripTrailingZeros();
-        return stripped.scale() <= 0;
+        return decimal.stripTrailingZeros().scale() <= 0;
     }
 
     /**
