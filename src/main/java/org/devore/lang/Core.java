@@ -758,15 +758,11 @@ public class Core {
             }
             return DList.valueOf(list);
         }), 3, false);
-        dEnv.addTokenProcedure("string->int", ((args, env) -> {
-            if (!(args.getFirst() instanceof DString)) throw new DevoreCastException(args.getFirst().type(), "string");
-            return DNumber.valueOf(new BigInteger(args.getFirst().toString()));
-        }), 1, false);
         dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
             if (!(args.getFirst() instanceof DString)) throw new DevoreCastException(args.getFirst().type(), "string");
             return DSymbol.valueOf(args.getFirst().toString());
         }), 1, false);
-        dEnv.addTokenProcedure("string->float", ((args, env) -> {
+        dEnv.addTokenProcedure("string->number", ((args, env) -> {
             if (!(args.getFirst() instanceof DString)) throw new DevoreCastException(args.getFirst().type(), "string");
             return DNumber.valueOf(new BigDecimal(args.getFirst().toString()));
         }), 1, false);
