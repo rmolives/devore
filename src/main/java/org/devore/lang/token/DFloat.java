@@ -11,7 +11,7 @@ import java.math.BigInteger;
 public class DFloat extends DNumber {
     public final BigDecimal num;
 
-    public DFloat(BigDecimal num) {
+    protected DFloat(BigDecimal num) {
         this.num = num;
     }
 

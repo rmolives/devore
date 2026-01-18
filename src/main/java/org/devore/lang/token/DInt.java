@@ -9,7 +9,7 @@ import java.math.BigInteger;
 public class DInt extends DNumber {
     public final BigInteger num;
 
-    public DInt(BigInteger num) {
+    protected DInt(BigInteger num) {
         this.num = num;
     }
 
