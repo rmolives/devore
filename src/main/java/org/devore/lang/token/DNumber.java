@@ -1,5 +1,6 @@
 package org.devore.lang.token;
 
+import org.devore.exception.DevoreRuntimeException;
 import org.devore.utils.NumberUtils;
 
 import java.math.BigDecimal;
@@ -40,6 +41,8 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber div(DNumber a) {
+        if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0)
+            throw new DevoreRuntimeException("除数不能为0.");
         return DNumber.valueOf(this.toBigDecimal().divide(a.toBigDecimal(), MathContext.DECIMAL128));
     }
 
