@@ -6,7 +6,7 @@ import java.io.PrintStream;
 /**
  * IO表
  */
-public final class IOConfig {
+public class IOConfig {
     public final InputStream in;    // 输入流
     public final PrintStream out;   // 输出流
 
