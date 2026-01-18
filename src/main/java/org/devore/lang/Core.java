@@ -123,7 +123,7 @@ public class Core {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
             DInt n1 = (DInt) args.get(0);
-            DInt n2 = (DInt) args.get(0);
+            DInt n2 = (DInt) args.get(1);
             for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
                  i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
                 if (n1.toBigInteger().mod(i).equals(BigInteger.ZERO) && n2.toBigInteger().mod(i).equals(BigInteger.ZERO))
@@ -134,7 +134,7 @@ public class Core {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
             DInt n1 = (DInt) args.get(0);
-            DInt n2 = (DInt) args.get(0);
+            DInt n2 = (DInt) args.get(1);
             BigInteger gcd = BigInteger.ONE;
             for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
                  i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
