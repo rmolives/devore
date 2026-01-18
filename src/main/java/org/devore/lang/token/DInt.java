@@ -36,14 +36,4 @@ public class DInt extends DNumber {
     protected String str() {
         return num.toString();
     }
-
-    @Override
-    public Token copy() {
-        return DNumber.valueOf(num);
-    }
-
-    @Override
-    public int compareTo(Token t) {
-        return t instanceof DNumber n ? this.toBigDecimal().compareTo(n.toBigDecimal()) : -1;
-    }
 }

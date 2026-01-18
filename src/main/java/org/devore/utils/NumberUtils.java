@@ -342,7 +342,7 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new DevoreRuntimeException("非整数指数的负数.");
         // General case: x^y = exp(y * ln(x))
-        return exp(y.multiply(ln(x, mc)), mc);
+        return exp(y.multiply(log(x, mc)), mc);
     }
 
     /**
@@ -372,7 +372,7 @@ public class NumberUtils {
      * @param mc 精度
      * @return ln(x)
      */
-    public static BigDecimal ln(BigDecimal x, MathContext mc) {
+    public static BigDecimal log(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0)
             throw new DevoreRuntimeException("非正数的对数.");
         // Use ln(x) = 2*atanh((x-1)/(x+1)) for better convergence
@@ -406,7 +406,7 @@ public class NumberUtils {
             throw new DevoreRuntimeException("log_b(a) 要求b必须大于0.");
         if (b.compareTo(BigDecimal.ONE) == 0)
             throw new DevoreRuntimeException("log_b(a) 要求底数b不能为1.");
-        return ln(a, mc).divide(ln(b, mc), mc);
+        return log(a, mc).divide(log(b, mc), mc);
     }
 
     /**

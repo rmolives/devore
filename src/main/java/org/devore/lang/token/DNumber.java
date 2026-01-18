@@ -41,8 +41,7 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber div(DNumber a) {
-        if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("除数不能为0.");
+        if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0) throw new DevoreRuntimeException("除数不能为0.");
         return DNumber.valueOf(this.toBigDecimal().divide(a.toBigDecimal(), MathContext.DECIMAL128));
     }
 
@@ -79,9 +78,7 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber truncate() {
-        return DNumber.valueOf(this.toBigDecimal().signum() >= 0
-                ? this.toBigDecimal().setScale(0, RoundingMode.FLOOR)
-                : this.toBigDecimal().setScale(0, RoundingMode.CEILING));
+        return DNumber.valueOf(this.toBigDecimal().signum() >= 0 ? this.toBigDecimal().setScale(0, RoundingMode.FLOOR) : this.toBigDecimal().setScale(0, RoundingMode.CEILING));
     }
 
     public DNumber round() {
@@ -101,7 +98,7 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber log() {
-        return DNumber.valueOf(NumberUtils.ln(this.toBigDecimal(), MathContext.DECIMAL128));
+        return DNumber.valueOf(NumberUtils.log(this.toBigDecimal(), MathContext.DECIMAL128));
     }
 
     public DNumber log(DNumber b) {
@@ -119,4 +116,19 @@ public abstract class DNumber extends Token {
     public abstract BigInteger toBigInteger();
 
     public abstract BigDecimal toBigDecimal();
+
+    @Override
+    public int compareTo(Token t) {
+        return t instanceof DNumber n ? this.toBigDecimal().compareTo(n.toBigDecimal()) : -1;
+    }
+
+    @Override
+    public Token copy() {
+        return DNumber.valueOf(this.toBigDecimal());
+    }
+
+    @Override
+    protected String str() {
+        return NumberUtils.isInt(this.toBigDecimal()) ? this.toBigDecimal().toBigInteger().toString() : this.toBigDecimal().toPlainString();
+    }
 }

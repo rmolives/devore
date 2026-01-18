@@ -1,7 +1,5 @@
 package org.devore.lang.token;
 
-import org.devore.utils.NumberUtils;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -28,20 +26,5 @@ public class DFloat extends DNumber {
     @Override
     public String type() {
         return "float";
-    }
-
-    @Override
-    protected String str() {
-        return NumberUtils.isInt(num) ? DInt.valueOf(num).toString() : num.toPlainString();
-    }
-
-    @Override
-    public Token copy() {
-        return DNumber.valueOf(num);
-    }
-
-    @Override
-    public int compareTo(Token t) {
-        return t instanceof DNumber n ? num.compareTo(n.toBigDecimal()) : -1;
     }
 }
