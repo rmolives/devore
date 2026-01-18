@@ -58,7 +58,7 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber arctan() {
-        return DNumber.valueOf(NumberUtils.tan(this.toBigDecimal(), MathContext.DECIMAL128));
+        return DNumber.valueOf(NumberUtils.arctan(this.toBigDecimal(), MathContext.DECIMAL128));
     }
 
     public DNumber arcsin() {
