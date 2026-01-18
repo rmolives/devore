@@ -543,9 +543,9 @@ public class Core {
         }), 3, false);
         dEnv.addTokenProcedure("list-remove", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list)) throw new DevoreCastException(args.getFirst().type(), "list");
+            if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
             if (list.size() == 0) return DWord.NIL;
-            if (args.get(1) instanceof DInt) return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), false);
-            return list.remove(args.get(1), false);
+            return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), false);
         }), 2, false);
         dEnv.addTokenProcedure("list-add", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list)) throw new DevoreCastException(args.getFirst().type(), "list");
@@ -564,9 +564,9 @@ public class Core {
         }), 3, false);
         dEnv.addTokenProcedure("list-remove!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list)) throw new DevoreCastException(args.getFirst().type(), "list");
+            if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
             if (list.size() == 0) return DWord.NIL;
-            if (args.get(1) instanceof DInt) return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), true);
-            return list.remove(args.get(1), false);
+            return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), true);
         }), 2, false);
         dEnv.addTokenProcedure("list-add!", ((args, env) -> {
             if (!(args.getFirst() instanceof DList)) throw new DevoreCastException(args.getFirst().type(), "list");

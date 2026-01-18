@@ -79,16 +79,6 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
-    public DList remove(Token t, boolean force) {
-        if (force) {
-            tokens.remove(t);
-            return this;
-        }
-        List<Token> newList = new ArrayList<>(tokens);
-        newList.remove(t);
-        return DList.valueOf(newList);
-    }
-
     public boolean contains(Token t) {
         return tokens.contains(t);
     }
