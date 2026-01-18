@@ -122,7 +122,8 @@ public class Core {
         dEnv.addTokenProcedure("gcd", ((args, env) -> {
             if (!(args.getFirst() instanceof DInt n1)) throw new DevoreCastException(args.getFirst().type(), "int");
             if (!(args.get(1) instanceof DInt n2)) throw new DevoreCastException(args.get(1).type(), "int");
-            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger(); i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
+            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
+                 i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
                 if (n1.toBigInteger().mod(i).equals(BigInteger.ZERO) && n2.toBigInteger().mod(i).equals(BigInteger.ZERO))
                     return DNumber.valueOf(i);
             return DNumber.valueOf(1);
@@ -131,7 +132,8 @@ public class Core {
             if (!(args.getFirst() instanceof DInt n1)) throw new DevoreCastException(args.getFirst().type(), "int");
             if (!(args.get(1) instanceof DInt n2)) throw new DevoreCastException(args.get(1).type(), "int");
             BigInteger gcd = BigInteger.ONE;
-            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger(); i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
+            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
+                 i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
                 if (n1.toBigInteger().mod(i).equals(BigInteger.ZERO) && n2.toBigInteger().mod(i).equals(BigInteger.ZERO)) {
                     gcd = i;
                     break;
@@ -392,12 +394,18 @@ public class Core {
                 asts.add(new AstNode(arg));
             return ((DProcedure) args.getFirst()).call(asts, env);
         }), 2, false);
-        dEnv.addTokenProcedure(">", ((args, env) -> DBool.valueOf(args.getFirst().compareTo(args.get(1)) > 0)), 2, false);
-        dEnv.addTokenProcedure("<", ((args, env) -> DBool.valueOf(args.getFirst().compareTo(args.get(1)) < 0)), 2, false);
-        dEnv.addTokenProcedure("=", ((args, env) -> DBool.valueOf(args.getFirst().compareTo(args.get(1)) == 0)), 2, false);
-        dEnv.addTokenProcedure("/=", ((args, env) -> DBool.valueOf(args.getFirst().compareTo(args.get(1)) != 0)), 2, false);
-        dEnv.addTokenProcedure(">=", ((args, env) -> DBool.valueOf(args.getFirst().compareTo(args.get(1)) >= 0)), 2, false);
-        dEnv.addTokenProcedure("<=", ((args, env) -> DBool.valueOf(args.getFirst().compareTo(args.get(1)) <= 0)), 2, false);
+        dEnv.addTokenProcedure(">", ((args, env) ->
+                DBool.valueOf(args.getFirst().compareTo(args.get(1)) > 0)), 2, false);
+        dEnv.addTokenProcedure("<", ((args, env) ->
+                DBool.valueOf(args.getFirst().compareTo(args.get(1)) < 0)), 2, false);
+        dEnv.addTokenProcedure("=", ((args, env) ->
+                DBool.valueOf(args.getFirst().compareTo(args.get(1)) == 0)), 2, false);
+        dEnv.addTokenProcedure("/=", ((args, env) ->
+                DBool.valueOf(args.getFirst().compareTo(args.get(1)) != 0)), 2, false);
+        dEnv.addTokenProcedure(">=", ((args, env) ->
+                DBool.valueOf(args.getFirst().compareTo(args.get(1)) >= 0)), 2, false);
+        dEnv.addTokenProcedure("<=", ((args, env) ->
+                DBool.valueOf(args.getFirst().compareTo(args.get(1)) <= 0)), 2, false);
         dEnv.addSymbolProcedure("unless", (ast, env) -> {
             Token result = DWord.NIL;
             Token condition = Evaluator.eval(env, ast.getFirst().copy());
@@ -471,11 +479,16 @@ public class Core {
             }
             return result;
         }, 2, true);
-        dEnv.addTokenProcedure("read-line", ((args, env) -> DString.valueOf(new Scanner(env.io().in()).nextLine())), 0, false);
-        dEnv.addTokenProcedure("read-int", ((args, env) -> DNumber.valueOf(new Scanner(env.io().in()).nextBigInteger())), 0, false);
-        dEnv.addTokenProcedure("read-float", ((args, env) -> DNumber.valueOf(new Scanner(env.io().in()).nextBigDecimal())), 0, false);
-        dEnv.addTokenProcedure("read-bool", ((args, env) -> DBool.valueOf(new Scanner(env.io().in()).nextBoolean())), 0, false);
-        dEnv.addTokenProcedure("read", ((args, env) -> DString.valueOf(new Scanner(env.io().in()).next())), 0, false);
+        dEnv.addTokenProcedure("read-line", ((args, env) ->
+                DString.valueOf(new Scanner(env.io().in()).nextLine())), 0, false);
+        dEnv.addTokenProcedure("read-int", ((args, env) ->
+                DNumber.valueOf(new Scanner(env.io().in()).nextBigInteger())), 0, false);
+        dEnv.addTokenProcedure("read-float", ((args, env) ->
+                DNumber.valueOf(new Scanner(env.io().in()).nextBigDecimal())), 0, false);
+        dEnv.addTokenProcedure("read-bool", ((args, env) ->
+                DBool.valueOf(new Scanner(env.io().in()).nextBoolean())), 0, false);
+        dEnv.addTokenProcedure("read", ((args, env) ->
+                DString.valueOf(new Scanner(env.io().in()).next())), 0, false);
         dEnv.addTokenProcedure("newline", ((args, env) -> {
             env.io().out().println();
             return DWord.NIL;
@@ -737,9 +750,10 @@ public class Core {
             BigDecimal start = BigDecimal.ZERO;
             BigDecimal step = BigDecimal.ONE;
             BigDecimal end = ((DNumber) args.getFirst()).toBigDecimal().subtract(step);
+            boolean isFloat = args.getFirst() instanceof DFloat;
             List<Token> list = new ArrayList<>();
             for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                list.add(DNumber.valueOf(current));
+                list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
             return DList.valueOf(list);
         }), 1, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
@@ -748,9 +762,10 @@ public class Core {
             BigDecimal start = ((DNumber) args.get(0)).toBigDecimal();
             BigDecimal step = BigDecimal.ONE;
             BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
+            boolean isFloat = args.getFirst() instanceof DFloat || args.get(1) instanceof DFloat;
             List<Token> list = new ArrayList<>();
             for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                list.add(DNumber.valueOf(current));
+                list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
             return DList.valueOf(list);
         }), 2, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
@@ -761,13 +776,14 @@ public class Core {
             BigDecimal step = ((DNumber) args.get(2)).toBigDecimal();
             BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
             if (step.compareTo(BigDecimal.ZERO) == 0) throw new DevoreRuntimeException("步长不能为零.");
+            boolean isFloat = args.getFirst() instanceof DFloat || args.get(1) instanceof DFloat || args.get(2) instanceof DFloat;
             List<Token> list = new ArrayList<>();
             if (step.compareTo(BigDecimal.ZERO) > 0) {
                 for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                    list.add(DNumber.valueOf(current));
+                    list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
             } else {
                 for (BigDecimal current = start; current.compareTo(end) >= 0; current = current.add(step))
-                    list.add(DNumber.valueOf(current));
+                    list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
             }
             return DList.valueOf(list);
         }), 3, false);
@@ -865,18 +881,31 @@ public class Core {
                 if (args.get(i).compareTo(t) < 0) t = args.get(i);
             return t;
         }), 1, true);
-        dEnv.addTokenProcedure("bool?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DBool)), 1, false);
-        dEnv.addTokenProcedure("float?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DFloat)), 1, false);
-        dEnv.addTokenProcedure("int?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DInt)), 1, false);
-        dEnv.addTokenProcedure("list?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DList)), 1, false);
-        dEnv.addTokenProcedure("macro?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DMacro)), 1, false);
-        dEnv.addTokenProcedure("number?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DNumber)), 1, false);
-        dEnv.addTokenProcedure("procedure?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DProcedure)), 1, false);
-        dEnv.addTokenProcedure("string?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DString)), 1, false);
-        dEnv.addTokenProcedure("symbol?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DSymbol)), 1, false);
-        dEnv.addTokenProcedure("table?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DTable)), 1, false);
-        dEnv.addTokenProcedure("word?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DWord)), 1, false);
-        dEnv.addTokenProcedure("nil?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DWord word && word == DWord.NIL)), 1, false);
-        dEnv.addTokenProcedure("zero?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DNumber number && number.toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
+        dEnv.addTokenProcedure("bool?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DBool)), 1, false);
+        dEnv.addTokenProcedure("float?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DFloat)), 1, false);
+        dEnv.addTokenProcedure("int?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DInt)), 1, false);
+        dEnv.addTokenProcedure("list?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DList)), 1, false);
+        dEnv.addTokenProcedure("macro?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DMacro)), 1, false);
+        dEnv.addTokenProcedure("number?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DNumber)), 1, false);
+        dEnv.addTokenProcedure("procedure?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DProcedure)), 1, false);
+        dEnv.addTokenProcedure("string?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DString)), 1, false);
+        dEnv.addTokenProcedure("symbol?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DSymbol)), 1, false);
+        dEnv.addTokenProcedure("table?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DTable)), 1, false);
+        dEnv.addTokenProcedure("word?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DWord)), 1, false);
+        dEnv.addTokenProcedure("nil?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DWord word && word == DWord.NIL)), 1, false);
+        dEnv.addTokenProcedure("zero?", ((args, env) ->
+                DBool.valueOf(args.getFirst() instanceof DNumber number && number.toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
     }
 }

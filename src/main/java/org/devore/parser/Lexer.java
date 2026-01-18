@@ -1,10 +1,12 @@
 package org.devore.parser;
 
 import org.devore.lang.token.*;
+import org.devore.utils.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,8 +142,8 @@ public class Lexer {
                     tokens.add(DNumber.valueOf(negative ? v.subtract(v.multiply(BigInteger.TWO)) : v));
                     continue;
                 }
-                var x = new BigDecimal(v);
-                var d = BigDecimal.valueOf(10);
+                BigDecimal x = new BigDecimal(v);
+                BigDecimal d = BigDecimal.valueOf(10);
                 ++index;
                 while (true) {
                     ++index;
@@ -152,7 +154,8 @@ public class Lexer {
                     x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index])).divide(d, MathContext.DECIMAL128));
                     d = d.multiply(BigDecimal.valueOf(10));
                 }
-                tokens.add(DNumber.valueOf(negative ? x.subtract(x.multiply(BigDecimal.valueOf(2))) : x));
+                BigDecimal r = negative ? x.subtract(x.multiply(BigDecimal.valueOf(2))) : x;
+                tokens.add(DNumber.valueOf(NumberUtils.isInt(r) ? r.setScale(1, RoundingMode.FLOOR) : r));
                 continue;
             }
             if (expressionCharArray[index] == '\"') {

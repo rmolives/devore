@@ -31,9 +31,4 @@ public class DInt extends DNumber {
     public String type() {
         return "int";
     }
-
-    @Override
-    protected String str() {
-        return num.toString();
-    }
 }

@@ -5,8 +5,6 @@ import org.devore.lang.token.DWord;
 import org.devore.lang.token.Token;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class Repl {
     /**
@@ -37,10 +35,7 @@ public class Repl {
                 out.println(Devore.VERSION_MESSAGE);
             else if (read.startsWith(":clear"))
                 env = Env.newEnv();
-            else if (read.startsWith(":load")) {
-                String[] files = read.substring(6).split(" ");
-                for (String file : files) codeBuilder.append(Files.readString(Path.of(file)));
-            } else {
+            else {
                 codeBuilder.append(read);
                 char[] codeCharArray = codeBuilder.toString().toCharArray();
                 boolean skip = false;

@@ -17,7 +17,7 @@ public abstract class DNumber extends Token {
     }
 
     public static DNumber valueOf(double n) {
-        return NumberUtils.isInt(BigDecimal.valueOf(n)) ? new DInt(BigDecimal.valueOf(n).toBigInteger()) : new DFloat(BigDecimal.valueOf(n));
+        return new DFloat(BigDecimal.valueOf(n));
     }
 
     public static DNumber valueOf(BigInteger n) {
@@ -25,24 +25,28 @@ public abstract class DNumber extends Token {
     }
 
     public static DNumber valueOf(BigDecimal n) {
-        return NumberUtils.isInt(n) ? new DInt(n.toBigInteger()) : new DFloat(n);
+        return new DFloat(n);
     }
 
     public DNumber add(DNumber a) {
-        return DNumber.valueOf(this.toBigDecimal().add(a.toBigDecimal()));
+        DNumber result = DNumber.valueOf(this.toBigDecimal().add(a.toBigDecimal()));
+        return (this instanceof DFloat || a instanceof DFloat) ? result : DNumber.valueOf(result.toBigInteger());
     }
 
     public DNumber sub(DNumber a) {
-        return DNumber.valueOf(this.toBigDecimal().subtract(a.toBigDecimal()));
+        DNumber result = DNumber.valueOf(this.toBigDecimal().subtract(a.toBigDecimal()));
+        return (this instanceof DFloat || a instanceof DFloat) ? result : DNumber.valueOf(result.toBigInteger());
     }
 
     public DNumber mul(DNumber a) {
-        return DNumber.valueOf(this.toBigDecimal().multiply(a.toBigDecimal()));
+        DNumber result = DNumber.valueOf(this.toBigDecimal().multiply(a.toBigDecimal()));
+        return (this instanceof DFloat || a instanceof DFloat) ? result : DNumber.valueOf(result.toBigInteger());
     }
 
     public DNumber div(DNumber a) {
         if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0) throw new DevoreRuntimeException("除数不能为0.");
-        return DNumber.valueOf(this.toBigDecimal().divide(a.toBigDecimal(), MathContext.DECIMAL128));
+        DNumber result = DNumber.valueOf(this.toBigDecimal().divide(a.toBigDecimal(), MathContext.DECIMAL128));
+        return (this instanceof DFloat || a instanceof DFloat) ? result : DNumber.valueOf(result.toBigInteger());
     }
 
     public DNumber sin() {
@@ -70,19 +74,21 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber ceiling() {
-        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.CEILING));
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.CEILING).toBigInteger());
     }
 
     public DNumber floor() {
-        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.FLOOR));
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.FLOOR).toBigInteger());
     }
 
     public DNumber truncate() {
-        return DNumber.valueOf(this.toBigDecimal().signum() >= 0 ? this.toBigDecimal().setScale(0, RoundingMode.FLOOR) : this.toBigDecimal().setScale(0, RoundingMode.CEILING));
+        return DNumber.valueOf((this.toBigDecimal().signum() >= 0
+                ? this.toBigDecimal().setScale(0, RoundingMode.FLOOR)
+                : this.toBigDecimal().setScale(0, RoundingMode.CEILING)).toBigInteger());
     }
 
     public DNumber round() {
-        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.HALF_UP).toBigInteger());
     }
 
     public DNumber sqrt() {
@@ -90,11 +96,14 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber pow(DNumber n) {
-        return DNumber.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+        DNumber result = DNumber.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+        return (this instanceof DFloat || n instanceof DFloat || !NumberUtils.isInt(result.toBigDecimal()))
+                ? result : DNumber.valueOf(result.toBigInteger());
     }
 
     public DNumber abs() {
-        return DNumber.valueOf(this.toBigDecimal().abs());
+        DNumber result = DNumber.valueOf(this.toBigDecimal().abs());
+        return this instanceof DFloat ? result : DNumber.valueOf(result.toBigInteger());
     }
 
     public DNumber log() {
@@ -124,11 +133,11 @@ public abstract class DNumber extends Token {
 
     @Override
     public Token copy() {
-        return DNumber.valueOf(this.toBigDecimal());
+        return this instanceof DFloat ? DNumber.valueOf(this.toBigDecimal()) : DNumber.valueOf(this.toBigInteger());
     }
 
     @Override
     protected String str() {
-        return NumberUtils.isInt(this.toBigDecimal()) ? this.toBigDecimal().toBigInteger().toString() : this.toBigDecimal().toPlainString();
+        return this instanceof DFloat ? this.toBigDecimal().toPlainString() : this.toBigInteger().toString();
     }
 }
