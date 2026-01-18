@@ -93,23 +93,23 @@ public class Core {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).tan();
         }), 1, false);
-        dEnv.addTokenProcedure("arctan", ((args, env) -> {
+        dEnv.addTokenProcedure("atan", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arctan();
         }), 1, false);
-        dEnv.addTokenProcedure("arcsin", ((args, env) -> {
+        dEnv.addTokenProcedure("atan", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
+            if (!(args.get(1) instanceof DNumber)) throw new DevoreCastException(args.get(1).type(), "number");
+            return ((DNumber) args.get(0)).arctan((DNumber) args.get(1));
+        }), 2, false);
+        dEnv.addTokenProcedure("asin", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arcsin();
         }), 1, false);
-        dEnv.addTokenProcedure("arccos", ((args, env) -> {
+        dEnv.addTokenProcedure("acos", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arccos();
         }), 1, false);
-        dEnv.addTokenProcedure("arctan2", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
-            if (!(args.get(1) instanceof DNumber)) throw new DevoreCastException(args.get(1).type(), "number");
-            return ((DNumber) args.get(0)).arctan2((DNumber) args.get(1));
-        }), 2, false);
         dEnv.addTokenProcedure("prime?", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             return DBool.valueOf(((DInt) args.get(0)).toBigInteger().isProbablePrime(100));
