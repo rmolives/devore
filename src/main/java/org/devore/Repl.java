@@ -10,12 +10,12 @@ public class Repl {
     /**
      * REPL
      *
-     * @param in   输入流
-     * @param out  输出流
      * @param dEnv 环境
      * @throws IOException 错误
      */
-    public static void repl(InputStream in, PrintStream out, Env dEnv) throws IOException {
+    public static void repl(Env dEnv) throws IOException {
+        InputStream in = dEnv.io.in;
+        PrintStream out = dEnv.io.out;
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder codeBuilder = new StringBuilder();
         Env env = dEnv;
