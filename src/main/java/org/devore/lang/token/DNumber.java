@@ -1,53 +1,117 @@
 package org.devore.lang.token;
 
+import org.devore.utils.NumberUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 /**
  * 数字
  */
 public abstract class DNumber extends Token {
-    public abstract DNumber sin();
+    public static DNumber valueOf(long n) {
+        return new DInt(BigInteger.valueOf(n));
+    }
 
-    public abstract DNumber cos();
+    public static DNumber valueOf(double n) {
+        return NumberUtils.isInt(BigDecimal.valueOf(n)) ? new DInt(BigDecimal.valueOf(n).toBigInteger()) : new DFloat(BigDecimal.valueOf(n));
+    }
 
-    public abstract DNumber tan();
+    public static DNumber valueOf(BigInteger n) {
+        return new DInt(n);
+    }
 
-    public abstract DNumber arctan();
+    public static DNumber valueOf(BigDecimal n) {
+        return NumberUtils.isInt(n) ? new DInt(n.toBigInteger()) : new DFloat(n);
+    }
 
-    public abstract DNumber arcsin();
+    public DNumber add(DNumber a) {
+        return DNumber.valueOf(this.toBigDecimal().add(a.toBigDecimal()));
+    }
 
-    public abstract DNumber arccos();
+    public DNumber sub(DNumber a) {
+        return DNumber.valueOf(this.toBigDecimal().subtract(a.toBigDecimal()));
+    }
 
-    public abstract DNumber ceiling();
+    public DNumber mul(DNumber a) {
+        return DNumber.valueOf(this.toBigDecimal().multiply(a.toBigDecimal()));
+    }
 
-    public abstract DNumber floor();
+    public DNumber div(DNumber a) {
+        return DNumber.valueOf(this.toBigDecimal().divide(a.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber truncate();
+    public DNumber sin() {
+        return DNumber.valueOf(NumberUtils.sin(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber round();
+    public DNumber cos() {
+        return DNumber.valueOf(NumberUtils.cos(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber sqrt();
+    public DNumber tan() {
+        return DNumber.valueOf(NumberUtils.tan(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber pow(DNumber n);
+    public DNumber arctan() {
+        return DNumber.valueOf(NumberUtils.tan(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber abs();
+    public DNumber arcsin() {
+        return DNumber.valueOf(NumberUtils.arcsin(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber log();
+    public DNumber arccos() {
+        return DNumber.valueOf(NumberUtils.arccos(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber log(DNumber b);
+    public DNumber ceiling() {
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.CEILING));
+    }
 
-    public abstract DNumber atan2(DNumber x);
+    public DNumber floor() {
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.FLOOR));
+    }
 
-    public abstract DNumber exp();
+    public DNumber truncate() {
+        return DNumber.valueOf(this.toBigDecimal().signum() >= 0
+                ? this.toBigDecimal().setScale(0, RoundingMode.FLOOR)
+                : this.toBigDecimal().setScale(0, RoundingMode.CEILING));
+    }
 
-    public abstract DNumber add(DNumber a);
+    public DNumber round() {
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.HALF_UP));
+    }
 
-    public abstract DNumber sub(DNumber a);
+    public DNumber sqrt() {
+        return DNumber.valueOf(NumberUtils.sqrt(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber mul(DNumber a);
+    public DNumber pow(DNumber n) {
+        return DNumber.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
-    public abstract DNumber div(DNumber a);
+    public DNumber abs() {
+        return DNumber.valueOf(this.toBigDecimal().abs());
+    }
+
+    public DNumber log() {
+        return DNumber.valueOf(NumberUtils.ln(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    public DNumber log(DNumber b) {
+        return DNumber.valueOf(NumberUtils.log(this.toBigDecimal(), b.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    public DNumber atan2(DNumber x) {
+        return DNumber.valueOf(NumberUtils.atan2(this.toBigDecimal(), x.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    public DNumber exp() {
+        return DNumber.valueOf(NumberUtils.exp(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
 
     public abstract BigInteger toBigInteger();
 
