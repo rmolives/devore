@@ -750,10 +750,9 @@ public class Core {
             BigDecimal start = BigDecimal.ZERO;
             BigDecimal step = BigDecimal.ONE;
             BigDecimal end = ((DNumber) args.getFirst()).toBigDecimal().subtract(step);
-            boolean isFloat = args.getFirst() instanceof DFloat;
             List<Token> list = new ArrayList<>();
             for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
+                list.add(DNumber.valueOf(current));
             return DList.valueOf(list);
         }), 1, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
@@ -762,10 +761,9 @@ public class Core {
             BigDecimal start = ((DNumber) args.get(0)).toBigDecimal();
             BigDecimal step = BigDecimal.ONE;
             BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
-            boolean isFloat = args.getFirst() instanceof DFloat || args.get(1) instanceof DFloat;
             List<Token> list = new ArrayList<>();
             for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
+                list.add(DNumber.valueOf(current));
             return DList.valueOf(list);
         }), 2, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
@@ -776,14 +774,13 @@ public class Core {
             BigDecimal step = ((DNumber) args.get(2)).toBigDecimal();
             BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
             if (step.compareTo(BigDecimal.ZERO) == 0) throw new DevoreRuntimeException("步长不能为零.");
-            boolean isFloat = args.getFirst() instanceof DFloat || args.get(1) instanceof DFloat || args.get(2) instanceof DFloat;
             List<Token> list = new ArrayList<>();
             if (step.compareTo(BigDecimal.ZERO) > 0) {
                 for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                    list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
+                    list.add(DNumber.valueOf(current));
             } else {
                 for (BigDecimal current = start; current.compareTo(end) >= 0; current = current.add(step))
-                    list.add(isFloat ? DNumber.valueOf(current) : DNumber.valueOf(current.toBigInteger()));
+                    list.add(DNumber.valueOf(current));
             }
             return DList.valueOf(list);
         }), 3, false);
