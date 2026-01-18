@@ -22,7 +22,7 @@ public final class IOConfig {
     }
 
     /**
-     * 创建默认IO表（等价于 record 的紧凑构造器）
+     * 创建默认IO表
      */
     public IOConfig() {
         this(System.in, System.out);
