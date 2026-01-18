@@ -55,10 +55,6 @@ public class DList extends Token {
         return tokens.get(index);
     }
 
-    public Token getFirst() {
-        return get(0);
-    }
-
     public Token set(int index, Token t, boolean force) {
         if (force) {
             tokens.set(index, t);
@@ -120,7 +116,10 @@ public class DList extends Token {
 
     @Override
     public int compareTo(Token t) {
-        if (!(t instanceof DList list) || list.size() != this.size())
+        if (!(t instanceof DList))
+            return -1;
+        DList list = (DList) t;
+        if (list.size() != this.size())
             return -1;
         for (int i = 0; i < this.size(); ++i)
             if (!list.get(i).equals(this.get(i)))

@@ -23,7 +23,8 @@ public class Evaluator {
             else
                 break;
         }
-        if (ast.symbol instanceof DMacro macro) {
+        if (ast.symbol instanceof DMacro) {
+            DMacro macro = (DMacro) ast.symbol;
             List<AstNode> bodys = macro.expand(ast.children);
             Token result = DWord.NIL;
             for (AstNode temp : bodys)
@@ -32,7 +33,8 @@ public class Evaluator {
         }
         if (ast.isEmpty() && ast.type != AstNode.AstType.PROCEDURE)
             return ast.symbol;
-        if (ast.symbol instanceof DProcedure procedure) {
+        if (ast.symbol instanceof DProcedure) {
+            DProcedure procedure = (DProcedure) ast.symbol;
             ast.symbol = procedure.call(ast, env);
             ast.clear();
         }

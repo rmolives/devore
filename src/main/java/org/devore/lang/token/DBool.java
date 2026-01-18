@@ -33,6 +33,6 @@ public class DBool extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DBool b && b.bool == this.bool ? 0 : -1;
+        return t instanceof DBool && ((DBool) t).bool == this.bool ? 0 : -1;
     }
 }

@@ -26,8 +26,12 @@ public class DWord extends Token {
     protected String str() {
         String result = "nil";
         switch (tag) {
-            case LB -> result = "(";
-            case RB -> result = ")";
+            case LB:
+                result = "(";
+                break;
+            case RB:
+                result = ")";
+                break;
         }
         return result;
     }
@@ -39,7 +43,7 @@ public class DWord extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DWord w && w.tag.equals(this.tag) ? 0 : -1;
+        return t instanceof DWord && ((DWord) t).tag.equals(this.tag) ? 0 : -1;
     }
 
     private enum WordTags {

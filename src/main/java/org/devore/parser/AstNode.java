@@ -92,15 +92,6 @@ public class AstNode {
     }
 
     /**
-     * 获取第1位子树
-     *
-     * @return 子树
-     */
-    public AstNode getFirst() {
-        return get(0);
-    }
-
-    /**
      * 清空语法树
      */
     public void clear() {

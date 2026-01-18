@@ -111,9 +111,8 @@ public class NumberUtils {
         if (absX.compareTo(new BigDecimal("0.7")) <= 0)
             result = arcsinTaylor(x, mc);
         else {
-            BigDecimal transformed = BigDecimal.ONE.subtract(absX)
-                    .divide(BigDecimal.valueOf(2), mc)
-                    .sqrt(mc);
+            BigDecimal transformed = sqrt(BigDecimal.ONE.subtract(absX)
+                    .divide(BigDecimal.valueOf(2), mc), mc);
             result = PI.divide(BigDecimal.valueOf(2), mc)
                     .subtract(BigDecimal.valueOf(2).multiply(arcsinTaylor(transformed, mc), mc), mc);
             if (x.compareTo(BigDecimal.ZERO) < 0)
@@ -354,7 +353,7 @@ public class NumberUtils {
      */
     private static BigDecimal powInt(BigDecimal x, BigInteger y, MathContext mc) {
         if (y.compareTo(BigInteger.ZERO) < 0)
-            return BigDecimal.ONE.divide(powInt(x, y.subtract(y.multiply(BigInteger.TWO)), mc), mc);
+            return BigDecimal.ONE.divide(powInt(x, y.subtract(y.multiply(BigInteger.valueOf(2))), mc), mc);
         BigDecimal result = BigDecimal.ONE;
         BigInteger exp = y;
         while (exp.compareTo(BigInteger.ZERO) > 0) {

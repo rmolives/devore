@@ -75,7 +75,10 @@ public class DTable extends Token {
 
     @Override
     public int compareTo(Token t) {
-        if (!(t instanceof DTable map) || map.size() != this.size())
+        if (!(t instanceof DTable))
+            return -1;
+        DTable map = (DTable) t;
+        if (map.size() != this.size())
             return -1;
         Object[] mapKeys = map.table.keySet().toArray();
         Object[] thisKeys = this.table.keySet().toArray();

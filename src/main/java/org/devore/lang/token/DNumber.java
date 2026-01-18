@@ -121,7 +121,7 @@ public abstract class DNumber extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DNumber n ? this.toBigDecimal().compareTo(n.toBigDecimal()) : -1;
+        return t instanceof DNumber ? this.toBigDecimal().compareTo(((DNumber) t).toBigDecimal()) : -1;
     }
 
     @Override

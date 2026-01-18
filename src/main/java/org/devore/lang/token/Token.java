@@ -41,7 +41,7 @@ public abstract class Token {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Token t && this.compareTo(t) == 0;
+        return obj instanceof Token && this.compareTo((Token) obj) == 0;
     }
 
     /**

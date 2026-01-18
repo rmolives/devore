@@ -13,14 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-/**
- * 环境
- *
- * @param table  环境表
- * @param father 父环境
- * @param io     IO表
- */
-public record Env(Map<String, Token> table, Env father, IOConfig io) {
+public class Env {
+    public final Map<String, Token> table;
+    public final Env father;
+    public final IOConfig io;
+
     /**
      * 创建环境
      *

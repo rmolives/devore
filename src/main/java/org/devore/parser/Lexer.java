@@ -109,19 +109,18 @@ public class Lexer {
         int index = -1;
         while (++index < expressionCharArray.length) {
             switch (expressionCharArray[index]) {
-                case '(', '[' -> {
+                case '(':
+                case '[':
                     tokens.add(DWord.LB);
                     continue;
-                }
-                case ')', ']' -> {
+                case ')':
+                case ']':
                     tokens.add(DWord.RB);
                     continue;
-                }
-                case ' ' -> {
+                case ' ':
                     continue;
-                }
             }
-            var negative = false;
+            boolean negative = false;
             if (expressionCharArray[index] == '-' && index < expressionCharArray.length - 1 && Character.isDigit(expressionCharArray[index + 1])) {
                 negative = true;
                 ++index;
@@ -137,7 +136,7 @@ public class Lexer {
                     ++index;
                 }
                 if (expressionCharArray[index + 1] != '.') {
-                    tokens.add(DNumber.valueOf(negative ? v.subtract(v.multiply(BigInteger.TWO)) : v));
+                    tokens.add(DNumber.valueOf(negative ? v.subtract(v.multiply(BigInteger.valueOf(2))) : v));
                     continue;
                 }
                 BigDecimal x = new BigDecimal(v);
@@ -152,7 +151,7 @@ public class Lexer {
                     x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index])).divide(d, MathContext.DECIMAL128));
                     d = d.multiply(BigDecimal.valueOf(10));
                 }
-                tokens.add(DNumber.valueOf(negative ? x.subtract(x.multiply(BigDecimal.TWO)) : x));
+                tokens.add(DNumber.valueOf(negative ? x.subtract(x.multiply(BigDecimal.valueOf(2))) : x));
                 continue;
             }
             if (expressionCharArray[index] == '\"') {
@@ -178,12 +177,24 @@ public class Lexer {
                     if (skip) {
                         skip = false;
                         switch (expressionCharArray[index]) {
-                            case 'n' -> builder.append("\n");
-                            case 'r' -> builder.append("\r");
-                            case 't' -> builder.append("\t");
-                            case 'b' -> builder.append("\b");
-                            case 'f' -> builder.append("\f");
-                            default -> builder.append("\\").append(expressionCharArray[index]);
+                            case 'n':
+                                builder.append("\n");
+                                break;
+                            case 'r':
+                                builder.append("\r");
+                                break;
+                            case 't':
+                                builder.append("\t");
+                                break;
+                            case 'b':
+                                builder.append("\b");
+                                break;
+                            case 'f':
+                                builder.append("\f");
+                                break;
+                            default:
+                                builder.append("\\").append(expressionCharArray[index]);
+                                break;
                         }
                     } else
                         builder.append(expressionCharArray[index]);

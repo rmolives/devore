@@ -17,9 +17,9 @@ public class Repl {
      */
     public static void repl(InputStream in, PrintStream out, Env dEnv) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        var codeBuilder = new StringBuilder();
-        var env = dEnv;
-        var size = 0;
+        StringBuilder codeBuilder = new StringBuilder();
+        Env env = dEnv;
+        int size = 0;
         while (true) {
             out.print("[Devore] >>> ");
             if (size > 0)
