@@ -529,6 +529,14 @@ public class Core {
             if (!(args.getFirst() instanceof DList)) throw new DevoreCastException(args.getFirst().type(), "list");
             return DBool.valueOf(((DList) args.getFirst()).contains(args.get(1)));
         }), 2, false);
+        dEnv.addTokenProcedure("list-index", ((args, env) -> {
+            if (!(args.getFirst() instanceof DList)) throw new DevoreCastException(args.getFirst().type(), "list");
+            return DNumber.valueOf(((DList) args.getFirst()).indexOf(args.get(1)));
+        }), 2, false);
+        dEnv.addTokenProcedure("list-index-last", ((args, env) -> {
+            if (!(args.getFirst() instanceof DList)) throw new DevoreCastException(args.getFirst().type(), "list");
+            return DNumber.valueOf(((DList) args.getFirst()).lastIndexOf(args.get(1)));
+        }), 2, false);
         dEnv.addTokenProcedure("list-get", ((args, env) -> {
             if (!(args.getFirst() instanceof DList list)) throw new DevoreCastException(args.getFirst().type(), "list");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");

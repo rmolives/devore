@@ -79,6 +79,14 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
+    public int indexOf(Token t) {
+        return tokens.indexOf(t);
+    }
+
+    public int lastIndexOf(Token t) {
+        return tokens.lastIndexOf(t);
+    }
+
     public boolean contains(Token t) {
         return tokens.contains(t);
     }
