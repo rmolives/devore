@@ -30,7 +30,7 @@ public class NumberUtils {
     }
 
     /**
-     * 计算 atan2(y, x)，返回从正X轴到点 (x, y) 的角度
+     * 计算 arctan2(y, x)，返回从正X轴到点 (x, y) 的角度
      * 能够正确处理所有象限，返回范围在 [-π, π]
      *
      * @param y  Y坐标
