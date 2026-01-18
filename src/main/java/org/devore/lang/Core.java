@@ -849,6 +849,20 @@ public class Core {
                 throw new DevoreCastException(args.getFirst().type(), "table");
             return DList.valueOf(new ArrayList<>(((DTable) args.getFirst()).keys()));
         }), 1, false);
+        dEnv.addTokenProcedure("max", ((args, env) -> {
+            Token t = args.getFirst();
+            for (int i = 1; i < args.size(); ++i)
+                if (args.get(i).compareTo(t) > 0)
+                    t = args.get(i);
+            return t;
+        }), 1, true);
+        dEnv.addTokenProcedure("min", ((args, env) -> {
+            Token t = args.getFirst();
+            for (int i = 1; i < args.size(); ++i)
+                if (args.get(i).compareTo(t) < 0)
+                    t = args.get(i);
+            return t;
+        }), 1, true);
         dEnv.addTokenProcedure("bool?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DBool)), 1, false);
         dEnv.addTokenProcedure("float?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DFloat)), 1, false);
         dEnv.addTokenProcedure("int?", ((args, env) -> DBool.valueOf(args.getFirst() instanceof DInt)), 1, false);
