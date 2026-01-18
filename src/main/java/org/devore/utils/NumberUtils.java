@@ -38,7 +38,7 @@ public class NumberUtils {
      * @param mc 精度
      * @return 角度，范围 [-π, π]
      */
-    public static BigDecimal atan2(BigDecimal y, BigDecimal x, MathContext mc) {
+    public static BigDecimal arctan2(BigDecimal y, BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0 &&
                 y.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;

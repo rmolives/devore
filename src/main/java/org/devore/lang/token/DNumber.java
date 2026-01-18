@@ -107,8 +107,8 @@ public abstract class DNumber extends Token {
         return DNumber.valueOf(NumberUtils.log(this.toBigDecimal(), b.toBigDecimal(), MathContext.DECIMAL128));
     }
 
-    public DNumber atan2(DNumber x) {
-        return DNumber.valueOf(NumberUtils.atan2(this.toBigDecimal(), x.toBigDecimal(), MathContext.DECIMAL128));
+    public DNumber arctan2(DNumber x) {
+        return DNumber.valueOf(NumberUtils.arctan2(this.toBigDecimal(), x.toBigDecimal(), MathContext.DECIMAL128));
     }
 
     public DNumber exp() {

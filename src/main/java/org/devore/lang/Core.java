@@ -105,10 +105,10 @@ public class Core {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arccos();
         }), 1, false);
-        dEnv.addTokenProcedure("atan2", ((args, env) -> {
+        dEnv.addTokenProcedure("arctan2", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             if (!(args.get(1) instanceof DNumber)) throw new DevoreCastException(args.get(1).type(), "number");
-            return ((DNumber) args.get(0)).atan2((DNumber) args.get(1));
+            return ((DNumber) args.get(0)).arctan2((DNumber) args.get(1));
         }), 2, false);
         dEnv.addTokenProcedure("prime?", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
