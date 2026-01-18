@@ -70,21 +70,21 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber ceiling() {
-        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.CEILING));
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.CEILING).toBigInteger());
     }
 
     public DNumber floor() {
-        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.FLOOR));
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.FLOOR).toBigInteger());
     }
 
     public DNumber truncate() {
-        return DNumber.valueOf(this.toBigDecimal().signum() >= 0
+        return DNumber.valueOf((this.toBigDecimal().signum() >= 0
                 ? this.toBigDecimal().setScale(0, RoundingMode.FLOOR)
-                : this.toBigDecimal().setScale(0, RoundingMode.CEILING));
+                : this.toBigDecimal().setScale(0, RoundingMode.CEILING)).toBigInteger());
     }
 
     public DNumber round() {
-        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.HALF_UP));
+        return DNumber.valueOf(this.toBigDecimal().setScale(0, RoundingMode.HALF_UP).toBigInteger());
     }
 
     public DNumber sqrt() {
