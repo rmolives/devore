@@ -13,11 +13,11 @@ import java.math.RoundingMode;
  */
 public abstract class DNumber extends Token {
     public static DNumber valueOf(long n) {
-        return new DInt(BigInteger.valueOf(n));
+        return DNumber.valueOf(BigInteger.valueOf(n));
     }
 
     public static DNumber valueOf(double n) {
-        return new DFloat(BigDecimal.valueOf(n));
+        return DNumber.valueOf(BigDecimal.valueOf(n));
     }
 
     public static DNumber valueOf(BigInteger n) {
@@ -25,7 +25,7 @@ public abstract class DNumber extends Token {
     }
 
     public static DNumber valueOf(BigDecimal n) {
-        return new DFloat(n);
+        return new DFloat(n.stripTrailingZeros());
     }
 
     public DNumber add(DNumber a) {
