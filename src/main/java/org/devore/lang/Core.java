@@ -666,8 +666,10 @@ public class Core {
             if (flag) {
                 List<Token> list = new ArrayList<>();
                 for (Token arg : args) {
-                    if (arg instanceof DList) list.addAll(((DList) arg).toList());
-                    else list.add(arg);
+                    if (arg instanceof DList)
+                        list.addAll(((DList) arg).toList());
+                    else
+                        list.add(arg);
                 }
                 result = DList.valueOf(list);
             } else {
@@ -688,8 +690,7 @@ public class Core {
                 List<Token> params = new ArrayList<>();
                 params.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
-                    if (!(args.get(j + 1) instanceof DList))
-                        throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    if (!(args.get(j + 1) instanceof DList)) throw new DevoreCastException(args.get(j + 1).type(), "list");
                     params.add(((DList) args.get(j + 1)).get(i));
                 }
                 result.add(((DProcedure) args.get(0)).call(params.toArray(new Token[0]), env.createChild()));
@@ -704,8 +705,7 @@ public class Core {
                 List<Token> params = new ArrayList<>();
                 params.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
-                    if (!(args.get(j + 1) instanceof DList))
-                        throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    if (!(args.get(j + 1) instanceof DList)) throw new DevoreCastException(args.get(j + 1).type(), "list");
                     params.add(((DList) args.get(j + 1)).get(i));
                 }
                 ((DProcedure) args.get(0)).call(params.toArray(new Token[0]), env.createChild());
