@@ -96,10 +96,7 @@ public abstract class DNumber extends Token {
     }
 
     public DNumber pow(DNumber n) {
-        DNumber result = DNumber.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
-        return (((this instanceof DFloat || n instanceof DFloat) && !NumberUtils.isInt(result.toBigDecimal()))
-                || !NumberUtils.isInt(result.toBigDecimal()))
-                ? result : DNumber.valueOf(result.toBigInteger());
+        return DNumber.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), MathContext.DECIMAL128));
     }
 
     public DNumber abs() {
