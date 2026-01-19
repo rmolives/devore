@@ -123,8 +123,7 @@ public class Core {
         dEnv.addTokenProcedure("gcd", ((args, env) -> {
             List<BigInteger> nums = new ArrayList<>();
             for (Token arg : args) {
-                if (!(arg instanceof DInt))
-                    throw new DevoreCastException(arg.type(), "int");
+                if (!(arg instanceof DInt)) throw new DevoreCastException(arg.type(), "int");
                 nums.add(((DInt) arg).toBigInteger());
             }
             BigInteger result = nums.get(0).abs();
@@ -135,8 +134,7 @@ public class Core {
         dEnv.addTokenProcedure("lcm", ((args, env) -> {
             List<BigInteger> nums = new ArrayList<>();
             for (Token arg : args) {
-                if (!(arg instanceof DInt))
-                    throw new DevoreCastException(arg.type(), "int");
+                if (!(arg instanceof DInt)) throw new DevoreCastException(arg.type(), "int");
                 nums.add(((DInt) arg).toBigInteger());
             }
             BigInteger result = nums.get(0).abs();
