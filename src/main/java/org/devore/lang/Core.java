@@ -121,25 +121,19 @@ public class Core {
             return DBool.valueOf(((DInt) args.get(0)).toBigInteger().isProbablePrime(((DInt) args.get(1)).toBigInteger().intValue()));
         }), 2, false);
         dEnv.addTokenProcedure("gcd", ((args, env) -> {
-            List<BigInteger> nums = new ArrayList<>();
-            for (Token arg : args) {
+            for (Token arg : args)
                 if (!(arg instanceof DInt)) throw new DevoreCastException(arg.type(), "int");
-                nums.add(((DInt) arg).toBigInteger());
-            }
-            BigInteger result = nums.get(0).abs();
-            for (int i = 1; i < nums.size(); ++i)
-                result = NumberUtils.gcd(result, nums.get(i));
+            BigInteger result = ((DInt) args.get(0)).toBigInteger();
+            for (int i = 1; i < args.size(); ++i)
+                result = NumberUtils.gcd(result, ((DInt) args.get(i)).toBigInteger());
             return DNumber.valueOf(result);
         }), 2, true);
         dEnv.addTokenProcedure("lcm", ((args, env) -> {
-            List<BigInteger> nums = new ArrayList<>();
-            for (Token arg : args) {
+            for (Token arg : args)
                 if (!(arg instanceof DInt)) throw new DevoreCastException(arg.type(), "int");
-                nums.add(((DInt) arg).toBigInteger());
-            }
-            BigInteger result = nums.get(0).abs();
-            for (int i = 1; i < nums.size(); ++i)
-                result = NumberUtils.lcm(result, nums.get(i));
+            BigInteger result = ((DInt) args.get(0)).toBigInteger();
+            for (int i = 1; i < args.size(); ++i)
+                result = NumberUtils.lcm(result, ((DInt) args.get(i)).toBigInteger());
             return DNumber.valueOf(result);
         }), 2, true);
         dEnv.addTokenProcedure("log", ((args, env) -> {
