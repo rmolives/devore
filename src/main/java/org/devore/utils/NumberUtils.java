@@ -15,6 +15,38 @@ public class NumberUtils {
     private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
 
     /**
+     * 计算gcd(a, b)
+     *
+     * @param a a
+     * @param b b
+     * @return gcd(a, b)
+     */
+    public static BigInteger gcd(BigInteger a, BigInteger b) {
+        BigInteger r0 = a.abs();
+        BigInteger r1 = b.abs();
+        while (!r1.equals(BigInteger.ZERO)) {
+            BigInteger r2 = r0.mod(r1);
+            r0 = r1;
+            r1 = r2;
+        }
+        return r0;
+    }
+
+    /**
+     * 计算lcm(a, b)
+     *
+     * @param a a
+     * @param b b
+     * @return lcm(a, b)
+     */
+    public static BigInteger lcm(BigInteger a, BigInteger b) {
+        if (a.equals(BigInteger.ZERO) || b.equals(BigInteger.ZERO))
+            return BigInteger.ZERO;
+        BigInteger g = gcd(a, b);
+        return a.divide(g).multiply(b).abs();
+    }
+
+    /**
      * 将 π 近似
      *
      * @return π 近似值

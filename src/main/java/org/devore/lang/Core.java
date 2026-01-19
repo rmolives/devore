@@ -4,6 +4,7 @@ import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.*;
 import org.devore.parser.AstNode;
+import org.devore.utils.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -71,7 +72,7 @@ public class Core {
         dEnv.addTokenProcedure("mod", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
-            return ((DInt) args.get(0)).mod(((DInt) args.get(1)));
+            return DNumber.valueOf(((DInt) args.get(0)).toBigInteger().mod(((DInt) args.get(1)).toBigInteger()));
         }), 2, false);
         dEnv.addTokenProcedure("abs", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
@@ -120,32 +121,29 @@ public class Core {
             return DBool.valueOf(((DInt) args.get(0)).toBigInteger().isProbablePrime(((DInt) args.get(1)).toBigInteger().intValue()));
         }), 2, false);
         dEnv.addTokenProcedure("gcd", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
-            if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
-            DInt n1 = (DInt) args.get(0);
-            DInt n2 = (DInt) args.get(1);
-            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
-                 i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
-                if (n1.toBigInteger().mod(i).equals(BigInteger.ZERO) && n2.toBigInteger().mod(i).equals(BigInteger.ZERO))
-                    return DNumber.valueOf(i);
-            return DNumber.valueOf(1);
-        }), 2, false);
+            List<BigInteger> nums = new ArrayList<>();
+            for (Token arg : args) {
+                if (!(arg instanceof DInt))
+                    throw new DevoreCastException(arg.type(), "int");
+                nums.add(((DInt) arg).toBigInteger());
+            }
+            BigInteger result = nums.get(0).abs();
+            for (int i = 1; i < nums.size(); ++i)
+                result = NumberUtils.gcd(result, nums.get(i));
+            return DNumber.valueOf(result);
+        }), 2, true);
         dEnv.addTokenProcedure("lcm", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
-            if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
-            DInt n1 = (DInt) args.get(0);
-            DInt n2 = (DInt) args.get(1);
-            BigInteger gcd = BigInteger.ONE;
-            for (BigInteger i = (n1.toBigInteger().compareTo(n2.toBigInteger()) < 0 ? n1 : n2).toBigInteger();
-                 i.compareTo(BigInteger.ONE) > 0; i = i.subtract(BigInteger.ONE))
-                if (n1.toBigInteger().mod(i).equals(BigInteger.ZERO) && n2.toBigInteger().mod(i).equals(BigInteger.ZERO)) {
-                    gcd = i;
-                    break;
-                }
-            if (n1.toBigInteger().compareTo(BigInteger.ZERO) == 0 || n2.toBigInteger().compareTo(BigInteger.ZERO) == 0)
-                return DNumber.valueOf(0);
-            return DNumber.valueOf(n1.toBigInteger().multiply(n2.toBigInteger()).divide(gcd));
-        }), 2, false);
+            List<BigInteger> nums = new ArrayList<>();
+            for (Token arg : args) {
+                if (!(arg instanceof DInt))
+                    throw new DevoreCastException(arg.type(), "int");
+                nums.add(((DInt) arg).toBigInteger());
+            }
+            BigInteger result = nums.get(0).abs();
+            for (int i = 1; i < nums.size(); ++i)
+                result = NumberUtils.lcm(result, nums.get(i));
+            return DNumber.valueOf(result);
+        }), 2, true);
         dEnv.addTokenProcedure("log", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).log();
@@ -197,7 +195,8 @@ public class Core {
             return DWord.NIL;
         }), 1, true);
         dEnv.addSymbolProcedure("def-macro", ((ast, env) -> {
-            if (!(ast.get(0).symbol instanceof DSymbol)) throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
+            if (!(ast.get(0).symbol instanceof DSymbol))
+                throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
             List<String> params = new ArrayList<>();
             for (AstNode param : ast.get(0).children) {
                 if (!(param.symbol instanceof DSymbol)) throw new DevoreCastException(param.symbol.type(), "symbol");
@@ -210,7 +209,8 @@ public class Core {
             return DWord.NIL;
         }), 2, true);
         dEnv.addSymbolProcedure("def", ((ast, env) -> {
-            if (!(ast.get(0).symbol instanceof DSymbol)) throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
+            if (!(ast.get(0).symbol instanceof DSymbol))
+                throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
             if (ast.get(0).isEmpty() && ast.get(0).type != AstNode.AstType.PROCEDURE) {
                 Env newEnv = env.createChild();
                 Token result = DWord.NIL;
@@ -220,7 +220,8 @@ public class Core {
             } else {
                 List<String> params = new ArrayList<>();
                 for (AstNode param : ast.get(0).children) {
-                    if (!(param.symbol instanceof DSymbol)) throw new DevoreCastException(param.symbol.type(), "symbol");
+                    if (!(param.symbol instanceof DSymbol))
+                        throw new DevoreCastException(param.symbol.type(), "symbol");
                     params.add(param.symbol.toString());
                 }
                 List<AstNode> asts = new ArrayList<>();
@@ -250,7 +251,8 @@ public class Core {
             } else {
                 List<String> params = new ArrayList<>();
                 for (AstNode param : ast.get(0).children) {
-                    if (!(param.symbol instanceof DSymbol)) throw new DevoreCastException(param.symbol.type(), "symbol");
+                    if (!(param.symbol instanceof DSymbol))
+                        throw new DevoreCastException(param.symbol.type(), "symbol");
                     params.add(param.symbol.toString());
                 }
                 List<AstNode> asts = new ArrayList<>();
@@ -276,12 +278,14 @@ public class Core {
                     List<String> params = new ArrayList<>();
                     List<AstNode> asts = new ArrayList<>();
                     for (AstNode paramNode : node.get(0).children) {
-                        if (!(paramNode.symbol instanceof DSymbol)) throw new DevoreCastException(paramNode.symbol.type(), "symbol");
+                        if (!(paramNode.symbol instanceof DSymbol))
+                            throw new DevoreCastException(paramNode.symbol.type(), "symbol");
                         params.add(paramNode.symbol.toString());
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
-                    if (!(ast.get(0).symbol instanceof DSymbol)) throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
+                    if (!(ast.get(0).symbol instanceof DSymbol))
+                        throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
                     newEnv.addTokenProcedure(ast.get(0).symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = env.createChild();
                         for (int i = 0; i < params.size(); ++i)
@@ -311,12 +315,14 @@ public class Core {
                     List<String> params = new ArrayList<>();
                     List<AstNode> asts = new ArrayList<>();
                     for (AstNode paramNode : node.get(0).children) {
-                        if (!(paramNode.symbol instanceof DSymbol)) throw new DevoreCastException(paramNode.symbol.type(), "symbol");
+                        if (!(paramNode.symbol instanceof DSymbol))
+                            throw new DevoreCastException(paramNode.symbol.type(), "symbol");
                         params.add(paramNode.symbol.toString());
                     }
                     for (int i = 1; i < node.size(); ++i)
                         asts.add(node.get(i).copy());
-                    if (!(ast.get(0).symbol instanceof DSymbol)) throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
+                    if (!(ast.get(0).symbol instanceof DSymbol))
+                        throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
                     newEnv.addTokenProcedure(ast.get(0).symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = newEnv.createChild();
                         for (int i = 0; i < params.size(); ++i)
@@ -341,10 +347,12 @@ public class Core {
         dEnv.addSymbolProcedure("lambda", ((ast, env) -> {
             List<String> params = new ArrayList<>();
             if (ast.get(0).isNotNil()) {
-                if (!(ast.get(0).symbol instanceof DSymbol)) throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
+                if (!(ast.get(0).symbol instanceof DSymbol))
+                    throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
                 params.add(ast.get(0).symbol.toString());
                 for (AstNode param : ast.get(0).children) {
-                    if (!(param.symbol instanceof DSymbol)) throw new DevoreCastException(param.symbol.type(), "symbol");
+                    if (!(param.symbol instanceof DSymbol))
+                        throw new DevoreCastException(param.symbol.type(), "symbol");
                     params.add(param.symbol.toString());
                 }
             }
@@ -690,7 +698,8 @@ public class Core {
                 List<Token> params = new ArrayList<>();
                 params.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
-                    if (!(args.get(j + 1) instanceof DList)) throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    if (!(args.get(j + 1) instanceof DList))
+                        throw new DevoreCastException(args.get(j + 1).type(), "list");
                     params.add(((DList) args.get(j + 1)).get(i));
                 }
                 result.add(((DProcedure) args.get(0)).call(params.toArray(new Token[0]), env.createChild()));
@@ -705,7 +714,8 @@ public class Core {
                 List<Token> params = new ArrayList<>();
                 params.add(tokens.get(i));
                 for (int j = 1; j < args.size() - 1; ++j) {
-                    if (!(args.get(j + 1) instanceof DList)) throw new DevoreCastException(args.get(j + 1).type(), "list");
+                    if (!(args.get(j + 1) instanceof DList))
+                        throw new DevoreCastException(args.get(j + 1).type(), "list");
                     params.add(((DList) args.get(j + 1)).get(i));
                 }
                 ((DProcedure) args.get(0)).call(params.toArray(new Token[0]), env.createChild());

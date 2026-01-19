@@ -13,10 +13,6 @@ public class DInt extends DNumber {
         this.num = num;
     }
 
-    public DNumber mod(DInt n) {
-        return DNumber.valueOf(this.toBigInteger().mod(n.toBigInteger()));
-    }
-
     @Override
     public BigInteger toBigInteger() {
         return num;
