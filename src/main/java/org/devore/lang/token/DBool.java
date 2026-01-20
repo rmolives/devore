@@ -23,12 +23,12 @@ public class DBool extends Token {
 
     @Override
     protected String str() {
-        return bool ? "true" : "false";
+        return this.bool ? "true" : "false";
     }
 
     @Override
     public Token copy() {
-        return DBool.valueOf(bool);
+        return DBool.valueOf(this.bool);
     }
 
     @Override

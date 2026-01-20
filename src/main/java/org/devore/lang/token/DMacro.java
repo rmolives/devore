@@ -112,7 +112,7 @@ public class DMacro extends Token {
     public Token copy() {
         List<AstNode> temp = new ArrayList<>();
         for (AstNode body : this.bodys) temp.add(body.copy());
-        return new DMacro(new ArrayList<>(this.params), temp);
+        return DMacro.newMacro(new ArrayList<>(this.params), temp);
     }
 
     @Override
