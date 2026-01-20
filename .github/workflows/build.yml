@@ -58,7 +58,7 @@ jobs:
           echo "SHA256: $SHA256"
       - name: Get timestamp
         id: timestamp
-        run: echo "date=$(date -u +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+        run: echo "date=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S CST')" >> $GITHUB_OUTPUT
       - name: Create Release with fixed tag
         id: create_release
         uses: actions/create-release@v1
