@@ -1,6 +1,7 @@
 package org.devore.lang.token;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,6 +22,11 @@ public class DList extends Token {
         tokens.clear();
     }
 
+    /**
+     * 排序
+     * @param force 是否更改原列表
+     * @return 结果
+     */
     public DList sort(boolean force) {
         if (force) {
             tokens.sort(Token::compareTo);
@@ -31,6 +37,27 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
+    /**
+     * 颠倒
+     * @param force 是否更改原列表
+     * @return 结果
+     */
+    public DList reverse(boolean force) {
+        if (force) {
+            Collections.reverse(tokens);
+            return this;
+        }
+        List<Token> newList = new ArrayList<>(tokens);
+        Collections.reverse(newList);
+        return DList.valueOf(newList);
+    }
+
+    /**
+     * 添加元素
+     * @param t     元素
+     * @param force 是否更改原列表
+     * @return 结果
+     */
     public DList add(Token t, boolean force) {
         if (force) {
             tokens.add(t);
@@ -41,6 +68,13 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
+    /**
+     * 添加元素
+     * @param index 位置
+     * @param t     元素
+     * @param force 是否更改原列表
+     * @return 结果
+     */
     public DList add(int index, Token t, boolean force) {
         if (force) {
             tokens.add(index, t);
@@ -51,10 +85,22 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
+    /**
+     * 获取元素
+     * @param index 位置
+     * @return 元素
+     */
     public Token get(int index) {
         return tokens.get(index);
     }
 
+    /**
+     * 设置元素
+     * @param index 位置
+     * @param t     元素
+     * @param force 是否更改原列表
+     * @return 结果
+     */
     public Token set(int index, Token t, boolean force) {
         if (force) {
             tokens.set(index, t);
@@ -65,6 +111,12 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
+    /**
+     * 删除元素
+     * @param index 位置
+     * @param force 是否更改原列表
+     * @return 结果
+     */
     public DList remove(int index, boolean force) {
         if (force) {
             tokens.remove(index);
@@ -75,26 +127,55 @@ public class DList extends Token {
         return DList.valueOf(newList);
     }
 
+    /**
+     * 获取元素首次出现的位置
+     * @param t 元素
+     * @return 位置
+     */
     public int indexOf(Token t) {
         return tokens.indexOf(t);
     }
 
+    /**
+     * 获取元素最后出现的位置
+     * @param t 元素
+     * @return 位置
+     */
     public int lastIndexOf(Token t) {
         return tokens.lastIndexOf(t);
     }
 
+    /**
+     * 是否包含特定元素
+     * @param t 元素
+     * @return 结果
+     */
     public boolean contains(Token t) {
         return tokens.contains(t);
     }
 
+    /**
+     * 获取数量
+     * @return 数量
+     */
     public int size() {
         return tokens.size();
     }
 
+    /**
+     * 截取
+     * @param fromIndex 起始位置
+     * @param toIndex   结束位置
+     * @return 截取后的列表
+     */
     public DList subList(int fromIndex, int toIndex) {
         return DList.valueOf(tokens.subList(fromIndex, toIndex));
     }
 
+    /**
+     * 转换为Java的List
+     * @return 结果
+     */
     public List<Token> toList() {
         return tokens;
     }

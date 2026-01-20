@@ -18,6 +18,13 @@ public class DTable extends Token {
         return new DTable(table);
     }
 
+    /**
+     * 设置KY对
+     * @param key   key
+     * @param value value
+     * @param force 是否更改原表
+     * @return 结果
+     */
     public DTable put(Token key, Token value, boolean force) {
         if (force) {
             table.put(key, value);
@@ -28,18 +35,39 @@ public class DTable extends Token {
         return DTable.valueOf(newTable);
     }
 
+    /**
+     * 是否包含特定key
+     * @param key   key
+     * @return 结果
+     */
     public DBool containsKey(Token key) {
         return DBool.valueOf(table.containsKey(key));
     }
 
-    public DBool containsValue(Token key) {
-        return DBool.valueOf(table.containsValue(key));
+    /**
+     * 是否包含特定value
+     * @param value value
+     * @return 结果
+     */
+    public DBool containsValue(Token value) {
+        return DBool.valueOf(table.containsValue(value));
     }
 
+    /**
+     * 获取key对应的value
+     * @param key   key
+     * @return 结果
+     */
     public Token get(Token key) {
         return table.get(key);
     }
 
+    /**
+     * 删除key
+     * @param key   key
+     * @param force 是否更改原表
+     * @return 结果
+     */
     public DTable remove(Token key, boolean force) {
         if (force) {
             table.remove(key);
@@ -50,10 +78,18 @@ public class DTable extends Token {
         return DTable.valueOf(newTable);
     }
 
+    /**
+     * 获取所有key
+     * @return 结果
+     */
     public Set<Token> keys() {
         return table.keySet();
     }
 
+    /**
+     * 获取数量
+     * @return 数量
+     */
     public int size() {
         return table.size();
     }

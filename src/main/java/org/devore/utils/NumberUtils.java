@@ -16,7 +16,6 @@ public class NumberUtils {
 
     /**
      * 计算gcd(a, b)
-     *
      * @param a a
      * @param b b
      * @return gcd(a, b)
@@ -34,7 +33,6 @@ public class NumberUtils {
 
     /**
      * 计算lcm(a, b)
-     *
      * @param a a
      * @param b b
      * @return lcm(a, b)
@@ -47,7 +45,6 @@ public class NumberUtils {
 
     /**
      * 将 π 近似
-     *
      * @return π 近似值
      */
     private static BigDecimal approximatePi() {
@@ -68,7 +65,7 @@ public class NumberUtils {
      * @param y  Y坐标
      * @param x  X坐标
      * @param mc 精度
-     * @return 角度，范围 [-π, π]
+     * @return 角度
      */
     public static BigDecimal arctan2(BigDecimal y, BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0 &&
@@ -97,9 +94,9 @@ public class NumberUtils {
      * 稳健的arccos计算，适用于定义域 [-1, 1]
      * 使用恒等式: arccos(x) = π/2 - arcsin(x)
      *
-     * @param x  输入值，必须在 [-1, 1] 范围内
+     * @param x  输入值
      * @param mc 精度
-     * @return arccos(x)，范围在 0 到 π 之间
+     * @return arccos(x)
      */
     public static BigDecimal arccos(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
@@ -119,9 +116,9 @@ public class NumberUtils {
      * 稳健的arcsin计算，适用于定义域 [-1, 1]
      * 使用恒等式转换和泰勒级数展开
      *
-     * @param x  输入值，必须在 [-1, 1] 范围内
+     * @param x  输入值
      * @param mc 精度
-     * @return arcsin(x)，范围在 -π/2 到 π/2 之间
+     * @return arcsin(x)
      */
     public static BigDecimal arcsin(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
@@ -145,6 +142,10 @@ public class NumberUtils {
     /**
      * 使用泰勒级数计算 arcsin(x)
      * arcsin(x) = x + (1/2)(x³/3) + (1·3/2·4)(x⁵/5) + (1·3·5/2·4·6)(x⁷/7) + ...
+     *
+     * @param x  输入值
+     * @param mc 精度
+     * @return arcsin(x)
      */
     private static BigDecimal arcsinTaylor(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
@@ -175,7 +176,7 @@ public class NumberUtils {
      *
      * @param x  输入值
      * @param mc 精度
-     * @return arctan(x)，范围在 -π/2 到 π/2 之间
+     * @return arctan(x)
      */
     public static BigDecimal arctan(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
@@ -196,6 +197,10 @@ public class NumberUtils {
     /**
      * 使用泰勒级数计算 arctan(x)，仅适用于 0 ≤ x ≤ 1
      * arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
+     *
+     * @param x  输入值
+     * @param mc 精度
+     * @return arctan(x)
      */
     private static BigDecimal arctanTaylor(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
@@ -219,7 +224,6 @@ public class NumberUtils {
 
     /**
      * 将角度缩小到范围 [-π，π]
-     *
      * @param angle 角度
      * @param mc    精度
      * @return [-π, π]
@@ -233,7 +237,6 @@ public class NumberUtils {
 
     /**
      * 判断BigDecimal是否为整数
-     *
      * @param decimal BigDecimal
      * @return 结果
      */
@@ -243,7 +246,6 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算 sin(x)
-     *
      * @param x  x
      * @param mc 精度
      * @return sin(x)
@@ -266,7 +268,6 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数展开计算 cos(x)
-     *
      * @param x  x
      * @param mc 精度
      * @return cos(x)
@@ -289,7 +290,6 @@ public class NumberUtils {
 
     /**
      * 将tan计算为 sin(x)/cos(x)
-     *
      * @param x  x
      * @param mc 精度
      * @return tan(x)
@@ -302,7 +302,6 @@ public class NumberUtils {
 
     /**
      * 使用牛顿法计算BigDecimal的平方根
-     *
      * @param x  x
      * @param mc 精度
      * @return √x
@@ -323,7 +322,6 @@ public class NumberUtils {
 
     /**
      * 计算BigDecimal的 x^y
-     *
      * @param x  x
      * @param y  y
      * @param mc 精度
@@ -343,7 +341,6 @@ public class NumberUtils {
 
     /**
      * 计算BigDecimal的 x^y, 其中 y 为整数
-     *
      * @param x  x
      * @param y  y
      * @param mc 精度
@@ -363,7 +360,6 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数计算 ln(x)
-     *
      * @param x  x
      * @param mc 精度
      * @return ln(x)
@@ -386,7 +382,6 @@ public class NumberUtils {
 
     /**
      * 以 b 为底的 a 的对数：log_b(a)
-     *
      * @param a  a
      * @param b  b
      * @param mc 精度
@@ -401,7 +396,6 @@ public class NumberUtils {
 
     /**
      * 使用泰勒级数计算 e^x
-     *
      * @param x  x
      * @param mc 精度
      * @return e^x

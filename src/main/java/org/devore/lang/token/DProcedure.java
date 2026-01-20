@@ -24,34 +24,63 @@ public class DProcedure extends Token {
         this.vararg = vararg;
     }
 
-    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> function, int argc, boolean vararg) {
-        return new DProcedure(function, argc, vararg);
+    /**
+     * 创建新过程
+     * @param procedure 过程
+     * @param argc      参数数量
+     * @param vararg    是否为可变参数
+     * @return this
+     */
+    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
+        return new DProcedure(procedure, argc, vararg);
     }
 
+    /**
+     * 添加新过程
+     * @param procedure 过程
+     * @return this
+     */
     public DProcedure addProcedure(DProcedure procedure) {
         if (match(procedure.argc) != null) throw new DevoreRuntimeException("过程定义冲突.");
         this.children.add(procedure);
         return this;
     }
 
+    /**
+     * 匹配符合条件的过程
+     * @param argc  参数数量
+     * @return 符合条件的过程
+     */
     private DProcedure match(int argc) {
-        DProcedure function = null;
-        if (this.argc == argc || (this.vararg && argc >= this.argc)) function = this;
+        DProcedure procedure = null;
+        if (this.argc == argc || (this.vararg && argc >= this.argc)) procedure = this;
         else {
             for (DProcedure df : children) {
                 DProcedure temp = df.match(argc);
-                if (temp != null) function = temp;
+                if (temp != null) procedure = temp;
             }
         }
-        return function;
+        return procedure;
     }
 
+    /**
+     * 执行过程
+     * @param ast   ast
+     * @param env   环境
+     * @return 结果
+     */
     public Token call(AstNode ast, Env env) {
         DProcedure df = match(ast.size());
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
         return df.procedure.apply(ast, env);
     }
 
+    /**
+     * 执行过程
+     * @param args  参数
+     * @param env   环境
+     * @return 结果
+     */
     public Token call(Token[] args, Env env) {
         DProcedure df = match(args.length);
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");

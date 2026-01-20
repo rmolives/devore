@@ -559,8 +559,9 @@ public class Core {
             return list.subList(0, list.size() - 1);
         }), 1, false);
         dEnv.addTokenProcedure("length", ((args, env) -> {
-            if (!(args.get(0) instanceof DList)) return DNumber.valueOf(args.get(0).toString().length());
-            return DNumber.valueOf(((DList) args.get(0)).size());
+            if (args.get(0) instanceof DList) return DNumber.valueOf(((DList) args.get(0)).size());
+            if (args.get(0) instanceof DTable) return DNumber.valueOf(((DTable) args.get(0)).size());
+            return DNumber.valueOf(args.get(0).toString().length());
         }), 1, false);
         dEnv.addTokenProcedure("list-sub", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
@@ -571,19 +572,11 @@ public class Core {
         }), 3, false);
         dEnv.addTokenProcedure("reverse", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
-            List<Token> temp = new ArrayList<>();
-            for (int i = list.size() - 1; i >= 0; --i) temp.add(list.get(i));
-            return DList.valueOf(new ArrayList<>(temp));
+            return ((DList) args.get(0)).reverse(false);
         }), 1, false);
         dEnv.addTokenProcedure("reverse!", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
-            List<Token> temp = new ArrayList<>();
-            for (int i = list.size() - 1; i >= 0; --i) temp.add(list.get(i));
-            list.clear();
-            for (Token t : temp) list.add(t, true);
-            return list;
+            return ((DList) args.get(0)).reverse(true);
         }), 1, false);
         dEnv.addTokenProcedure("sort", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
@@ -755,10 +748,6 @@ public class Core {
             if (!(args.get(0) instanceof DTable)) throw new DevoreCastException(args.get(0).type(), "table");
             return ((DTable) args.get(0)).containsValue(args.get(1));
         }), 2, false);
-        dEnv.addTokenProcedure("table-size", ((args, env) -> {
-            if (!(args.get(0) instanceof DTable)) throw new DevoreCastException(args.get(0).type(), "table");
-            return DNumber.valueOf(((DTable) args.get(0)).size());
-        }), 1, false);
         dEnv.addTokenProcedure("table-put", ((args, env) -> {
             if (!(args.get(0) instanceof DTable)) throw new DevoreCastException(args.get(0).type(), "table");
             return ((DTable) args.get(0)).put(args.get(1), args.get(2), false);

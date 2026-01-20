@@ -20,16 +20,32 @@ public class DMacro extends Token {
         this.children = new ArrayList<>();
     }
 
+    /**
+     * 创建宏
+     * @param params    params
+     * @param bodys     bodys
+     * @return this
+     */
     public static DMacro newMacro(List<String> params, List<AstNode> bodys) {
         return new DMacro(params, bodys);
     }
 
+    /**
+     * 添加宏
+     * @param macro 宏
+     * @return this
+     */
     public DMacro addMacro(DMacro macro) {
         if (match(macro.params.size()) != null) throw new DevoreRuntimeException("宏定义冲突.");
         this.children.add(macro);
         return this;
     }
 
+    /**
+     * 匹配符合条件的宏
+     * @param argc  参数数量
+     * @return 符合条件的宏
+     */
     private DMacro match(int argc) {
         DMacro macro = null;
         if (this.params.size() == argc) macro = this;
@@ -42,6 +58,12 @@ public class DMacro extends Token {
         return macro;
     }
 
+    /**
+     * 进行替换
+     * @param body  body
+     * @param asts  asts
+     * @return 替换后的ast
+     */
     private AstNode expand(AstNode body, List<AstNode> asts) {
         for (int j = 0; j < params.size(); ++j)
             if (body.isNotNil()
@@ -63,6 +85,11 @@ public class DMacro extends Token {
         return body;
     }
 
+    /**
+     * 进行替换
+     * @param asts  asts
+     * @return 替换后的ast
+     */
     public List<AstNode> expand(List<AstNode> asts) {
         DMacro dm = match(asts.size());
         if (dm == null) throw new DevoreRuntimeException("找不到匹配条件的宏.");

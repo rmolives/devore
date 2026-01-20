@@ -99,7 +99,6 @@ public class Lexer {
 
     /**
      * 词法分析器
-     *
      * @param expression 代码片段
      * @return Token序列
      */

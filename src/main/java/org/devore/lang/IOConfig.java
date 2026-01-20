@@ -12,7 +12,6 @@ public class IOConfig {
 
     /**
      * 创建IO表
-     *
      * @param out 输出流
      * @param in  输入流
      */
