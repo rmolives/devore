@@ -33,4 +33,11 @@ public class DSymbol extends Token {
     public int compareTo(Token t) {
         return t instanceof DSymbol ? this.symbol.compareTo(((DSymbol) t).symbol) : -1;
     }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + symbol.hashCode();
+        return result;
+    }
 }

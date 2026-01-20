@@ -46,6 +46,13 @@ public class DWord extends Token {
         return t instanceof DWord && this.tag.equals(((DWord) t).tag) ? 0 : -1;
     }
 
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + tag.hashCode();
+        return result;
+    }
+
     private enum WordTags {
         LB, RB, NIL
     }

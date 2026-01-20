@@ -78,16 +78,13 @@ public class DTable extends Token {
         if (!(t instanceof DTable))
             return -1;
         DTable map = (DTable) t;
-        if (map.size() != this.size())
-            return -1;
-        Object[] mapKeys = map.table.keySet().toArray();
-        Object[] thisKeys = this.table.keySet().toArray();
-        for (int i = 0; i < this.size(); ++i)
-            if (!mapKeys[i].equals(thisKeys[i]))
-                return -1;
-        for (Object key : mapKeys)
-            if (!map.get((Token) key).equals(this.table.get((Token) key)))
-                return -1;
-        return 0;
+        return this.table.equals(map.table) ? 0 : -1;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + table.hashCode();
+        return result;
     }
 }

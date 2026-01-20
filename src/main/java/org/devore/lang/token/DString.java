@@ -33,4 +33,11 @@ public class DString extends Token {
     public int compareTo(Token t) {
         return t instanceof DString ? this.str.compareTo(((DString) t).str) : -1;
     }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + str.hashCode();
+        return result;
+    }
 }

@@ -126,4 +126,11 @@ public class DList extends Token {
                 return -1;
         return 0;
     }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + tokens.hashCode();
+        return result;
+    }
 }

@@ -133,4 +133,11 @@ public abstract class DNumber extends Token {
     protected String str() {
         return NumberUtils.isInt(this.toBigDecimal()) ? this.toBigInteger().toString() : this.toBigDecimal().toPlainString();
     }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + this.toBigDecimal().stripTrailingZeros().hashCode();
+        return result;
+    }
 }

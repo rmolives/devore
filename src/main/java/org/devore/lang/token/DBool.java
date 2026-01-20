@@ -35,4 +35,11 @@ public class DBool extends Token {
     public int compareTo(Token t) {
         return t instanceof DBool && this.bool == ((DBool) t).bool ? 0 : -1;
     }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + Boolean.hashCode(bool);
+        return result;
+    }
 }

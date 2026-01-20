@@ -34,6 +34,14 @@ public abstract class Token {
     public abstract int compareTo(Token t);
 
     /**
+     * 获取当前token的hash
+     *
+     * @return hash
+     */
+    @Override
+    public abstract int hashCode();
+
+    /**
      * 判断token是否相等
      *
      * @param obj token
@@ -52,15 +60,5 @@ public abstract class Token {
     @Override
     public String toString() {
         return str();
-    }
-
-    /**
-     * 获取当前token的hash
-     *
-     * @return hash
-     */
-    @Override
-    public int hashCode() {
-        return (type() + this).hashCode();
     }
 }
