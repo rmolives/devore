@@ -77,6 +77,6 @@ public class DProcedure extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DProcedure ? this == t ? 0 : -1 : -1;
+        return this == t ? 0 : -1;
     }
 }
