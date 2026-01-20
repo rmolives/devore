@@ -77,14 +77,14 @@ public class DProcedure extends DToken {
 
     /**
      * 执行过程
-     * @param ast   ast
+     * @param node  node
      * @param env   环境
      * @return 结果
      */
-    public DToken call(Ast ast, Env env) {
-        DProcedure df = this.match(ast.size());
+    public DToken call(Ast node, Env env) {
+        DProcedure df = this.match(node.size());
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
-        return df.procedure.apply(ast, env);
+        return df.procedure.apply(node, env);
     }
 
     /**

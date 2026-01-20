@@ -61,16 +61,16 @@ public class DMacro extends DToken {
     /**
      * 进行替换
      * @param body  body
-     * @param asts  asts
+     * @param nodes nodes
      * @return 替换后的ast
      */
-    private Ast expand(Ast body, List<Ast> asts) {
+    private Ast expand(Ast body, List<Ast> nodes) {
         for (int j = 0; j < this.params.size(); ++j)
             if (body.isNotNil()
                     && body.symbol instanceof DSymbol
                     && body.symbol.toString().equals(this.params.get(j))) {
                 body.symbol = DSymbol.valueOf("apply");
-                body.add(0, asts.get(j));
+                body.add(0, nodes.get(j));
             }
         for (int i = 0; i < body.size(); ++i) {
             Ast temp = body.get(i);
@@ -79,22 +79,22 @@ public class DMacro extends DToken {
                         && body.symbol instanceof DSymbol
                         && temp.symbol.toString().equals(this.params.get(j))
                         && temp.isEmpty())
-                    body.set(i, asts.get(j));
-            if (!body.get(i).isEmpty()) body.set(i, expand(body.get(i), asts));
+                    body.set(i, nodes.get(j));
+            if (!body.get(i).isEmpty()) body.set(i, expand(body.get(i), nodes));
         }
         return body;
     }
 
     /**
      * 进行替换
-     * @param asts  asts
+     * @param nodes nodes
      * @return 替换后的ast
      */
-    public List<Ast> expand(List<Ast> asts) {
-        DMacro dm = this.match(asts.size());
+    public List<Ast> expand(List<Ast> nodes) {
+        DMacro dm = this.match(nodes.size());
         if (dm == null) throw new DevoreRuntimeException("找不到匹配条件的宏.");
         List<Ast> result = new ArrayList<>();
-        for (Ast body : dm.bodys) result.add(dm.expand(body.copy(), asts));
+        for (Ast body : dm.bodys) result.add(dm.expand(body.copy(), nodes));
         return result;
     }
 

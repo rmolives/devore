@@ -192,9 +192,9 @@ public class Core {
                 if (!(param.symbol instanceof DSymbol)) throw new DevoreCastException(param.symbol.type(), "symbol");
                 params.add(param.symbol.toString());
             }
-            List<Ast> asts = new ArrayList<>();
-            for (int i = 1; i < ast.size(); ++i) asts.add(ast.get(i).copy());
-            env.addMacro(ast.get(0).symbol.toString(), DMacro.newMacro(params, asts));
+            List<Ast> nodes = new ArrayList<>();
+            for (int i = 1; i < ast.size(); ++i) nodes.add(ast.get(i).copy());
+            env.addMacro(ast.get(0).symbol.toString(), DMacro.newMacro(params, nodes));
             return DWord.NIL;
         }), 2, true);
         dEnv.addAstProcedure("def", ((ast, env) -> {
@@ -211,13 +211,13 @@ public class Core {
                     if (!(param.symbol instanceof DSymbol)) throw new DevoreCastException(param.symbol.type(), "symbol");
                     params.add(param.symbol.toString());
                 }
-                List<Ast> asts = new ArrayList<>();
-                for (int i = 1; i < ast.size(); ++i) asts.add(ast.get(i).copy());
+                List<Ast> nodes = new ArrayList<>();
+                for (int i = 1; i < ast.size(); ++i) nodes.add(ast.get(i).copy());
                 env.addTokenProcedure(ast.get(0).symbol.toString(), ((cArgs, cEnv) -> {
                     Env newEnv = env.createChild();
                     for (int i = 0; i < params.size(); ++i) newEnv.put(params.get(i), cArgs.get(i));
                     DToken result = DWord.NIL;
-                    for (Ast node : asts) result = Evaluator.eval(newEnv, node.copy());
+                    for (Ast node : nodes) result = Evaluator.eval(newEnv, node.copy());
                     return result;
                 }), params.size(), false);
             }
@@ -237,13 +237,13 @@ public class Core {
                     if (!(param.symbol instanceof DSymbol)) throw new DevoreCastException(param.symbol.type(), "symbol");
                     params.add(param.symbol.toString());
                 }
-                List<Ast> asts = new ArrayList<>();
-                for (int i = 1; i < ast.size(); ++i) asts.add(ast.get(i).copy());
+                List<Ast> nodes = new ArrayList<>();
+                for (int i = 1; i < ast.size(); ++i) nodes.add(ast.get(i).copy());
                 env.setTokenProcedure(ast.get(0).symbol.toString(), ((cArgs, cEnv) -> {
                     Env newEnv = env.createChild();
                     for (int i = 0; i < params.size(); ++i) newEnv.put(params.get(i), cArgs.get(i));
                     DToken result = DWord.NIL;
-                    for (Ast node : asts) result = Evaluator.eval(newEnv, node.copy());
+                    for (Ast node : nodes) result = Evaluator.eval(newEnv, node.copy());
                     return result;
                 }), params.size(), false);
             }
@@ -255,18 +255,18 @@ public class Core {
             for (Ast node : ast.get(0).children) {
                 if ("apply".equals(node.symbol.toString())) {
                     List<String> params = new ArrayList<>();
-                    List<Ast> asts = new ArrayList<>();
+                    List<Ast> res = new ArrayList<>();
                     for (Ast paramNode : node.get(0).children) {
                         if (!(paramNode.symbol instanceof DSymbol)) throw new DevoreCastException(paramNode.symbol.type(), "symbol");
                         params.add(paramNode.symbol.toString());
                     }
-                    for (int i = 1; i < node.size(); ++i) asts.add(node.get(i).copy());
+                    for (int i = 1; i < node.size(); ++i) res.add(node.get(i).copy());
                     if (!(ast.get(0).symbol instanceof DSymbol)) throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
                     newEnv.addTokenProcedure(ast.get(0).symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = env.createChild();
                         for (int i = 0; i < params.size(); ++i) newInEnv.put(params.get(i), cArgs.get(i));
                         DToken inResult = DWord.NIL;
-                        for (Ast astNode : asts) inResult = Evaluator.eval(newInEnv, astNode.copy());
+                        for (Ast tmp : res) inResult = Evaluator.eval(newInEnv, tmp.copy());
                         return inResult;
                     }), params.size(), false);
                 } else {
@@ -285,18 +285,18 @@ public class Core {
             for (Ast node : ast.get(0).children) {
                 if ("apply".equals(node.symbol.toString())) {
                     List<String> params = new ArrayList<>();
-                    List<Ast> asts = new ArrayList<>();
+                    List<Ast> res = new ArrayList<>();
                     for (Ast paramNode : node.get(0).children) {
                         if (!(paramNode.symbol instanceof DSymbol)) throw new DevoreCastException(paramNode.symbol.type(), "symbol");
                         params.add(paramNode.symbol.toString());
                     }
-                    for (int i = 1; i < node.size(); ++i) asts.add(node.get(i).copy());
+                    for (int i = 1; i < node.size(); ++i) res.add(node.get(i).copy());
                     if (!(ast.get(0).symbol instanceof DSymbol)) throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
                     newEnv.addTokenProcedure(ast.get(0).symbol.toString(), ((cArgs, cEnv) -> {
                         Env newInEnv = newEnv.createChild();
                         for (int i = 0; i < params.size(); ++i) newInEnv.put(params.get(i), cArgs.get(i));
                         DToken inResult = DWord.NIL;
-                        for (Ast astNode : asts) inResult = Evaluator.eval(newInEnv, astNode.copy());
+                        for (Ast tmp : res) inResult = Evaluator.eval(newInEnv, tmp.copy());
                         return inResult;
                     }), params.size(), false);
                 } else {
@@ -319,8 +319,8 @@ public class Core {
                     params.add(param.symbol.toString());
                 }
             }
-            List<Ast> asts = new ArrayList<>();
-            for (int i = 1; i < ast.size(); ++i) asts.add(ast.get(i).copy());
+            List<Ast> node = new ArrayList<>();
+            for (int i = 1; i < ast.size(); ++i) node.add(ast.get(i).copy());
             BiFunction<Ast, Env, DToken> df = (inAst, inEnv) -> {
                 List<DToken> args = new ArrayList<>();
                 for (int i = 0; i < inAst.size(); ++i) {
@@ -330,7 +330,7 @@ public class Core {
                 Env newInEnv = env.createChild();
                 for (int i = 0; i < params.size(); ++i) newInEnv.put(params.get(i), args.get(i));
                 DToken inResult = DWord.NIL;
-                for (Ast astNode : asts) inResult = Evaluator.eval(newInEnv, astNode.copy());
+                for (Ast tmp : node) inResult = Evaluator.eval(newInEnv, tmp.copy());
                 return inResult;
             };
             return DProcedure.newProcedure(df, params.size(), false);
@@ -339,17 +339,17 @@ public class Core {
             if (!(args.get(0) instanceof DProcedure)) throw new DevoreCastException(args.get(0).type(), "procedure");
             List<DToken> params = new ArrayList<>();
             for (int i = 1; i < args.size(); ++i) params.add(args.get(i));
-            Ast asts = Ast.emptyAst.copy();
-            for (DToken arg : params) asts.add(new Ast(arg));
-            return ((DProcedure) args.get(0)).call(asts, env);
+            Ast node = Ast.emptyAst.copy();
+            for (DToken arg : params) node.add(new Ast(arg));
+            return ((DProcedure) args.get(0)).call(node, env);
         }), 1, true);
         dEnv.addTokenProcedure("act", ((args, env) -> {
             if (!(args.get(0) instanceof DProcedure)) throw new DevoreCastException(args.get(0).type(), "procedure");
             if (!(args.get(1) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
             List<DToken> params = ((DList) args.get(1)).toList();
-            Ast asts = Ast.emptyAst.copy();
-            for (DToken arg : params) asts.add(new Ast(arg));
-            return ((DProcedure) args.get(0)).call(asts, env);
+            Ast node = Ast.emptyAst.copy();
+            for (DToken arg : params) node.add(new Ast(arg));
+            return ((DProcedure) args.get(0)).call(node, env);
         }), 2, false);
         dEnv.addTokenProcedure(">", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 2, false);
@@ -671,9 +671,9 @@ public class Core {
             List<DToken> result = new ArrayList<>();
             List<DToken> tokens = ((DList) args.get(1)).toList();
             for (DToken token : tokens) {
-                Ast asts = Ast.emptyAst.copy();
-                asts.add(new Ast(token));
-                DToken condition = ((DProcedure) args.get(0)).call(asts, env.createChild());
+                Ast node = Ast.emptyAst.copy();
+                node.add(new Ast(token));
+                DToken condition = ((DProcedure) args.get(0)).call(node, env.createChild());
                 if (!(condition instanceof DBool)) throw new DevoreCastException(condition.type(), "list");
                 if (((DBool) condition).bool) result.add(token);
             }
