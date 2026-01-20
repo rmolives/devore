@@ -17,11 +17,23 @@ public class DProcedure extends Token {
     private final List<DProcedure> children;
     private final boolean vararg;
 
-    private DProcedure(BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
+    private DProcedure(BiFunction<AstNode, Env, Token> procedure, List<DProcedure> children, int argc, boolean vararg) {
         this.procedure = procedure;
         this.argc = argc;
-        this.children = new ArrayList<>();
+        this.children = children;
         this.vararg = vararg;
+    }
+
+    /**
+     * 创建新过程
+     * @param procedure 过程
+     * @param children  子过程集
+     * @param argc      参数数量
+     * @param vararg    是否为可变参数
+     * @return this
+     */
+    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> procedure, List<DProcedure> children, int argc, boolean vararg) {
+        return new DProcedure(procedure, children, argc, vararg);
     }
 
     /**
@@ -32,7 +44,7 @@ public class DProcedure extends Token {
      * @return this
      */
     public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
-        return new DProcedure(procedure, argc, vararg);
+        return new DProcedure(procedure, new ArrayList<>(), argc, vararg);
     }
 
     /**
@@ -101,7 +113,9 @@ public class DProcedure extends Token {
 
     @Override
     public Token copy() {
-        return newProcedure(procedure, argc, vararg);
+        List<DProcedure> temp = new ArrayList<>();
+        for (DProcedure proc : children) temp.add((DProcedure) proc.copy());
+        return newProcedure(procedure, temp, argc, vararg);
     }
 
     @Override
