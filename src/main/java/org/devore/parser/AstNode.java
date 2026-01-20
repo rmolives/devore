@@ -121,7 +121,7 @@ public class AstNode {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        if (isEmpty()) {
+        if (this.isEmpty()) {
             if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
             else builder.append(this.symbol);
         } else {
