@@ -77,6 +77,6 @@ public class DProcedure extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DProcedure ? t.hashCode() == this.hashCode() ? 0 : -1 : -1;
+        return t instanceof DProcedure ? this == t ? 0 : -1 : -1;
     }
 }
