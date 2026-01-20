@@ -51,7 +51,8 @@ public class NumberUtils {
      * @return π 近似值
      */
     private static BigDecimal approximatePi() {
-        MathContext extendedMc = new MathContext(MathContext.DECIMAL128.getPrecision() + 10, MathContext.DECIMAL128.getRoundingMode());
+        MathContext extendedMc = new MathContext(MathContext.DECIMAL128.getPrecision() + 10,
+                MathContext.DECIMAL128.getRoundingMode());
         BigDecimal term1 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(5), extendedMc), extendedMc);
         BigDecimal term2 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(239), extendedMc), extendedMc);
         BigDecimal pi = BigDecimal.valueOf(4).multiply(
@@ -109,10 +110,8 @@ public class NumberUtils {
         BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), mc);
         BigDecimal arcsinX = arcsin(x, mc);
         BigDecimal result = piOver2.subtract(arcsinX, mc);
-        if (result.compareTo(BigDecimal.ZERO) < 0)
-            result = result.add(PI, mc);
-        else if (result.compareTo(PI) > 0)
-            result = result.subtract(PI, mc);
+        if (result.compareTo(BigDecimal.ZERO) < 0) result = result.add(PI, mc);
+        else if (result.compareTo(PI) > 0) result = result.subtract(PI, mc);
         return result.round(mc);
     }
 
@@ -125,7 +124,6 @@ public class NumberUtils {
      * @return arcsin(x)，范围在 -π/2 到 π/2 之间
      */
     public static BigDecimal arcsin(BigDecimal x, MathContext mc) {
-        // 检查定义域
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
             throw new DevoreRuntimeException("arcsin(x) 的定义域为 [-1, 1]，输入值超出范围.");
         if (x.compareTo(BigDecimal.ONE) == 0) return PI.divide(BigDecimal.valueOf(2), mc);
@@ -133,15 +131,13 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
         BigDecimal absX = x.abs();
         BigDecimal result;
-        if (absX.compareTo(new BigDecimal("0.7")) <= 0)
-            result = arcsinTaylor(x, mc);
+        if (absX.compareTo(new BigDecimal("0.7")) <= 0) result = arcsinTaylor(x, mc);
         else {
             BigDecimal transformed = sqrt(BigDecimal.ONE.subtract(absX)
                     .divide(BigDecimal.valueOf(2), mc), mc);
             result = PI.divide(BigDecimal.valueOf(2), mc)
                     .subtract(BigDecimal.valueOf(2).multiply(arcsinTaylor(transformed, mc), mc), mc);
-            if (x.compareTo(BigDecimal.ZERO) < 0)
-                result = result.negate();
+            if (x.compareTo(BigDecimal.ZERO) < 0) result = result.negate();
         }
         return result.round(mc);
     }
@@ -168,8 +164,7 @@ public class NumberUtils {
             BigDecimal currentTerm = coefficient.multiply(term, mc);
             result = result.add(currentTerm, mc);
             ++n;
-            if (n > mc.getPrecision() * 10)
-                break;
+            if (n > mc.getPrecision() * 10) break;
         }
         return result;
     }
@@ -188,15 +183,13 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ONE.negate()) == 0) return PI.divide(BigDecimal.valueOf(4), mc).negate(); // -π/4
         BigDecimal absX = x.abs();
         BigDecimal result;
-        if (absX.compareTo(BigDecimal.ONE) <= 0)
-            result = arctanTaylor(absX, mc);
+        if (absX.compareTo(BigDecimal.ONE) <= 0) result = arctanTaylor(absX, mc);
         else {
             BigDecimal reciprocal = BigDecimal.ONE.divide(absX, mc);
             BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), mc);
             result = piOver2.subtract(arctanTaylor(reciprocal, mc), mc);
         }
-        if (x.compareTo(BigDecimal.ZERO) < 0)
-            result = result.negate();
+        if (x.compareTo(BigDecimal.ZERO) < 0) result = result.negate();
         return result.round(mc);
     }
 
@@ -219,8 +212,7 @@ public class NumberUtils {
             term = term.multiply(xSquared, mc);
             n++;
             add = !add;
-            if (n > mc.getPrecision() * 20)
-                break;
+            if (n > mc.getPrecision() * 20) break;
         }
         return result;
     }
@@ -234,10 +226,8 @@ public class NumberUtils {
      */
     private static BigDecimal reduceAngle(BigDecimal angle, MathContext mc) {
         angle = angle.remainder(TWO_PI, mc);
-        if (angle.compareTo(PI) > 0)
-            angle = angle.subtract(TWO_PI);
-        else if (angle.compareTo(PI.negate()) < 0)
-            angle = angle.add(TWO_PI);
+        if (angle.compareTo(PI) > 0) angle = angle.subtract(TWO_PI);
+        else if (angle.compareTo(PI.negate()) < 0) angle = angle.add(TWO_PI);
         return angle;
     }
 
@@ -267,7 +257,6 @@ public class NumberUtils {
         int i = 1;
         while (term.abs().compareTo(tolerance) > 0) {
             result = result.add(term);
-            // Calculate next term: term * -x² / ((i+1)*(i+2))
             term = term.multiply(xSquared).negate()
                     .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), mc);
             i += 2;
@@ -291,7 +280,6 @@ public class NumberUtils {
         int i = 0;
         while (term.abs().compareTo(tolerance) > 0) {
             result = result.add(term);
-            // Calculate next term: term * -x² / ((i+1)*(i+2))
             term = term.multiply(xSquared).negate()
                     .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), mc);
             i += 2;
@@ -349,9 +337,7 @@ public class NumberUtils {
         }
         if (x.compareTo(BigDecimal.ONE) == 0) return BigDecimal.ONE;
         if (isInt(y)) return powInt(x, y.toBigInteger(), mc);
-        if (x.compareTo(BigDecimal.ZERO) < 0)
-            throw new DevoreRuntimeException("非整数指数的负数.");
-        // General case: x^y = exp(y * ln(x))
+        if (x.compareTo(BigDecimal.ZERO) < 0) throw new DevoreRuntimeException("非整数指数的负数.");
         return exp(y.multiply(log(x, mc)), mc);
     }
 
@@ -383,9 +369,7 @@ public class NumberUtils {
      * @return ln(x)
      */
     public static BigDecimal log(BigDecimal x, MathContext mc) {
-        if (x.compareTo(BigDecimal.ZERO) <= 0)
-            throw new DevoreRuntimeException("非正数的对数.");
-        // Use ln(x) = 2*atanh((x-1)/(x+1)) for better convergence
+        if (x.compareTo(BigDecimal.ZERO) <= 0) throw new DevoreRuntimeException("非正数的对数.");
         BigDecimal term = x.subtract(BigDecimal.ONE).divide(x.add(BigDecimal.ONE), mc);
         BigDecimal termSquared = term.multiply(term);
         BigDecimal result = term;
@@ -395,8 +379,7 @@ public class NumberUtils {
             currentTerm = currentTerm.multiply(termSquared, mc);
             BigDecimal delta = currentTerm.divide(BigDecimal.valueOf(k), mc);
             result = result.add(delta, mc);
-            if (delta.abs().compareTo(tolerance) < 0)
-                break;
+            if (delta.abs().compareTo(tolerance) < 0) break;
         }
         return result.multiply(TWO, mc);
     }
@@ -431,8 +414,7 @@ public class NumberUtils {
         while (true) {
             term = term.multiply(x, mc).divide(BigDecimal.valueOf(n), mc);
             result = result.add(term, mc);
-            if (term.abs().compareTo(tolerance) < 0)
-                break;
+            if (term.abs().compareTo(tolerance) < 0) break;
             ++n;
         }
         return result.round(mc);

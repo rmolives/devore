@@ -25,21 +25,18 @@ public class DMacro extends Token {
     }
 
     public DMacro addMacro(DMacro macro) {
-        if (match(macro.params.size()) != null)
-            throw new DevoreRuntimeException("宏定义冲突.");
+        if (match(macro.params.size()) != null) throw new DevoreRuntimeException("宏定义冲突.");
         this.children.add(macro);
         return this;
     }
 
     private DMacro match(int argSize) {
         DMacro macro = null;
-        if (this.params.size() == argSize)
-            macro = this;
+        if (this.params.size() == argSize) macro = this;
         else {
             for (DMacro dm : children) {
                 DMacro temp = dm.match(argSize);
-                if (temp != null)
-                    macro = temp;
+                if (temp != null) macro = temp;
             }
         }
         return macro;
@@ -61,8 +58,7 @@ public class DMacro extends Token {
                         && temp.symbol.toString().equals(params.get(j))
                         && temp.isEmpty())
                     body.set(i, asts.get(j));
-            if (!body.get(i).isEmpty())
-                body.set(i, expand(body.get(i), asts));
+            if (!body.get(i).isEmpty()) body.set(i, expand(body.get(i), asts));
         }
         return body;
     }
@@ -71,8 +67,7 @@ public class DMacro extends Token {
         DMacro dm = match(asts.size());
         if (dm == null) throw new DevoreRuntimeException("找不到匹配条件的宏.");
         List<AstNode> result = new ArrayList<>();
-        for (AstNode body : dm.bodys)
-            result.add(dm.expand(body.copy(), asts));
+        for (AstNode body : dm.bodys) result.add(dm.expand(body.copy(), asts));
         return result;
     }
 
@@ -89,8 +84,7 @@ public class DMacro extends Token {
     @Override
     public Token copy() {
         List<AstNode> temp = new ArrayList<>();
-        for (AstNode body : bodys)
-            temp.add(body.copy());
+        for (AstNode body : bodys) temp.add(body.copy());
         return new DMacro(new ArrayList<>(params), temp);
     }
 

@@ -623,10 +623,8 @@ public class Core {
             if (flag) {
                 List<Token> list = new ArrayList<>();
                 for (Token arg : args) {
-                    if (arg instanceof DList)
-                        list.addAll(((DList) arg).toList());
-                    else
-                        list.add(arg);
+                    if (arg instanceof DList) list.addAll(((DList) arg).toList());
+                    else list.add(arg);
                 }
                 result = DList.valueOf(list);
             } else {
