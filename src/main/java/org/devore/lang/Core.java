@@ -31,7 +31,7 @@ public class Core {
         dEnv.addTokenProcedure("-", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             DNumber number = (DNumber) args.get(0);
-            if (args.size() == 1) return DNumber.valueOf(0).sub(number);
+            if (args.size() == 1) return DNumber.valueOf(number.toBigDecimal().negate());
             for (int i = 1; i < args.size(); ++i) {
                 if (!(args.get(i) instanceof DNumber)) throw new DevoreCastException(args.get(i).type(), "number");
                 number = number.sub((DNumber) args.get(i));
