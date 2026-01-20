@@ -64,20 +64,19 @@ public class DProcedure extends DToken {
      * @return 符合条件的过程
      */
     private DProcedure match(int argc) {
-        if (this.argc == argc) return this;
+        if (this.argc == argc && !vararg) return this;
         for (DProcedure df : this.children) {
             DProcedure temp = df.match(argc);
-            if (temp != null && temp.argc == argc) return temp;
+            if (temp != null && temp.argc == argc && !temp.vararg) return temp;
         }
         DProcedure bestVararg = null;
         for (DProcedure df : this.children) {
             DProcedure temp = df.match(argc);
-            if (temp != null && temp.vararg && argc >= temp.argc)
-                if (bestVararg == null || temp.argc > bestVararg.argc)
-                    bestVararg = temp;
+            if (temp != null && argc >= temp.argc && temp.vararg)
+                if (bestVararg == null || temp.argc > bestVararg.argc) bestVararg = temp;
         }
         if (bestVararg != null) return bestVararg;
-        if (this.vararg && argc >= this.argc) return this;
+        if (argc >= this.argc && this.vararg) return this;
         return null;
     }
 
