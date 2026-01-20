@@ -905,6 +905,6 @@ public class Core {
                 DBool.valueOf(args.get(0) instanceof DWord && args.get(0) == DWord.NIL)), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DNumber
-                        && ((DNumber) args.get(0)).toBigInteger().compareTo(BigInteger.ZERO) == 0)), 1, false);
+                        && args.get(0).compareTo(DNumber.valueOf(0)) == 0)), 1, false);
     }
 }
