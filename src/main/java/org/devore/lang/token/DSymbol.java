@@ -3,7 +3,7 @@ package org.devore.lang.token;
 /**
  * 符号
  */
-public class DSymbol extends Token {
+public class DSymbol extends DToken {
     public final String symbol;
 
     protected DSymbol(String symbol) {
@@ -25,12 +25,12 @@ public class DSymbol extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         return DSymbol.valueOf(this.symbol);
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         return t instanceof DSymbol ? this.symbol.compareTo(((DSymbol) t).symbol) : -1;
     }
 

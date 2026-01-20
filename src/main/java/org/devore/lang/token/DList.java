@@ -7,14 +7,14 @@ import java.util.List;
 /**
  * 列表
  */
-public class DList extends Token {
-    private final List<Token> tokens;
+public class DList extends DToken {
+    private final List<DToken> tokens;
 
-    private DList(List<Token> tokens) {
+    private DList(List<DToken> tokens) {
         this.tokens = tokens;
     }
 
-    public static DList valueOf(List<Token> tokens) {
+    public static DList valueOf(List<DToken> tokens) {
         return new DList(tokens);
     }
 
@@ -32,11 +32,11 @@ public class DList extends Token {
      */
     public DList sort(boolean force) {
         if (force) {
-            this.tokens.sort(Token::compareTo);
+            this.tokens.sort(DToken::compareTo);
             return this;
         }
-        List<Token> newList = new ArrayList<>(this.tokens);
-        newList.sort(Token::compareTo);
+        List<DToken> newList = new ArrayList<>(this.tokens);
+        newList.sort(DToken::compareTo);
         return DList.valueOf(newList);
     }
 
@@ -50,7 +50,7 @@ public class DList extends Token {
             Collections.reverse(this.tokens);
             return this;
         }
-        List<Token> newList = new ArrayList<>(this.tokens);
+        List<DToken> newList = new ArrayList<>(this.tokens);
         Collections.reverse(newList);
         return DList.valueOf(newList);
     }
@@ -61,12 +61,12 @@ public class DList extends Token {
      * @param force 是否更改原列表
      * @return 结果
      */
-    public DList add(Token t, boolean force) {
+    public DList add(DToken t, boolean force) {
         if (force) {
             this.tokens.add(t);
             return this;
         }
-        List<Token> newList = new ArrayList<>(this.tokens);
+        List<DToken> newList = new ArrayList<>(this.tokens);
         newList.add(t);
         return DList.valueOf(newList);
     }
@@ -78,12 +78,12 @@ public class DList extends Token {
      * @param force 是否更改原列表
      * @return 结果
      */
-    public DList add(int index, Token t, boolean force) {
+    public DList add(int index, DToken t, boolean force) {
         if (force) {
             this.tokens.add(index, t);
             return this;
         }
-        List<Token> newList = new ArrayList<>(this.tokens);
+        List<DToken> newList = new ArrayList<>(this.tokens);
         newList.add(index, t);
         return DList.valueOf(newList);
     }
@@ -93,7 +93,7 @@ public class DList extends Token {
      * @param index 位置
      * @return 元素
      */
-    public Token get(int index) {
+    public DToken get(int index) {
         return this.tokens.get(index);
     }
 
@@ -104,12 +104,12 @@ public class DList extends Token {
      * @param force 是否更改原列表
      * @return 结果
      */
-    public Token set(int index, Token t, boolean force) {
+    public DToken set(int index, DToken t, boolean force) {
         if (force) {
             this.tokens.set(index, t);
             return this;
         }
-        List<Token> newList = new ArrayList<>(this.tokens);
+        List<DToken> newList = new ArrayList<>(this.tokens);
         newList.set(index, t);
         return DList.valueOf(newList);
     }
@@ -125,7 +125,7 @@ public class DList extends Token {
             this.tokens.remove(index);
             return this;
         }
-        List<Token> newList = new ArrayList<>(this.tokens);
+        List<DToken> newList = new ArrayList<>(this.tokens);
         newList.remove(index);
         return DList.valueOf(newList);
     }
@@ -135,7 +135,7 @@ public class DList extends Token {
      * @param t 元素
      * @return 位置
      */
-    public int indexOf(Token t) {
+    public int indexOf(DToken t) {
         return this.tokens.indexOf(t);
     }
 
@@ -144,7 +144,7 @@ public class DList extends Token {
      * @param t 元素
      * @return 位置
      */
-    public int lastIndexOf(Token t) {
+    public int lastIndexOf(DToken t) {
         return this.tokens.lastIndexOf(t);
     }
 
@@ -153,7 +153,7 @@ public class DList extends Token {
      * @param t 元素
      * @return 结果
      */
-    public boolean contains(Token t) {
+    public boolean contains(DToken t) {
         return this.tokens.contains(t);
     }
 
@@ -174,7 +174,7 @@ public class DList extends Token {
      */
     public DList subList(int fromIndex, int toIndex, boolean force) {
         if (force) {
-            List<Token> view = this.tokens.subList(fromIndex, toIndex);
+            List<DToken> view = this.tokens.subList(fromIndex, toIndex);
             this.tokens.clear();
             this.tokens.addAll(view);
             return this;
@@ -186,7 +186,7 @@ public class DList extends Token {
      * 转换为Java的List
      * @return 结果
      */
-    public List<Token> toList() {
+    public List<DToken> toList() {
         return this.tokens;
     }
 
@@ -201,12 +201,12 @@ public class DList extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         return DList.valueOf(new ArrayList<>(this.tokens));
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         if (!(t instanceof DList)) return -1;
         DList other = (DList) t;
         if (other.size() != this.size()) return -1;

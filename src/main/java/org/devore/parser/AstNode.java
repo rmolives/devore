@@ -2,7 +2,7 @@ package org.devore.parser;
 
 import org.devore.lang.token.DString;
 import org.devore.lang.token.DWord;
-import org.devore.lang.token.Token;
+import org.devore.lang.token.DToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +13,14 @@ import java.util.List;
 public class AstNode {
     public final static AstNode emptyAst = new AstNode(DWord.NIL);     // 空白语法树
     public List<AstNode> children;                                     // 子树
-    public Token symbol;                                               // 内容
+    public DToken symbol;                                               // 内容
     public AstType type;                                               // 语法树类型
 
     /**
      * 创建语法树
      * @param symbol 内容
      */
-    public AstNode(Token symbol) {
+    public AstNode(DToken symbol) {
         this.symbol = symbol;
         this.type = AstType.BASIC;
         this.children = new ArrayList<>();
@@ -32,7 +32,7 @@ public class AstNode {
      * @param type   类型
      * @param child  子树
      */
-    public AstNode(Token symbol, AstType type, List<AstNode> child) {
+    public AstNode(DToken symbol, AstType type, List<AstNode> child) {
         this.symbol = symbol;
         this.type = type;
         this.children = child;

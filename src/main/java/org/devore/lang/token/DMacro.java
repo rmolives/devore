@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 宏
  */
-public class DMacro extends Token {
+public class DMacro extends DToken {
     private final List<String> params;
     private final List<AstNode> bodys;
     private final List<DMacro> children;
@@ -109,14 +109,14 @@ public class DMacro extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         List<AstNode> temp = new ArrayList<>();
         for (AstNode body : this.bodys) temp.add(body.copy());
         return DMacro.newMacro(new ArrayList<>(this.params), temp);
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         if (this == t) return 0;
         if (!(t instanceof DMacro)) return -1;
         DMacro other = (DMacro) t;

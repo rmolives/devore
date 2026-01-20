@@ -3,7 +3,7 @@ package org.devore;
 import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.DWord;
-import org.devore.lang.token.Token;
+import org.devore.lang.token.DToken;
 import org.devore.parser.Lexer;
 import org.devore.parser.Parse;
 
@@ -21,9 +21,9 @@ public class Devore {
      * @param code 代码
      * @return 返回值
      */
-    public static Token call(Env env, String code) {
+    public static DToken call(Env env, String code) {
         List<String> codes = Lexer.splitCode(code);
-        Token result = DWord.NIL;
+        DToken result = DWord.NIL;
         for (String exp : codes) result = Evaluator.eval(env, Parse.parse(Lexer.lexer(exp)));
         return result;
     }

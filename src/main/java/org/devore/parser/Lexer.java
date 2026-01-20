@@ -102,9 +102,9 @@ public class Lexer {
      * @param expression 代码片段
      * @return Token序列
      */
-    public static List<Token> lexer(String expression) {
+    public static List<DToken> lexer(String expression) {
         char[] expressionCharArray = expression.toCharArray();
-        List<Token> tokens = new ArrayList<>();
+        List<DToken> tokens = new ArrayList<>();
         int index = -1;
         while (++index < expressionCharArray.length) {
             switch (expressionCharArray[index]) {

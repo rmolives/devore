@@ -2,7 +2,7 @@ package org.devore;
 
 import org.devore.lang.Env;
 import org.devore.lang.token.DWord;
-import org.devore.lang.token.Token;
+import org.devore.lang.token.DToken;
 
 import java.io.*;
 
@@ -53,7 +53,7 @@ public class Repl {
                 ++index;
             } while (index < codeCharArray.length);
             if (flag == 0) {
-                Token result = Devore.call(env, codeBuilder.toString());
+                DToken result = Devore.call(env, codeBuilder.toString());
                 codeBuilder = new StringBuilder();
                 if (result != DWord.NIL)
                     out.println(result.toString());

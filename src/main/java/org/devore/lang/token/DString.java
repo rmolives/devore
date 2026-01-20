@@ -3,7 +3,7 @@ package org.devore.lang.token;
 /**
  * 字符串
  */
-public class DString extends Token {
+public class DString extends DToken {
     public final String str;
 
     protected DString(String str) {
@@ -25,12 +25,12 @@ public class DString extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         return DString.valueOf(this.str);
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         return t instanceof DString ? this.str.compareTo(((DString) t).str) : -1;
     }
 

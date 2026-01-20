@@ -15,7 +15,7 @@ public class Evaluator {
      * @param ast 语法树
      * @return 返回值
      */
-    public static Token eval(Env env, AstNode ast) {
+    public static DToken eval(Env env, AstNode ast) {
         while (true) {
             if (ast.symbol instanceof DSymbol && env.contains(ast.symbol.toString()))
                 ast.symbol = env.get(ast.symbol.toString());
@@ -25,7 +25,7 @@ public class Evaluator {
         if (ast.symbol instanceof DMacro) {
             DMacro macro = (DMacro) ast.symbol;
             List<AstNode> bodys = macro.expand(ast.children);
-            Token result = DWord.NIL;
+            DToken result = DWord.NIL;
             for (AstNode temp : bodys) result = eval(env, temp);
             return result;
         }

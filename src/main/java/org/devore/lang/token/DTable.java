@@ -7,14 +7,14 @@ import java.util.Set;
 /**
  * 表
  */
-public class DTable extends Token {
-    private final Map<Token, Token> table;
+public class DTable extends DToken {
+    private final Map<DToken, DToken> table;
 
-    private DTable(Map<Token, Token> table) {
+    private DTable(Map<DToken, DToken> table) {
         this.table = table;
     }
 
-    public static DTable valueOf(Map<Token, Token> table) {
+    public static DTable valueOf(Map<DToken, DToken> table) {
         return new DTable(table);
     }
 
@@ -32,12 +32,12 @@ public class DTable extends Token {
      * @param force 是否更改原表
      * @return 结果
      */
-    public DTable put(Token key, Token value, boolean force) {
+    public DTable put(DToken key, DToken value, boolean force) {
         if (force) {
             this.table.put(key, value);
             return this;
         }
-        Map<Token, Token> newTable = new HashMap<>(this.table);
+        Map<DToken, DToken> newTable = new HashMap<>(this.table);
         newTable.put(key, value);
         return DTable.valueOf(newTable);
     }
@@ -47,7 +47,7 @@ public class DTable extends Token {
      * @param key   key
      * @return 结果
      */
-    public DBool containsKey(Token key) {
+    public DBool containsKey(DToken key) {
         return DBool.valueOf(this.table.containsKey(key));
     }
 
@@ -56,7 +56,7 @@ public class DTable extends Token {
      * @param value value
      * @return 结果
      */
-    public DBool containsValue(Token value) {
+    public DBool containsValue(DToken value) {
         return DBool.valueOf(this.table.containsValue(value));
     }
 
@@ -65,7 +65,7 @@ public class DTable extends Token {
      * @param key   key
      * @return 结果
      */
-    public Token get(Token key) {
+    public DToken get(DToken key) {
         return this.table.get(key);
     }
 
@@ -75,12 +75,12 @@ public class DTable extends Token {
      * @param force 是否更改原表
      * @return 结果
      */
-    public DTable remove(Token key, boolean force) {
+    public DTable remove(DToken key, boolean force) {
         if (force) {
             this.table.remove(key);
             return this;
         }
-        Map<Token, Token> newTable = new HashMap<>(this.table);
+        Map<DToken, DToken> newTable = new HashMap<>(this.table);
         newTable.remove(key);
         return DTable.valueOf(newTable);
     }
@@ -89,7 +89,7 @@ public class DTable extends Token {
      * 获取所有key
      * @return 结果
      */
-    public Set<Token> keys() {
+    public Set<DToken> keys() {
         return this.table.keySet();
     }
 
@@ -112,12 +112,12 @@ public class DTable extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         return DTable.valueOf(new HashMap<>(this.table));
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         if (!(t instanceof DTable)) return -1;
         DTable other = (DTable) t;
         return this.table.equals(other.table) ? 0 : -1;

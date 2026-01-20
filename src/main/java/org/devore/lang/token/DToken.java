@@ -3,7 +3,7 @@ package org.devore.lang.token;
 /**
  * Token
  */
-public abstract class Token {
+public abstract class DToken {
     /**
      * 获取当前token类型
      * @return 类型
@@ -20,14 +20,14 @@ public abstract class Token {
      * 复制当前token
      * @return token
      */
-    public abstract Token copy();
+    public abstract DToken copy();
 
     /**
      * token比较
      * @param t token
      * @return 结果
      */
-    public abstract int compareTo(Token t);
+    public abstract int compareTo(DToken t);
 
     /**
      * 获取当前token的hash
@@ -43,7 +43,7 @@ public abstract class Token {
      */
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Token && this.compareTo((Token) obj) == 0;
+        return obj instanceof DToken && this.compareTo((DToken) obj) == 0;
     }
 
     /**

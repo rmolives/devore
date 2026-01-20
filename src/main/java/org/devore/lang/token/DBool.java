@@ -3,7 +3,7 @@ package org.devore.lang.token;
 /**
  * 布尔值
  */
-public class DBool extends Token {
+public class DBool extends DToken {
     public static final DBool FALSE = new DBool(false);
     public static final DBool TRUE = new DBool(true);
     public final boolean bool;
@@ -27,12 +27,12 @@ public class DBool extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         return DBool.valueOf(this.bool);
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         return t instanceof DBool && this.bool == ((DBool) t).bool ? 0 : -1;
     }
 

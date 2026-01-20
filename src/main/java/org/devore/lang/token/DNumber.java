@@ -11,7 +11,7 @@ import java.math.RoundingMode;
 /**
  * 数字
  */
-public abstract class DNumber extends Token {
+public abstract class DNumber extends DToken {
     public static DNumber valueOf(long n) {
         return DNumber.valueOf(BigInteger.valueOf(n));
     }
@@ -218,12 +218,12 @@ public abstract class DNumber extends Token {
     public abstract BigDecimal toBigDecimal();
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         return t instanceof DNumber ? this.toBigDecimal().compareTo(((DNumber) t).toBigDecimal()) : -1;
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         return DNumber.valueOf(this.toBigDecimal());
     }
 

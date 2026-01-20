@@ -3,7 +3,7 @@ package org.devore.lang.token;
 /**
  * 关键字
  */
-public class DWord extends Token {
+public class DWord extends DToken {
     public static final DWord LB = DWord.valueOf(WordTags.LB);     // (
     public static final DWord RB = DWord.valueOf(WordTags.RB);     // )
     public static final DWord NIL = DWord.valueOf(WordTags.NIL);   // nil
@@ -37,12 +37,12 @@ public class DWord extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         return DWord.valueOf(this.tag);
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         return t instanceof DWord && this.tag.equals(((DWord) t).tag) ? 0 : -1;
     }
 

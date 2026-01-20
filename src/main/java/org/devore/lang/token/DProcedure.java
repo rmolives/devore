@@ -11,13 +11,13 @@ import java.util.function.BiFunction;
 /**
  * 过程
  */
-public class DProcedure extends Token {
-    private final BiFunction<AstNode, Env, Token> procedure;
+public class DProcedure extends DToken {
+    private final BiFunction<AstNode, Env, DToken> procedure;
     private final int argc;
     private final List<DProcedure> children;
     private final boolean vararg;
 
-    private DProcedure(BiFunction<AstNode, Env, Token> procedure, List<DProcedure> children, int argc, boolean vararg) {
+    private DProcedure(BiFunction<AstNode, Env, DToken> procedure, List<DProcedure> children, int argc, boolean vararg) {
         this.procedure = procedure;
         this.argc = argc;
         this.children = children;
@@ -32,7 +32,7 @@ public class DProcedure extends Token {
      * @param vararg    是否为可变参数
      * @return this
      */
-    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> procedure, List<DProcedure> children, int argc, boolean vararg) {
+    public static DProcedure newProcedure(BiFunction<AstNode, Env, DToken> procedure, List<DProcedure> children, int argc, boolean vararg) {
         return new DProcedure(procedure, children, argc, vararg);
     }
 
@@ -43,7 +43,7 @@ public class DProcedure extends Token {
      * @param vararg    是否为可变参数
      * @return this
      */
-    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
+    public static DProcedure newProcedure(BiFunction<AstNode, Env, DToken> procedure, int argc, boolean vararg) {
         return new DProcedure(procedure, new ArrayList<>(), argc, vararg);
     }
 
@@ -81,7 +81,7 @@ public class DProcedure extends Token {
      * @param env   环境
      * @return 结果
      */
-    public Token call(AstNode ast, Env env) {
+    public DToken call(AstNode ast, Env env) {
         DProcedure df = this.match(ast.size());
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
         return df.procedure.apply(ast, env);
@@ -93,11 +93,11 @@ public class DProcedure extends Token {
      * @param env   环境
      * @return 结果
      */
-    public Token call(Token[] args, Env env) {
+    public DToken call(DToken[] args, Env env) {
         DProcedure df = this.match(args.length);
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
         AstNode ast = AstNode.emptyAst.copy();
-        for (Token arg : args) ast.add(new AstNode(arg));
+        for (DToken arg : args) ast.add(new AstNode(arg));
         return df.procedure.apply(ast, env);
     }
 
@@ -112,14 +112,14 @@ public class DProcedure extends Token {
     }
 
     @Override
-    public Token copy() {
+    public DToken copy() {
         List<DProcedure> temp = new ArrayList<>();
         for (DProcedure proc : this.children) temp.add((DProcedure) proc.copy());
         return newProcedure(this.procedure, temp, this.argc, this.vararg);
     }
 
     @Override
-    public int compareTo(Token t) {
+    public int compareTo(DToken t) {
         if (this == t) return 0;
         if (!(t instanceof DProcedure)) return -1;
         DProcedure other = (DProcedure) t;

@@ -3,7 +3,7 @@ package org.devore.parser;
 import org.devore.exception.DevoreParseException;
 import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.DWord;
-import org.devore.lang.token.Token;
+import org.devore.lang.token.DToken;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -18,7 +18,7 @@ public class Parse {
      * @param tokens Token序列
      * @return 语法树
      */
-    public static AstNode parse(List<Token> tokens) {
+    public static AstNode parse(List<DToken> tokens) {
         AstNode ast = null;
         Deque<AstNode> stack = new ArrayDeque<>();
         int state = -1;

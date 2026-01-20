@@ -4,7 +4,7 @@ import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DWord;
-import org.devore.lang.token.Token;
+import org.devore.lang.token.DToken;
 import org.devore.parser.AstNode;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public class Env {
-    public final Map<String, Token> table;  // 环境表
+    public final Map<String, DToken> table;  // 环境表
     public final Env father;                // 父环境
     public final IOConfig io;               // IO表
 
@@ -24,7 +24,7 @@ public class Env {
      * @param father 父环境
      * @param io     IO表
      */
-    public Env(Map<String, Token> table, Env father, IOConfig io) {
+    public Env(Map<String, DToken> table, Env father, IOConfig io) {
         this.table = table;
         this.father = father;
         this.io = io;
@@ -64,7 +64,7 @@ public class Env {
      * @param value value
      * @return 环境
      */
-    public Env put(String key, Token value) {
+    public Env put(String key, DToken value) {
         if (this.table.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
         this.table.put(key, value);
@@ -94,7 +94,7 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
+    public Env addAstProcedure(String key, BiFunction<AstNode, Env, DToken> procedure, int argc, boolean vararg) {
         if (this.table.containsKey(key)) {
             this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argc, vararg)));
             return this;
@@ -111,9 +111,9 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argc, boolean vararg) {
-        BiFunction<AstNode, Env, Token> df = (ast, env) -> {
-            List<Token> args = new ArrayList<>();
+    public Env addTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
+        BiFunction<AstNode, Env, DToken> df = (ast, env) -> {
+            List<DToken> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
                 ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
                 args.add(ast.get(i).symbol);
@@ -136,7 +136,7 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
+    public Env setAstProcedure(String key, BiFunction<AstNode, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
         temp.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
@@ -151,11 +151,11 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argc, boolean vararg) {
+    public Env setTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
-        BiFunction<AstNode, Env, Token> df = (ast, env) -> {
-            List<Token> args = new ArrayList<>();
+        BiFunction<AstNode, Env, DToken> df = (ast, env) -> {
+            List<DToken> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
                 ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
                 args.add(ast.get(i).symbol);
@@ -172,7 +172,7 @@ public class Env {
      * @param value value
      * @return 环境
      */
-    public Env set(String key, Token value) {
+    public Env set(String key, DToken value) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
         temp.table.put(key, value);
@@ -195,7 +195,7 @@ public class Env {
      * @param key key
      * @return value
      */
-    public Token get(String key) {
+    public DToken get(String key) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
         return temp.contains(key) ? temp.table.get(key) : DWord.NIL;
@@ -206,7 +206,7 @@ public class Env {
      * @param key key
      * @return 删除的value
      */
-    public Token remove(String key) {
+    public DToken remove(String key) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
         return temp.contains(key) ? temp.table.remove(key) : DWord.NIL;
