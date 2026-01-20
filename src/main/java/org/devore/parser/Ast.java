@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * 抽象语法树
  */
-public class AstNode {
-    public final static AstNode emptyAst = new AstNode(DWord.NIL);     // 空白语法树
-    public List<AstNode> children;                                     // 子树
+public class Ast {
+    public final static Ast emptyAst = new Ast(DWord.NIL);     // 空白语法树
+    public List<Ast> children;                                     // 子树
     public DToken symbol;                                               // 内容
     public AstType type;                                               // 语法树类型
 
@@ -20,7 +20,7 @@ public class AstNode {
      * 创建语法树
      * @param symbol 内容
      */
-    public AstNode(DToken symbol) {
+    public Ast(DToken symbol) {
         this.symbol = symbol;
         this.type = AstType.BASIC;
         this.children = new ArrayList<>();
@@ -32,7 +32,7 @@ public class AstNode {
      * @param type   类型
      * @param child  子树
      */
-    public AstNode(DToken symbol, AstType type, List<AstNode> child) {
+    public Ast(DToken symbol, AstType type, List<Ast> child) {
         this.symbol = symbol;
         this.type = type;
         this.children = child;
@@ -42,17 +42,17 @@ public class AstNode {
      * 复制
      * @return 复制
      */
-    public AstNode copy() {
-        List<AstNode> list = new ArrayList<>();
-        for (AstNode ast : this.children) list.add(ast.copy());
-        return new AstNode(this.symbol, this.type, list);
+    public Ast copy() {
+        List<Ast> list = new ArrayList<>();
+        for (Ast ast : this.children) list.add(ast.copy());
+        return new Ast(this.symbol, this.type, list);
     }
 
     /**
      * 添加子树
      * @param node 子树
      */
-    public void add(AstNode node) {
+    public void add(Ast node) {
         this.children.add(node);
     }
 
@@ -61,7 +61,7 @@ public class AstNode {
      * @param i    位置
      * @param node 子树
      */
-    public void add(int i, AstNode node) {
+    public void add(int i, Ast node) {
         this.children.add(i, node);
     }
 
@@ -70,7 +70,7 @@ public class AstNode {
      * @param i    index
      * @param node 子树
      */
-    public void set(int i, AstNode node) {
+    public void set(int i, Ast node) {
         this.children.set(i, node);
     }
 
@@ -79,7 +79,7 @@ public class AstNode {
      * @param i index
      * @return 子树
      */
-    public AstNode get(int i) {
+    public Ast get(int i) {
         return this.children.get(i);
     }
 
@@ -123,13 +123,13 @@ public class AstNode {
         StringBuilder builder = new StringBuilder();
         if (this.isEmpty()) {
             if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
-            else if (this.type == AstNode.AstType.PROCEDURE) builder.append("(").append(this.symbol).append(")");
+            else if (this.type == Ast.AstType.PROCEDURE) builder.append("(").append(this.symbol).append(")");
             else builder.append(this.symbol);
         } else {
             builder.append("(");
             if (this.symbol instanceof DString) builder.append("\"").append(symbol).append("\"");
             else builder.append(this.symbol);
-            for (AstNode ast : this.children) builder.append(" ").append(ast.toString());
+            for (Ast ast : this.children) builder.append(" ").append(ast.toString());
             builder.append(")");
         }
         return builder.toString();

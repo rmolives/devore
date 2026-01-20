@@ -1,7 +1,7 @@
 package org.devore.lang.token;
 
 import org.devore.exception.DevoreRuntimeException;
-import org.devore.parser.AstNode;
+import org.devore.parser.Ast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.List;
  */
 public class DMacro extends DToken {
     private final List<String> params;
-    private final List<AstNode> bodys;
+    private final List<Ast> bodys;
     private final List<DMacro> children;
 
-    private DMacro(List<String> params, List<AstNode> bodys) {
+    private DMacro(List<String> params, List<Ast> bodys) {
         this.params = params;
         this.bodys = bodys;
         this.children = new ArrayList<>();
@@ -26,7 +26,7 @@ public class DMacro extends DToken {
      * @param bodys     bodys
      * @return this
      */
-    public static DMacro newMacro(List<String> params, List<AstNode> bodys) {
+    public static DMacro newMacro(List<String> params, List<Ast> bodys) {
         return new DMacro(params, bodys);
     }
 
@@ -64,7 +64,7 @@ public class DMacro extends DToken {
      * @param asts  asts
      * @return 替换后的ast
      */
-    private AstNode expand(AstNode body, List<AstNode> asts) {
+    private Ast expand(Ast body, List<Ast> asts) {
         for (int j = 0; j < this.params.size(); ++j)
             if (body.isNotNil()
                     && body.symbol instanceof DSymbol
@@ -73,7 +73,7 @@ public class DMacro extends DToken {
                 body.add(0, asts.get(j));
             }
         for (int i = 0; i < body.size(); ++i) {
-            AstNode temp = body.get(i);
+            Ast temp = body.get(i);
             for (int j = 0; j < this.params.size(); ++j)
                 if (body.isNotNil()
                         && body.symbol instanceof DSymbol
@@ -90,11 +90,11 @@ public class DMacro extends DToken {
      * @param asts  asts
      * @return 替换后的ast
      */
-    public List<AstNode> expand(List<AstNode> asts) {
+    public List<Ast> expand(List<Ast> asts) {
         DMacro dm = this.match(asts.size());
         if (dm == null) throw new DevoreRuntimeException("找不到匹配条件的宏.");
-        List<AstNode> result = new ArrayList<>();
-        for (AstNode body : dm.bodys) result.add(dm.expand(body.copy(), asts));
+        List<Ast> result = new ArrayList<>();
+        for (Ast body : dm.bodys) result.add(dm.expand(body.copy(), asts));
         return result;
     }
 
@@ -110,8 +110,8 @@ public class DMacro extends DToken {
 
     @Override
     public DToken copy() {
-        List<AstNode> temp = new ArrayList<>();
-        for (AstNode body : this.bodys) temp.add(body.copy());
+        List<Ast> temp = new ArrayList<>();
+        for (Ast body : this.bodys) temp.add(body.copy());
         return DMacro.newMacro(new ArrayList<>(this.params), temp);
     }
 

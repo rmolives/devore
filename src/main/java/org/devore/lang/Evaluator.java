@@ -1,7 +1,7 @@
 package org.devore.lang;
 
 import org.devore.lang.token.*;
-import org.devore.parser.AstNode;
+import org.devore.parser.Ast;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class Evaluator {
      * @param ast 语法树
      * @return 返回值
      */
-    public static DToken eval(Env env, AstNode ast) {
+    public static DToken eval(Env env, Ast ast) {
         while (true) {
             if (ast.symbol instanceof DSymbol && env.contains(ast.symbol.toString()))
                 ast.symbol = env.get(ast.symbol.toString());
@@ -24,12 +24,12 @@ public class Evaluator {
         }
         if (ast.symbol instanceof DMacro) {
             DMacro macro = (DMacro) ast.symbol;
-            List<AstNode> bodys = macro.expand(ast.children);
+            List<Ast> bodys = macro.expand(ast.children);
             DToken result = DWord.NIL;
-            for (AstNode temp : bodys) result = eval(env, temp);
+            for (Ast temp : bodys) result = eval(env, temp);
             return result;
         }
-        if (ast.isEmpty() && ast.type != AstNode.AstType.PROCEDURE)
+        if (ast.isEmpty() && ast.type != Ast.AstType.PROCEDURE)
             return ast.symbol;
         if (ast.symbol instanceof DProcedure) {
             DProcedure procedure = (DProcedure) ast.symbol;

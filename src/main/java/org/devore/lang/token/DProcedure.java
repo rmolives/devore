@@ -2,7 +2,7 @@ package org.devore.lang.token;
 
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
-import org.devore.parser.AstNode;
+import org.devore.parser.Ast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +12,12 @@ import java.util.function.BiFunction;
  * 过程
  */
 public class DProcedure extends DToken {
-    private final BiFunction<AstNode, Env, DToken> procedure;
+    private final BiFunction<Ast, Env, DToken> procedure;
     private final int argc;
     private final List<DProcedure> children;
     private final boolean vararg;
 
-    private DProcedure(BiFunction<AstNode, Env, DToken> procedure, List<DProcedure> children, int argc, boolean vararg) {
+    private DProcedure(BiFunction<Ast, Env, DToken> procedure, List<DProcedure> children, int argc, boolean vararg) {
         this.procedure = procedure;
         this.argc = argc;
         this.children = children;
@@ -32,7 +32,7 @@ public class DProcedure extends DToken {
      * @param vararg    是否为可变参数
      * @return this
      */
-    public static DProcedure newProcedure(BiFunction<AstNode, Env, DToken> procedure, List<DProcedure> children, int argc, boolean vararg) {
+    public static DProcedure newProcedure(BiFunction<Ast, Env, DToken> procedure, List<DProcedure> children, int argc, boolean vararg) {
         return new DProcedure(procedure, children, argc, vararg);
     }
 
@@ -43,7 +43,7 @@ public class DProcedure extends DToken {
      * @param vararg    是否为可变参数
      * @return this
      */
-    public static DProcedure newProcedure(BiFunction<AstNode, Env, DToken> procedure, int argc, boolean vararg) {
+    public static DProcedure newProcedure(BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         return new DProcedure(procedure, new ArrayList<>(), argc, vararg);
     }
 
@@ -81,7 +81,7 @@ public class DProcedure extends DToken {
      * @param env   环境
      * @return 结果
      */
-    public DToken call(AstNode ast, Env env) {
+    public DToken call(Ast ast, Env env) {
         DProcedure df = this.match(ast.size());
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
         return df.procedure.apply(ast, env);
@@ -96,8 +96,8 @@ public class DProcedure extends DToken {
     public DToken call(DToken[] args, Env env) {
         DProcedure df = this.match(args.length);
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
-        AstNode ast = AstNode.emptyAst.copy();
-        for (DToken arg : args) ast.add(new AstNode(arg));
+        Ast ast = Ast.emptyAst.copy();
+        for (DToken arg : args) ast.add(new Ast(arg));
         return df.procedure.apply(ast, env);
     }
 

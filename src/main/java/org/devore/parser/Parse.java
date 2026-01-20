@@ -18,29 +18,29 @@ public class Parse {
      * @param tokens Token序列
      * @return 语法树
      */
-    public static AstNode parse(List<DToken> tokens) {
-        AstNode ast = null;
-        Deque<AstNode> stack = new ArrayDeque<>();
+    public static Ast parse(List<DToken> tokens) {
+        Ast node = null;
+        Deque<Ast> stack = new ArrayDeque<>();
         int state = -1;
-        AstNode temp;
+        Ast temp;
         int index = 0;
         while (index < tokens.size()) {
             if (state == 1) {
                 if (tokens.get(index) == DWord.RB) {
-                    temp = AstNode.emptyAst.copy();
+                    temp = Ast.emptyAst.copy();
                     stack.push(temp);
                     state = -1;
                     ++index;
                     continue;
                 }
                 if (tokens.get(index) == DWord.LB) tokens.add(index, DSymbol.valueOf("apply"));
-                temp = new AstNode(tokens.get(index));
+                temp = new Ast(tokens.get(index));
                 stack.push(temp);
-                ast = temp;
+                node = temp;
                 state = -1;
             } else if (state == 2) {
                 if (tokens.get(index) == DWord.RB) {
-                    temp = AstNode.emptyAst.copy();
+                    temp = Ast.emptyAst.copy();
                     if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
                     stack.peek().add(temp);
                     state = -1;
@@ -49,7 +49,7 @@ public class Parse {
                 }
                 if (tokens.get(index) == DWord.LB)
                     tokens.add(index, DSymbol.valueOf("apply"));
-                temp = new AstNode(tokens.get(index));
+                temp = new Ast(tokens.get(index));
                 if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
                 stack.peek().add(temp);
                 stack.push(temp);
@@ -58,17 +58,17 @@ public class Parse {
             else if (tokens.get(index) == DWord.RB) {
                 if (index >= 2 && tokens.get(index - 2) == DWord.LB) {
                     if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
-                    stack.peek().type = AstNode.AstType.PROCEDURE;
+                    stack.peek().type = Ast.AstType.PROCEDURE;
                 }
                 if (stack.isEmpty()) throw new DevoreParseException("语法解析中栈顶为空.");
                 stack.pop();
             } else {
                 if (stack.isEmpty()) throw new DevoreParseException("语法解析中栈顶为空.");
-                stack.peek().add(new AstNode(tokens.get(index)));
+                stack.peek().add(new Ast(tokens.get(index)));
             }
             ++index;
         }
-        if (ast != null) return ast;
+        if (node != null) return node;
         throw new DevoreParseException("语法解析出的AST为null.");
     }
 }

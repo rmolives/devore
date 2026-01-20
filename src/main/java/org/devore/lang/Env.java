@@ -5,7 +5,7 @@ import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DWord;
 import org.devore.lang.token.DToken;
-import org.devore.parser.AstNode;
+import org.devore.parser.Ast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addAstProcedure(String key, BiFunction<AstNode, Env, DToken> procedure, int argc, boolean vararg) {
+    public Env addAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         if (this.table.containsKey(key)) {
             this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argc, vararg)));
             return this;
@@ -112,7 +112,7 @@ public class Env {
      * @return 环境
      */
     public Env addTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
-        BiFunction<AstNode, Env, DToken> df = (ast, env) -> {
+        BiFunction<Ast, Env, DToken> df = (ast, env) -> {
             List<DToken> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
                 ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
@@ -136,7 +136,7 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setAstProcedure(String key, BiFunction<AstNode, Env, DToken> procedure, int argc, boolean vararg) {
+    public Env setAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
         temp.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
@@ -154,7 +154,7 @@ public class Env {
     public Env setTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
-        BiFunction<AstNode, Env, DToken> df = (ast, env) -> {
+        BiFunction<Ast, Env, DToken> df = (ast, env) -> {
             List<DToken> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
                 ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
