@@ -38,8 +38,8 @@ public class DBool extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + Boolean.hashCode(bool);
+        int result = this.type().hashCode();
+        result = 31 * result + Boolean.hashCode(this.bool);
         return result;
     }
 }

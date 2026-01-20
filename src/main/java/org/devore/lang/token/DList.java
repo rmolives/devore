@@ -22,7 +22,7 @@ public class DList extends Token {
      * 清空列表
      */
     public void clear() {
-        tokens.clear();
+        this.tokens.clear();
     }
 
     /**
@@ -32,10 +32,10 @@ public class DList extends Token {
      */
     public DList sort(boolean force) {
         if (force) {
-            tokens.sort(Token::compareTo);
+            this.tokens.sort(Token::compareTo);
             return this;
         }
-        List<Token> newList = new ArrayList<>(tokens);
+        List<Token> newList = new ArrayList<>(this.tokens);
         newList.sort(Token::compareTo);
         return DList.valueOf(newList);
     }
@@ -47,10 +47,10 @@ public class DList extends Token {
      */
     public DList reverse(boolean force) {
         if (force) {
-            Collections.reverse(tokens);
+            Collections.reverse(this.tokens);
             return this;
         }
-        List<Token> newList = new ArrayList<>(tokens);
+        List<Token> newList = new ArrayList<>(this.tokens);
         Collections.reverse(newList);
         return DList.valueOf(newList);
     }
@@ -63,10 +63,10 @@ public class DList extends Token {
      */
     public DList add(Token t, boolean force) {
         if (force) {
-            tokens.add(t);
+            this.tokens.add(t);
             return this;
         }
-        List<Token> newList = new ArrayList<>(tokens);
+        List<Token> newList = new ArrayList<>(this.tokens);
         newList.add(t);
         return DList.valueOf(newList);
     }
@@ -80,10 +80,10 @@ public class DList extends Token {
      */
     public DList add(int index, Token t, boolean force) {
         if (force) {
-            tokens.add(index, t);
+            this.tokens.add(index, t);
             return this;
         }
-        List<Token> newList = new ArrayList<>(tokens);
+        List<Token> newList = new ArrayList<>(this.tokens);
         newList.add(index, t);
         return DList.valueOf(newList);
     }
@@ -94,7 +94,7 @@ public class DList extends Token {
      * @return 元素
      */
     public Token get(int index) {
-        return tokens.get(index);
+        return this.tokens.get(index);
     }
 
     /**
@@ -106,10 +106,10 @@ public class DList extends Token {
      */
     public Token set(int index, Token t, boolean force) {
         if (force) {
-            tokens.set(index, t);
+            this.tokens.set(index, t);
             return this;
         }
-        List<Token> newList = new ArrayList<>(tokens);
+        List<Token> newList = new ArrayList<>(this.tokens);
         newList.set(index, t);
         return DList.valueOf(newList);
     }
@@ -122,10 +122,10 @@ public class DList extends Token {
      */
     public DList remove(int index, boolean force) {
         if (force) {
-            tokens.remove(index);
+            this.tokens.remove(index);
             return this;
         }
-        List<Token> newList = new ArrayList<>(tokens);
+        List<Token> newList = new ArrayList<>(this.tokens);
         newList.remove(index);
         return DList.valueOf(newList);
     }
@@ -136,7 +136,7 @@ public class DList extends Token {
      * @return 位置
      */
     public int indexOf(Token t) {
-        return tokens.indexOf(t);
+        return this.tokens.indexOf(t);
     }
 
     /**
@@ -145,7 +145,7 @@ public class DList extends Token {
      * @return 位置
      */
     public int lastIndexOf(Token t) {
-        return tokens.lastIndexOf(t);
+        return this.tokens.lastIndexOf(t);
     }
 
     /**
@@ -154,7 +154,7 @@ public class DList extends Token {
      * @return 结果
      */
     public boolean contains(Token t) {
-        return tokens.contains(t);
+        return this.tokens.contains(t);
     }
 
     /**
@@ -162,7 +162,7 @@ public class DList extends Token {
      * @return 数量
      */
     public int size() {
-        return tokens.size();
+        return this.tokens.size();
     }
 
     /**
@@ -174,12 +174,12 @@ public class DList extends Token {
      */
     public DList subList(int fromIndex, int toIndex, boolean force) {
         if (force) {
-            List<Token> view = tokens.subList(fromIndex, toIndex);
-            tokens.clear();
-            tokens.addAll(view);
+            List<Token> view = this.tokens.subList(fromIndex, toIndex);
+            this.tokens.clear();
+            this.tokens.addAll(view);
             return this;
         }
-        return DList.valueOf(new ArrayList<>(tokens.subList(fromIndex, toIndex)));
+        return DList.valueOf(new ArrayList<>(this.tokens.subList(fromIndex, toIndex)));
     }
 
     /**
@@ -187,7 +187,7 @@ public class DList extends Token {
      * @return 结果
      */
     public List<Token> toList() {
-        return tokens;
+        return this.tokens;
     }
 
     @Override
@@ -197,12 +197,12 @@ public class DList extends Token {
 
     @Override
     protected String str() {
-        return tokens.toString();
+        return this.tokens.toString();
     }
 
     @Override
     public Token copy() {
-        return DList.valueOf(new ArrayList<>(tokens));
+        return DList.valueOf(new ArrayList<>(this.tokens));
     }
 
     @Override
@@ -217,8 +217,8 @@ public class DList extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + tokens.hashCode();
+        int result = this.type().hashCode();
+        result = 31 * result + this.tokens.hashCode();
         return result;
     }
 }

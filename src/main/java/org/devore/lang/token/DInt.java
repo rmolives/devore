@@ -15,12 +15,12 @@ public class DInt extends DNumber {
 
     @Override
     public BigInteger toBigInteger() {
-        return num;
+        return this.num;
     }
 
     @Override
     public BigDecimal toBigDecimal() {
-        return new BigDecimal(num);
+        return new BigDecimal(this.num);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class DProcedure extends Token {
      * @return this
      */
     public DProcedure addProcedure(DProcedure procedure) {
-        if (match(procedure.argc) != null) throw new DevoreRuntimeException("过程定义冲突.");
+        if (this.match(procedure.argc) != null) throw new DevoreRuntimeException("过程定义冲突.");
         this.children.add(procedure);
         return this;
     }
@@ -82,7 +82,7 @@ public class DProcedure extends Token {
      * @return 结果
      */
     public Token call(AstNode ast, Env env) {
-        DProcedure df = match(ast.size());
+        DProcedure df = this.match(ast.size());
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
         return df.procedure.apply(ast, env);
     }
@@ -94,7 +94,7 @@ public class DProcedure extends Token {
      * @return 结果
      */
     public Token call(Token[] args, Env env) {
-        DProcedure df = match(args.length);
+        DProcedure df = this.match(args.length);
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
         AstNode ast = AstNode.emptyAst.copy();
         for (Token arg : args) ast.add(new AstNode(arg));
@@ -114,8 +114,8 @@ public class DProcedure extends Token {
     @Override
     public Token copy() {
         List<DProcedure> temp = new ArrayList<>();
-        for (DProcedure proc : children) temp.add((DProcedure) proc.copy());
-        return newProcedure(procedure, temp, argc, vararg);
+        for (DProcedure proc : this.children) temp.add((DProcedure) proc.copy());
+        return newProcedure(this.procedure, temp, this.argc, this.vararg);
     }
 
     @Override
@@ -134,11 +134,11 @@ public class DProcedure extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + System.identityHashCode(procedure);
-        result = 31 * result + argc;
-        result = 31 * result + Boolean.hashCode(vararg);
-        result = 31 * result + children.hashCode();
+        int result = this.type().hashCode();
+        result = 31 * result + System.identityHashCode(this.procedure);
+        result = 31 * result + this.argc;
+        result = 31 * result + Boolean.hashCode(this.vararg);
+        result = 31 * result + this.children.hashCode();
         return result;
     }
 }

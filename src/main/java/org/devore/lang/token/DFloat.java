@@ -15,12 +15,12 @@ public class DFloat extends DNumber {
 
     @Override
     public BigInteger toBigInteger() {
-        return num.toBigInteger();
+        return this.num.toBigInteger();
     }
 
     @Override
     public BigDecimal toBigDecimal() {
-        return num;
+        return this.num;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class DMacro extends Token {
      * @return this
      */
     public DMacro addMacro(DMacro macro) {
-        if (match(macro.params.size()) != null) throw new DevoreRuntimeException("宏定义冲突.");
+        if (this.match(macro.params.size()) != null) throw new DevoreRuntimeException("宏定义冲突.");
         this.children.add(macro);
         return this;
     }
@@ -65,19 +65,19 @@ public class DMacro extends Token {
      * @return 替换后的ast
      */
     private AstNode expand(AstNode body, List<AstNode> asts) {
-        for (int j = 0; j < params.size(); ++j)
+        for (int j = 0; j < this.params.size(); ++j)
             if (body.isNotNil()
                     && body.symbol instanceof DSymbol
-                    && body.symbol.toString().equals(params.get(j))) {
+                    && body.symbol.toString().equals(this.params.get(j))) {
                 body.symbol = DSymbol.valueOf("apply");
                 body.add(0, asts.get(j));
             }
         for (int i = 0; i < body.size(); ++i) {
             AstNode temp = body.get(i);
-            for (int j = 0; j < params.size(); ++j)
+            for (int j = 0; j < this.params.size(); ++j)
                 if (body.isNotNil()
                         && body.symbol instanceof DSymbol
-                        && temp.symbol.toString().equals(params.get(j))
+                        && temp.symbol.toString().equals(this.params.get(j))
                         && temp.isEmpty())
                     body.set(i, asts.get(j));
             if (!body.get(i).isEmpty()) body.set(i, expand(body.get(i), asts));
@@ -91,7 +91,7 @@ public class DMacro extends Token {
      * @return 替换后的ast
      */
     public List<AstNode> expand(List<AstNode> asts) {
-        DMacro dm = match(asts.size());
+        DMacro dm = this.match(asts.size());
         if (dm == null) throw new DevoreRuntimeException("找不到匹配条件的宏.");
         List<AstNode> result = new ArrayList<>();
         for (AstNode body : dm.bodys) result.add(dm.expand(body.copy(), asts));
@@ -111,8 +111,8 @@ public class DMacro extends Token {
     @Override
     public Token copy() {
         List<AstNode> temp = new ArrayList<>();
-        for (AstNode body : bodys) temp.add(body.copy());
-        return new DMacro(new ArrayList<>(params), temp);
+        for (AstNode body : this.bodys) temp.add(body.copy());
+        return new DMacro(new ArrayList<>(this.params), temp);
     }
 
     @Override
@@ -132,10 +132,10 @@ public class DMacro extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + params.hashCode();
-        result = 31 * result + bodys.hashCode();
-        result = 31 * result + children.hashCode();
+        int result = this.type().hashCode();
+        result = 31 * result + this.params.hashCode();
+        result = 31 * result + this.bodys.hashCode();
+        result = 31 * result + this.children.hashCode();
         return result;
     }
 }

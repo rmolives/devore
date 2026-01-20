@@ -234,7 +234,7 @@ public abstract class DNumber extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
+        int result = this.type().hashCode();
         result = 31 * result + this.toBigDecimal().stripTrailingZeros().hashCode();
         return result;
     }

@@ -21,12 +21,12 @@ public class DSymbol extends Token {
 
     @Override
     protected String str() {
-        return symbol;
+        return this.symbol;
     }
 
     @Override
     public Token copy() {
-        return DSymbol.valueOf(symbol);
+        return DSymbol.valueOf(this.symbol);
     }
 
     @Override
@@ -36,8 +36,8 @@ public class DSymbol extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + symbol.hashCode();
+        int result = this.type().hashCode();
+        result = 31 * result + this.symbol.hashCode();
         return result;
     }
 }

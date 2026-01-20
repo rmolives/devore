@@ -52,6 +52,6 @@ public abstract class Token {
      */
     @Override
     public String toString() {
-        return str();
+        return this.str();
     }
 }

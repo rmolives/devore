@@ -25,7 +25,7 @@ public class DWord extends Token {
     @Override
     protected String str() {
         String result = "nil";
-        switch (tag) {
+        switch (this.tag) {
             case LB:
                 result = "(";
                 break;
@@ -38,7 +38,7 @@ public class DWord extends Token {
 
     @Override
     public Token copy() {
-        return DWord.valueOf(tag);
+        return DWord.valueOf(this.tag);
     }
 
     @Override
@@ -48,8 +48,8 @@ public class DWord extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + tag.hashCode();
+        int result = this.type().hashCode();
+        result = 31 * result + this.tag.hashCode();
         return result;
     }
 

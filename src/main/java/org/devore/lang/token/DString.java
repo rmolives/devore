@@ -21,12 +21,12 @@ public class DString extends Token {
 
     @Override
     protected String str() {
-        return str;
+        return this.str;
     }
 
     @Override
     public Token copy() {
-        return DString.valueOf(str);
+        return DString.valueOf(this.str);
     }
 
     @Override
@@ -36,8 +36,8 @@ public class DString extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + str.hashCode();
+        int result = this.type().hashCode();
+        result = 31 * result + this.str.hashCode();
         return result;
     }
 }

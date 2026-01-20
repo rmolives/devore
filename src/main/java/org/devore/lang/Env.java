@@ -65,9 +65,9 @@ public class Env {
      * @return 环境
      */
     public Env put(String key, Token value) {
-        if (table.containsKey(key))
+        if (this.table.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
-        table.put(key, value);
+        this.table.put(key, value);
         return this;
     }
 
@@ -78,11 +78,11 @@ public class Env {
      * @return 环境
      */
     public Env addMacro(String key, DMacro macro) {
-        if (table.containsKey(key)) {
-            table.put(key, ((DMacro) table.get(key)).addMacro(macro));
+        if (this.table.containsKey(key)) {
+            this.table.put(key, ((DMacro) this.table.get(key)).addMacro(macro));
             return this;
         }
-        table.put(key, macro);
+        this.table.put(key, macro);
         return this;
     }
 
@@ -95,11 +95,11 @@ public class Env {
      * @return 环境
      */
     public Env addAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
-        if (table.containsKey(key)) {
-            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argc, vararg)));
+        if (this.table.containsKey(key)) {
+            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argc, vararg)));
             return this;
         }
-        table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
+        this.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
         return this;
     }
 
@@ -120,11 +120,11 @@ public class Env {
             }
             return procedure.apply(args, env);
         };
-        if (table.containsKey(key)) {
-            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(df, argc, vararg)));
+        if (this.table.containsKey(key)) {
+            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(DProcedure.newProcedure(df, argc, vararg)));
             return this;
         }
-        table.put(key, DProcedure.newProcedure(df, argc, vararg));
+        this.table.put(key, DProcedure.newProcedure(df, argc, vararg));
         return this;
     }
 
@@ -224,6 +224,6 @@ public class Env {
      * @return 子环境
      */
     public Env createChild() {
-        return newEnv(this, io);
+        return newEnv(this, this.io);
     }
 }

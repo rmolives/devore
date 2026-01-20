@@ -44,8 +44,8 @@ public class AstNode {
      */
     public AstNode copy() {
         List<AstNode> list = new ArrayList<>();
-        for (AstNode ast : children) list.add(ast.copy());
-        return new AstNode(symbol, type, list);
+        for (AstNode ast : this.children) list.add(ast.copy());
+        return new AstNode(this.symbol, this.type, list);
     }
 
     /**
@@ -53,7 +53,7 @@ public class AstNode {
      * @param node 子树
      */
     public void add(AstNode node) {
-        children.add(node);
+        this.children.add(node);
     }
 
     /**
@@ -62,7 +62,7 @@ public class AstNode {
      * @param node 子树
      */
     public void add(int i, AstNode node) {
-        children.add(i, node);
+        this.children.add(i, node);
     }
 
     /**
@@ -71,7 +71,7 @@ public class AstNode {
      * @param node 子树
      */
     public void set(int i, AstNode node) {
-        children.set(i, node);
+        this.children.set(i, node);
     }
 
     /**
@@ -87,7 +87,7 @@ public class AstNode {
      * 清空语法树
      */
     public void clear() {
-        children.clear();
+        this.children.clear();
     }
 
     /**
@@ -95,7 +95,7 @@ public class AstNode {
      * @return 数量
      */
     public int size() {
-        return children.size();
+        return this.children.size();
     }
 
     /**
@@ -103,7 +103,7 @@ public class AstNode {
      * @return 结果
      */
     public boolean isEmpty() {
-        return size() == 0;
+        return this.size() == 0;
     }
 
     /**
@@ -111,7 +111,7 @@ public class AstNode {
      * @return 结果
      */
     public boolean isNotNil() {
-        return symbol != DWord.NIL;
+        return this.symbol != DWord.NIL;
     }
 
     /**
@@ -122,13 +122,13 @@ public class AstNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (isEmpty()) {
-            if (symbol instanceof DString) builder.append("\"").append(symbol).append("\"");
-            else builder.append(symbol);
+            if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
+            else builder.append(this.symbol);
         } else {
             builder.append("(");
-            if (symbol instanceof DString) builder.append("\"").append(symbol).append("\"");
-            else builder.append(symbol);
-            for (AstNode ast : children) builder.append(" ").append(ast.toString());
+            if (this.symbol instanceof DString) builder.append("\"").append(symbol).append("\"");
+            else builder.append(this.symbol);
+            for (AstNode ast : this.children) builder.append(" ").append(ast.toString());
             builder.append(")");
         }
         return builder.toString();

@@ -22,7 +22,7 @@ public class DTable extends Token {
      * 清空表
      */
     public void clear() {
-        table.clear();
+        this.table.clear();
     }
 
     /**
@@ -34,10 +34,10 @@ public class DTable extends Token {
      */
     public DTable put(Token key, Token value, boolean force) {
         if (force) {
-            table.put(key, value);
+            this.table.put(key, value);
             return this;
         }
-        Map<Token, Token> newTable = new HashMap<>(table);
+        Map<Token, Token> newTable = new HashMap<>(this.table);
         newTable.put(key, value);
         return DTable.valueOf(newTable);
     }
@@ -48,7 +48,7 @@ public class DTable extends Token {
      * @return 结果
      */
     public DBool containsKey(Token key) {
-        return DBool.valueOf(table.containsKey(key));
+        return DBool.valueOf(this.table.containsKey(key));
     }
 
     /**
@@ -57,7 +57,7 @@ public class DTable extends Token {
      * @return 结果
      */
     public DBool containsValue(Token value) {
-        return DBool.valueOf(table.containsValue(value));
+        return DBool.valueOf(this.table.containsValue(value));
     }
 
     /**
@@ -66,7 +66,7 @@ public class DTable extends Token {
      * @return 结果
      */
     public Token get(Token key) {
-        return table.get(key);
+        return this.table.get(key);
     }
 
     /**
@@ -77,10 +77,10 @@ public class DTable extends Token {
      */
     public DTable remove(Token key, boolean force) {
         if (force) {
-            table.remove(key);
+            this.table.remove(key);
             return this;
         }
-        Map<Token, Token> newTable = new HashMap<>(table);
+        Map<Token, Token> newTable = new HashMap<>(this.table);
         newTable.remove(key);
         return DTable.valueOf(newTable);
     }
@@ -90,7 +90,7 @@ public class DTable extends Token {
      * @return 结果
      */
     public Set<Token> keys() {
-        return table.keySet();
+        return this.table.keySet();
     }
 
     /**
@@ -98,7 +98,7 @@ public class DTable extends Token {
      * @return 数量
      */
     public int size() {
-        return table.size();
+        return this.table.size();
     }
 
     @Override
@@ -108,12 +108,12 @@ public class DTable extends Token {
 
     @Override
     protected String str() {
-        return table.toString();
+        return this.table.toString();
     }
 
     @Override
     public Token copy() {
-        return DTable.valueOf(new HashMap<>(table));
+        return DTable.valueOf(new HashMap<>(this.table));
     }
 
     @Override
@@ -125,8 +125,8 @@ public class DTable extends Token {
 
     @Override
     public int hashCode() {
-        int result = type().hashCode();
-        result = 31 * result + table.hashCode();
+        int result = this.type().hashCode();
+        result = 31 * result + this.table.hashCode();
         return result;
     }
 }
