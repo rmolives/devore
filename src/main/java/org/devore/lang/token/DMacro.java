@@ -97,6 +97,6 @@ public class DMacro extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return !(t instanceof DMacro) ? t.hashCode() == this.hashCode() ? 0 : -1 : -1;
+        return t instanceof DMacro ? t.hashCode() == this.hashCode() ? 0 : -1 : -1;
     }
 }
