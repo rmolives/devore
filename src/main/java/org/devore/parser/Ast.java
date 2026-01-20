@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class Ast {
     public final static Ast emptyAst = new Ast(DWord.NIL);     // 空白语法树
-    public List<Ast> children;                                     // 子树
-    public DToken symbol;                                               // 内容
-    public AstType type;                                               // 语法树类型
+    public List<Ast> children;                                 // 子树
+    public DToken symbol;                                      // 符号
+    public AstType type;                                       // 语法树类型
 
     /**
      * 创建语法树
