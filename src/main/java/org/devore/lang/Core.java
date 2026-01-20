@@ -465,28 +465,13 @@ public class Core {
         }), 1, false);
         dEnv.addTokenProcedure("random", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
-            BigInteger start = BigInteger.ZERO;
-            BigInteger end = ((DInt) args.get(0)).toBigInteger().subtract(BigInteger.ONE);
-            Random rand = new Random();
-            BigInteger range = end.subtract(start).add(BigInteger.ONE);
-            BigInteger randomValue;
-            do {
-                randomValue = new BigInteger(range.bitLength(), rand);
-            } while (randomValue.compareTo(range) >= 0);
-            return DNumber.valueOf(randomValue.add(start));
+            return DNumber.valueOf(random(BigInteger.ZERO, ((DInt) args.get(0)).toBigInteger().subtract(BigInteger.ONE)));
         }), 1, false);
         dEnv.addTokenProcedure("random", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
-            BigInteger start = ((DInt) args.get(0)).toBigInteger();
-            BigInteger end = ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE);
-            Random rand = new Random();
-            BigInteger range = end.subtract(start).add(BigInteger.ONE);
-            BigInteger randomValue;
-            do {
-                randomValue = new BigInteger(range.bitLength(), rand);
-            } while (randomValue.compareTo(range) >= 0);
-            return DNumber.valueOf(randomValue.add(start));
+            return DNumber.valueOf(random(((DInt) args.get(0)).toBigInteger(),
+                    ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE)));
         }), 2, false);
         dEnv.addTokenProcedure("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 0, true);
         dEnv.addTokenProcedure("list-contains", ((args, env) -> {
@@ -700,41 +685,22 @@ public class Core {
         }), 2, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
-            BigDecimal start = BigDecimal.ZERO;
-            BigDecimal step = BigDecimal.ONE;
-            BigDecimal end = ((DNumber) args.get(0)).toBigDecimal().subtract(step);
-            List<Token> list = new ArrayList<>();
-            for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                list.add(DNumber.valueOf(current));
-            return DList.valueOf(list);
+            return DList.valueOf(range(BigDecimal.ZERO,
+                    ((DNumber) args.get(0)).toBigDecimal().subtract(BigDecimal.ONE), BigDecimal.ONE));
         }), 1, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             if (!(args.get(1) instanceof DNumber)) throw new DevoreCastException(args.get(1).type(), "number");
-            BigDecimal start = ((DNumber) args.get(0)).toBigDecimal();
-            BigDecimal step = BigDecimal.ONE;
-            BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
-            List<Token> list = new ArrayList<>();
-            for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                list.add(DNumber.valueOf(current));
-            return DList.valueOf(list);
+            return DList.valueOf(range(((DNumber) args.get(0)).toBigDecimal(),
+                    ((DNumber) args.get(1)).toBigDecimal().subtract(BigDecimal.ONE), BigDecimal.ONE));
         }), 2, false);
         dEnv.addTokenProcedure("range", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             if (!(args.get(1) instanceof DNumber)) throw new DevoreCastException(args.get(1).type(), "number");
             if (!(args.get(2) instanceof DNumber)) throw new DevoreCastException(args.get(2).type(), "number");
-            BigDecimal start = ((DNumber) args.get(0)).toBigDecimal();
-            BigDecimal step = ((DNumber) args.get(2)).toBigDecimal();
-            BigDecimal end = ((DNumber) args.get(1)).toBigDecimal().subtract(step);
-            if (step.compareTo(BigDecimal.ZERO) == 0) throw new DevoreRuntimeException("步长不能为零.");
-            List<Token> list = new ArrayList<>();
-            if (step.compareTo(BigDecimal.ZERO) > 0)
-                for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
-                    list.add(DNumber.valueOf(current));
-            else
-                for (BigDecimal current = start; current.compareTo(end) >= 0; current = current.add(step))
-                    list.add(DNumber.valueOf(current));
-            return DList.valueOf(list);
+            return DList.valueOf(range(((DNumber) args.get(0)).toBigDecimal(),
+                    ((DNumber) args.get(1)).toBigDecimal().subtract(((DNumber) args.get(2)).toBigDecimal()),
+                    ((DNumber) args.get(2)).toBigDecimal()));
         }), 3, false);
         dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
             if (!(args.get(0) instanceof DString)) throw new DevoreCastException(args.get(0).type(), "string");
@@ -855,5 +821,27 @@ public class Core {
                 DBool.valueOf(args.get(0).equals(DWord.NIL))), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env) ->
                 DBool.valueOf(args.get(0).equals(DNumber.valueOf(0)))), 1, false);
+    }
+
+    private static BigInteger random(BigInteger start, BigInteger end) {
+        Random rand = new Random();
+        BigInteger range = end.subtract(start).add(BigInteger.ONE);
+        BigInteger randomValue;
+        do {
+            randomValue = new BigInteger(range.bitLength(), rand);
+        } while (randomValue.compareTo(range) >= 0);
+        return randomValue.add(start);
+    }
+
+    private static List<Token> range(BigDecimal start, BigDecimal end, BigDecimal step) {
+        if (step.compareTo(BigDecimal.ZERO) == 0) throw new DevoreRuntimeException("步长不能为零.");
+        List<Token> list = new ArrayList<>();
+        if (step.compareTo(BigDecimal.ZERO) > 0)
+            for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
+                list.add(DNumber.valueOf(current));
+        else
+            for (BigDecimal current = start; current.compareTo(end) >= 0; current = current.add(step))
+                list.add(DNumber.valueOf(current));
+        return list;
     }
 }
