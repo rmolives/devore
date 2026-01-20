@@ -166,10 +166,17 @@ public class DList extends Token {
      * 截取
      * @param fromIndex 起始位置
      * @param toIndex   结束位置
+     * @param force 是否更改原列表
      * @return 截取后的列表
      */
-    public DList subList(int fromIndex, int toIndex) {
-        return DList.valueOf(tokens.subList(fromIndex, toIndex));
+    public DList subList(int fromIndex, int toIndex, boolean force) {
+        if (force) {
+            List<Token> view = tokens.subList(fromIndex, toIndex);
+            tokens.clear();
+            tokens.addAll(view);
+            return this;
+        }
+        return DList.valueOf(new ArrayList<>(tokens.subList(fromIndex, toIndex)));
     }
 
     /**

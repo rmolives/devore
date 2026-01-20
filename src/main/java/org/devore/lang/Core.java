@@ -551,12 +551,12 @@ public class Core {
         dEnv.addTokenProcedure("tail", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
             DList list = (DList) args.get(0);
-            return list.subList(1, list.size());
+            return list.subList(1, list.size(), false);
         }), 1, false);
         dEnv.addTokenProcedure("init", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
             DList list = (DList) args.get(0);
-            return list.subList(0, list.size() - 1);
+            return list.subList(0, list.size() - 1, false);
         }), 1, false);
         dEnv.addTokenProcedure("length", ((args, env) -> {
             if (args.get(0) instanceof DList) return DNumber.valueOf(((DList) args.get(0)).size());
@@ -568,7 +568,14 @@ public class Core {
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(2) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             return ((DList) args.get(0)).subList(((DInt) args.get(1)).toBigInteger().intValue(),
-                    ((DInt) args.get(2)).toBigInteger().intValue());
+                    ((DInt) args.get(2)).toBigInteger().intValue(), false);
+        }), 3, false);
+        dEnv.addTokenProcedure("list-sub!", ((args, env) -> {
+            if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
+            if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
+            if (!(args.get(2) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
+            return ((DList) args.get(0)).subList(((DInt) args.get(1)).toBigInteger().intValue(),
+                    ((DInt) args.get(2)).toBigInteger().intValue(), true);
         }), 3, false);
         dEnv.addTokenProcedure("reverse", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
