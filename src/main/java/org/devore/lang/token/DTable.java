@@ -86,7 +86,7 @@ public class DTable extends Token {
             if (!mapKeys[i].equals(thisKeys[i]))
                 return -1;
         for (Object key : mapKeys)
-            if (!map.get((Token) key).equals(table.get((Token) key)))
+            if (!map.get((Token) key).equals(this.table.get((Token) key)))
                 return -1;
         return 0;
     }

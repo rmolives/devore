@@ -43,7 +43,7 @@ public class DWord extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return t instanceof DWord && ((DWord) t).tag.equals(this.tag) ? 0 : -1;
+        return t instanceof DWord && this.tag.equals(((DWord) t).tag) ? 0 : -1;
     }
 
     private enum WordTags {
