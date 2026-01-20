@@ -76,8 +76,8 @@ public class DTable extends Token {
     @Override
     public int compareTo(Token t) {
         if (!(t instanceof DTable)) return -1;
-        DTable map = (DTable) t;
-        return this.table.equals(map.table) ? 0 : -1;
+        DTable other = (DTable) t;
+        return this.table.equals(other.table) ? 0 : -1;
     }
 
     @Override
