@@ -391,7 +391,7 @@ public class Core {
         dEnv.addTokenProcedure("<", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) < 0)), 2, false);
         dEnv.addTokenProcedure("=", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(args.get(1)) == 0)), 2, false);
+                DBool.valueOf(args.get(0).equals(args.get(1)))), 2, false);
         dEnv.addTokenProcedure("/=", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) != 0)), 2, false);
         dEnv.addTokenProcedure(">=", ((args, env) ->
@@ -902,8 +902,8 @@ public class Core {
         dEnv.addTokenProcedure("word?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DWord)), 1, false);
         dEnv.addTokenProcedure("nil?", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(DWord.NIL) == 0)), 1, false);
+                DBool.valueOf(args.get(0).equals(DWord.NIL))), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env) ->
-                DBool.valueOf(args.get(0).compareTo(DNumber.valueOf(0)) == 0)), 1, false);
+                DBool.valueOf(args.get(0).equals(DNumber.valueOf(0)))), 1, false);
     }
 }
