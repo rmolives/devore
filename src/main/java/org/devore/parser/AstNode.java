@@ -123,6 +123,7 @@ public class AstNode {
         StringBuilder builder = new StringBuilder();
         if (this.isEmpty()) {
             if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
+            else if (this.type == AstNode.AstType.PROCEDURE) builder.append("(").append(this.symbol).append(")");
             else builder.append(this.symbol);
         } else {
             builder.append("(");
