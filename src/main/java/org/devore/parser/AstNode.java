@@ -47,8 +47,7 @@ public class AstNode {
      */
     public AstNode copy() {
         List<AstNode> list = new ArrayList<>();
-        for (AstNode ast : children)
-            list.add(ast.copy());
+        for (AstNode ast : children) list.add(ast.copy());
         return new AstNode(symbol, type, list);
     }
 
@@ -134,18 +133,13 @@ public class AstNode {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (isEmpty()) {
-            if (symbol instanceof DString)
-                builder.append("\"").append(symbol).append("\"");
-            else
-                builder.append(symbol);
+            if (symbol instanceof DString) builder.append("\"").append(symbol).append("\"");
+            else builder.append(symbol);
         } else {
             builder.append("(");
-            if (symbol instanceof DString)
-                builder.append("\"").append(symbol).append("\"");
-            else
-                builder.append(symbol);
-            for (AstNode ast : children)
-                builder.append(" ").append(ast.toString());
+            if (symbol instanceof DString) builder.append("\"").append(symbol).append("\"");
+            else builder.append(symbol);
+            for (AstNode ast : children) builder.append(" ").append(ast.toString());
             builder.append(")");
         }
         return builder.toString();

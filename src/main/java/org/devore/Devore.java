@@ -25,8 +25,7 @@ public class Devore {
     public static Token call(Env env, String code) {
         List<String> codes = Lexer.splitCode(code);
         Token result = DWord.NIL;
-        for (String exp : codes)
-            result = Evaluator.eval(env, Parse.parse(Lexer.lexer(exp)));
+        for (String exp : codes) result = Evaluator.eval(env, Parse.parse(Lexer.lexer(exp)));
         return result;
     }
 }

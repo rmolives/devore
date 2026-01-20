@@ -27,12 +27,12 @@ public class Lexer {
             int flag = 0;
             StringBuilder builder = new StringBuilder();
             while (index < codeCharArray.length) {
-                if (codeCharArray[index] == ';') {
+                if (codeCharArray[index] == ';')
                     while (index < codeCharArray.length &&
                             codeCharArray[index] != '\n' &&
                             codeCharArray[index] != '\r')
                         ++index;
-                } else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
+                else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
                     break;
                 else
                     ++index;

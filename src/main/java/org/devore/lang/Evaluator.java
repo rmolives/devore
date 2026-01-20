@@ -27,8 +27,7 @@ public class Evaluator {
             DMacro macro = (DMacro) ast.symbol;
             List<AstNode> bodys = macro.expand(ast.children);
             Token result = DWord.NIL;
-            for (AstNode temp : bodys)
-                result = eval(env, temp);
+            for (AstNode temp : bodys) result = eval(env, temp);
             return result;
         }
         if (ast.isEmpty() && ast.type != AstNode.AstType.PROCEDURE)

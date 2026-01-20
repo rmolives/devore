@@ -69,8 +69,7 @@ public class DMacro extends Token {
 
     public List<AstNode> expand(List<AstNode> asts) {
         DMacro dm = match(asts.size());
-        if (dm == null)
-            throw new DevoreRuntimeException("找不到匹配条件的宏.");
+        if (dm == null) throw new DevoreRuntimeException("找不到匹配条件的宏.");
         List<AstNode> result = new ArrayList<>();
         for (AstNode body : dm.bodys)
             result.add(dm.expand(body.copy(), asts));
@@ -97,7 +96,17 @@ public class DMacro extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return this == t ? 0 : -1;
+        if (this == t) return 0;
+        if (!(t instanceof DMacro)) return -1;
+        DMacro other = (DMacro) t;
+        if (!this.params.equals(other.params)) return -1;
+        if (this.bodys.size() != other.bodys.size()) return -1;
+        for (int i = 0; i < this.bodys.size(); ++i)
+            if (!this.bodys.get(i).equals(other.bodys.get(i))) return -1;
+        if (this.children.size() != other.children.size()) return -1;
+        for (int i = 0; i < this.children.size(); ++i)
+            if (this.children.get(i).compareTo(other.children.get(i)) != 0) return -1;
+        return 0;
     }
 
     @Override

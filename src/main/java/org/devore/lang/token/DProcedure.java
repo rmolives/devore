@@ -77,7 +77,16 @@ public class DProcedure extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return this == t ? 0 : -1;
+        if (this == t) return 0;
+        if (!(t instanceof DProcedure)) return -1;
+        DProcedure other = (DProcedure) t;
+        if (this.procedure != other.procedure) return -1;
+        if (this.argSize != other.argSize) return -1;
+        if (this.vararg != other.vararg) return -1;
+        if (this.children.size() != other.children.size()) return -1;
+        for (int i = 0; i < children.size(); ++i)
+            if (children.get(i).compareTo(other.children.get(i)) != 0) return -1;
+        return 0;
     }
 
     @Override
