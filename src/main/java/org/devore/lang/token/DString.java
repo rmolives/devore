@@ -31,6 +31,6 @@ public class DString extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return str.compareTo(t.toString());
+        return t instanceof DString ? str.compareTo(((DString) t).str) : -1;
     }
 }

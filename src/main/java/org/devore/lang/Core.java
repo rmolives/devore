@@ -902,9 +902,8 @@ public class Core {
         dEnv.addTokenProcedure("word?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DWord)), 1, false);
         dEnv.addTokenProcedure("nil?", ((args, env) ->
-                DBool.valueOf(args.get(0) instanceof DWord && args.get(0) == DWord.NIL)), 1, false);
+                DBool.valueOf(args.get(0).compareTo(DWord.NIL) == 0)), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env) ->
-                DBool.valueOf(args.get(0) instanceof DNumber
-                        && args.get(0).compareTo(DNumber.valueOf(0)) == 0)), 1, false);
+                DBool.valueOf(args.get(0).compareTo(DNumber.valueOf(0)) == 0)), 1, false);
     }
 }

@@ -77,12 +77,6 @@ public class DProcedure extends Token {
 
     @Override
     public int compareTo(Token t) {
-        if (!(t instanceof DProcedure))
-            return -1;
-        DProcedure proc = (DProcedure) t;
-        return proc.procedure.equals(this.procedure)
-                && proc.argSize == this.argSize
-                && proc.children.equals(this.children)
-                && proc.vararg == this.vararg ? 0 : -1;
+        return !(t instanceof DProcedure) ? t.hashCode() == this.hashCode() ? 0 : -1 : -1;
     }
 }

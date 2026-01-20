@@ -31,6 +31,6 @@ public class DSymbol extends Token {
 
     @Override
     public int compareTo(Token t) {
-        return symbol.compareTo(t.toString());
+        return t instanceof DSymbol ? symbol.compareTo(((DSymbol) t).symbol) : -1;
     }
 }
