@@ -99,4 +99,13 @@ public class DMacro extends Token {
     public int compareTo(Token t) {
         return this == t ? 0 : -1;
     }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + params.hashCode();
+        result = 31 * result + bodys.hashCode();
+        result = 31 * result + children.hashCode();
+        return result;
+    }
 }

@@ -79,4 +79,14 @@ public class DProcedure extends Token {
     public int compareTo(Token t) {
         return this == t ? 0 : -1;
     }
+
+    @Override
+    public int hashCode() {
+        int result = type().hashCode();
+        result = 31 * result + System.identityHashCode(procedure);
+        result = 31 * result + argSize;
+        result = 31 * result + Boolean.hashCode(vararg);
+        result = 31 * result + children.hashCode();
+        return result;
+    }
 }

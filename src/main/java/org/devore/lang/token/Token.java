@@ -53,4 +53,14 @@ public abstract class Token {
     public String toString() {
         return str();
     }
+
+    /**
+     * 获取当前token的hash
+     *
+     * @return hash
+     */
+    @Override
+    public int hashCode() {
+        return (type() + this).hashCode();
+    }
 }
