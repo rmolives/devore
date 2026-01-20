@@ -414,11 +414,7 @@ public class Core {
             }
             return result;
         }, 2, true);
-        dEnv.addAstProcedure("begin", (ast, env) -> {
-            Token result = DWord.NIL;
-            for (AstNode node : ast.children) result = Evaluator.eval(env, node.copy());
-            return result;
-        }, 1, true);
+        dEnv.addTokenProcedure("begin", (arg, env) -> arg.get(arg.size() - 1), 1, true);
         dEnv.addAstProcedure("while", (ast, env) -> {
             Token result = DWord.NIL;
             Token condition = Evaluator.eval(env, ast.get(0).copy());
