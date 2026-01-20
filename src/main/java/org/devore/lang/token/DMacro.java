@@ -48,12 +48,11 @@ public class DMacro extends DToken {
      */
     private DMacro match(int argc) {
         if (this.params.size() == argc) return this;
-        DMacro macro = null;
         for (DMacro dm : children) {
             DMacro temp = dm.match(argc);
-            if (temp != null) macro = temp;
+            if (temp != null) return temp;
         }
-        return macro;
+        return null;
     }
 
     /**
