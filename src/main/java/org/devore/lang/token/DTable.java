@@ -19,6 +19,13 @@ public class DTable extends Token {
     }
 
     /**
+     * 清空表
+     */
+    public void clear() {
+        table.clear();
+    }
+
+    /**
      * 设置KY对
      * @param key   key
      * @param value value

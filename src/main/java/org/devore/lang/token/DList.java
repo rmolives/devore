@@ -18,6 +18,9 @@ public class DList extends Token {
         return new DList(tokens);
     }
 
+    /**
+     * 清空列表
+     */
     public void clear() {
         tokens.clear();
     }
