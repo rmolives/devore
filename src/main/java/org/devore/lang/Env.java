@@ -93,7 +93,7 @@ public class Env {
     }
 
     /**
-     * 添加Symbol过程
+     * 设置Ast过程
      *
      * @param key       key
      * @param procedure 过程
@@ -101,7 +101,7 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addSymbolProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
+    public Env addAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
         if (table.containsKey(key)) {
             table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argSize, vararg)));
             return this;
@@ -137,7 +137,7 @@ public class Env {
     }
 
     /**
-     * 设置Symbol过程
+     * 设置Ast过程
      *
      * @param key       key
      * @param procedure 过程
@@ -145,7 +145,7 @@ public class Env {
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setSymbolProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
+    public Env setAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
         temp.table.put(key, DProcedure.newProcedure(procedure, argSize, vararg));
