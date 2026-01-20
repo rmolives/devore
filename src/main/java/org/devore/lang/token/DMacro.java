@@ -30,12 +30,12 @@ public class DMacro extends Token {
         return this;
     }
 
-    private DMacro match(int argSize) {
+    private DMacro match(int argc) {
         DMacro macro = null;
-        if (this.params.size() == argSize) macro = this;
+        if (this.params.size() == argc) macro = this;
         else {
             for (DMacro dm : children) {
-                DMacro temp = dm.match(argSize);
+                DMacro temp = dm.match(argc);
                 if (temp != null) macro = temp;
             }
         }

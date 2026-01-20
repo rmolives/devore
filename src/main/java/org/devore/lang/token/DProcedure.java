@@ -13,33 +13,33 @@ import java.util.function.BiFunction;
  */
 public class DProcedure extends Token {
     private final BiFunction<AstNode, Env, Token> procedure;
-    private final int argSize;
+    private final int argc;
     private final List<DProcedure> children;
     private final boolean vararg;
 
-    private DProcedure(BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
+    private DProcedure(BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
         this.procedure = procedure;
-        this.argSize = argSize;
+        this.argc = argc;
         this.children = new ArrayList<>();
         this.vararg = vararg;
     }
 
-    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> function, int argSize, boolean vararg) {
-        return new DProcedure(function, argSize, vararg);
+    public static DProcedure newProcedure(BiFunction<AstNode, Env, Token> function, int argc, boolean vararg) {
+        return new DProcedure(function, argc, vararg);
     }
 
     public DProcedure addProcedure(DProcedure procedure) {
-        if (match(procedure.argSize) != null) throw new DevoreRuntimeException("过程定义冲突.");
+        if (match(procedure.argc) != null) throw new DevoreRuntimeException("过程定义冲突.");
         this.children.add(procedure);
         return this;
     }
 
-    private DProcedure match(int argSize) {
+    private DProcedure match(int argc) {
         DProcedure function = null;
-        if (this.argSize == argSize || (this.vararg && argSize >= this.argSize)) function = this;
+        if (this.argc == argc || (this.vararg && argc >= this.argc)) function = this;
         else {
             for (DProcedure df : children) {
-                DProcedure temp = df.match(argSize);
+                DProcedure temp = df.match(argc);
                 if (temp != null) function = temp;
             }
         }
@@ -72,7 +72,7 @@ public class DProcedure extends Token {
 
     @Override
     public Token copy() {
-        return newProcedure(procedure, argSize, vararg);
+        return newProcedure(procedure, argc, vararg);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class DProcedure extends Token {
         if (!(t instanceof DProcedure)) return -1;
         DProcedure other = (DProcedure) t;
         if (this.procedure != other.procedure) return -1;
-        if (this.argSize != other.argSize) return -1;
+        if (this.argc != other.argc) return -1;
         if (this.vararg != other.vararg) return -1;
         if (this.children.size() != other.children.size()) return -1;
         for (int i = 0; i < children.size(); ++i)
@@ -93,7 +93,7 @@ public class DProcedure extends Token {
     public int hashCode() {
         int result = type().hashCode();
         result = 31 * result + System.identityHashCode(procedure);
-        result = 31 * result + argSize;
+        result = 31 * result + argc;
         result = 31 * result + Boolean.hashCode(vararg);
         result = 31 * result + children.hashCode();
         return result;

@@ -97,16 +97,16 @@ public class Env {
      *
      * @param key       key
      * @param procedure 过程
-     * @param argSize   参数数量
+     * @param argc      参数数量
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
+    public Env addAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
         if (table.containsKey(key)) {
-            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argSize, vararg)));
+            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argc, vararg)));
             return this;
         }
-        table.put(key, DProcedure.newProcedure(procedure, argSize, vararg));
+        table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
         return this;
     }
 
@@ -115,11 +115,11 @@ public class Env {
      *
      * @param key       key
      * @param procedure 过程
-     * @param argSize   参数数量
+     * @param argc      参数数量
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env addTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argSize, boolean vararg) {
+    public Env addTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argc, boolean vararg) {
         BiFunction<AstNode, Env, Token> df = (ast, env) -> {
             List<Token> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
@@ -129,10 +129,10 @@ public class Env {
             return procedure.apply(args, env);
         };
         if (table.containsKey(key)) {
-            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(df, argSize, vararg)));
+            table.put(key, ((DProcedure) table.get(key)).addProcedure(DProcedure.newProcedure(df, argc, vararg)));
             return this;
         }
-        table.put(key, DProcedure.newProcedure(df, argSize, vararg));
+        table.put(key, DProcedure.newProcedure(df, argc, vararg));
         return this;
     }
 
@@ -141,14 +141,14 @@ public class Env {
      *
      * @param key       key
      * @param procedure 过程
-     * @param argSize   参数数量
+     * @param argc      参数数量
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argSize, boolean vararg) {
+    public Env setAstProcedure(String key, BiFunction<AstNode, Env, Token> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
-        temp.table.put(key, DProcedure.newProcedure(procedure, argSize, vararg));
+        temp.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
         return this;
     }
 
@@ -157,11 +157,11 @@ public class Env {
      *
      * @param key       key
      * @param procedure 过程
-     * @param argSize   参数数量
+     * @param argc      参数数量
      * @param vararg    是否为可变参数
      * @return 环境
      */
-    public Env setTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argSize, boolean vararg) {
+    public Env setTokenProcedure(String key, BiFunction<List<Token>, Env, Token> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
         BiFunction<AstNode, Env, Token> df = (ast, env) -> {
@@ -172,7 +172,7 @@ public class Env {
             }
             return procedure.apply(args, env);
         };
-        temp.table.put(key, DProcedure.newProcedure(df, argSize, vararg));
+        temp.table.put(key, DProcedure.newProcedure(df, argc, vararg));
         return this;
     }
 
