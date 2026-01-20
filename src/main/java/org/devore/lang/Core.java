@@ -626,7 +626,8 @@ public class Core {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(2) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
-            return ((DList) args.get(0)).subList(((DInt) args.get(1)).toBigInteger().intValue(), ((DInt) args.get(2)).toBigInteger().intValue());
+            return ((DList) args.get(0)).subList(((DInt) args.get(1)).toBigInteger().intValue(),
+                    ((DInt) args.get(2)).toBigInteger().intValue());
         }), 3, false);
         dEnv.addTokenProcedure("reverse", ((args, env) -> {
             if (!(args.get(0) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
