@@ -47,13 +47,11 @@ public class DMacro extends DToken {
      * @return 符合条件的宏
      */
     private DMacro match(int argc) {
+        if (this.params.size() == argc) return this;
         DMacro macro = null;
-        if (this.params.size() == argc) macro = this;
-        else {
-            for (DMacro dm : children) {
-                DMacro temp = dm.match(argc);
-                if (temp != null) macro = temp;
-            }
+        for (DMacro dm : children) {
+            DMacro temp = dm.match(argc);
+            if (temp != null) macro = temp;
         }
         return macro;
     }
