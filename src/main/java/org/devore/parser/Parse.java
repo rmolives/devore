@@ -34,8 +34,7 @@ public class Parse {
                     ++index;
                     continue;
                 }
-                if (tokens.get(index) == DWord.LB)
-                    tokens.add(index, DSymbol.valueOf("apply"));
+                if (tokens.get(index) == DWord.LB) tokens.add(index, DSymbol.valueOf("apply"));
                 temp = new AstNode(tokens.get(index));
                 stack.push(temp);
                 ast = temp;
@@ -56,12 +55,10 @@ public class Parse {
                 stack.peek().add(temp);
                 stack.push(temp);
                 state = -1;
-            } else if (tokens.get(index) == DWord.LB)
-                state = stack.isEmpty() ? 1 : 2;
+            } else if (tokens.get(index) == DWord.LB) state = stack.isEmpty() ? 1 : 2;
             else if (tokens.get(index) == DWord.RB) {
                 if (index >= 2 && tokens.get(index - 2) == DWord.LB) {
-                    if (stack.peek() == null)
-                        throw new DevoreParseException("语法解析中栈顶为null.");
+                    if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
                     stack.peek().type = AstNode.AstType.PROCEDURE;
                 }
                 if (stack.isEmpty()) throw new DevoreParseException("语法解析中栈顶为空.");
