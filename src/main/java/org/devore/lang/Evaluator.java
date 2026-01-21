@@ -29,7 +29,7 @@ public class Evaluator {
             for (Ast temp : bodys) result = eval(env, temp);
             return result;
         }
-        if (node.isEmpty() && node.type != Ast.AstType.PROCEDURE)
+        if (node.isEmpty() && node.type != Ast.Type.PROCEDURE)
             return node.symbol;
         if (node.symbol instanceof DProcedure) {
             DProcedure procedure = (DProcedure) node.symbol;

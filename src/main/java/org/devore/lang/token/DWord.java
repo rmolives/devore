@@ -4,16 +4,16 @@ package org.devore.lang.token;
  * 关键字
  */
 public class DWord extends DToken {
-    public static final DWord LB = DWord.valueOf(WordTags.LB);     // (
-    public static final DWord RB = DWord.valueOf(WordTags.RB);     // )
-    public static final DWord NIL = DWord.valueOf(WordTags.NIL);   // nil
-    private final WordTags tag;
+    public static final DWord LB = DWord.valueOf(Tags.LB);     // (
+    public static final DWord RB = DWord.valueOf(Tags.RB);     // )
+    public static final DWord NIL = DWord.valueOf(Tags.NIL);   // nil
+    private final Tags tag;
 
-    private DWord(WordTags tag) {
+    private DWord(Tags tag) {
         this.tag = tag;
     }
 
-    private static DWord valueOf(WordTags tag) {
+    private static DWord valueOf(Tags tag) {
         return new DWord(tag);
     }
 
@@ -53,7 +53,7 @@ public class DWord extends DToken {
         return result;
     }
 
-    private enum WordTags {
+    private enum Tags {
         LB, RB, NIL
     }
 }

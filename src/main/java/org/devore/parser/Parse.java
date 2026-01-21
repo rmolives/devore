@@ -27,7 +27,7 @@ public class Parse {
         while (index < tokens.size()) {
             if (state == 1) {
                 if (tokens.get(index) == DWord.RB) {
-                    tmp = Ast.emptyAst.copy();
+                    tmp = Ast.empty.copy();
                     stack.push(tmp);
                     state = -1;
                     ++index;
@@ -40,7 +40,7 @@ public class Parse {
                 state = -1;
             } else if (state == 2) {
                 if (tokens.get(index) == DWord.RB) {
-                    tmp = Ast.emptyAst.copy();
+                    tmp = Ast.empty.copy();
                     if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
                     stack.peek().add(tmp);
                     state = -1;
@@ -58,7 +58,7 @@ public class Parse {
             else if (tokens.get(index) == DWord.RB) {
                 if (index >= 2 && tokens.get(index - 2) == DWord.LB) {
                     if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
-                    stack.peek().type = Ast.AstType.PROCEDURE;
+                    stack.peek().type = Ast.Type.PROCEDURE;
                 }
                 if (stack.isEmpty()) throw new DevoreParseException("语法解析中栈顶为空.");
                 stack.pop();

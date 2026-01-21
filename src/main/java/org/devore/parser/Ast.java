@@ -11,10 +11,10 @@ import java.util.List;
  * 抽象语法树
  */
 public class Ast {
-    public final static Ast emptyAst = new Ast(DWord.NIL);     // 空白语法树
-    public List<Ast> children;                                 // 子树
-    public DToken symbol;                                      // 符号
-    public AstType type;                                       // 语法树类型
+    public final static Ast empty = new Ast(DWord.NIL);         // 空白语法树
+    public List<Ast> children;                                  // 子树
+    public DToken symbol;                                       // 符号
+    public Type type;                                           // 语法树类型
 
     /**
      * 创建语法树
@@ -22,7 +22,7 @@ public class Ast {
      */
     public Ast(DToken symbol) {
         this.symbol = symbol;
-        this.type = AstType.BASIC;
+        this.type = Type.BASIC;
         this.children = new ArrayList<>();
     }
 
@@ -32,7 +32,7 @@ public class Ast {
      * @param type   类型
      * @param child  子树
      */
-    public Ast(DToken symbol, AstType type, List<Ast> child) {
+    public Ast(DToken symbol, Type type, List<Ast> child) {
         this.symbol = symbol;
         this.type = type;
         this.children = child;
@@ -123,7 +123,7 @@ public class Ast {
         StringBuilder builder = new StringBuilder();
         if (this.isEmpty()) {
             if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
-            else if (this.type == Ast.AstType.PROCEDURE) builder.append("(").append(this.symbol).append(")");
+            else if (this.type == Type.PROCEDURE) builder.append("(").append(this.symbol).append(")");
             else builder.append(this.symbol);
         } else {
             builder.append("(");
@@ -138,7 +138,7 @@ public class Ast {
     /**
      * 子树类型
      */
-    public enum AstType {
+    public enum Type {
         PROCEDURE,   // 过程
         BASIC        // 普通
     }

@@ -200,7 +200,7 @@ public class Core {
         dEnv.addAstProcedure("def", ((ast, env) -> {
             if (!(ast.get(0).symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
-            if (ast.get(0).isEmpty() && ast.get(0).type != Ast.AstType.PROCEDURE) {
+            if (ast.get(0).isEmpty() && ast.get(0).type != Ast.Type.PROCEDURE) {
                 Env newEnv = env.createChild();
                 DToken result = DWord.NIL;
                 for (int i = 1; i < ast.size(); ++i) result = Evaluator.eval(newEnv, ast.get(i).copy());
@@ -226,7 +226,7 @@ public class Core {
         dEnv.addAstProcedure("set!", ((ast, env) -> {
             if (!(ast.get(0).symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
-            if (ast.get(0).isEmpty() && ast.get(0).type != Ast.AstType.PROCEDURE) {
+            if (ast.get(0).isEmpty() && ast.get(0).type != Ast.Type.PROCEDURE) {
                 Env newEnv = env.createChild();
                 DToken result = DWord.NIL;
                 for (int i = 1; i < ast.size(); ++i) result = Evaluator.eval(newEnv, ast.get(i).copy());
@@ -339,7 +339,7 @@ public class Core {
             if (!(args.get(0) instanceof DProcedure)) throw new DevoreCastException(args.get(0).type(), "procedure");
             List<DToken> params = new ArrayList<>();
             for (int i = 1; i < args.size(); ++i) params.add(args.get(i));
-            Ast node = Ast.emptyAst.copy();
+            Ast node = Ast.empty.copy();
             for (DToken arg : params) node.add(new Ast(arg));
             return ((DProcedure) args.get(0)).call(node, env);
         }), 1, true);
@@ -347,7 +347,7 @@ public class Core {
             if (!(args.get(0) instanceof DProcedure)) throw new DevoreCastException(args.get(0).type(), "procedure");
             if (!(args.get(1) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
             List<DToken> params = ((DList) args.get(1)).toList();
-            Ast node = Ast.emptyAst.copy();
+            Ast node = Ast.empty.copy();
             for (DToken arg : params) node.add(new Ast(arg));
             return ((DProcedure) args.get(0)).call(node, env);
         }), 2, false);
@@ -671,7 +671,7 @@ public class Core {
             List<DToken> result = new ArrayList<>();
             List<DToken> tokens = ((DList) args.get(1)).toList();
             for (DToken token : tokens) {
-                Ast node = Ast.emptyAst.copy();
+                Ast node = Ast.empty.copy();
                 node.add(new Ast(token));
                 DToken condition = ((DProcedure) args.get(0)).call(node, env.createChild());
                 if (!(condition instanceof DBool)) throw new DevoreCastException(condition.type(), "list");
