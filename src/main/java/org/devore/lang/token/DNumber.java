@@ -223,7 +223,7 @@ public abstract class DNumber extends DToken {
      * ln运算
      * @return 结果
      */
-    public DNumber log() {
+    public DNumber ln() {
         return DNumber.valueOf(NumberUtils.ln(this.toBigDecimal(), MathContext.DECIMAL128));
     }
 

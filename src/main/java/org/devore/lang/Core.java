@@ -162,7 +162,7 @@ public class Core {
         }), 2, true);
         dEnv.addTokenProcedure("log", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).log();
+            return ((DNumber) args.get(0)).ln();
         }), 1, false);
         dEnv.addTokenProcedure("log", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
