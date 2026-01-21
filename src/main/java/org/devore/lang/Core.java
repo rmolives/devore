@@ -684,8 +684,7 @@ public class Core {
             DToken result = args.get(1);
             List<DToken> tokens = ((DList) args.get(2)).toList();
             for (int i = tokens.size() - 1; i >= 0; --i)
-                result = ((DProcedure) args.get(0))
-                        .call(new ArrayList<>(Arrays.asList(tokens.get(i), result)), env.createChild());
+                result = ((DProcedure) args.get(0)).call(Arrays.asList(tokens.get(i), result), env.createChild());
             return result;
         }), 3, false);
         dEnv.addTokenProcedure("foldl", ((args, env) -> {
@@ -694,8 +693,7 @@ public class Core {
             DToken result = args.get(1);
             List<DToken> tokens = ((DList) args.get(2)).toList();
             for (int i = tokens.size() - 1; i >= 0; --i)
-                result = ((DProcedure) args.get(0))
-                        .call(new ArrayList<>(Arrays.asList(result, tokens.get(i))), env.createChild());
+                result = ((DProcedure) args.get(0)).call(Arrays.asList(result, tokens.get(i)), env.createChild());
             return result;
         }), 3, false);
         dEnv.addTokenProcedure("filter", ((args, env) -> {
