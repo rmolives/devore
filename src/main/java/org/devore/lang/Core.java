@@ -368,19 +368,12 @@ public class Core {
         }), 2, true);
         dEnv.addTokenProcedure("apply", ((args, env) -> {
             if (!(args.get(0) instanceof DProcedure)) throw new DevoreCastException(args.get(0).type(), "procedure");
-            List<DToken> params = new ArrayList<>();
-            for (int i = 1; i < args.size(); ++i) params.add(args.get(i));
-            Ast node = Ast.empty.copy();
-            for (DToken arg : params) node.add(new Ast(arg));
-            return ((DProcedure) args.get(0)).call(node, env);
+            return ((DProcedure) args.get(0)).call(args.subList(1, args.size()), env);
         }), 1, true);
         dEnv.addTokenProcedure("act", ((args, env) -> {
             if (!(args.get(0) instanceof DProcedure)) throw new DevoreCastException(args.get(0).type(), "procedure");
             if (!(args.get(1) instanceof DList)) throw new DevoreCastException(args.get(0).type(), "list");
-            List<DToken> params = ((DList) args.get(1)).toList();
-            Ast node = Ast.empty.copy();
-            for (DToken arg : params) node.add(new Ast(arg));
-            return ((DProcedure) args.get(0)).call(node, env);
+            return ((DProcedure) args.get(0)).call(((DList) args.get(1)).toList(), env);
         }), 2, false);
         dEnv.addTokenProcedure(">", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 2, false);
@@ -702,9 +695,7 @@ public class Core {
             List<DToken> result = new ArrayList<>();
             List<DToken> tokens = ((DList) args.get(1)).toList();
             for (DToken token : tokens) {
-                Ast node = Ast.empty.copy();
-                node.add(new Ast(token));
-                DToken condition = ((DProcedure) args.get(0)).call(node, env.createChild());
+                DToken condition = ((DProcedure) args.get(0)).call(Collections.singletonList(token), env.createChild());
                 if (!(condition instanceof DBool)) throw new DevoreCastException(condition.type(), "list");
                 if (((DBool) condition).bool) result.add(token);
             }
