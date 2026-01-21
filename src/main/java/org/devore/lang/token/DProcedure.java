@@ -98,8 +98,8 @@ public class DProcedure extends DToken {
      * @param env   环境
      * @return 结果
      */
-    public DToken call(DToken[] args, Env env) {
-        DProcedure df = this.match(args.length);
+    public DToken call(List<DToken> args, Env env) {
+        DProcedure df = this.match(args.size());
         if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
         Ast ast = Ast.empty.copy();
         for (DToken arg : args) ast.add(new Ast(arg));
