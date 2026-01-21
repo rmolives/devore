@@ -425,9 +425,7 @@ public class Core {
                     DToken condition = Evaluator.eval(env, node.get(0).copy());
                     if (!(condition instanceof DBool)) throw new DevoreCastException(condition.type(), "bool");
                     if (((DBool) condition).bool) {
-                        DToken r = DWord.NIL;
-                        for (int i = 1; i < node.size(); ++i) r = Evaluator.eval(env, node.get(i).copy());
-                        result = r;
+                        for (int i = 1; i < node.size(); ++i) result = Evaluator.eval(env, node.get(i).copy());
                         break;
                     }
                 }
