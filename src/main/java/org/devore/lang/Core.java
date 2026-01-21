@@ -399,25 +399,21 @@ public class Core {
             DToken result = DWord.NIL;
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool)) throw new DevoreCastException(condition.type(), "bool");
-            if (((DBool) condition).bool) {
+            if (((DBool) condition).bool)
                 for (int i = 1; i < ast.size(); ++i) result = Evaluator.eval(env, ast.get(i).copy());
-            }
             return result;
         }, 2, true);
         dEnv.addAstProcedure("if", (ast, env) -> {
-            DToken result = DWord.NIL;
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool)) throw new DevoreCastException(condition.type(), "bool");
-            if (((DBool) condition).bool) result = Evaluator.eval(env, ast.get(1).copy());
-            return result;
+            if (((DBool) condition).bool) return Evaluator.eval(env, ast.get(1).copy());
+            return DWord.NIL;
         }, 2, false);
         dEnv.addAstProcedure("if", (ast, env) -> {
-            DToken result;
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool)) throw new DevoreCastException(condition.type(), "bool");
-            if (((DBool) condition).bool) result = Evaluator.eval(env, ast.get(1).copy());
-            else result = Evaluator.eval(env, ast.get(2).copy());
-            return result;
+            if (((DBool) condition).bool) return Evaluator.eval(env, ast.get(1).copy());
+            else return Evaluator.eval(env, ast.get(2).copy());
         }, 3, false);
         dEnv.addAstProcedure("cond", (ast, env) -> {
             DToken result = DWord.NIL;
