@@ -72,11 +72,13 @@ public class Core {
         dEnv.addTokenProcedure("mod", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
+            if (args.get(1).equals(DNumber.valueOf(0))) throw new DevoreRuntimeException("模数不能为0.");
             return DNumber.valueOf(((DInt) args.get(0)).toBigInteger().mod(((DInt) args.get(1)).toBigInteger()));
         }), 2, false);
         dEnv.addTokenProcedure("rem", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
+            if (args.get(1).equals(DNumber.valueOf(0))) throw new DevoreRuntimeException("除数不能为0.");
             return DNumber.valueOf(((DInt) args.get(0)).toBigInteger().remainder(((DInt) args.get(1)).toBigInteger()));
         }), 2, false);
         dEnv.addTokenProcedure("abs", ((args, env) -> {
