@@ -114,6 +114,54 @@ public abstract class DNumber extends DToken {
     }
 
     /**
+     * tanh运算
+     * @return 结果
+     */
+    public DNumber tanh() {
+        return DNumber.valueOf(NumberUtils.tanh(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * sinh运算
+     * @return 结果
+     */
+    public DNumber sinh() {
+        return DNumber.valueOf(NumberUtils.sinh(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * arccosh运算
+     * @return 结果
+     */
+    public DNumber arccosh() {
+        return DNumber.valueOf(NumberUtils.arccosh(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * arctanh运算
+     * @return 结果
+     */
+    public DNumber arctanh() {
+        return DNumber.valueOf(NumberUtils.arctanh(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * arcsinh运算
+     * @return 结果
+     */
+    public DNumber arcsinh() {
+        return DNumber.valueOf(NumberUtils.arcsinh(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * cosh运算
+     * @return 结果
+     */
+    public DNumber cosh() {
+        return DNumber.valueOf(NumberUtils.cosh(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
      * 向上取整
      * @return 结果
      */
@@ -176,7 +224,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber log() {
-        return DNumber.valueOf(NumberUtils.log(this.toBigDecimal(), MathContext.DECIMAL128));
+        return DNumber.valueOf(NumberUtils.ln(this.toBigDecimal(), MathContext.DECIMAL128));
     }
 
     /**

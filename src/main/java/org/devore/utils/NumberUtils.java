@@ -15,7 +15,7 @@ public class NumberUtils {
     private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
 
     /**
-     * 计算gcd(a, b)
+     * gcd(a, b)
      * @param a a
      * @param b b
      * @return gcd(a, b)
@@ -32,7 +32,7 @@ public class NumberUtils {
     }
 
     /**
-     * 计算lcm(a, b)
+     * lcm(a, b)
      * @param a a
      * @param b b
      * @return lcm(a, b)
@@ -59,9 +59,7 @@ public class NumberUtils {
     }
 
     /**
-     * 计算 arctan2(y, x)，返回从正X轴到点 (x, y) 的角度
-     * 能够正确处理所有象限，返回范围在 [-π, π]
-     *
+     * arctan2(y, x)
      * @param y  Y坐标
      * @param x  X坐标
      * @param mc 精度
@@ -91,10 +89,94 @@ public class NumberUtils {
     }
 
     /**
-     * 稳健的arccos计算，适用于定义域 [-1, 1]
-     * 使用恒等式: arccos(x) = π/2 - arcsin(x)
-     *
-     * @param x  输入值
+     * sinh(x)
+     * @param x  x
+     * @param mc 精度
+     * @return sinh(x)
+     */
+    public static BigDecimal sinh(BigDecimal x, MathContext mc) {
+        BigDecimal ex = exp(x, mc);
+        BigDecimal emx = exp(x.negate(), mc);
+        return ex.subtract(emx, mc)
+                .divide(BigDecimal.valueOf(2), mc)
+                .round(mc);
+    }
+
+    /**
+     * cosh(x)
+     * @param x  x
+     * @param mc 精度
+     * @return cosh(x)
+     */
+    public static BigDecimal cosh(BigDecimal x, MathContext mc) {
+        BigDecimal ex = exp(x, mc);
+        BigDecimal emx = exp(x.negate(), mc);
+        return ex.add(emx, mc)
+                .divide(BigDecimal.valueOf(2), mc)
+                .round(mc);
+    }
+
+    /**
+     * tanh(x)
+     * @param x  x
+     * @param mc 精度
+     * @return tanh(x)
+     */
+    public static BigDecimal tanh(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
+        BigDecimal e2x = exp(x.multiply(BigDecimal.valueOf(2), mc), mc);
+        BigDecimal numerator = e2x.subtract(BigDecimal.ONE, mc);
+        BigDecimal denominator = e2x.add(BigDecimal.ONE, mc);
+        return numerator.divide(denominator, mc).round(mc);
+    }
+
+    /**
+     * arcsinh(x)
+     * @param x  x
+     * @param mc 精度
+     * @return arcsinh(x)
+     */
+    public static BigDecimal arcsinh(BigDecimal x, MathContext mc) {
+        BigDecimal x2 = x.multiply(x, mc);
+        BigDecimal sqrt = sqrt(x2.add(BigDecimal.ONE, mc), mc);
+        BigDecimal inner = x.add(sqrt, mc);
+        return ln(inner, mc).round(mc);
+    }
+
+    /**
+     * arccosh(x)
+     * @param x  x
+     * @param mc 精度
+     * @return arccosh(x)
+     */
+    public static BigDecimal arccosh(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ONE) < 0) throw new DevoreRuntimeException("arcosh(x) 的定义域为 [1, +∞)，输入值超出范围.");
+        if (x.compareTo(BigDecimal.ONE) == 0) return BigDecimal.ZERO;
+        BigDecimal xm1 = x.subtract(BigDecimal.ONE, mc);
+        BigDecimal xp1 = x.add(BigDecimal.ONE, mc);
+        BigDecimal sqrt = sqrt(xm1.multiply(xp1, mc), mc);
+        return ln(x.add(sqrt, mc), mc).round(mc);
+    }
+
+    /**
+     * arctanh(x)
+     * @param x  x
+     * @param mc 精度
+     * @return arctanh(x)
+     */
+    public static BigDecimal arctanh(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ONE) >= 0 || x.compareTo(BigDecimal.ONE.negate()) <= 0)
+            throw new DevoreRuntimeException("artanh(x) 的定义域为 (-1, 1)，输入值超出范围.");
+        if (x.compareTo(BigDecimal.ZERO) == 0) return BigDecimal.ZERO;
+        BigDecimal onePlus = BigDecimal.ONE.add(x, mc);
+        BigDecimal oneMinus = BigDecimal.ONE.subtract(x, mc);
+        BigDecimal ln = ln(onePlus.divide(oneMinus, mc), mc);
+        return ln.divide(BigDecimal.valueOf(2), mc).round(mc);
+    }
+
+    /**
+     * arccos(x)
+     * @param x  x
      * @param mc 精度
      * @return arccos(x)
      */
@@ -113,10 +195,8 @@ public class NumberUtils {
     }
 
     /**
-     * 稳健的arcsin计算，适用于定义域 [-1, 1]
-     * 使用恒等式转换和泰勒级数展开
-     *
-     * @param x  输入值
+     * arcsin(x)
+     * @param x  x
      * @param mc 精度
      * @return arcsin(x)
      */
@@ -140,10 +220,8 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数计算 arcsin(x)
-     * arcsin(x) = x + (1/2)(x³/3) + (1·3/2·4)(x⁵/5) + (1·3·5/2·4·6)(x⁷/7) + ...
-     *
-     * @param x  输入值
+     * arcsin(x)
+     * @param x  x
      * @param mc 精度
      * @return arcsin(x)
      */
@@ -171,10 +249,8 @@ public class NumberUtils {
     }
 
     /**
-     * 稳健的arctan计算，适用于所有实数
-     * 使用泰勒级数展开，对于 |x| > 1 的情况使用恒等式转换
-     *
-     * @param x  输入值
+     * arctan(x)
+     * @param x  x
      * @param mc 精度
      * @return arctan(x)
      */
@@ -195,10 +271,8 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数计算 arctan(x)，仅适用于 0 ≤ x ≤ 1
-     * arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
-     *
-     * @param x  输入值
+     * arctan(x)
+     * @param x  x
      * @param mc 精度
      * @return arctan(x)
      */
@@ -245,7 +319,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数展开计算 sin(x)
+     * sin(x)
      * @param x  x
      * @param mc 精度
      * @return sin(x)
@@ -267,7 +341,7 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数展开计算 cos(x)
+     * cos(x)
      * @param x  x
      * @param mc 精度
      * @return cos(x)
@@ -289,7 +363,7 @@ public class NumberUtils {
     }
 
     /**
-     * 将tan计算为 sin(x)/cos(x)
+     * tan(x)
      * @param x  x
      * @param mc 精度
      * @return tan(x)
@@ -301,10 +375,10 @@ public class NumberUtils {
     }
 
     /**
-     * 使用牛顿法计算BigDecimal的平方根
+     * sqrt(x)
      * @param x  x
      * @param mc 精度
-     * @return √x
+     * @return sqrt(x)
      */
     public static BigDecimal sqrt(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) < 0) throw new DevoreRuntimeException("负数的平方根.");
@@ -321,7 +395,7 @@ public class NumberUtils {
     }
 
     /**
-     * 计算BigDecimal的 x^y
+     * x^y
      * @param x  x
      * @param y  y
      * @param mc 精度
@@ -336,11 +410,11 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ONE) == 0) return BigDecimal.ONE;
         if (isInt(y)) return powInt(x, y.toBigInteger(), mc);
         if (x.compareTo(BigDecimal.ZERO) < 0) throw new DevoreRuntimeException("非整数指数的负数.");
-        return exp(y.multiply(log(x, mc)), mc);
+        return exp(y.multiply(ln(x, mc)), mc);
     }
 
     /**
-     * 计算BigDecimal的 x^y, 其中 y 为整数
+     * x^y, 其中 y 为整数
      * @param x  x
      * @param y  y
      * @param mc 精度
@@ -359,12 +433,12 @@ public class NumberUtils {
     }
 
     /**
-     * 使用泰勒级数计算 ln(x)
+     * ln(x)
      * @param x  x
      * @param mc 精度
      * @return ln(x)
      */
-    public static BigDecimal log(BigDecimal x, MathContext mc) {
+    public static BigDecimal ln(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0) throw new DevoreRuntimeException("非正数的对数.");
         BigDecimal term = x.subtract(BigDecimal.ONE).divide(x.add(BigDecimal.ONE), mc);
         BigDecimal termSquared = term.multiply(term);
@@ -381,7 +455,7 @@ public class NumberUtils {
     }
 
     /**
-     * 以 b 为底的 a 的对数：log_b(a)
+     * log_b(a)
      * @param a  a
      * @param b  b
      * @param mc 精度
@@ -391,11 +465,11 @@ public class NumberUtils {
         if (a.compareTo(BigDecimal.ZERO) <= 0) throw new DevoreRuntimeException("log_b(a) 要求a必须大于0.");
         if (b.compareTo(BigDecimal.ZERO) <= 0) throw new DevoreRuntimeException("log_b(a) 要求b必须大于0.");
         if (b.compareTo(BigDecimal.ONE) == 0) throw new DevoreRuntimeException("log_b(a) 要求底数b不能为1.");
-        return log(a, mc).divide(log(b, mc), mc);
+        return ln(a, mc).divide(ln(b, mc), mc);
     }
 
     /**
-     * 使用泰勒级数计算 e^x
+     * e^x
      * @param x  x
      * @param mc 精度
      * @return e^x

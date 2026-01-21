@@ -86,17 +86,33 @@ public class Core {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).sin();
         }), 1, false);
+        dEnv.addTokenProcedure("sinh", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).sinh();
+        }), 1, false);
         dEnv.addTokenProcedure("cos", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).cos();
+        }), 1, false);
+        dEnv.addTokenProcedure("cosh", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).cosh();
         }), 1, false);
         dEnv.addTokenProcedure("tan", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).tan();
         }), 1, false);
+        dEnv.addTokenProcedure("tanh", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).tanh();
+        }), 1, false);
         dEnv.addTokenProcedure("atan", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arctan();
+        }), 1, false);
+        dEnv.addTokenProcedure("atanh", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).arctanh();
         }), 1, false);
         dEnv.addTokenProcedure("atan", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
@@ -107,9 +123,17 @@ public class Core {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arcsin();
         }), 1, false);
+        dEnv.addTokenProcedure("asinh", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).arcsinh();
+        }), 1, false);
         dEnv.addTokenProcedure("acos", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arccos();
+        }), 1, false);
+        dEnv.addTokenProcedure("acosh", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber)) throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).arccosh();
         }), 1, false);
         dEnv.addTokenProcedure("prime?", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
