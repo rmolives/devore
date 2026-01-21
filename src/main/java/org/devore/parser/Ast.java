@@ -136,7 +136,7 @@ public class Ast {
     }
 
     /**
-     * 子树类型
+     * 语法树类型
      */
     public enum Type {
         PROCEDURE,   // 过程
