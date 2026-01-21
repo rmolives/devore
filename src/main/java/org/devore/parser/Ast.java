@@ -127,7 +127,7 @@ public class Ast {
             else builder.append(this.symbol);
         } else {
             builder.append("(");
-            if (this.symbol instanceof DString) builder.append("\"").append(symbol).append("\"");
+            if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
             else builder.append(this.symbol);
             for (Ast node : this.children) builder.append(" ").append(node.toString());
             builder.append(")");
