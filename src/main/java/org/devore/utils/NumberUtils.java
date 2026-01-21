@@ -289,7 +289,7 @@ public class NumberUtils {
             BigDecimal currentTerm = term.divide(denominator, mc);
             result = add ? result.add(currentTerm, mc) : result.subtract(currentTerm, mc);
             term = term.multiply(xSquared, mc);
-            n++;
+            ++n;
             add = !add;
             if (n > mc.getPrecision() * 20) break;
         }
