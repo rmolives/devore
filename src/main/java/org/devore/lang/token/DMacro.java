@@ -34,9 +34,9 @@ public class DMacro extends DToken {
     /**
      * 创建宏
      *
-     * @param params    params
-     * @param bodys     bodys
-     * @param children  子宏
+     * @param params   params
+     * @param bodys    bodys
+     * @param children 子宏
      * @return this
      */
     public static DMacro newMacro(List<String> params, List<Ast> bodys, List<DMacro> children) {
