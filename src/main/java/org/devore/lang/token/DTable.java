@@ -27,6 +27,7 @@ public class DTable extends DToken {
 
     /**
      * 设置KY对
+     *
      * @param key   key
      * @param value value
      * @param force 是否更改原表
@@ -44,7 +45,8 @@ public class DTable extends DToken {
 
     /**
      * 是否包含特定key
-     * @param key   key
+     *
+     * @param key key
      * @return 结果
      */
     public DBool containsKey(DToken key) {
@@ -53,6 +55,7 @@ public class DTable extends DToken {
 
     /**
      * 是否包含特定value
+     *
      * @param value value
      * @return 结果
      */
@@ -62,7 +65,8 @@ public class DTable extends DToken {
 
     /**
      * 获取key对应的value
-     * @param key   key
+     *
+     * @param key key
      * @return 结果
      */
     public DToken get(DToken key) {
@@ -71,6 +75,7 @@ public class DTable extends DToken {
 
     /**
      * 删除key
+     *
      * @param key   key
      * @param force 是否更改原表
      * @return 结果
@@ -87,6 +92,7 @@ public class DTable extends DToken {
 
     /**
      * 获取所有key
+     *
      * @return 结果
      */
     public Set<DToken> keys() {
@@ -95,6 +101,7 @@ public class DTable extends DToken {
 
     /**
      * 获取数量
+     *
      * @return 数量
      */
     public int size() {

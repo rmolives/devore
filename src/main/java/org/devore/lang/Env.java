@@ -3,8 +3,8 @@ package org.devore.lang;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
-import org.devore.lang.token.DWord;
 import org.devore.lang.token.DToken;
+import org.devore.lang.token.DWord;
 import org.devore.parser.Ast;
 
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ public class Env {
 
     /**
      * 创建环境
+     *
      * @param table  环境表
      * @param father 父环境
      * @param io     IO表
@@ -33,6 +34,7 @@ public class Env {
 
     /**
      * 创建环境
+     *
      * @return 环境
      */
     public static Env newEnv() {
@@ -41,6 +43,7 @@ public class Env {
 
     /**
      * 创建环境
+     *
      * @param father 父环境
      * @param io     IO表
      * @return 环境
@@ -51,6 +54,7 @@ public class Env {
 
     /**
      * 创建环境
+     *
      * @param io IO表
      * @return 环境
      */
@@ -60,6 +64,7 @@ public class Env {
 
     /**
      * 设置KY对
+     *
      * @param key   key
      * @param value value
      * @return 环境
@@ -73,6 +78,7 @@ public class Env {
 
     /**
      * 添加宏
+     *
      * @param key   key
      * @param macro 宏
      * @return 环境
@@ -88,6 +94,7 @@ public class Env {
 
     /**
      * 设置Ast过程
+     *
      * @param key       key
      * @param procedure 过程
      * @param argc      参数数量
@@ -105,6 +112,7 @@ public class Env {
 
     /**
      * 添加普通过程
+     *
      * @param key       key
      * @param procedure 过程
      * @param argc      参数数量
@@ -130,6 +138,7 @@ public class Env {
 
     /**
      * 更改Ast过程
+     *
      * @param key       key
      * @param procedure 过程
      * @param argc      参数数量
@@ -145,6 +154,7 @@ public class Env {
 
     /**
      * 更改普通过程
+     *
      * @param key       key
      * @param procedure 过程
      * @param argc      参数数量
@@ -168,6 +178,7 @@ public class Env {
 
     /**
      * 更改KY对
+     *
      * @param key   key
      * @param value value
      * @return 环境
@@ -181,6 +192,7 @@ public class Env {
 
     /**
      * 查看是否包含特定key
+     *
      * @param key key
      * @return 结果
      */
@@ -192,6 +204,7 @@ public class Env {
 
     /**
      * 获取key对应的value
+     *
      * @param key key
      * @return value
      */
@@ -203,6 +216,7 @@ public class Env {
 
     /**
      * 删除KY对
+     *
      * @param key key
      * @return 删除的value
      */
@@ -221,6 +235,7 @@ public class Env {
 
     /**
      * 创建子环境
+     *
      * @return 子环境
      */
     public Env createChild() {

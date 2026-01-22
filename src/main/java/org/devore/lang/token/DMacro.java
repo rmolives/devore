@@ -22,8 +22,9 @@ public class DMacro extends DToken {
 
     /**
      * 创建宏
-     * @param params    params
-     * @param bodys     bodys
+     *
+     * @param params params
+     * @param bodys  bodys
      * @return this
      */
     public static DMacro newMacro(List<String> params, List<Ast> bodys) {
@@ -32,6 +33,7 @@ public class DMacro extends DToken {
 
     /**
      * 添加宏
+     *
      * @param macro 宏
      * @return this
      */
@@ -43,7 +45,8 @@ public class DMacro extends DToken {
 
     /**
      * 匹配符合条件的宏
-     * @param argc  参数数量
+     *
+     * @param argc 参数数量
      * @return 符合条件的宏
      */
     private DMacro match(int argc) {
@@ -57,6 +60,7 @@ public class DMacro extends DToken {
 
     /**
      * 进行替换
+     *
      * @param body  body
      * @param nodes nodes
      * @return 替换后的ast
@@ -84,6 +88,7 @@ public class DMacro extends DToken {
 
     /**
      * 进行替换
+     *
      * @param nodes nodes
      * @return 替换后的ast
      */

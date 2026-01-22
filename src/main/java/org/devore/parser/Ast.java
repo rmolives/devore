@@ -1,8 +1,8 @@
 package org.devore.parser;
 
 import org.devore.lang.token.DString;
-import org.devore.lang.token.DWord;
 import org.devore.lang.token.DToken;
+import org.devore.lang.token.DWord;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,7 @@ public class Ast {
 
     /**
      * 创建语法树
+     *
      * @param symbol 内容
      */
     public Ast(DToken symbol) {
@@ -28,6 +29,7 @@ public class Ast {
 
     /**
      * 创建语法树
+     *
      * @param symbol 内容
      * @param type   类型
      * @param child  子树
@@ -40,6 +42,7 @@ public class Ast {
 
     /**
      * 复制
+     *
      * @return 复制
      */
     public Ast copy() {
@@ -50,6 +53,7 @@ public class Ast {
 
     /**
      * 添加子树
+     *
      * @param node 子树
      */
     public void add(Ast node) {
@@ -58,6 +62,7 @@ public class Ast {
 
     /**
      * 插入子树
+     *
      * @param i    位置
      * @param node 子树
      */
@@ -67,6 +72,7 @@ public class Ast {
 
     /**
      * 设置子树
+     *
      * @param i    index
      * @param node 子树
      */
@@ -76,6 +82,7 @@ public class Ast {
 
     /**
      * 获取第i位子树
+     *
      * @param i index
      * @return 子树
      */
@@ -92,6 +99,7 @@ public class Ast {
 
     /**
      * 获取语法树子树数量
+     *
      * @return 数量
      */
     public int size() {
@@ -100,6 +108,7 @@ public class Ast {
 
     /**
      * 判断语法树是否为空
+     *
      * @return 结果
      */
     public boolean isEmpty() {
@@ -108,6 +117,7 @@ public class Ast {
 
     /**
      * 判断语法树symbol是否为nil
+     *
      * @return 结果
      */
     public boolean isNotNil() {
@@ -116,6 +126,7 @@ public class Ast {
 
     /**
      * 转换为字符串
+     *
      * @return 字符串
      */
     @Override

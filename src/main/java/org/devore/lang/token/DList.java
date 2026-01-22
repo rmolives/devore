@@ -27,6 +27,7 @@ public class DList extends DToken {
 
     /**
      * 排序
+     *
      * @param force 是否更改原列表
      * @return 结果
      */
@@ -42,6 +43,7 @@ public class DList extends DToken {
 
     /**
      * 颠倒
+     *
      * @param force 是否更改原列表
      * @return 结果
      */
@@ -57,6 +59,7 @@ public class DList extends DToken {
 
     /**
      * 添加元素
+     *
      * @param t     元素
      * @param force 是否更改原列表
      * @return 结果
@@ -73,6 +76,7 @@ public class DList extends DToken {
 
     /**
      * 添加元素
+     *
      * @param index 位置
      * @param t     元素
      * @param force 是否更改原列表
@@ -90,6 +94,7 @@ public class DList extends DToken {
 
     /**
      * 获取元素
+     *
      * @param index 位置
      * @return 元素
      */
@@ -99,6 +104,7 @@ public class DList extends DToken {
 
     /**
      * 设置元素
+     *
      * @param index 位置
      * @param t     元素
      * @param force 是否更改原列表
@@ -116,6 +122,7 @@ public class DList extends DToken {
 
     /**
      * 删除元素
+     *
      * @param index 位置
      * @param force 是否更改原列表
      * @return 结果
@@ -132,6 +139,7 @@ public class DList extends DToken {
 
     /**
      * 获取元素首次出现的位置
+     *
      * @param t 元素
      * @return 位置
      */
@@ -141,6 +149,7 @@ public class DList extends DToken {
 
     /**
      * 获取元素最后出现的位置
+     *
      * @param t 元素
      * @return 位置
      */
@@ -150,6 +159,7 @@ public class DList extends DToken {
 
     /**
      * 是否包含特定元素
+     *
      * @param t 元素
      * @return 结果
      */
@@ -159,6 +169,7 @@ public class DList extends DToken {
 
     /**
      * 获取数量
+     *
      * @return 数量
      */
     public int size() {
@@ -167,6 +178,7 @@ public class DList extends DToken {
 
     /**
      * 截取
+     *
      * @param fromIndex 起始位置
      * @param toIndex   结束位置
      * @param force     是否更改原列表
@@ -184,6 +196,7 @@ public class DList extends DToken {
 
     /**
      * 转换为Java的List
+     *
      * @return 结果
      */
     public List<DToken> toList() {

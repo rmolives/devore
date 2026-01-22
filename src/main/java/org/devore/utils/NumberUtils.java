@@ -16,6 +16,7 @@ public class NumberUtils {
 
     /**
      * gcd(a, b)
+     *
      * @param a a
      * @param b b
      * @return gcd(a, b)
@@ -33,6 +34,7 @@ public class NumberUtils {
 
     /**
      * lcm(a, b)
+     *
      * @param a a
      * @param b b
      * @return lcm(a, b)
@@ -45,6 +47,7 @@ public class NumberUtils {
 
     /**
      * 将 π 近似
+     *
      * @return π 近似值
      */
     private static BigDecimal approximatePi() {
@@ -60,6 +63,7 @@ public class NumberUtils {
 
     /**
      * arctan2(y, x)
+     *
      * @param y  Y坐标
      * @param x  X坐标
      * @param mc 精度
@@ -90,6 +94,7 @@ public class NumberUtils {
 
     /**
      * sinh(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return sinh(x)
@@ -104,6 +109,7 @@ public class NumberUtils {
 
     /**
      * cosh(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return cosh(x)
@@ -118,6 +124,7 @@ public class NumberUtils {
 
     /**
      * tanh(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return tanh(x)
@@ -132,6 +139,7 @@ public class NumberUtils {
 
     /**
      * arcsinh(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arcsinh(x)
@@ -145,12 +153,14 @@ public class NumberUtils {
 
     /**
      * arccosh(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arccosh(x)
      */
     public static BigDecimal arccosh(BigDecimal x, MathContext mc) {
-        if (x.compareTo(BigDecimal.ONE) < 0) throw new DevoreRuntimeException("arcosh(x) 的定义域为 [1, +∞)，输入值超出范围.");
+        if (x.compareTo(BigDecimal.ONE) < 0)
+            throw new DevoreRuntimeException("arcosh(x) 的定义域为 [1, +∞)，输入值超出范围.");
         if (x.compareTo(BigDecimal.ONE) == 0) return BigDecimal.ZERO;
         BigDecimal xm1 = x.subtract(BigDecimal.ONE, mc);
         BigDecimal xp1 = x.add(BigDecimal.ONE, mc);
@@ -160,6 +170,7 @@ public class NumberUtils {
 
     /**
      * arctanh(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arctanh(x)
@@ -176,6 +187,7 @@ public class NumberUtils {
 
     /**
      * arccos(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arccos(x)
@@ -196,6 +208,7 @@ public class NumberUtils {
 
     /**
      * arcsin(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arcsin(x)
@@ -221,6 +234,7 @@ public class NumberUtils {
 
     /**
      * arcsin(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arcsin(x)
@@ -250,6 +264,7 @@ public class NumberUtils {
 
     /**
      * arctan(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arctan(x)
@@ -272,6 +287,7 @@ public class NumberUtils {
 
     /**
      * arctan(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return arctan(x)
@@ -298,6 +314,7 @@ public class NumberUtils {
 
     /**
      * 将角度缩小到范围 [-π，π]
+     *
      * @param angle 角度
      * @param mc    精度
      * @return [-π, π]
@@ -311,6 +328,7 @@ public class NumberUtils {
 
     /**
      * 判断BigDecimal是否为整数
+     *
      * @param decimal BigDecimal
      * @return 结果
      */
@@ -320,6 +338,7 @@ public class NumberUtils {
 
     /**
      * sin(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return sin(x)
@@ -342,6 +361,7 @@ public class NumberUtils {
 
     /**
      * cos(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return cos(x)
@@ -364,6 +384,7 @@ public class NumberUtils {
 
     /**
      * tan(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return tan(x)
@@ -376,6 +397,7 @@ public class NumberUtils {
 
     /**
      * sqrt(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return sqrt(x)
@@ -396,6 +418,7 @@ public class NumberUtils {
 
     /**
      * x^y
+     *
      * @param x  x
      * @param y  y
      * @param mc 精度
@@ -415,6 +438,7 @@ public class NumberUtils {
 
     /**
      * x^y, 其中 y 为整数
+     *
      * @param x  x
      * @param y  y
      * @param mc 精度
@@ -434,6 +458,7 @@ public class NumberUtils {
 
     /**
      * ln(x)
+     *
      * @param x  x
      * @param mc 精度
      * @return ln(x)
@@ -456,6 +481,7 @@ public class NumberUtils {
 
     /**
      * log_b(a)
+     *
      * @param a  a
      * @param b  b
      * @param mc 精度
@@ -470,6 +496,7 @@ public class NumberUtils {
 
     /**
      * e^x
+     *
      * @param x  x
      * @param mc 精度
      * @return e^x

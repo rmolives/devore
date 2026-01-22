@@ -6,24 +6,28 @@ package org.devore.lang.token;
 public abstract class DToken {
     /**
      * 获取当前token类型
+     *
      * @return 类型
      */
     public abstract String type();
 
     /**
      * 将当前token转为字符串
+     *
      * @return 字符串
      */
     protected abstract String str();
 
     /**
      * 复制当前token
+     *
      * @return token
      */
     public abstract DToken copy();
 
     /**
      * token比较
+     *
      * @param t token
      * @return 结果
      */
@@ -31,6 +35,7 @@ public abstract class DToken {
 
     /**
      * 获取当前token的hash
+     *
      * @return hash
      */
     @Override
@@ -38,6 +43,7 @@ public abstract class DToken {
 
     /**
      * 判断token是否相等
+     *
      * @param obj token
      * @return 结果
      */
@@ -48,6 +54,7 @@ public abstract class DToken {
 
     /**
      * 将当前token转为字符串
+     *
      * @return 字符串
      */
     @Override

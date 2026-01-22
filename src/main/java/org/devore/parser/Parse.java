@@ -2,8 +2,8 @@ package org.devore.parser;
 
 import org.devore.exception.DevoreParseException;
 import org.devore.lang.token.DSymbol;
-import org.devore.lang.token.DWord;
 import org.devore.lang.token.DToken;
+import org.devore.lang.token.DWord;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -15,6 +15,7 @@ import java.util.List;
 public class Parse {
     /**
      * 语法分析器
+     *
      * @param tokens Token序列
      * @return 语法树
      */

@@ -26,6 +26,7 @@ public class DProcedure extends DToken {
 
     /**
      * 创建新过程
+     *
      * @param procedure 过程
      * @param children  子过程集
      * @param argc      参数数量
@@ -38,6 +39,7 @@ public class DProcedure extends DToken {
 
     /**
      * 创建新过程
+     *
      * @param procedure 过程
      * @param argc      参数数量
      * @param vararg    是否为可变参数
@@ -49,6 +51,7 @@ public class DProcedure extends DToken {
 
     /**
      * 添加新过程
+     *
      * @param procedure 过程
      * @return this
      */
@@ -60,7 +63,8 @@ public class DProcedure extends DToken {
 
     /**
      * 匹配符合条件的过程
-     * @param argc  参数数量
+     *
+     * @param argc 参数数量
      * @return 符合条件的过程
      */
     private DProcedure match(int argc) {
@@ -82,8 +86,9 @@ public class DProcedure extends DToken {
 
     /**
      * 执行过程
-     * @param node  node
-     * @param env   环境
+     *
+     * @param node node
+     * @param env  环境
      * @return 结果
      */
     public DToken call(Ast node, Env env) {
@@ -94,8 +99,9 @@ public class DProcedure extends DToken {
 
     /**
      * 执行过程
-     * @param args  参数
-     * @param env   环境
+     *
+     * @param args 参数
+     * @param env  环境
      * @return 结果
      */
     public DToken call(List<DToken> args, Env env) {

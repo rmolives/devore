@@ -30,6 +30,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 加法运算
+     *
      * @param a 数值
      * @return 结果
      */
@@ -39,6 +40,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 减法运算
+     *
      * @param a 数值
      * @return 结果
      */
@@ -48,6 +50,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 乘法运算
+     *
      * @param a 数值
      * @return 结果
      */
@@ -57,6 +60,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 除法运算
+     *
      * @param a 数值
      * @return 结果
      */
@@ -67,6 +71,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * sin运算
+     *
      * @return 结果
      */
     public DNumber sin() {
@@ -75,6 +80,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * cos运算
+     *
      * @return 结果
      */
     public DNumber cos() {
@@ -83,6 +89,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * tan运算
+     *
      * @return 结果
      */
     public DNumber tan() {
@@ -91,6 +98,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * arctan运算
+     *
      * @return 结果
      */
     public DNumber arctan() {
@@ -99,6 +107,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * arcsin运算
+     *
      * @return 结果
      */
     public DNumber arcsin() {
@@ -107,6 +116,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * arccos运算
+     *
      * @return 结果
      */
     public DNumber arccos() {
@@ -115,6 +125,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * tanh运算
+     *
      * @return 结果
      */
     public DNumber tanh() {
@@ -123,6 +134,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * sinh运算
+     *
      * @return 结果
      */
     public DNumber sinh() {
@@ -131,6 +143,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * arccosh运算
+     *
      * @return 结果
      */
     public DNumber arccosh() {
@@ -139,6 +152,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * arctanh运算
+     *
      * @return 结果
      */
     public DNumber arctanh() {
@@ -147,6 +161,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * arcsinh运算
+     *
      * @return 结果
      */
     public DNumber arcsinh() {
@@ -155,6 +170,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * cosh运算
+     *
      * @return 结果
      */
     public DNumber cosh() {
@@ -163,6 +179,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 向上取整
+     *
      * @return 结果
      */
     public DNumber ceiling() {
@@ -171,6 +188,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 向下取整
+     *
      * @return 结果
      */
     public DNumber floor() {
@@ -179,6 +197,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 向0取整
+     *
      * @return 结果
      */
     public DNumber truncate() {
@@ -189,6 +208,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 四舍五入
+     *
      * @return 结果
      */
     public DNumber round() {
@@ -197,6 +217,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * sqrt运算
+     *
      * @return 结果
      */
     public DNumber sqrt() {
@@ -205,6 +226,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * pow运算
+     *
      * @return 结果
      */
     public DNumber pow(DNumber n) {
@@ -213,6 +235,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * 绝对值
+     *
      * @return 结果
      */
     public DNumber abs() {
@@ -221,6 +244,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * ln运算
+     *
      * @return 结果
      */
     public DNumber ln() {
@@ -229,6 +253,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * log运算
+     *
      * @param a 数值
      * @return 结果
      */
@@ -238,6 +263,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * arctan2运算
+     *
      * @param x x
      * @return 结果
      */
@@ -247,6 +273,7 @@ public abstract class DNumber extends DToken {
 
     /**
      * exp运算
+     *
      * @return 结果
      */
     public DNumber exp() {
@@ -255,12 +282,14 @@ public abstract class DNumber extends DToken {
 
     /**
      * 转换为BigInteger
+     *
      * @return 结果
      */
     public abstract BigInteger toBigInteger();
 
     /**
      * 转换为BigDecimal
+     *
      * @return 结果
      */
     public abstract BigDecimal toBigDecimal();
