@@ -46,17 +46,14 @@ public class Repl {
                         if (codeCharArray[index] == '\"') break;
                     } while (index < codeCharArray.length - 1);
                 }
-                if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
-                    ++flag;
-                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
-                    --flag;
+                if (codeCharArray[index] == '(' || codeCharArray[index] == '[') ++flag;
+                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']') --flag;
                 ++index;
             } while (index < codeCharArray.length);
             if (flag == 0) {
                 DToken result = Devore.call(env, codeBuilder.toString());
                 codeBuilder = new StringBuilder();
-                if (result != DWord.NIL)
-                    out.println(result.toString());
+                if (result != DWord.NIL) out.println(result.toString());
             }
             size = flag;
         }

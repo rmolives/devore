@@ -32,13 +32,10 @@ public class Lexer {
                             codeCharArray[index] != '\n' &&
                             codeCharArray[index] != '\r')
                         ++index;
-                else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
-                    break;
-                else
-                    ++index;
+                else if (codeCharArray[index] == '(' || codeCharArray[index] == '[') break;
+                else ++index;
             }
-            if (index >= codeCharArray.length)
-                return expressions;
+            if (index >= codeCharArray.length) return expressions;
             do {
                 if (codeCharArray[index] == ';') {
                     while (index < codeCharArray.length &&
@@ -57,16 +54,14 @@ public class Lexer {
                             if (skip) {
                                 skip = false;
                                 value.append("\\\\");
-                            } else
-                                skip = true;
+                            } else skip = true;
                             continue;
                         } else if (index >= codeCharArray.length - 1 || codeCharArray[index] == '\"') {
                             if (skip) {
                                 skip = false;
                                 value.append("\\\"");
                                 continue;
-                            } else
-                                break;
+                            } else break;
                         } else if (skip) {
                             value.append("\\").append(codeCharArray[index]);
                             skip = false;
@@ -86,10 +81,8 @@ public class Lexer {
                                 || codeCharArray[index + 1] == ')'
                                 || codeCharArray[index + 1] == ']'))
                     ++index;
-                if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
-                    ++flag;
-                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
-                    --flag;
+                if (codeCharArray[index] == '(' || codeCharArray[index] == '[') ++flag;
+                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']') --flag;
                 builder.append(codeCharArray[index++]);
             } while (flag > 0);
             expressions.add(builder.toString());
@@ -120,7 +113,8 @@ public class Lexer {
                     continue;
             }
             boolean negative = false;
-            if (expressionCharArray[index] == '-' && index < expressionCharArray.length - 1 && Character.isDigit(expressionCharArray[index + 1])) {
+            if (expressionCharArray[index] == '-' && index < expressionCharArray.length - 1
+                    && Character.isDigit(expressionCharArray[index + 1])) {
                 negative = true;
                 ++index;
             }
@@ -162,16 +156,14 @@ public class Lexer {
                         if (skip) {
                             skip = false;
                             builder.append("\\");
-                        } else
-                            skip = true;
+                        } else skip = true;
                         continue;
                     } else if (index >= expressionCharArray.length - 1 || expressionCharArray[index] == '\"') {
                         if (skip) {
                             skip = false;
                             builder.append("\"");
                             continue;
-                        } else
-                            break;
+                        } else break;
                     }
                     if (skip) {
                         skip = false;
@@ -195,8 +187,7 @@ public class Lexer {
                                 builder.append("\\").append(expressionCharArray[index]);
                                 break;
                         }
-                    } else
-                        builder.append(expressionCharArray[index]);
+                    } else builder.append(expressionCharArray[index]);
                 }
                 tokens.add(DString.valueOf(builder.toString()));
                 continue;
