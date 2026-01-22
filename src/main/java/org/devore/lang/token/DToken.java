@@ -19,13 +19,6 @@ public abstract class DToken {
     protected abstract String str();
 
     /**
-     * 复制当前token
-     *
-     * @return token
-     */
-    public abstract DToken copy();
-
-    /**
      * token比较
      *
      * @param t token

@@ -132,14 +132,6 @@ public class DProcedure extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        List<DProcedure> temp = new ArrayList<>();
-        for (DProcedure proc : this.children)
-            temp.add((DProcedure) proc.copy());
-        return newProcedure(this.procedure, temp, this.argc, this.vararg);
-    }
-
-    @Override
     public int compareTo(DToken t) {
         if (this == t)
             return 0;

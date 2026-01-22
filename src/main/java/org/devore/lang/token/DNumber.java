@@ -301,11 +301,6 @@ public abstract class DNumber extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        return DNumber.valueOf(this.toBigDecimal());
-    }
-
-    @Override
     protected String str() {
         return NumberUtils.isInt(this.toBigDecimal()) ? this.toBigInteger().toString() : this.toBigDecimal().toPlainString();
     }

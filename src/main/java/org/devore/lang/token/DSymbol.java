@@ -25,11 +25,6 @@ public class DSymbol extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        return DSymbol.valueOf(this.symbol);
-    }
-
-    @Override
     public int compareTo(DToken t) {
         return t instanceof DSymbol ? this.symbol.compareTo(((DSymbol) t).symbol) : -1;
     }

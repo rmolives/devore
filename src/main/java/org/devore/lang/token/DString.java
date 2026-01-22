@@ -25,11 +25,6 @@ public class DString extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        return DString.valueOf(this.str);
-    }
-
-    @Override
     public int compareTo(DToken t) {
         return t instanceof DString ? this.str.compareTo(((DString) t).str) : -1;
     }

@@ -119,11 +119,6 @@ public class DTable extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        return DTable.valueOf(new HashMap<>(this.table));
-    }
-
-    @Override
     public int compareTo(DToken t) {
         if (!(t instanceof DTable))
             return -1;

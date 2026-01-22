@@ -37,11 +37,6 @@ public class DWord extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        return DWord.valueOf(this.tag);
-    }
-
-    @Override
     public int compareTo(DToken t) {
         return t instanceof DWord && this.tag.equals(((DWord) t).tag) ? 0 : -1;
     }

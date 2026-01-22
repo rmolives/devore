@@ -214,11 +214,6 @@ public class DList extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        return DList.valueOf(new ArrayList<>(this.list));
-    }
-
-    @Override
     public int compareTo(DToken t) {
         if (!(t instanceof DList))
             return -1;

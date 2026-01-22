@@ -27,11 +27,6 @@ public class DBool extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        return DBool.valueOf(this.bool);
-    }
-
-    @Override
     public int compareTo(DToken t) {
         return t instanceof DBool && this.bool == ((DBool) t).bool ? 0 : -1;
     }

@@ -129,17 +129,6 @@ public class DMacro extends DToken {
     }
 
     @Override
-    public DToken copy() {
-        List<Ast> tempBodys = new ArrayList<>();
-        for (Ast body : this.bodys)
-            tempBodys.add(body.copy());
-        List<DMacro> tempChildren = new ArrayList<>();
-        for (DMacro child : this.children)
-            tempChildren.add((DMacro) child.copy());
-        return newMacro(new ArrayList<>(this.params), tempBodys, tempChildren);
-    }
-
-    @Override
     public int compareTo(DToken t) {
         if (this == t)
             return 0;
