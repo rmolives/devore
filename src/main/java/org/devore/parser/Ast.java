@@ -30,14 +30,14 @@ public class Ast {
     /**
      * 创建语法树
      *
-     * @param symbol 内容
-     * @param type   类型
-     * @param child  子树
+     * @param symbol    内容
+     * @param type      类型
+     * @param children  子树
      */
-    public Ast(DToken symbol, Type type, List<Ast> child) {
+    public Ast(DToken symbol, Type type, List<Ast> children) {
         this.symbol = symbol;
         this.type = type;
-        this.children = child;
+        this.children = children;
     }
 
     /**
