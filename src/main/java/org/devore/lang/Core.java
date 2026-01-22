@@ -772,7 +772,8 @@ public class Core {
                 for (DToken arg : args) {
                     if (arg instanceof DList)
                         list.addAll(((DList) arg).toList());
-                    else list.add(arg);
+                    else
+                        list.add(arg);
                 }
                 result = DList.valueOf(list);
             } else {
