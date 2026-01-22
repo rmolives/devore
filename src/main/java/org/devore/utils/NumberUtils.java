@@ -462,7 +462,8 @@ public class NumberUtils {
         }
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ONE;
-        if (isInt(y)) return powInt(x, y.toBigInteger(), mc);
+        if (isInt(y))
+            return powInt(x, y.toBigInteger(), mc);
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new DevoreRuntimeException("非整数指数的负数.");
         return exp(y.multiply(ln(x, mc)), mc);
