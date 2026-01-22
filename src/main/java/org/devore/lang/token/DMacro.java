@@ -10,8 +10,8 @@ import java.util.List;
  * 宏
  */
 public class DMacro extends DToken {
-    private final List<String> params;      // 参数集
-    private final List<Ast> bodys;          // 宏
+    private final List<String> params;      // params
+    private final List<Ast> bodys;          // bodys
     private final List<DMacro> children;    // 子宏
 
     private DMacro(List<String> params, List<Ast> bodys) {
