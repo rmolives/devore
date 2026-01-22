@@ -14,10 +14,10 @@ public class DMacro extends DToken {
     private final List<Ast> bodys;          // bodys
     private final List<DMacro> children;    // 子宏
 
-    private DMacro(List<String> params, List<Ast> bodys) {
+    private DMacro(List<String> params, List<Ast> bodys, List<DMacro> children) {
         this.params = params;
         this.bodys = bodys;
-        this.children = new ArrayList<>();
+        this.children = children;
     }
 
     /**
@@ -28,7 +28,19 @@ public class DMacro extends DToken {
      * @return this
      */
     public static DMacro newMacro(List<String> params, List<Ast> bodys) {
-        return new DMacro(params, bodys);
+        return new DMacro(params, bodys, new ArrayList<>());
+    }
+
+    /**
+     * 创建宏
+     *
+     * @param params    params
+     * @param bodys     bodys
+     * @param children  子宏
+     * @return this
+     */
+    public static DMacro newMacro(List<String> params, List<Ast> bodys, List<DMacro> children) {
+        return new DMacro(params, bodys, children);
     }
 
     /**
@@ -118,10 +130,13 @@ public class DMacro extends DToken {
 
     @Override
     public DToken copy() {
-        List<Ast> temp = new ArrayList<>();
+        List<Ast> tempBodys = new ArrayList<>();
         for (Ast body : this.bodys)
-            temp.add(body.copy());
-        return DMacro.newMacro(new ArrayList<>(this.params), temp);
+            tempBodys.add(body.copy());
+        List<DMacro> tempChildren = new ArrayList<>();
+        for (DMacro child : this.children)
+            tempChildren.add((DMacro) child.copy());
+        return newMacro(new ArrayList<>(this.params), tempBodys, tempChildren);
     }
 
     @Override

@@ -23,39 +23,39 @@ public class Parse {
         Ast node = null;
         Deque<Ast> stack = new ArrayDeque<>();
         int state = -1;
-        Ast tmp;
+        Ast temp;
         int index = 0;
         while (index < tokens.size()) {
             if (state == 1) {
                 if (tokens.get(index) == DWord.RB) {
-                    tmp = Ast.empty.copy();
-                    stack.push(tmp);
+                    temp = Ast.empty.copy();
+                    stack.push(temp);
                     state = -1;
                     ++index;
                     continue;
                 }
                 if (tokens.get(index) == DWord.LB) tokens.add(index, DSymbol.valueOf("apply"));
-                tmp = new Ast(tokens.get(index));
-                stack.push(tmp);
-                node = tmp;
+                temp = new Ast(tokens.get(index));
+                stack.push(temp);
+                node = temp;
                 state = -1;
             } else if (state == 2) {
                 if (tokens.get(index) == DWord.RB) {
-                    tmp = Ast.empty.copy();
+                    temp = Ast.empty.copy();
                     if (stack.peek() == null)
                         throw new DevoreParseException("语法解析中栈顶为null.");
-                    stack.peek().add(tmp);
+                    stack.peek().add(temp);
                     state = -1;
                     ++index;
                     continue;
                 }
                 if (tokens.get(index) == DWord.LB)
                     tokens.add(index, DSymbol.valueOf("apply"));
-                tmp = new Ast(tokens.get(index));
+                temp = new Ast(tokens.get(index));
                 if (stack.peek() == null)
                     throw new DevoreParseException("语法解析中栈顶为null.");
-                stack.peek().add(tmp);
-                stack.push(tmp);
+                stack.peek().add(temp);
+                stack.push(temp);
                 state = -1;
             } else if (tokens.get(index) == DWord.LB) state = stack.isEmpty() ? 1 : 2;
             else if (tokens.get(index) == DWord.RB) {

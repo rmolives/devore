@@ -364,8 +364,8 @@ public class Core {
                         for (int i = 0; i < params.size(); ++i)
                             newInEnv.put(params.get(i), cArgs.get(i));
                         DToken inResult = DWord.NIL;
-                        for (Ast tmp : res)
-                            inResult = Evaluator.eval(newInEnv, tmp.copy());
+                        for (Ast temp : res)
+                            inResult = Evaluator.eval(newInEnv, temp.copy());
                         return inResult;
                     }), params.size(), false);
                 } else {
@@ -402,8 +402,8 @@ public class Core {
                         for (int i = 0; i < params.size(); ++i)
                             newInEnv.put(params.get(i), cArgs.get(i));
                         DToken inResult = DWord.NIL;
-                        for (Ast tmp : res)
-                            inResult = Evaluator.eval(newInEnv, tmp.copy());
+                        for (Ast temp : res)
+                            inResult = Evaluator.eval(newInEnv, temp.copy());
                         return inResult;
                     }), params.size(), false);
                 } else {
@@ -443,8 +443,8 @@ public class Core {
                 for (int i = 0; i < params.size(); ++i)
                     newInEnv.put(params.get(i), args.get(i));
                 DToken inResult = DWord.NIL;
-                for (Ast tmp : node)
-                    inResult = Evaluator.eval(newInEnv, tmp.copy());
+                for (Ast temp : node)
+                    inResult = Evaluator.eval(newInEnv, temp.copy());
                 return inResult;
             };
             return DProcedure.newProcedure(df, params.size(), false);
