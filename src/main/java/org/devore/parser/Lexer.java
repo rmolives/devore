@@ -142,7 +142,8 @@ public class Lexer {
                         --index;
                         break;
                     }
-                    x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index])).divide(d, MathContext.DECIMAL128));
+                    x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index]))
+                            .divide(d, MathContext.DECIMAL128));
                     d = d.multiply(BigDecimal.valueOf(10));
                 }
                 tokens.add(DNumber.valueOf(negative ? x.negate() : x));
