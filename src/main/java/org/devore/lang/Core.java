@@ -149,7 +149,8 @@ public class Core {
         dEnv.addTokenProcedure("prime?", ((args, env) -> {
             if (!(args.get(0) instanceof DInt)) throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(1) instanceof DInt)) throw new DevoreCastException(args.get(1).type(), "int");
-            return DBool.valueOf(((DInt) args.get(0)).toBigInteger().isProbablePrime(((DInt) args.get(1)).toBigInteger().intValue()));
+            return DBool.valueOf(((DInt) args.get(0)).toBigInteger()
+                    .isProbablePrime(((DInt) args.get(1)).toBigInteger().intValue()));
         }), 2, false);
         dEnv.addTokenProcedure("gcd", ((args, env) -> {
             for (DToken arg : args)
