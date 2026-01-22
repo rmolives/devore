@@ -7,7 +7,7 @@ import java.math.BigInteger;
  * 浮点数
  */
 public class DFloat extends DNumber {
-    public final BigDecimal num;
+    public final BigDecimal num;    // 数字
 
     protected DFloat(BigDecimal num) {
         this.num = num;

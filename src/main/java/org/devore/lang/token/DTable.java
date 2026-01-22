@@ -8,7 +8,7 @@ import java.util.Set;
  * 表
  */
 public class DTable extends DToken {
-    private final Map<DToken, DToken> table;
+    private final Map<DToken, DToken> table;    // 表
 
     private DTable(Map<DToken, DToken> table) {
         this.table = table;

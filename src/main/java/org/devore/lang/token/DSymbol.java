@@ -4,7 +4,7 @@ package org.devore.lang.token;
  * 符号
  */
 public class DSymbol extends DToken {
-    public final String symbol;
+    public final String symbol; // 符号
 
     protected DSymbol(String symbol) {
         this.symbol = symbol;

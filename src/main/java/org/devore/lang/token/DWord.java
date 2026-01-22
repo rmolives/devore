@@ -7,7 +7,7 @@ public class DWord extends DToken {
     public static final DWord LB = DWord.valueOf(Tags.LB);     // (
     public static final DWord RB = DWord.valueOf(Tags.RB);     // )
     public static final DWord NIL = DWord.valueOf(Tags.NIL);   // nil
-    private final Tags tag;
+    private final Tags tag;                                     // 关键字
 
     private DWord(Tags tag) {
         this.tag = tag;

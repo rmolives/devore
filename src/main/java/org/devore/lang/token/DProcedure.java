@@ -12,15 +12,15 @@ import java.util.function.BiFunction;
  * 过程
  */
 public class DProcedure extends DToken {
-    private final BiFunction<Ast, Env, DToken> procedure;
-    private final int argc;
-    private final List<DProcedure> children;
-    private final boolean vararg;
+    private final BiFunction<Ast, Env, DToken> procedure;   // 过程
+    private final int argc;                                 // 参数数量
+    private final List<DProcedure> children;                // 子过程
+    private final boolean vararg;                           // 是否为可变参数
 
     private DProcedure(BiFunction<Ast, Env, DToken> procedure, List<DProcedure> children, int argc, boolean vararg) {
         this.procedure = procedure;
-        this.argc = argc;
         this.children = children;
+        this.argc = argc;
         this.vararg = vararg;
     }
 
@@ -28,7 +28,7 @@ public class DProcedure extends DToken {
      * 创建新过程
      *
      * @param procedure 过程
-     * @param children  子过程集
+     * @param children  子过程
      * @param argc      参数数量
      * @param vararg    是否为可变参数
      * @return this

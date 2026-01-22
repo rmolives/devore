@@ -4,9 +4,9 @@ package org.devore.lang.token;
  * 布尔值
  */
 public class DBool extends DToken {
-    public static final DBool FALSE = new DBool(false);
-    public static final DBool TRUE = new DBool(true);
-    public final boolean bool;
+    public static final DBool FALSE = new DBool(false);     // False
+    public static final DBool TRUE = new DBool(true);       // True
+    public final boolean bool;                              // 布尔值
 
     protected DBool(boolean bool) {
         this.bool = bool;
