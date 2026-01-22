@@ -42,7 +42,8 @@ public class Parse {
             } else if (state == 2) {
                 if (tokens.get(index) == DWord.RB) {
                     tmp = Ast.empty.copy();
-                    if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
+                    if (stack.peek() == null)
+                        throw new DevoreParseException("语法解析中栈顶为null.");
                     stack.peek().add(tmp);
                     state = -1;
                     ++index;
@@ -51,25 +52,30 @@ public class Parse {
                 if (tokens.get(index) == DWord.LB)
                     tokens.add(index, DSymbol.valueOf("apply"));
                 tmp = new Ast(tokens.get(index));
-                if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
+                if (stack.peek() == null)
+                    throw new DevoreParseException("语法解析中栈顶为null.");
                 stack.peek().add(tmp);
                 stack.push(tmp);
                 state = -1;
             } else if (tokens.get(index) == DWord.LB) state = stack.isEmpty() ? 1 : 2;
             else if (tokens.get(index) == DWord.RB) {
                 if (index >= 2 && tokens.get(index - 2) == DWord.LB) {
-                    if (stack.peek() == null) throw new DevoreParseException("语法解析中栈顶为null.");
+                    if (stack.peek() == null)
+                        throw new DevoreParseException("语法解析中栈顶为null.");
                     stack.peek().type = Ast.Type.PROCEDURE;
                 }
-                if (stack.isEmpty()) throw new DevoreParseException("语法解析中栈顶为空.");
+                if (stack.isEmpty())
+                    throw new DevoreParseException("语法解析中栈顶为空.");
                 stack.pop();
             } else {
-                if (stack.isEmpty()) throw new DevoreParseException("语法解析中栈顶为空.");
+                if (stack.isEmpty())
+                    throw new DevoreParseException("语法解析中栈顶为空.");
                 stack.peek().add(new Ast(tokens.get(index)));
             }
             ++index;
         }
-        if (node != null) return node;
-        throw new DevoreParseException("语法解析出的AST为null.");
+        if (node == null)
+            throw new DevoreParseException("语法解析出的AST为null.");
+        return node;
     }
 }

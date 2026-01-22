@@ -125,7 +125,8 @@ public class DTable extends DToken {
 
     @Override
     public int compareTo(DToken t) {
-        if (!(t instanceof DTable)) return -1;
+        if (!(t instanceof DTable))
+            return -1;
         DTable other = (DTable) t;
         return this.table.equals(other.table) ? 0 : -1;
     }

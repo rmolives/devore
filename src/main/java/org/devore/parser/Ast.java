@@ -47,7 +47,8 @@ public class Ast {
      */
     public Ast copy() {
         List<Ast> list = new ArrayList<>();
-        for (Ast ast : this.children) list.add(ast.copy());
+        for (Ast ast : this.children)
+            list.add(ast.copy());
         return new Ast(this.symbol, this.type, list);
     }
 
@@ -133,14 +134,20 @@ public class Ast {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (this.isEmpty()) {
-            if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
-            else if (this.type == Type.PROCEDURE) builder.append("(").append(this.symbol).append(")");
-            else builder.append(this.symbol);
+            if (this.symbol instanceof DString)
+                builder.append("\"").append(this.symbol).append("\"");
+            else if (this.type == Type.PROCEDURE)
+                builder.append("(").append(this.symbol).append(")");
+            else
+                builder.append(this.symbol);
         } else {
             builder.append("(");
-            if (this.symbol instanceof DString) builder.append("\"").append(this.symbol).append("\"");
-            else builder.append(this.symbol);
-            for (Ast node : this.children) builder.append(" ").append(node.toString());
+            if (this.symbol instanceof DString)
+                builder.append("\"").append(this.symbol).append("\"");
+            else
+                builder.append(this.symbol);
+            for (Ast node : this.children)
+                builder.append(" ").append(node.toString());
             builder.append(")");
         }
         return builder.toString();

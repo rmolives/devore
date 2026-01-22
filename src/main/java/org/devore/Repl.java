@@ -21,15 +21,18 @@ public class Repl {
         int size = 0;
         while (true) {
             out.print("[Devore] >>> ");
-            if (size > 0) codeBuilder.append(" ");
-            while (size-- > 0) out.print("    ");
+            if (size > 0)
+                codeBuilder.append(" ");
+            while (size-- > 0)
+                out.print("    ");
             int index = 0;
             int flag = 0;
             String read = reader.readLine();
             codeBuilder.append(read);
             char[] codeCharArray = codeBuilder.toString().toCharArray();
             boolean skip = false;
-            while (codeCharArray[index] != '(' && codeCharArray[index] != '[') ++index;
+            while (codeCharArray[index] != '(' && codeCharArray[index] != '[')
+                ++index;
             do {
                 if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
                     skip = true;
@@ -44,17 +47,21 @@ public class Repl {
                             continue;
                         }
                         ++index;
-                        if (codeCharArray[index] == '\"') break;
+                        if (codeCharArray[index] == '\"')
+                            break;
                     } while (index < codeCharArray.length - 1);
                 }
-                if (codeCharArray[index] == '(' || codeCharArray[index] == '[') ++flag;
-                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']') --flag;
+                if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
+                    ++flag;
+                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
+                    --flag;
                 ++index;
             } while (index < codeCharArray.length);
             if (flag == 0) {
                 DToken result = Devore.call(env, codeBuilder.toString());
                 codeBuilder = new StringBuilder();
-                if (result != DWord.NIL) out.println(result.toString());
+                if (result != DWord.NIL)
+                    out.println(result.toString());
             }
             size = flag;
         }

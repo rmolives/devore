@@ -38,7 +38,8 @@ public class DMacro extends DToken {
      * @return this
      */
     public DMacro addMacro(DMacro macro) {
-        if (this.match(macro.params.size()) != null) throw new DevoreRuntimeException("宏定义冲突.");
+        if (this.match(macro.params.size()) != null)
+            throw new DevoreRuntimeException("宏定义冲突.");
         this.children.add(macro);
         return this;
     }
@@ -50,10 +51,12 @@ public class DMacro extends DToken {
      * @return 符合条件的宏
      */
     private DMacro match(int argc) {
-        if (this.params.size() == argc) return this;
+        if (this.params.size() == argc)
+            return this;
         for (DMacro dm : children) {
             DMacro temp = dm.match(argc);
-            if (temp != null) return temp;
+            if (temp != null)
+                return temp;
         }
         return null;
     }
@@ -81,7 +84,8 @@ public class DMacro extends DToken {
                         && temp.symbol.toString().equals(this.params.get(j))
                         && temp.isEmpty())
                     body.set(i, nodes.get(j));
-            if (!body.get(i).isEmpty()) body.set(i, expand(body.get(i), nodes));
+            if (!body.get(i).isEmpty())
+                body.set(i, expand(body.get(i), nodes));
         }
         return body;
     }
@@ -94,9 +98,11 @@ public class DMacro extends DToken {
      */
     public List<Ast> expand(List<Ast> nodes) {
         DMacro dm = this.match(nodes.size());
-        if (dm == null) throw new DevoreRuntimeException("找不到匹配条件的宏.");
+        if (dm == null)
+            throw new DevoreRuntimeException("找不到匹配条件的宏.");
         List<Ast> result = new ArrayList<>();
-        for (Ast body : dm.bodys) result.add(dm.expand(body.copy(), nodes));
+        for (Ast body : dm.bodys)
+            result.add(dm.expand(body.copy(), nodes));
         return result;
     }
 
@@ -113,22 +119,30 @@ public class DMacro extends DToken {
     @Override
     public DToken copy() {
         List<Ast> temp = new ArrayList<>();
-        for (Ast body : this.bodys) temp.add(body.copy());
+        for (Ast body : this.bodys)
+            temp.add(body.copy());
         return DMacro.newMacro(new ArrayList<>(this.params), temp);
     }
 
     @Override
     public int compareTo(DToken t) {
-        if (this == t) return 0;
-        if (!(t instanceof DMacro)) return -1;
+        if (this == t)
+            return 0;
+        if (!(t instanceof DMacro))
+            return -1;
         DMacro other = (DMacro) t;
-        if (!this.params.equals(other.params)) return -1;
-        if (this.bodys.size() != other.bodys.size()) return -1;
+        if (!this.params.equals(other.params))
+            return -1;
+        if (this.bodys.size() != other.bodys.size())
+            return -1;
         for (int i = 0; i < this.bodys.size(); ++i)
-            if (!this.bodys.get(i).equals(other.bodys.get(i))) return -1;
-        if (this.children.size() != other.children.size()) return -1;
+            if (!this.bodys.get(i).equals(other.bodys.get(i)))
+                return -1;
+        if (this.children.size() != other.children.size())
+            return -1;
         for (int i = 0; i < this.children.size(); ++i)
-            if (this.children.get(i).compareTo(other.children.get(i)) != 0) return -1;
+            if (this.children.get(i).compareTo(other.children.get(i)) != 0)
+                return -1;
         return 0;
     }
 

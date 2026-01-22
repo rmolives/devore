@@ -220,11 +220,14 @@ public class DList extends DToken {
 
     @Override
     public int compareTo(DToken t) {
-        if (!(t instanceof DList)) return -1;
+        if (!(t instanceof DList))
+            return -1;
         DList other = (DList) t;
-        if (other.size() != this.size()) return -1;
+        if (other.size() != this.size())
+            return -1;
         for (int i = 0; i < this.size(); ++i)
-            if (!other.get(i).equals(this.get(i))) return -1;
+            if (!other.get(i).equals(this.get(i)))
+                return -1;
         return 0;
     }
 

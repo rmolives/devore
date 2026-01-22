@@ -56,7 +56,8 @@ public class DProcedure extends DToken {
      * @return this
      */
     public DProcedure addProcedure(DProcedure procedure) {
-        if (this.match(procedure.argc) != null) throw new DevoreRuntimeException("过程定义冲突.");
+        if (this.match(procedure.argc) != null)
+            throw new DevoreRuntimeException("过程定义冲突.");
         this.children.add(procedure);
         return this;
     }
@@ -68,19 +69,24 @@ public class DProcedure extends DToken {
      * @return 符合条件的过程
      */
     private DProcedure match(int argc) {
-        if (this.argc == argc && !vararg) return this;
+        if (this.argc == argc && !vararg)
+            return this;
         for (DProcedure df : this.children) {
             DProcedure temp = df.match(argc);
-            if (temp != null && temp.argc == argc && !temp.vararg) return temp;
+            if (temp != null && temp.argc == argc && !temp.vararg)
+                return temp;
         }
         DProcedure bestVararg = null;
         for (DProcedure df : this.children) {
             DProcedure temp = df.match(argc);
             if (temp != null && argc >= temp.argc && temp.vararg)
-                if (bestVararg == null || temp.argc > bestVararg.argc) bestVararg = temp;
+                if (bestVararg == null || temp.argc > bestVararg.argc)
+                    bestVararg = temp;
         }
-        if (bestVararg != null) return bestVararg;
-        if (argc >= this.argc && this.vararg) return this;
+        if (bestVararg != null)
+            return bestVararg;
+        if (argc >= this.argc && this.vararg)
+            return this;
         return null;
     }
 
@@ -93,7 +99,8 @@ public class DProcedure extends DToken {
      */
     public DToken call(Ast node, Env env) {
         DProcedure df = this.match(node.size());
-        if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
+        if (df == null)
+            throw new DevoreRuntimeException("找不到匹配条件的过程.");
         return df.procedure.apply(node, env);
     }
 
@@ -106,9 +113,11 @@ public class DProcedure extends DToken {
      */
     public DToken call(List<DToken> args, Env env) {
         DProcedure df = this.match(args.size());
-        if (df == null) throw new DevoreRuntimeException("找不到匹配条件的过程.");
+        if (df == null)
+            throw new DevoreRuntimeException("找不到匹配条件的过程.");
         Ast ast = Ast.empty.copy();
-        for (DToken arg : args) ast.add(new Ast(arg));
+        for (DToken arg : args)
+            ast.add(new Ast(arg));
         return df.procedure.apply(ast, env);
     }
 
@@ -125,21 +134,29 @@ public class DProcedure extends DToken {
     @Override
     public DToken copy() {
         List<DProcedure> temp = new ArrayList<>();
-        for (DProcedure proc : this.children) temp.add((DProcedure) proc.copy());
+        for (DProcedure proc : this.children)
+            temp.add((DProcedure) proc.copy());
         return newProcedure(this.procedure, temp, this.argc, this.vararg);
     }
 
     @Override
     public int compareTo(DToken t) {
-        if (this == t) return 0;
-        if (!(t instanceof DProcedure)) return -1;
+        if (this == t)
+            return 0;
+        if (!(t instanceof DProcedure))
+            return -1;
         DProcedure other = (DProcedure) t;
-        if (this.procedure != other.procedure) return -1;
-        if (this.argc != other.argc) return -1;
-        if (this.vararg != other.vararg) return -1;
-        if (this.children.size() != other.children.size()) return -1;
+        if (this.procedure != other.procedure)
+            return -1;
+        if (this.argc != other.argc)
+            return -1;
+        if (this.vararg != other.vararg)
+            return -1;
+        if (this.children.size() != other.children.size())
+            return -1;
         for (int i = 0; i < children.size(); ++i)
-            if (children.get(i).compareTo(other.children.get(i)) != 0) return -1;
+            if (children.get(i).compareTo(other.children.get(i)) != 0)
+                return -1;
         return 0;
     }
 

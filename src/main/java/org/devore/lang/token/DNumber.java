@@ -65,7 +65,8 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber div(DNumber a) {
-        if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0) throw new DevoreRuntimeException("除数不能为0.");
+        if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0)
+            throw new DevoreRuntimeException("除数不能为0.");
         return DNumber.valueOf(this.toBigDecimal().divide(a.toBigDecimal(), MathContext.DECIMAL128));
     }
 

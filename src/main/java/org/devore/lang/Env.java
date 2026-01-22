@@ -147,7 +147,8 @@ public class Env {
      */
     public Env setAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
         temp.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
         return this;
     }
@@ -163,7 +164,8 @@ public class Env {
      */
     public Env setTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
         BiFunction<Ast, Env, DToken> df = (ast, env) -> {
             List<DToken> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
@@ -185,7 +187,8 @@ public class Env {
      */
     public Env set(String key, DToken value) {
         Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
         temp.table.put(key, value);
         return this;
     }
@@ -198,7 +201,8 @@ public class Env {
      */
     public boolean contains(String key) {
         Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
         return temp.table.containsKey(key);
     }
 
@@ -210,7 +214,8 @@ public class Env {
      */
     public DToken get(String key) {
         Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
         return temp.contains(key) ? temp.table.get(key) : DWord.NIL;
     }
 
@@ -222,7 +227,8 @@ public class Env {
      */
     public DToken remove(String key) {
         Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key)) temp = temp.father;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
         return temp.contains(key) ? temp.table.remove(key) : DWord.NIL;
     }
 
