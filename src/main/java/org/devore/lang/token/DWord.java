@@ -4,11 +4,10 @@ package org.devore.lang.token;
  * 关键字
  */
 public class DWord extends DToken {
-    public static final DWord LB = DWord.valueOf(Tags.LB);              // (
-    public static final DWord RB = DWord.valueOf(Tags.RB);              // )
-    public static final DWord NIL = DWord.valueOf(Tags.NIL);            // nil
-    public static final DWord UNBOUND = DWord.valueOf(Tags.UNBOUND);    // 占位
-    private final Tags tag;                                             // 关键字
+    public static final DWord LB = DWord.valueOf(Tags.LB);      // (
+    public static final DWord RB = DWord.valueOf(Tags.RB);      // )
+    public static final DWord NIL = DWord.valueOf(Tags.NIL);    // nil
+    private final Tags tag;                                     // 关键字
 
     private DWord(Tags tag) {
         this.tag = tag;
@@ -33,9 +32,6 @@ public class DWord extends DToken {
             case RB:
                 result = ")";
                 break;
-            case UNBOUND:
-                result = "<unbound>";
-                break;
         }
         return result;
     }
@@ -53,6 +49,6 @@ public class DWord extends DToken {
     }
 
     private enum Tags {
-        LB, RB, NIL, UNBOUND
+        LB, RB, NIL
     }
 }

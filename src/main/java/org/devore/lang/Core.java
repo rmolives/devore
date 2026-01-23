@@ -344,18 +344,15 @@ public class Core {
             return DWord.NIL;
         }), 2, true);
         dEnv.addAstProcedure("let", ((ast, env) -> {
-            Env rhsEnv = env.createChild();
             Env newEnv = env.createChild();
             DToken result = DWord.NIL;
             for (Ast node : ast.get(0).children) {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
                 if (node.children.size() != 1)
-                    throw new DevoreRuntimeException("let绑定的内容必须只有一个值.");
-                rhsEnv.put(node.symbol.toString(), DWord.UNBOUND);
+                    throw new DevoreRuntimeException("绑定的内容必须只有一个值.");
+                newEnv.put(node.symbol.toString(), Evaluator.eval(env, node.children.get(0).copy()));
             }
-            for (Ast node : ast.get(0).children)
-                newEnv.put(node.symbol.toString(), Evaluator.eval(rhsEnv, node.children.get(0).copy()));
             for (int i = 1; i < ast.size(); ++i)
                 result = Evaluator.eval(newEnv, ast.get(i).copy());
             return result;
@@ -367,7 +364,7 @@ public class Core {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
                 if (node.children.size() != 1)
-                    throw new DevoreRuntimeException("let*绑定的内容必须只有一个值.");
+                    throw new DevoreRuntimeException("绑定的内容必须只有一个值.");
                 newEnv.put(node.symbol.toString(), Evaluator.eval(newEnv, node.children.get(0).copy()));
             }
             for (int i = 1; i < ast.size(); ++i)
