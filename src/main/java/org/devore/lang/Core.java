@@ -350,8 +350,9 @@ public class Core {
             for (Ast node : ast.get(0).children) {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
-                String name = node.symbol.toString();
-                rhsEnv.put(name, DWord.UNBOUND);
+                if (node.children.size() != 1)
+                    throw new DevoreRuntimeException("let绑定的内容必须只有一个值.");
+                rhsEnv.put(node.symbol.toString(), DWord.UNBOUND);
             }
             for (Ast node : ast.get(0).children)
                 newEnv.put(node.symbol.toString(), Evaluator.eval(rhsEnv, node.children.get(0).copy()));
@@ -365,6 +366,8 @@ public class Core {
             for (Ast node : ast.get(0).children) {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
+                if (node.children.size() != 1)
+                    throw new DevoreRuntimeException("let*绑定的内容必须只有一个值.");
                 newEnv.put(node.symbol.toString(), Evaluator.eval(newEnv, node.children.get(0).copy()));
             }
             for (int i = 1; i < ast.size(); ++i)
