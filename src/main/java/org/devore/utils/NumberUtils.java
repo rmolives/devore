@@ -40,7 +40,8 @@ public class NumberUtils {
      * @return lcm(a, b)
      */
     public static BigInteger lcm(BigInteger a, BigInteger b) {
-        if (a.equals(BigInteger.ZERO) || b.equals(BigInteger.ZERO)) return BigInteger.ZERO;
+        if (a.equals(BigInteger.ZERO) || b.equals(BigInteger.ZERO))
+            return BigInteger.ZERO;
         BigInteger g = gcd(a, b);
         return a.divide(g).multiply(b).abs();
     }
