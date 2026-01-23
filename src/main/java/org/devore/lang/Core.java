@@ -867,7 +867,7 @@ public class Core {
             try {
                 Thread.sleep(((DInt) args.get(0)).toBigInteger().longValue());
             } catch (InterruptedException e) {
-                return DWord.NIL;
+                throw new DevoreRuntimeException(e.getLocalizedMessage());
             }
             return DWord.NIL;
         }), 1, false);
