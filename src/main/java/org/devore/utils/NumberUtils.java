@@ -600,6 +600,28 @@ public class NumberUtils {
     }
 
     /**
+     * cbrt(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return cbrt(x)
+     */
+    public static BigDecimal cbrt(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return BigDecimal.ZERO;
+        BigDecimal guess = x.divide(BigDecimal.valueOf(3), mc);
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal lastGuess;
+        do {
+            lastGuess = guess;
+            guess = guess.multiply(BigDecimal.valueOf(2), mc)
+                    .add(x.divide(guess.multiply(guess, mc), mc))
+                    .divide(BigDecimal.valueOf(3), mc);
+        } while (guess.subtract(lastGuess).abs().compareTo(tolerance) > 0);
+        return guess.round(mc);
+    }
+
+    /**
      * x^y
      *
      * @param x  x

@@ -334,6 +334,15 @@ public abstract class DNumber extends DToken {
     }
 
     /**
+     * cbrt运算
+     *
+     * @return 结果
+     */
+    public DNumber cbrt() {
+        return DNumber.valueOf(NumberUtils.cbrt(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
      * pow运算
      *
      * @return 结果

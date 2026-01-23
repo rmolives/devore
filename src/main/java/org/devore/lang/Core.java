@@ -109,6 +109,11 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).sqrt();
         }), 1, false);
+        dEnv.addTokenProcedure("cbrt", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).cbrt();
+        }), 1, false);
         dEnv.addTokenProcedure("sin", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
