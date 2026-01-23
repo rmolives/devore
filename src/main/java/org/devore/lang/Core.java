@@ -533,9 +533,7 @@ public class Core {
         dEnv.addTokenProcedure("not", ((args, env) -> {
             if (!(args.get(0) instanceof DBool))
                 throw new DevoreCastException(args.get(0).type(), "bool");
-            if (((DBool) args.get(0)).bool)
-                return DBool.FALSE;
-            return DBool.TRUE;
+            return ((DBool) args.get(0)).bool ? DBool.FALSE : DBool.TRUE;
         }), 1, false);
         dEnv.addTokenProcedure("random", ((args, env) -> {
             if (!(args.get(0) instanceof DInt))
@@ -550,7 +548,8 @@ public class Core {
             return DNumber.valueOf(random(((DInt) args.get(0)).toBigInteger(),
                     ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE)));
         }), 2, false);
-        dEnv.addTokenProcedure("list", ((args, env) -> DList.valueOf(new ArrayList<>(args))), 0, true);
+        dEnv.addTokenProcedure("list", ((args, env) ->
+                DList.valueOf(new ArrayList<>(args))), 0, true);
         dEnv.addTokenProcedure("list-contains", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
@@ -571,30 +570,21 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
-            if (list.size() == 0)
-                return DWord.NIL;
-            return list.get(((DInt) args.get(1)).toBigInteger().intValue());
+            return ((DList) args.get(0)).get(((DInt) args.get(1)).toBigInteger().intValue());
         }), 2, false);
         dEnv.addTokenProcedure("list-set", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
-            if (list.size() == 0)
-                return DWord.NIL;
-            return list.set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), false);
+            return ((DList) args.get(0)).set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), false);
         }), 3, false);
         dEnv.addTokenProcedure("list-remove", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
-            if (list.size() == 0)
-                return DWord.NIL;
-            return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), false);
+            return ((DList) args.get(0)).remove(((DInt) args.get(1)).toBigInteger().intValue(), false);
         }), 2, false);
         dEnv.addTokenProcedure("list-add", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -606,28 +596,21 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            DList list = (DList) args.get(0);
-            return list.add(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), false);
+            return ((DList) args.get(0)).add(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), false);
         }), 3, false);
         dEnv.addTokenProcedure("list-set!", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
-            if (list.size() == 0)
-                return DWord.NIL;
-            return list.set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), true);
+            return ((DList) args.get(0)).set(((DInt) args.get(1)).toBigInteger().intValue(), args.get(2), true);
         }), 3, false);
         dEnv.addTokenProcedure("list-remove!", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            DList list = (DList) args.get(0);
-            if (list.size() == 0)
-                return DWord.NIL;
-            return list.remove(((DInt) args.get(1)).toBigInteger().intValue(), true);
+            return ((DList) args.get(0)).remove(((DInt) args.get(1)).toBigInteger().intValue(), true);
         }), 2, false);
         dEnv.addTokenProcedure("list-add!", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -644,17 +627,12 @@ public class Core {
         dEnv.addTokenProcedure("head", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
-            DList list = (DList) args.get(0);
-            if (list.size() == 0)
-                return DWord.NIL;
-            return list.get(0);
+            return ((DList) args.get(0)).get(0);
         }), 1, false);
         dEnv.addTokenProcedure("last", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             DList list = (DList) args.get(0);
-            if (list.size() == 0)
-                return DWord.NIL;
             return list.get(list.size() - 1);
         }), 1, false);
         dEnv.addTokenProcedure("tail", ((args, env) -> {
