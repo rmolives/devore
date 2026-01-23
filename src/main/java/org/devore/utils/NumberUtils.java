@@ -133,10 +133,7 @@ public class NumberUtils {
     public static BigDecimal tanh(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
-        BigDecimal e2x = exp(x.multiply(BigDecimal.valueOf(2), mc), mc);
-        BigDecimal numerator = e2x.subtract(BigDecimal.ONE, mc);
-        BigDecimal denominator = e2x.add(BigDecimal.ONE, mc);
-        return numerator.divide(denominator, mc).round(mc);
+        return sinh(x, mc).divide(cosh(x, mc), mc);
     }
 
     /**
