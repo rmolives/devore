@@ -152,7 +152,7 @@ public class NumberUtils {
      */
     public static BigDecimal arccsch(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            throw new ArithmeticException("arccsch(x)定义域为(-∞, 0)∪(0, +∞), x超出范围.");
+            throw new ArithmeticException("arccsch(x)要求x不为0.");
         return arcsinh(BigDecimal.ONE.divide(x, mc), mc);
     }
 
