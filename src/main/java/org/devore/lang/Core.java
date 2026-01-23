@@ -350,8 +350,8 @@ public class Core {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
                 DToken value = DWord.NIL;
-                for (Ast e : node.children)
-                    value = Evaluator.eval(env, e.copy());
+                for (Ast temp : node.children)
+                    value = Evaluator.eval(env, temp.copy());
                 newEnv.put(node.symbol.toString(), value);
             }
             for (int i = 1; i < ast.size(); ++i)
@@ -365,8 +365,8 @@ public class Core {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
                 DToken value = DWord.NIL;
-                for (Ast e : node.children)
-                    value = Evaluator.eval(newEnv, e.copy());
+                for (Ast temp : node.children)
+                    value = Evaluator.eval(newEnv, temp.copy());
                 newEnv.put(node.symbol.toString(), value);
             }
             for (int i = 1; i < ast.size(); ++i)
