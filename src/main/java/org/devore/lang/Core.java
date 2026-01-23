@@ -427,20 +427,20 @@ public class Core {
         dEnv.addTokenProcedure("<=", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) <= 0)), 2, false);
         dEnv.addAstProcedure("unless", (ast, env) -> {
-            DToken result = DWord.NIL;
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
+            DToken result = DWord.NIL;
             if (!((DBool) condition).bool)
                 for (int i = 1; i < ast.size(); ++i)
                     result = Evaluator.eval(env, ast.get(i).copy());
             return result;
         }, 2, true);
         dEnv.addAstProcedure("when", (ast, env) -> {
-            DToken result = DWord.NIL;
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
+            DToken result = DWord.NIL;
             if (((DBool) condition).bool)
                 for (int i = 1; i < ast.size(); ++i)
                     result = Evaluator.eval(env, ast.get(i).copy());
@@ -450,9 +450,7 @@ public class Core {
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
-            if (((DBool) condition).bool)
-                return Evaluator.eval(env, ast.get(1).copy());
-            return DWord.NIL;
+            return ((DBool) condition).bool ? Evaluator.eval(env, ast.get(1).copy()) : DWord.NIL;
         }, 2, false);
         dEnv.addAstProcedure("if", (ast, env) -> {
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
@@ -487,10 +485,10 @@ public class Core {
         }, 2, true);
         dEnv.addTokenProcedure("begin", (arg, env) -> arg.get(arg.size() - 1), 1, true);
         dEnv.addAstProcedure("while", (ast, env) -> {
-            DToken result = DWord.NIL;
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
+            DToken result = DWord.NIL;
             while (((DBool) condition).bool) {
                 for (int i = 1; i < ast.size(); ++i)
                     result = Evaluator.eval(env, ast.get(i).copy());
