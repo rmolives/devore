@@ -565,7 +565,8 @@ public class Core {
             for (DToken arg : args) {
                 if (!(arg instanceof DBool))
                     throw new DevoreCastException(arg.type(), "bool");
-                if (!((DBool) arg).bool) return DBool.FALSE;
+                if (!((DBool) arg).bool)
+                    return DBool.FALSE;
             }
             return DBool.TRUE;
         }), 1, true);
@@ -573,7 +574,8 @@ public class Core {
             for (DToken arg : args) {
                 if (!(arg instanceof DBool))
                     throw new DevoreCastException(arg.type(), "bool");
-                if (((DBool) arg).bool) return DBool.TRUE;
+                if (((DBool) arg).bool)
+                    return DBool.TRUE;
             }
             return DBool.FALSE;
         }), 1, true);
@@ -858,7 +860,8 @@ public class Core {
                 DToken condition = ((DProcedure) args.get(0)).call(Collections.singletonList(token), env.createChild());
                 if (!(condition instanceof DBool))
                     throw new DevoreCastException(condition.type(), "list");
-                if (((DBool) condition).bool) result.add(token);
+                if (((DBool) condition).bool)
+                    result.add(token);
             }
             return DList.valueOf(result);
         }), 2, false);
@@ -902,7 +905,8 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "string");
             return "true".equals(args.get(0).toString()) ? DBool.TRUE : DBool.FALSE;
         }), 1, false);
-        dEnv.addTokenProcedure("->string", ((args, env) -> DString.valueOf(args.get(0).toString())), 1, false);
+        dEnv.addTokenProcedure("->string", ((args, env) ->
+                DString.valueOf(args.get(0).toString())), 1, false);
         dEnv.addTokenProcedure("string->list", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
