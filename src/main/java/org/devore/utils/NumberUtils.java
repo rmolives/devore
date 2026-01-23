@@ -162,7 +162,7 @@ public class NumberUtils {
      */
     public static BigDecimal arccosh(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) < 0)
-            throw new DevoreRuntimeException("arcosh(x) 的定义域为 [1, +∞)，输入值超出范围.");
+            throw new DevoreRuntimeException("arcosh(x) 的定义域为 [1, +∞)，x超出范围.");
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ZERO;
         BigDecimal xm1 = x.subtract(BigDecimal.ONE, mc);
@@ -180,7 +180,7 @@ public class NumberUtils {
      */
     public static BigDecimal arctanh(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) >= 0 || x.compareTo(BigDecimal.ONE.negate()) <= 0)
-            throw new DevoreRuntimeException("artanh(x) 的定义域为 (-1, 1)，输入值超出范围.");
+            throw new DevoreRuntimeException("artanh(x) 的定义域为 (-1, 1)，x超出范围.");
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         BigDecimal onePlus = BigDecimal.ONE.add(x, mc);
@@ -198,7 +198,7 @@ public class NumberUtils {
      */
     public static BigDecimal arccos(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
-            throw new DevoreRuntimeException("arccos(x) 的定义域为 [-1, 1]，输入值超出范围.");
+            throw new DevoreRuntimeException("arccos(x) 的定义域为 [-1, 1]，x超出范围.");
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ONE.negate()) == 0)
@@ -224,7 +224,7 @@ public class NumberUtils {
      */
     public static BigDecimal arcsin(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
-            throw new DevoreRuntimeException("arcsin(x) 的定义域为 [-1, 1]，输入值超出范围.");
+            throw new DevoreRuntimeException("arcsin(x) 的定义域为 [-1, 1]，x超出范围.");
         if (x.compareTo(BigDecimal.ONE) == 0)
             return PI.divide(BigDecimal.valueOf(2), mc);
         if (x.compareTo(BigDecimal.ONE.negate()) == 0)
@@ -430,7 +430,7 @@ public class NumberUtils {
      */
     public static BigDecimal sqrt(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
-            throw new DevoreRuntimeException("负数的平方根.");
+            throw new DevoreRuntimeException("sqrt(x) 要求x不为负数.");
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ONE) == 0)
@@ -459,14 +459,14 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ZERO) == 0) {
             if (y.compareTo(BigDecimal.ZERO) > 0)
                 return BigDecimal.ZERO;
-            throw new DevoreRuntimeException("零的负次方.");
+            throw new DevoreRuntimeException("x^y 要求但x为0时，y不能为负数.");
         }
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ONE;
         if (isInt(y))
             return powInt(x, y.toBigInteger(), mc);
         if (x.compareTo(BigDecimal.ZERO) < 0)
-            throw new DevoreRuntimeException("非整数指数的负数.");
+            throw new DevoreRuntimeException("x^y 要求但y为非整数时，x不能为负数.");
         return exp(y.multiply(ln(x, mc), mc), mc);
     }
 
@@ -504,7 +504,7 @@ public class NumberUtils {
      */
     public static BigDecimal ln(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0)
-            throw new DevoreRuntimeException("非正数的对数.");
+            throw new DevoreRuntimeException("ln(x) 要求x为正数.");
         BigDecimal term = x.subtract(BigDecimal.ONE).divide(x.add(BigDecimal.ONE), mc);
         BigDecimal termSquared = term.multiply(term, mc);
         BigDecimal result = term;
@@ -534,7 +534,7 @@ public class NumberUtils {
         if (b.compareTo(BigDecimal.ZERO) <= 0)
             throw new DevoreRuntimeException("log_b(a) 要求b必须大于0.");
         if (b.compareTo(BigDecimal.ONE) == 0)
-            throw new DevoreRuntimeException("log_b(a) 要求底数b不能为1.");
+            throw new DevoreRuntimeException("log_b(a) 要求b不能为1.");
         return ln(a, mc).divide(ln(b, mc), mc);
     }
 
