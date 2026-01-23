@@ -10,9 +10,9 @@ import java.math.MathContext;
  * 数学工具
  */
 public class NumberUtils {
-    private static final BigDecimal TWO = BigDecimal.valueOf(2);        // 2
-    private static final BigDecimal PI = approximatePi();               // Pi
-    private static final BigDecimal TWO_PI = PI.multiply(TWO);          // Pi * 2
+    private static final BigDecimal TWO = BigDecimal.valueOf(2);                                // 2
+    private static final BigDecimal PI = approximatePi();                                       // Pi
+    private static final BigDecimal TWO_PI = PI.multiply(TWO, MathContext.DECIMAL128);          // Pi * 2
 
     /**
      * gcd(a, b)
@@ -371,12 +371,12 @@ public class NumberUtils {
         x = reduceAngle(x, mc);
         BigDecimal result = BigDecimal.ZERO;
         BigDecimal term = x;
-        BigDecimal xSquared = x.multiply(x);
+        BigDecimal xSquared = x.multiply(x, mc);
         BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
         int i = 1;
         while (term.abs().compareTo(tolerance) > 0) {
             result = result.add(term);
-            term = term.multiply(xSquared).negate()
+            term = term.multiply(xSquared, mc).negate()
                     .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), mc);
             i += 2;
         }
@@ -394,12 +394,12 @@ public class NumberUtils {
         x = reduceAngle(x, mc);
         BigDecimal result = BigDecimal.ZERO;
         BigDecimal term = BigDecimal.ONE;
-        BigDecimal xSquared = x.multiply(x);
+        BigDecimal xSquared = x.multiply(x, mc);
         BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
         int i = 0;
         while (term.abs().compareTo(tolerance) > 0) {
             result = result.add(term);
-            term = term.multiply(xSquared).negate()
+            term = term.multiply(xSquared, mc).negate()
                     .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), mc);
             i += 2;
         }
@@ -466,7 +466,7 @@ public class NumberUtils {
             return powInt(x, y.toBigInteger(), mc);
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new DevoreRuntimeException("非整数指数的负数.");
-        return exp(y.multiply(ln(x, mc)), mc);
+        return exp(y.multiply(ln(x, mc), mc), mc);
     }
 
     /**
@@ -478,13 +478,18 @@ public class NumberUtils {
      * @return x^y
      */
     private static BigDecimal powInt(BigDecimal x, BigInteger y, MathContext mc) {
-        if (y.compareTo(BigInteger.ZERO) < 0)
-            return BigDecimal.ONE.divide(powInt(x, y.subtract(y.multiply(BigInteger.valueOf(2))), mc), mc);
+        if (y.signum() == 0)
+            return BigDecimal.ONE;
+        if (y.signum() < 0)
+            return BigDecimal.ONE.divide(powInt(x, y.negate(), mc), mc);
         BigDecimal result = BigDecimal.ONE;
+        BigDecimal base = x;
         BigInteger exp = y;
-        while (exp.compareTo(BigInteger.ZERO) > 0) {
-            result = result.multiply(x);
-            exp = exp.subtract(BigInteger.ONE);
+        while (exp.signum() > 0) {
+            if (exp.testBit(0))
+                result = result.multiply(base, mc);
+            base = base.multiply(base, mc);
+            exp = exp.shiftRight(1);
         }
         return result;
     }
@@ -500,7 +505,7 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ZERO) <= 0)
             throw new DevoreRuntimeException("非正数的对数.");
         BigDecimal term = x.subtract(BigDecimal.ONE).divide(x.add(BigDecimal.ONE), mc);
-        BigDecimal termSquared = term.multiply(term);
+        BigDecimal termSquared = term.multiply(term, mc);
         BigDecimal result = term;
         BigDecimal currentTerm = term;
         BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
