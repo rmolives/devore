@@ -206,6 +206,36 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).arccoth();
         }), 1, false);
+        dEnv.addTokenProcedure("sec", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).sec();
+        }), 1, false);
+        dEnv.addTokenProcedure("csc", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).csc();
+        }), 1, false);
+        dEnv.addTokenProcedure("cot", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).cot();
+        }), 1, false);
+        dEnv.addTokenProcedure("asec", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).arcsec();
+        }), 1, false);
+        dEnv.addTokenProcedure("acsc", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).arccsc();
+        }), 1, false);
+        dEnv.addTokenProcedure("acot", ((args, env) -> {
+            if (!(args.get(0) instanceof DNumber))
+                throw new DevoreCastException(args.get(0).type(), "number");
+            return ((DNumber) args.get(0)).arccot();
+        }), 1, false);
         dEnv.addTokenProcedure("prime?", ((args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");

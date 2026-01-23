@@ -233,6 +233,60 @@ public abstract class DNumber extends DToken {
     }
 
     /**
+     * sec运算
+     *
+     * @return 结果
+     */
+    public DNumber sec() {
+        return DNumber.valueOf(NumberUtils.sec(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * csc运算
+     *
+     * @return 结果
+     */
+    public DNumber csc() {
+        return DNumber.valueOf(NumberUtils.csc(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * cot运算
+     *
+     * @return 结果
+     */
+    public DNumber cot() {
+        return DNumber.valueOf(NumberUtils.cot(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * arcsec运算
+     *
+     * @return 结果
+     */
+    public DNumber arcsec() {
+        return DNumber.valueOf(NumberUtils.arcsec(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * arccsc运算
+     *
+     * @return 结果
+     */
+    public DNumber arccsc() {
+        return DNumber.valueOf(NumberUtils.arccsc(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
+     * arccot运算
+     *
+     * @return 结果
+     */
+    public DNumber arccot() {
+        return DNumber.valueOf(NumberUtils.arccot(this.toBigDecimal(), MathContext.DECIMAL128));
+    }
+
+    /**
      * 向上取整
      *
      * @return 结果

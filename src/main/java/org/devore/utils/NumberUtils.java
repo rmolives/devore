@@ -170,6 +170,87 @@ public class NumberUtils {
     }
 
     /**
+     * sec(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return sec(x)
+     */
+    public static BigDecimal sec(BigDecimal x, MathContext mc) {
+        BigDecimal c = cos(x, mc);
+        if (c.compareTo(BigDecimal.ZERO) == 0)
+            throw new DevoreRuntimeException("sec(x)在cos(x)=0时未定义.");
+        return BigDecimal.ONE.divide(c, mc);
+    }
+
+    /**
+     * csc(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return csch(x)
+     */
+    public static BigDecimal csc(BigDecimal x, MathContext mc) {
+        BigDecimal s = sin(x, mc);
+        if (s.compareTo(BigDecimal.ZERO) == 0)
+            throw new DevoreRuntimeException("csc(x)在sin(x)=0时未定义.");
+        return BigDecimal.ONE.divide(s, mc);
+    }
+
+    /**
+     * cot(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return cot(x)
+     */
+    public static BigDecimal cot(BigDecimal x, MathContext mc) {
+        BigDecimal s = sin(x, mc);
+        if (s.compareTo(BigDecimal.ZERO) == 0)
+            throw new DevoreRuntimeException("cot(x)在sin(x)=0时未定义.");
+        return cos(x, mc).divide(s, mc);
+    }
+
+    /**
+     * arcsec(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return arcsech(x)
+     */
+    public static BigDecimal arcsec(BigDecimal x, MathContext mc) {
+        if (x.abs().compareTo(BigDecimal.ONE) < 0)
+            throw new DevoreRuntimeException("arcsec(x)定义域为(-∞, -1]∪[1, +∞), x超出范围.");
+        return arccos(BigDecimal.ONE.divide(x, mc), mc);
+    }
+
+    /**
+     * arccsc(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return arccsc(x)
+     */
+    public static BigDecimal arccsc(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0 || x.abs().compareTo(BigDecimal.ONE) < 0)
+            throw new DevoreRuntimeException("arccsc(x)定义域为(-∞, -1]∪[1, +∞), x超出范围.");
+        return arcsin(BigDecimal.ONE.divide(x, mc), mc);
+    }
+
+    /**
+     * arccot(x)
+     *
+     * @param x  x
+     * @param mc 精度
+     * @return arccot(x)
+     */
+    public static BigDecimal arccot(BigDecimal x, MathContext mc) {
+        if (x.compareTo(BigDecimal.ZERO) == 0)
+            return new BigDecimal(Math.PI / 2, mc);
+        return arctan(BigDecimal.ONE.divide(x, mc), mc);
+    }
+
+    /**
      * sinh(x)
      *
      * @param x  x
@@ -490,7 +571,7 @@ public class NumberUtils {
     public static BigDecimal tan(BigDecimal x, MathContext mc) {
         BigDecimal cos = cos(x, mc);
         if (cos.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("此角度的tan未定义.");
+            throw new DevoreRuntimeException("tan(x)在cos(x)=0时未定义.");
         return sin(x, mc).divide(cos, mc);
     }
 
