@@ -344,16 +344,17 @@ public class Core {
             return DWord.NIL;
         }), 2, true);
         dEnv.addAstProcedure("let", ((ast, env) -> {
+            Env rhsEnv = env.createChild();
             Env newEnv = env.createChild();
             DToken result = DWord.NIL;
             for (Ast node : ast.get(0).children) {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
-                DToken value = DWord.NIL;
-                for (Ast temp : node.children)
-                    value = Evaluator.eval(env, temp.copy());
-                newEnv.put(node.symbol.toString(), value);
+                String name = node.symbol.toString();
+                rhsEnv.put(name, DWord.UNBOUND);
             }
+            for (Ast node : ast.get(0).children)
+                newEnv.put(node.symbol.toString(), Evaluator.eval(rhsEnv, node.children.get(0).copy()));
             for (int i = 1; i < ast.size(); ++i)
                 result = Evaluator.eval(newEnv, ast.get(i).copy());
             return result;
@@ -364,10 +365,7 @@ public class Core {
             for (Ast node : ast.get(0).children) {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
-                DToken value = DWord.NIL;
-                for (Ast temp : node.children)
-                    value = Evaluator.eval(newEnv, temp.copy());
-                newEnv.put(node.symbol.toString(), value);
+                newEnv.put(node.symbol.toString(), Evaluator.eval(newEnv, node.children.get(0).copy()));
             }
             for (int i = 1; i < ast.size(); ++i)
                 result = Evaluator.eval(newEnv, ast.get(i).copy());

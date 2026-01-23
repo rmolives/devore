@@ -1,5 +1,6 @@
 package org.devore.lang;
 
+import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.*;
 import org.devore.parser.Ast;
 
@@ -18,9 +19,12 @@ public class Evaluator {
      */
     public static DToken eval(Env env, Ast node) {
         while (true) {
-            if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString()))
-                node.symbol = env.get(node.symbol.toString());
-            else
+            if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString())) {
+                DToken value = env.get(node.symbol.toString());
+                if (value == DWord.UNBOUND)
+                    throw new DevoreRuntimeException("非法引用.");
+                node.symbol = value;
+            } else
                 break;
         }
         if (node.symbol instanceof DMacro) {
@@ -40,9 +44,12 @@ public class Evaluator {
         }
         if (node.symbol instanceof DSymbol)
             while (true) {
-                if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString()))
-                    node.symbol = env.get(node.symbol.toString());
-                else
+                if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString())) {
+                    DToken value = env.get(node.symbol.toString());
+                    if (value == DWord.UNBOUND)
+                        throw new DevoreRuntimeException("非法引用.");
+                    node.symbol = value;
+                } else
                     break;
             }
         return node.symbol;
