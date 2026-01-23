@@ -23,17 +23,6 @@ public class DMacro extends DToken {
     /**
      * 创建宏
      *
-     * @param params params
-     * @param bodys  bodys
-     * @return this
-     */
-    public static DMacro newMacro(List<String> params, List<Ast> bodys) {
-        return new DMacro(params, bodys, new ArrayList<>());
-    }
-
-    /**
-     * 创建宏
-     *
      * @param params   params
      * @param bodys    bodys
      * @param children 子宏
@@ -41,6 +30,17 @@ public class DMacro extends DToken {
      */
     public static DMacro newMacro(List<String> params, List<Ast> bodys, List<DMacro> children) {
         return new DMacro(params, bodys, children);
+    }
+
+    /**
+     * 创建宏
+     *
+     * @param params params
+     * @param bodys  bodys
+     * @return this
+     */
+    public static DMacro newMacro(List<String> params, List<Ast> bodys) {
+        return newMacro(params, bodys, new ArrayList<>());
     }
 
     /**

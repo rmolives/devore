@@ -46,7 +46,7 @@ public class DProcedure extends DToken {
      * @return this
      */
     public static DProcedure newProcedure(BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
-        return new DProcedure(procedure, new ArrayList<>(), argc, vararg);
+        return newProcedure(procedure, new ArrayList<>(), argc, vararg);
     }
 
     /**
