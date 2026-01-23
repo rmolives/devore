@@ -113,7 +113,7 @@ public class NumberUtils {
      */
     public static BigDecimal csch(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            throw new ArithmeticException("csch(x)要求x不为0.");
+            throw new DevoreRuntimeException("csch(x)要求x不为0.");
         return BigDecimal.ONE.divide(sinh(x, mc), mc);
     }
 
@@ -126,7 +126,7 @@ public class NumberUtils {
      */
     public static BigDecimal coth(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            throw new ArithmeticException("coth(x)要求x不为0.");
+            throw new DevoreRuntimeException("coth(x)要求x不为0.");
         return cosh(x, mc).divide(sinh(x, mc), mc);
     }
 
@@ -139,7 +139,7 @@ public class NumberUtils {
      */
     public static BigDecimal arcsech(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0 || x.compareTo(BigDecimal.ONE) > 0)
-            throw new ArithmeticException("arcsech(x)定义域为(0, 1], x超出范围.");
+            throw new DevoreRuntimeException("arcsech(x)定义域为(0, 1], x超出范围.");
         return arccosh(BigDecimal.ONE.divide(x, mc), mc);
     }
 
@@ -152,7 +152,7 @@ public class NumberUtils {
      */
     public static BigDecimal arccsch(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            throw new ArithmeticException("arccsch(x)要求x不为0.");
+            throw new DevoreRuntimeException("arccsch(x)要求x不为0.");
         return arcsinh(BigDecimal.ONE.divide(x, mc), mc);
     }
 
@@ -165,7 +165,7 @@ public class NumberUtils {
      */
     public static BigDecimal arccoth(BigDecimal x, MathContext mc) {
         if (x.abs().compareTo(BigDecimal.ONE) <= 0)
-            throw new ArithmeticException("arccoth(x)定义域为(-∞, -1)∪(1, +∞), x超出范围.");
+            throw new DevoreRuntimeException("arccoth(x)定义域为(-∞, -1)∪(1, +∞), x超出范围.");
         return arctanh(BigDecimal.ONE.divide(x, mc), mc);
     }
 
