@@ -347,7 +347,7 @@ public class Core {
             Env newEnv = env.createChild();
             DToken result = DWord.NIL;
             for (Ast node : ast.get(0).children) {
-                if ("apply".equals(node.symbol.toString())) {
+                if (node.symbol instanceof DSymbol && "apply".equals(node.symbol.toString())) {
                     List<String> params = new ArrayList<>();
                     List<Ast> res = new ArrayList<>();
                     for (Ast paramNode : node.get(0).children) {
@@ -385,7 +385,7 @@ public class Core {
             Env newEnv = env.createChild();
             DToken result = DWord.NIL;
             for (Ast node : ast.get(0).children) {
-                if ("apply".equals(node.symbol.toString())) {
+                if (node.symbol instanceof DSymbol && "apply".equals(node.symbol.toString())) {
                     List<String> params = new ArrayList<>();
                     List<Ast> res = new ArrayList<>();
                     for (Ast paramNode : node.get(0).children) {
@@ -505,17 +505,21 @@ public class Core {
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool))
                 throw new DevoreCastException(condition.type(), "bool");
-            if (((DBool) condition).bool)
-                return Evaluator.eval(env, ast.get(1).copy());
-            else return Evaluator.eval(env, ast.get(2).copy());
+            return ((DBool) condition).bool ? Evaluator.eval(env, ast.get(1).copy())
+                    : Evaluator.eval(env, ast.get(2).copy());
         }, 3, false);
         dEnv.addAstProcedure("cond", (ast, env) -> {
             DToken result = DWord.NIL;
             for (Ast node : ast.children) {
                 if (node.symbol instanceof DSymbol && "else".equals(node.symbol.toString())) {
-                    result = Evaluator.eval(env, node.get(0).copy());
+                    for (int i = 0; i < node.size(); ++i)
+                        result = Evaluator.eval(env, node.get(i).copy());
                     break;
                 } else {
+                    if (!(node.symbol instanceof DSymbol && "apply".equals(node.symbol.toString()))) {
+                        node.add(0, new Ast(node.symbol));
+                        node.symbol = DSymbol.valueOf("apply");
+                    }
                     DToken condition = Evaluator.eval(env, node.get(0).copy());
                     if (!(condition instanceof DBool))
                         throw new DevoreCastException(condition.type(), "bool");
