@@ -815,9 +815,9 @@ public class Core {
                 throw new DevoreCastException(args.get(1).type(), "number");
             if (!(args.get(2) instanceof DNumber))
                 throw new DevoreCastException(args.get(2).type(), "number");
+            BigDecimal step = ((DNumber) args.get(2)).toBigDecimal();
             return DList.valueOf(range(((DNumber) args.get(0)).toBigDecimal(),
-                    ((DNumber) args.get(1)).toBigDecimal().subtract(((DNumber) args.get(2)).toBigDecimal()),
-                    ((DNumber) args.get(2)).toBigDecimal()));
+                    ((DNumber) args.get(1)).toBigDecimal().subtract(step), step));
         }), 3, false);
         dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
@@ -871,9 +871,12 @@ public class Core {
             }
             return DWord.NIL;
         }), 1, false);
-        dEnv.addTokenProcedure("type", ((args, env) -> DString.valueOf(args.get(0).type())), 1, false);
-        dEnv.addTokenProcedure("time", ((args, env) -> DNumber.valueOf(System.currentTimeMillis())), 0, false);
-        dEnv.addTokenProcedure("table", ((args, env) -> DTable.valueOf(new HashMap<>())), 0, false);
+        dEnv.addTokenProcedure("type", ((args, env) ->
+                DString.valueOf(args.get(0).type())), 1, false);
+        dEnv.addTokenProcedure("time", ((args, env) ->
+                DNumber.valueOf(System.currentTimeMillis())), 0, false);
+        dEnv.addTokenProcedure("table", ((args, env) ->
+                DTable.valueOf(new HashMap<>())), 0, false);
         dEnv.addTokenProcedure("table-get", ((args, env) -> {
             if (!(args.get(0) instanceof DTable))
                 throw new DevoreCastException(args.get(0).type(), "table");
