@@ -5,6 +5,7 @@ import org.devore.exception.DevoreRuntimeException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.math.RoundingMode;
 
 /**
  * 数学工具
@@ -644,9 +645,63 @@ public class NumberUtils {
             return BigDecimal.ONE;
         if (isInt(y))
             return powInt(x, y.toBigInteger(), mc);
-        if (x.compareTo(BigDecimal.ZERO) < 0)
-            throw new DevoreRuntimeException("x^y要求但y为非整数时, x不能为负数.");
-        return exp(y.multiply(ln(x, mc), mc), mc);
+        boolean negativeBase = x.compareTo(BigDecimal.ZERO) < 0;
+        BigDecimal absX = x.abs();
+        BigDecimal result;
+        BigDecimal value = y.stripTrailingZeros();
+        boolean yNeg = value.signum() < 0;
+        BigDecimal v = value.abs();
+        BigInteger a0 = v.toBigInteger();
+        BigDecimal frac = v.subtract(new BigDecimal(a0));
+        BigInteger numerator;
+        BigInteger denominator;
+        if (frac.compareTo(BigDecimal.ZERO) == 0) {
+            numerator = a0;
+            denominator = BigInteger.ONE;
+        } else {
+            BigInteger h0 = BigInteger.ZERO, h1 = BigInteger.ONE;
+            BigInteger k0 = BigInteger.ONE, k1 = BigInteger.ZERO;
+            BigDecimal f = frac;
+            BigInteger maxDenominator = BigInteger.TEN.pow(mc.getPrecision() + 5);
+            while (true) {
+                BigInteger a = f.toBigInteger();
+                BigInteger h2 = a.multiply(h1).add(h0);
+                BigInteger k2 = a.multiply(k1).add(k0);
+                if (k2.compareTo(maxDenominator) > 0)
+                    break;
+                h0 = h1;
+                h1 = h2;
+                k0 = k1;
+                k1 = k2;
+                BigDecimal remainder = f.subtract(new BigDecimal(a));
+                if (remainder.compareTo(BigDecimal.ZERO) == 0)
+                    break;
+                f = BigDecimal.ONE.divide(remainder, MathContext.DECIMAL128);
+            }
+            numerator = a0.multiply(k1).add(h1);
+            denominator = k1;
+        }
+        if (yNeg)
+            numerator = numerator.negate();
+        if (negativeBase) {
+            if (!denominator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
+                throw new DevoreRuntimeException("x^y要求但y为非整数且分母为偶数时, x不能为负数.");
+            result = exp(y.multiply(ln(absX, mc), mc), mc);
+            if (numerator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
+                result = result.negate();
+        } else
+            result = exp(y.multiply(ln(x, mc), mc), mc);
+        BigDecimal eps = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal rounded = result.setScale(0, RoundingMode.HALF_UP);
+        if (rounded.subtract(result).abs().compareTo(eps) <= 0)
+            return rounded;
+        if (!denominator.equals(BigInteger.ONE)) {
+            BigDecimal exactFraction = new BigDecimal(numerator)
+                    .divide(new BigDecimal(denominator), mc);
+            if (exactFraction.subtract(result).abs().compareTo(eps) <= 0)
+                return exactFraction;
+        }
+        return result;
     }
 
     /**
