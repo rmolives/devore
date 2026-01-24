@@ -764,9 +764,9 @@ public class NumberUtils {
      */
     public static BigDecimal log(BigDecimal a, BigDecimal b, MathContext mc) {
         if (a.compareTo(BigDecimal.ZERO) <= 0)
-            throw new DevoreRuntimeException("log_b(a)要求a必须为正数.");
+            throw new DevoreRuntimeException("log_b(a)要求a为正数.");
         if (b.compareTo(BigDecimal.ZERO) <= 0)
-            throw new DevoreRuntimeException("log_b(a)要求b必须为正数.");
+            throw new DevoreRuntimeException("log_b(a)要求b为正数.");
         if (b.compareTo(BigDecimal.ONE) == 0)
             throw new DevoreRuntimeException("log_b(a)要求b不能为1.");
         return ln(a, mc).divide(ln(b, mc), mc);
