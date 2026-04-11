@@ -676,7 +676,7 @@ public class NumberUtils {
                 BigDecimal remainder = f.subtract(new BigDecimal(a));
                 if (remainder.compareTo(BigDecimal.ZERO) == 0)
                     break;
-                f = BigDecimal.ONE.divide(remainder, MathContext.DECIMAL128);
+                f = BigDecimal.ONE.divide(remainder, mc);
             }
             numerator = a0.multiply(k1).add(h1);
             denominator = k1;
