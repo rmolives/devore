@@ -4,7 +4,7 @@ import org.devore.lang.Env;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -15,7 +15,7 @@ public class Main {
         else {
             Env env = Env.newEnv();
             for (String arg : args)
-                Devore.call(env, Files.readString(Path.of(arg)));
+                Devore.call(env, Files.readString(Paths.get(arg)));
         }
     }
 }

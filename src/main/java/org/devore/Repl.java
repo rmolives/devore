@@ -6,7 +6,7 @@ import org.devore.lang.token.DWord;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Repl {
     /**
@@ -36,7 +36,7 @@ public class Repl {
                 break;
             if (read.startsWith(":load ")) {
                 String fileName = read.substring(6).trim();
-                String code = Files.readString(Path.of(fileName));
+                String code = Files.readString(Paths.get(fileName));
                 DToken result = Devore.call(env, code);
                 if (result != DWord.NIL)
                     out.println(result);
