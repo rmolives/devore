@@ -35,11 +35,13 @@ public class Repl {
             if (":exit".equals(read))
                 break;
             if (read.startsWith(":load ")) {
-                String fileName = read.substring(6).trim();
-                String code = Files.readString(Paths.get(fileName));
-                DToken result = Devore.call(env, code);
-                if (result != DWord.NIL)
-                    out.println(result);
+                String[] files = read.substring(6).trim().split(" ");
+                for (String file : files) {
+                    String code = Files.readString(Paths.get(file));
+                    DToken result = Devore.call(env, code);
+                    if (result != DWord.NIL)
+                        out.println(result);
+                }
                 continue;
             }
             codeBuilder.append(read);
