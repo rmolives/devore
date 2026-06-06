@@ -31,7 +31,7 @@ public class Repl {
             int index = 0;
             int flag = 0;
             String read = reader.readLine();
-            if (read.isEmpty())
+            if (read.trim().isEmpty())
                 continue;
             if (":exit".equals(read))
                 break;
