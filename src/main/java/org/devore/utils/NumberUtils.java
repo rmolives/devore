@@ -72,8 +72,7 @@ public class NumberUtils {
      * @return 角度
      */
     public static BigDecimal arctan2(BigDecimal y, BigDecimal x, MathContext mc) {
-        if (x.compareTo(BigDecimal.ZERO) == 0 &&
-                y.compareTo(BigDecimal.ZERO) == 0)
+        if (x.compareTo(BigDecimal.ZERO) == 0 && y.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return y.compareTo(BigDecimal.ZERO) > 0
