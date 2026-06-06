@@ -5,6 +5,8 @@ import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Repl {
     /**
@@ -28,6 +30,18 @@ public class Repl {
             int index = 0;
             int flag = 0;
             String read = reader.readLine();
+            if (read.isEmpty())
+                continue;
+            if (":exit".equals(read))
+                break;
+            if (read.startsWith(":load ")) {
+                String fileName = read.substring(6).trim();
+                String code = Files.readString(Path.of(fileName));
+                DToken result = Devore.call(env, code);
+                if (result != DWord.NIL)
+                    out.println(result);
+                continue;
+            }
             codeBuilder.append(read);
             char[] codeCharArray = codeBuilder.toString().toCharArray();
             boolean skip = false;
