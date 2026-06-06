@@ -3,6 +3,7 @@ package org.devore;
 import org.devore.lang.Env;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -15,7 +16,7 @@ public class Main {
         else {
             Env env = Env.newEnv();
             for (String arg : args)
-                Devore.call(env, Files.readString(Paths.get(arg)));
+                Devore.call(env, new String(Files.readAllBytes(Paths.get(arg)), StandardCharsets.UTF_8));
         }
     }
 }

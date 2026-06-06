@@ -5,6 +5,7 @@ import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -37,7 +38,7 @@ public class Repl {
             if (read.startsWith(":load ")) {
                 String[] files = read.substring(6).trim().split(" ");
                 for (String file : files) {
-                    String code = Files.readString(Paths.get(file));
+                    String code = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
                     DToken result = Devore.call(env, code);
                     if (result != DWord.NIL)
                         out.println(result);
