@@ -22,6 +22,7 @@ public class Repl {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder codeBuilder = new StringBuilder();
         int size = 0;
+        label:
         while (true) {
             out.print("[Devore] >>> ");
             if (size > 0)
@@ -31,13 +32,14 @@ public class Repl {
             int index = 0;
             int flag = 0;
             String read = reader.readLine();
-            if (read.trim().isEmpty())
-                continue;
-            if (":exit".equals(read))
-                break;
-            if (":version".equals(read)) {
-                out.println(Devore.VERSION_MESSAGE);
-                continue;
+            switch (read.trim()) {
+                case "":
+                    continue;
+                case ":exit":
+                    break label;
+                case ":version":
+                    out.println(Devore.VERSION_MESSAGE);
+                    continue;
             }
             if (read.startsWith(":load ")) {
                 String[] files = read.substring(6).trim().split(" ");
