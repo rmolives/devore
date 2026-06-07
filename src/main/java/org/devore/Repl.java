@@ -32,24 +32,26 @@ public class Repl {
             int index = 0;
             int flag = 0;
             String read = reader.readLine();
-            switch (read.trim()) {
-                case "":
-                    continue;
-                case ":exit":
-                    break label;
-                case ":version":
-                    out.println(Devore.VERSION_MESSAGE);
-                    continue;
-            }
-            if (read.startsWith(":load ")) {
-                String[] files = read.substring(6).trim().split(" ");
-                for (String file : files) {
-                    String code = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
-                    DToken result = Devore.call(env, code);
-                    if (result != DWord.NIL)
-                        out.println(result);
+            if (codeBuilder.length() == 0) {
+                switch (read.trim()) {
+                    case "":
+                        continue;
+                    case ":exit":
+                        break label;
+                    case ":version":
+                        out.println(Devore.VERSION_MESSAGE);
+                        continue;
                 }
-                continue;
+                if (read.startsWith(":load ")) {
+                    String[] files = read.substring(6).trim().split(" ");
+                    for (String file : files) {
+                        String code = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
+                        DToken result = Devore.call(env, code);
+                        if (result != DWord.NIL)
+                            out.println(result);
+                    }
+                    continue;
+                }
             }
             codeBuilder.append(read);
             char[] codeCharArray = codeBuilder.toString().toCharArray();
