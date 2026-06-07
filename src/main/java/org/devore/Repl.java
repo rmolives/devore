@@ -35,6 +35,10 @@ public class Repl {
                 continue;
             if (":exit".equals(read))
                 break;
+            if (":version".equals(read)) {
+                out.println(Devore.VERSION_MESSAGE);
+                continue;
+            }
             if (read.startsWith(":load ")) {
                 String[] files = read.substring(6).trim().split(" ");
                 for (String file : files) {
