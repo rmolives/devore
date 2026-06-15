@@ -4,7 +4,6 @@ import org.devore.lang.token.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +39,8 @@ public class Lexer {
             if (index >= codeCharArray.length)
                 return expressions;
             do {
+                if (index >= codeCharArray.length)
+                    break;
                 if (codeCharArray[index] == ';') {
                     while (index < codeCharArray.length &&
                             codeCharArray[index] != '\n' &&
@@ -47,35 +48,27 @@ public class Lexer {
                         ++index;
                     continue;
                 }
-                if (codeCharArray[index] == '\"') {
-                    builder.append("\"");
-                    StringBuilder value = new StringBuilder();
-                    boolean skip = false;
-                    while (true) {
-                        ++index;
-                        if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
-                            if (skip) {
-                                skip = false;
-                                value.append("\\\\");
-                            } else
-                                skip = true;
-                            continue;
-                        } else if (index >= codeCharArray.length - 1 || codeCharArray[index] == '\"') {
-                            if (skip) {
-                                skip = false;
-                                value.append("\\\"");
-                                continue;
-                            } else
-                                break;
-                        } else if (skip) {
-                            value.append("\\").append(codeCharArray[index]);
-                            skip = false;
+                if (codeCharArray[index] == '"') {
+                    builder.append('"');
+                    boolean escape = false;
+                    while (++index < codeCharArray.length) {
+                        char c = codeCharArray[index];          
+                        if (escape) {
+                            escape = false;
+                            builder.append('\\').append(c);
                             continue;
                         }
-                        value.append(codeCharArray[index]);
+                        if (c == '\\') {
+                            escape = true;
+                            continue;
+                        }
+                        if (c == '"') {
+                            builder.append('"');
+                            ++index;
+                            break;
+                        }
+                        builder.append(c);
                     }
-                    builder.append(value).append("\"");
-                    ++index;
                     continue;
                 }
                 if (codeCharArray[index] == '\n' || codeCharArray[index] == '\r')
@@ -91,7 +84,7 @@ public class Lexer {
                 else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
                     --flag;
                 builder.append(codeCharArray[index++]);
-            } while (flag > 0);
+            } while (flag > 0 && index < codeCharArray.length);
             expressions.add(builder.toString());
         }
         return expressions;
@@ -127,79 +120,54 @@ public class Lexer {
                 ++index;
             }
             if (Character.isDigit(expressionCharArray[index])) {
-                BigInteger v = BigInteger.ZERO;
-                while (true) {
-                    if (index >= expressionCharArray.length - 1 || !Character.isDigit(expressionCharArray[index])) {
-                        --index;
-                        break;
-                    }
-                    v = v.multiply(BigInteger.valueOf(10)).add(BigInteger.valueOf(((int) expressionCharArray[index]) - 48));
+                StringBuilder builder = new StringBuilder();
+                if (negative)
+                    builder.append('-');
+                while (index < expressionCharArray.length &&
+                        Character.isDigit(expressionCharArray[index])) {
+                    builder.append(expressionCharArray[index]);
                     ++index;
                 }
-                if (expressionCharArray[index + 1] != '.') {
-                    tokens.add(DNumber.valueOf(negative ? v.negate() : v));
-                    continue;
-                }
-                BigDecimal x = new BigDecimal(v);
-                BigDecimal d = BigDecimal.valueOf(10);
-                ++index;
-                while (true) {
+                if (index < expressionCharArray.length && expressionCharArray[index] == '.') {
+                    builder.append('.');
                     ++index;
-                    if (index >= expressionCharArray.length - 1 || !Character.isDigit(expressionCharArray[index])) {
-                        --index;
-                        break;
+                    while (index < expressionCharArray.length &&
+                            Character.isDigit(expressionCharArray[index])) {
+                        builder.append(expressionCharArray[index]);
+                        ++index;
                     }
-                    x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index]))
-                            .divide(d, MathContext.DECIMAL128));
-                    d = d.multiply(BigDecimal.valueOf(10));
-                }
-                tokens.add(DNumber.valueOf(negative ? x.negate() : x));
+                    tokens.add(DNumber.valueOf(new BigDecimal(builder.toString())));
+                } else
+                    tokens.add(DNumber.valueOf(new BigInteger(builder.toString())));
+                --index;
                 continue;
             }
             if (expressionCharArray[index] == '\"') {
                 StringBuilder builder = new StringBuilder();
-                boolean skip = false;
-                while (true) {
-                    ++index;
-                    if (index < expressionCharArray.length - 1 && expressionCharArray[index] == '\\') {
-                        if (skip) {
-                            skip = false;
-                            builder.append("\\");
-                        } else
-                            skip = true;
-                        continue;
-                    } else if (index >= expressionCharArray.length - 1 || expressionCharArray[index] == '\"') {
-                        if (skip) {
-                            skip = false;
-                            builder.append("\"");
-                            continue;
-                        } else
-                            break;
-                    }
-                    if (skip) {
-                        skip = false;
-                        switch (expressionCharArray[index]) {
-                            case 'n':
-                                builder.append("\n");
-                                break;
-                            case 'r':
-                                builder.append("\r");
-                                break;
-                            case 't':
-                                builder.append("\t");
-                                break;
-                            case 'b':
-                                builder.append("\b");
-                                break;
-                            case 'f':
-                                builder.append("\f");
-                                break;
-                            default:
-                                builder.append("\\").append(expressionCharArray[index]);
-                                break;
+                boolean escape = false;
+                while (++index < expressionCharArray.length) {
+                    char c = expressionCharArray[index];
+                    if (escape) {
+                        escape = false;
+                        switch (c) {
+                            case 'n': builder.append('\n'); break;
+                            case 'r': builder.append('\r'); break;
+                            case 't': builder.append('\t'); break;
+                            case 'b': builder.append('\b'); break;
+                            case 'f': builder.append('\f'); break;
+                            case '"': builder.append('"'); break;
+                            case '\\': builder.append('\\'); break;
+                            default: builder.append('\\').append(c); break;
                         }
-                    } else
-                        builder.append(expressionCharArray[index]);
+                        continue;
+                    }
+                    if (c == '\\') {
+                        escape = true;
+                        continue;
+                    }
+                    if (c == '"')
+                        break;
+                    builder.append(c);
                 }
                 tokens.add(DString.valueOf(builder.toString()));
                 continue;
@@ -207,15 +175,16 @@ public class Lexer {
             if (expressionCharArray[index] != ' ' && expressionCharArray[index] != '(' && expressionCharArray[index] != ')'
                     && expressionCharArray[index] != '[' && expressionCharArray[index] != ']') {
                 StringBuilder builder = new StringBuilder();
-                while (true) {
-                    if (index >= expressionCharArray.length - 1 || expressionCharArray[index] == ' '
-                            || expressionCharArray[index] == ')' || expressionCharArray[index] == ']') {
-                        --index;
-                        break;
-                    }
+                while (index < expressionCharArray.length &&
+                        expressionCharArray[index] != ' ' &&
+                        expressionCharArray[index] != '(' &&
+                        expressionCharArray[index] != ')' &&
+                        expressionCharArray[index] != '[' &&
+                        expressionCharArray[index] != ']') {
                     builder.append(expressionCharArray[index]);
                     ++index;
                 }
+                --index;
                 tokens.add(DSymbol.valueOf(builder.toString()));
             }
         }
