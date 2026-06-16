@@ -346,7 +346,7 @@ public class Core {
             env.addMacro(ast.get(0).symbol.toString(), DMacro.newMacro(params, nodes));
             return DWord.NIL;
         }), 2, true);
-        dEnv.addAstProcedure("set-macro", ((ast, env) -> {
+        dEnv.addAstProcedure("set-macro!", ((ast, env) -> {
             if (!(ast.get(0).symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
             List<String> params = new ArrayList<>();
