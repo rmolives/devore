@@ -93,7 +93,22 @@ public class Env {
     }
 
     /**
-     * 设置Ast过程
+     * 更改宏
+     *
+     * @param key   key
+     * @param macro 宏
+     * @return 环境
+     */
+    public Env setMacro(String key, DMacro macro) {
+        Env temp = this;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
+        temp.table.put(key, macro);
+        return this;
+    }
+
+    /**
+     * 添加Ast过程
      *
      * @param key       key
      * @param procedure 过程
