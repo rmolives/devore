@@ -346,6 +346,21 @@ public class Core {
             env.addMacro(ast.get(0).symbol.toString(), DMacro.newMacro(params, nodes));
             return DWord.NIL;
         }), 2, true);
+        dEnv.addAstProcedure("set-macro", ((ast, env) -> {
+            if (!(ast.get(0).symbol instanceof DSymbol))
+                throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
+            List<String> params = new ArrayList<>();
+            for (Ast param : ast.get(0).children) {
+                if (!(param.symbol instanceof DSymbol))
+                    throw new DevoreCastException(param.symbol.type(), "symbol");
+                params.add(param.symbol.toString());
+            }
+            List<Ast> nodes = new ArrayList<>();
+            for (int i = 1; i < ast.size(); ++i)
+                nodes.add(ast.get(i).copy());
+            env.setMacro(ast.get(0).symbol.toString(), DMacro.newMacro(params, nodes));
+            return DWord.NIL;
+        }), 2, true);
         dEnv.addAstProcedure("def", ((ast, env) -> {
             if (!(ast.get(0).symbol instanceof DSymbol))
                 throw new DevoreCastException(ast.get(0).symbol.type(), "symbol");
