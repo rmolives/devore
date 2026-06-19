@@ -81,25 +81,32 @@ public class DMacro extends DToken {
      * @return 替换后的ast
      */
     private Ast expand(Ast body, List<Ast> nodes) {
-        for (int j = 0; j < this.params.size(); ++j)
-            if (body.isNotNil()
-                    && body.symbol instanceof DSymbol
-                    && body.symbol.toString().equals(this.params.get(j))) {
-                body.symbol = DSymbol.valueOf("apply");
-                body.add(0, nodes.get(j));
-            }
+        int paramIndex = paramIndex(body.symbol);
+        if (paramIndex >= 0 && body.isEmpty())
+            return nodes.get(paramIndex).copy();
+        if (paramIndex >= 0) {
+            body.symbol = DSymbol.valueOf("apply");
+            body.add(0, nodes.get(paramIndex).copy());
+        }
         for (int i = 0; i < body.size(); ++i) {
-            Ast temp = body.get(i);
-            for (int j = 0; j < this.params.size(); ++j)
-                if (body.isNotNil()
-                        && body.symbol instanceof DSymbol
-                        && temp.symbol.toString().equals(this.params.get(j))
-                        && temp.isEmpty())
-                    body.set(i, nodes.get(j));
-            if (!body.get(i).isEmpty())
-                body.set(i, expand(body.get(i), nodes));
+            body.set(i, expand(body.get(i), nodes));
         }
         return body;
+    }
+
+    /**
+     * 查询符号对应的宏参数位置
+     *
+     * @param token token
+     * @return 参数位置, 不匹配时返回-1
+     */
+    private int paramIndex(DToken token) {
+        if (!(token instanceof DSymbol))
+            return -1;
+        for (int i = 0; i < this.params.size(); ++i)
+            if (token.toString().equals(this.params.get(i)))
+                return i;
+        return -1;
     }
 
     /**

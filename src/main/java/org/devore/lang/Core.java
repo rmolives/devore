@@ -563,6 +563,28 @@ public class Core {
             }
             return result;
         }, 2, true);
+        dEnv.addAstProcedure("try", (ast, env) -> {
+            Ast catchNode = ast.get(ast.size() - 1);
+            if (!(catchNode.symbol instanceof DSymbol && "catch".equals(catchNode.symbol.toString())))
+                throw new DevoreRuntimeException("try要求最后一个表达式为catch子句.");
+            if (catchNode.size() < 2)
+                throw new DevoreRuntimeException("catch子句必须包含错误变量和处理表达式.");
+            if (!(catchNode.get(0).symbol instanceof DSymbol) || !catchNode.get(0).isEmpty())
+                throw new DevoreCastException(catchNode.get(0).symbol.type(), "symbol");
+            try {
+                DToken result = DWord.NIL;
+                for (int i = 0; i < ast.size() - 1; ++i)
+                    result = Evaluator.eval(env, ast.get(i).copy());
+                return result;
+            } catch (DevoreRuntimeException e) {
+                Env catchEnv = env.createChild();
+                catchEnv.put(catchNode.get(0).symbol.toString(), DString.valueOf(e.getMessage()));
+                DToken result = DWord.NIL;
+                for (int i = 1; i < catchNode.size(); ++i)
+                    result = Evaluator.eval(catchEnv, catchNode.get(i).copy());
+                return result;
+            }
+        }, 2, true);
         dEnv.addTokenProcedure("begin", (arg, env) -> arg.get(arg.size() - 1), 1, true);
         dEnv.addAstProcedure("while", (ast, env) -> {
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
@@ -579,15 +601,15 @@ public class Core {
             return result;
         }, 2, true);
         dEnv.addTokenProcedure("read-line", ((args, env) ->
-                DString.valueOf(new Scanner(env.io.in).nextLine())), 0, false);
+                DString.valueOf(env.io.readLine())), 0, false);
         dEnv.addTokenProcedure("read-int", ((args, env) ->
-                DNumber.valueOf(new Scanner(env.io.in).nextBigInteger())), 0, false);
+                DNumber.valueOf(env.io.readBigInteger())), 0, false);
         dEnv.addTokenProcedure("read-float", ((args, env) ->
-                DNumber.valueOf(new Scanner(env.io.in).nextBigDecimal())), 0, false);
+                DNumber.valueOf(env.io.readBigDecimal())), 0, false);
         dEnv.addTokenProcedure("read-bool", ((args, env) ->
-                DBool.valueOf(new Scanner(env.io.in).nextBoolean())), 0, false);
+                DBool.valueOf(env.io.readBoolean())), 0, false);
         dEnv.addTokenProcedure("read", ((args, env) ->
-                DString.valueOf(new Scanner(env.io.in).next())), 0, false);
+                DString.valueOf(env.io.read())), 0, false);
         dEnv.addTokenProcedure("newline", ((args, env) -> {
             env.io.out.println();
             return DWord.NIL;
@@ -1019,8 +1041,12 @@ public class Core {
                 DBool.valueOf(args.get(0) instanceof DInt)), 1, false);
         dEnv.addTokenProcedure("list?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DList)), 1, false);
-        dEnv.addTokenProcedure("macro?", ((args, env) ->
-                DBool.valueOf(args.get(0) instanceof DMacro)), 1, false);
+        dEnv.addAstProcedure("macro?", ((ast, env) -> {
+            Ast arg = ast.get(0);
+            if (arg.isEmpty() && arg.symbol instanceof DSymbol && env.contains(arg.symbol.toString()))
+                return DBool.valueOf(env.get(arg.symbol.toString()) instanceof DMacro);
+            return DBool.valueOf(Evaluator.eval(env, arg.copy()) instanceof DMacro);
+        }), 1, false);
         dEnv.addTokenProcedure("number?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DNumber)), 1, false);
         dEnv.addTokenProcedure("procedure?", ((args, env) ->

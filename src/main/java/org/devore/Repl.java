@@ -1,10 +1,13 @@
 package org.devore;
 
+import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
+import org.devore.parser.Lexer;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,78 +20,125 @@ public class Repl {
      * @throws IOException 错误
      */
     public static void repl(Env env) throws IOException {
-        InputStream in = env.io.in;
         PrintStream out = env.io.out;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder codeBuilder = new StringBuilder();
-        int size = 0;
         label:
         while (true) {
-            out.print("[Devore] >>> ");
-            if (size > 0)
-                codeBuilder.append(" ");
-            while (size-- > 0)
-                out.print("    ");
-            int index = 0;
-            int flag = 0;
-            String read = reader.readLine();
+            if (codeBuilder.length() == 0 && !env.io.reader.ready())
+                out.print("[Devore] >>> ");
+            String read = env.io.reader.readLine();
+            if (read == null) {
+                if (codeBuilder.length() > 0)
+                    printError(out, codeBuilder.toString());
+                break;
+            }
             if (codeBuilder.length() == 0) {
                 switch (read.trim()) {
                     case "":
                         continue;
                     case ":exit":
                         break label;
+                    case ":help":
+                        printHelp(out);
+                        continue;
                     case ":version":
                         out.println(Devore.VERSION_MESSAGE);
                         continue;
                 }
-                if (read.startsWith(":load ")) {
-                    String[] files = read.substring(6).trim().split(" ");
-                    for (String file : files) {
-                        String code = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
-                        DToken result = Devore.call(env, code);
-                        if (result != DWord.NIL)
-                            out.println(result);
-                    }
+                if (read.trim().startsWith(":load ")) {
+                    loadFiles(env, out, read.trim().substring(6).trim());
                     continue;
                 }
             }
+            if (codeBuilder.length() > 0)
+                codeBuilder.append("\n");
             codeBuilder.append(read);
-            char[] codeCharArray = codeBuilder.toString().toCharArray();
-            boolean skip = false;
-            while (codeCharArray[index] != '(' && codeCharArray[index] != '[')
-                ++index;
-            do {
-                if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
-                    skip = true;
-                    ++index;
-                    continue;
-                }
-                if (codeCharArray[index] == '\"') {
-                    do {
-                        if (skip) {
-                            skip = false;
-                            ++index;
-                            continue;
-                        }
-                        ++index;
-                        if (codeCharArray[index] == '\"')
-                            break;
-                    } while (index < codeCharArray.length - 1);
-                }
-                if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
-                    ++flag;
-                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
-                    --flag;
-                ++index;
-            } while (index < codeCharArray.length);
-            if (flag == 0) {
-                DToken result = Devore.call(env, codeBuilder.toString());
+            while (env.io.reader.ready()) {
+                String buffered = env.io.reader.readLine();
+                if (buffered == null)
+                    break;
+                codeBuilder.append("\n").append(buffered);
+            }
+            String code = codeBuilder.toString();
+            if (isIncomplete(code))
+                continue;
+            try {
+                DToken result = Devore.call(env, code, "<repl>");
                 codeBuilder = new StringBuilder();
                 if (result != DWord.NIL)
                     out.println(result.toString());
+            } catch (DevoreRuntimeException e) {
+                out.println(e.getMessage());
+                codeBuilder = new StringBuilder();
             }
-            size = flag;
         }
+    }
+
+    /**
+     * 加载文件
+     *
+     * @param env   环境
+     * @param out   输出
+     * @param input 文件列表
+     * @throws IOException 错误
+     */
+    private static void loadFiles(Env env, PrintStream out, String input) throws IOException {
+        if (input.isEmpty()) {
+            out.println(":load 需要至少一个文件路径.");
+            return;
+        }
+        String[] files = input.split("\\s+");
+        for (String file : files) {
+            String code = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
+            try {
+                DToken result = Devore.call(env, code, file);
+                if (result != DWord.NIL)
+                    out.println(result);
+            } catch (DevoreRuntimeException e) {
+                out.println(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 判断当前输入是否需要继续读取
+     *
+     * @param code 代码
+     * @return 是否未完成
+     */
+    private static boolean isIncomplete(String code) {
+        try {
+            Lexer.splitCode(code);
+            return false;
+        } catch (RuntimeException e) {
+            String message = e.getMessage();
+            return message != null && (message.contains("括号未闭合") || message.contains("字符串未闭合"));
+        }
+    }
+
+    /**
+     * 打印错误
+     *
+     * @param out  输出
+     * @param code 代码
+     */
+    private static void printError(PrintStream out, String code) {
+        try {
+            Devore.call(Env.newEnv(), code, "<repl>");
+        } catch (DevoreRuntimeException e) {
+            out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * 打印帮助
+     *
+     * @param out 输出
+     */
+    private static void printHelp(PrintStream out) {
+        out.println(":help      显示帮助");
+        out.println(":version   显示版本");
+        out.println(":load FILE 加载文件, 可一次加载多个");
+        out.println(":exit      退出");
     }
 }

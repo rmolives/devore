@@ -15,6 +15,7 @@ public class Ast {
     public List<Ast> children;                                  // 子树
     public DToken symbol;                                       // 符号
     public Type type;                                           // 语法树类型
+    public int index;                                           // 源码位置
 
     /**
      * 创建语法树
@@ -25,6 +26,7 @@ public class Ast {
         this.symbol = symbol;
         this.type = Type.BASIC;
         this.children = new ArrayList<>();
+        this.index = -1;
     }
 
     /**
@@ -33,11 +35,13 @@ public class Ast {
      * @param symbol   内容
      * @param type     类型
      * @param children 子树
+     * @param index    源码位置
      */
-    public Ast(DToken symbol, Type type, List<Ast> children) {
+    public Ast(DToken symbol, Type type, List<Ast> children, int index) {
         this.symbol = symbol;
         this.type = type;
         this.children = children;
+        this.index = index;
     }
 
     /**
@@ -49,7 +53,7 @@ public class Ast {
         List<Ast> list = new ArrayList<>();
         for (Ast ast : this.children)
             list.add(ast.copy());
-        return new Ast(this.symbol, this.type, list);
+        return new Ast(this.symbol, this.type, list, this.index);
     }
 
     /**

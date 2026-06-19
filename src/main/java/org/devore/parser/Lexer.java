@@ -1,5 +1,6 @@
 package org.devore.parser;
 
+import org.devore.exception.DevoreParseException;
 import org.devore.lang.token.*;
 
 import java.math.BigDecimal;
@@ -13,18 +14,43 @@ import java.util.List;
  */
 public class Lexer {
     /**
+     * 带源码位置的表达式
+     */
+    public static class SourceExpression {
+        public final String expression;  // 表达式
+        public final int startIndex;     // 起始位置
+
+        public SourceExpression(String expression, int startIndex) {
+            this.expression = expression;
+            this.startIndex = startIndex;
+        }
+    }
+
+    /**
+     * 带源码位置的token
+     */
+    public static class SourceToken {
+        public final DToken token;   // token
+        public final int index;      // 源码位置
+
+        public SourceToken(DToken token, int index) {
+            this.token = token;
+            this.index = index;
+        }
+    }
+
+    /**
      * 分割代码
      * 例如：把(+ 2 3)(- 4 5)分割成(+ 2 3)和(- 4 5)
      *
      * @param code 代码
      * @return 代码片段序列
      */
-    public static List<String> splitCode(String code) {
+    public static List<SourceExpression> splitCode(String code) {
         char[] codeCharArray = code.toCharArray();
-        List<String> expressions = new ArrayList<>();
+        List<SourceExpression> expressions = new ArrayList<>();
         int index = 0;
         while (index < codeCharArray.length) {
-            int flag = 0;
             StringBuilder builder = new StringBuilder();
             while (index < codeCharArray.length) {
                 if (codeCharArray[index] == ';')
@@ -34,12 +60,17 @@ public class Lexer {
                         ++index;
                 else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
                     break;
+                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
+                    throw new DevoreParseException("多余的右括号: " + codeCharArray[index], index);
                 else
                     ++index;
             }
             if (index >= codeCharArray.length)
                 return expressions;
-            do {
+            int startIndex = index;
+            List<Character> brackets = new ArrayList<>();
+            List<Integer> bracketIndexes = new ArrayList<>();
+            while (index < codeCharArray.length) {
                 if (codeCharArray[index] == ';') {
                     while (index < codeCharArray.length &&
                             codeCharArray[index] != '\n' &&
@@ -48,19 +79,22 @@ public class Lexer {
                     continue;
                 }
                 if (codeCharArray[index] == '\"') {
+                    int stringStartIndex = index;
                     builder.append("\"");
                     StringBuilder value = new StringBuilder();
                     boolean skip = false;
                     while (true) {
                         ++index;
-                        if (index < codeCharArray.length - 1 && codeCharArray[index] == '\\') {
+                        if (index >= codeCharArray.length)
+                            throw new DevoreParseException("字符串未闭合.", stringStartIndex);
+                        if (codeCharArray[index] == '\\') {
                             if (skip) {
                                 skip = false;
                                 value.append("\\\\");
                             } else
                                 skip = true;
                             continue;
-                        } else if (index >= codeCharArray.length - 1 || codeCharArray[index] == '\"') {
+                        } else if (codeCharArray[index] == '\"') {
                             if (skip) {
                                 skip = false;
                                 value.append("\\\"");
@@ -78,21 +112,25 @@ public class Lexer {
                     ++index;
                     continue;
                 }
-                if (codeCharArray[index] == '\n' || codeCharArray[index] == '\r')
-                    codeCharArray[index] = ' ';
-                while (index < codeCharArray.length - 1 &&
-                        (codeCharArray[index] == ' ' || codeCharArray[index] == '\t') &&
-                        ((codeCharArray[index + 1] == ' ' || codeCharArray[index + 1] == '\t')
-                                || codeCharArray[index + 1] == ')'
-                                || codeCharArray[index + 1] == ']'))
-                    ++index;
-                if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
-                    ++flag;
-                else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
-                    --flag;
+                if (codeCharArray[index] == '(' || codeCharArray[index] == '[') {
+                    brackets.add(codeCharArray[index]);
+                    bracketIndexes.add(index);
+                } else if (codeCharArray[index] == ')' || codeCharArray[index] == ']') {
+                    if (brackets.isEmpty())
+                        throw new DevoreParseException("多余的右括号: " + codeCharArray[index], index);
+                    char left = brackets.remove(brackets.size() - 1);
+                    bracketIndexes.remove(bracketIndexes.size() - 1);
+                    if (!(left == '(' && codeCharArray[index] == ')' || left == '[' && codeCharArray[index] == ']'))
+                        throw new DevoreParseException("括号不匹配: " + left + " 与 " + codeCharArray[index], index);
+                }
                 builder.append(codeCharArray[index++]);
-            } while (flag > 0);
-            expressions.add(builder.toString());
+                if (brackets.isEmpty())
+                    break;
+            }
+            if (!brackets.isEmpty())
+                throw new DevoreParseException("括号未闭合: " + brackets.get(brackets.size() - 1),
+                        bracketIndexes.get(bracketIndexes.size() - 1));
+            expressions.add(new SourceExpression(builder.toString(), startIndex));
         }
         return expressions;
     }
@@ -101,25 +139,27 @@ public class Lexer {
      * 词法分析器
      *
      * @param expression 代码片段
+     * @param baseIndex  基础位置
      * @return Token序列
      */
-    public static List<DToken> lexer(String expression) {
+    public static List<SourceToken> lexer(String expression, int baseIndex) {
         char[] expressionCharArray = expression.toCharArray();
-        List<DToken> tokens = new ArrayList<>();
+        List<SourceToken> tokens = new ArrayList<>();
         int index = -1;
         while (++index < expressionCharArray.length) {
             switch (expressionCharArray[index]) {
                 case '(':
                 case '[':
-                    tokens.add(DWord.LB);
+                    tokens.add(new SourceToken(DWord.LB, baseIndex + index));
                     continue;
                 case ')':
                 case ']':
-                    tokens.add(DWord.RB);
-                    continue;
-                case ' ':
+                    tokens.add(new SourceToken(DWord.RB, baseIndex + index));
                     continue;
             }
+            if (Character.isWhitespace(expressionCharArray[index]))
+                continue;
+            int tokenIndex = index;
             boolean negative = false;
             if (expressionCharArray[index] == '-' && index < expressionCharArray.length - 1
                     && Character.isDigit(expressionCharArray[index + 1])) {
@@ -137,7 +177,7 @@ public class Lexer {
                     ++index;
                 }
                 if (expressionCharArray[index + 1] != '.') {
-                    tokens.add(DNumber.valueOf(negative ? v.negate() : v));
+                    tokens.add(new SourceToken(DNumber.valueOf(negative ? v.negate() : v), baseIndex + tokenIndex));
                     continue;
                 }
                 BigDecimal x = new BigDecimal(v);
@@ -153,7 +193,7 @@ public class Lexer {
                             .divide(d, MathContext.DECIMAL128));
                     d = d.multiply(BigDecimal.valueOf(10));
                 }
-                tokens.add(DNumber.valueOf(negative ? x.negate() : x));
+                tokens.add(new SourceToken(DNumber.valueOf(negative ? x.negate() : x), baseIndex + tokenIndex));
                 continue;
             }
             if (expressionCharArray[index] == '\"') {
@@ -201,14 +241,14 @@ public class Lexer {
                     } else
                         builder.append(expressionCharArray[index]);
                 }
-                tokens.add(DString.valueOf(builder.toString()));
+                tokens.add(new SourceToken(DString.valueOf(builder.toString()), baseIndex + tokenIndex));
                 continue;
             }
-            if (expressionCharArray[index] != ' ' && expressionCharArray[index] != '(' && expressionCharArray[index] != ')'
+            if (!Character.isWhitespace(expressionCharArray[index]) && expressionCharArray[index] != '(' && expressionCharArray[index] != ')'
                     && expressionCharArray[index] != '[' && expressionCharArray[index] != ']') {
                 StringBuilder builder = new StringBuilder();
                 while (true) {
-                    if (index >= expressionCharArray.length - 1 || expressionCharArray[index] == ' '
+                    if (index >= expressionCharArray.length - 1 || Character.isWhitespace(expressionCharArray[index])
                             || expressionCharArray[index] == ')' || expressionCharArray[index] == ']') {
                         --index;
                         break;
@@ -216,7 +256,7 @@ public class Lexer {
                     builder.append(expressionCharArray[index]);
                     ++index;
                 }
-                tokens.add(DSymbol.valueOf(builder.toString()));
+                tokens.add(new SourceToken(DSymbol.valueOf(builder.toString()), baseIndex + tokenIndex));
             }
         }
         return tokens;

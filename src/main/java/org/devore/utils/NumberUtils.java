@@ -644,63 +644,102 @@ public class NumberUtils {
             return BigDecimal.ONE;
         if (isInt(y))
             return powInt(x, y.toBigInteger(), mc);
-        boolean negativeBase = x.compareTo(BigDecimal.ZERO) < 0;
-        BigDecimal absX = x.abs();
-        BigDecimal result;
-        BigDecimal value = y.stripTrailingZeros();
-        boolean yNeg = value.signum() < 0;
-        BigDecimal v = value.abs();
-        BigInteger a0 = v.toBigInteger();
-        BigDecimal frac = v.subtract(new BigDecimal(a0));
-        BigInteger numerator;
-        BigInteger denominator;
-        if (frac.compareTo(BigDecimal.ZERO) == 0) {
-            numerator = a0;
-            denominator = BigInteger.ONE;
-        } else {
-            BigInteger h0 = BigInteger.ZERO, h1 = BigInteger.ONE;
-            BigInteger k0 = BigInteger.ONE, k1 = BigInteger.ZERO;
-            BigDecimal f = frac;
-            BigInteger maxDenominator = BigInteger.TEN.pow(mc.getPrecision() + 5);
-            while (true) {
-                BigInteger a = f.toBigInteger();
-                BigInteger h2 = a.multiply(h1).add(h0);
-                BigInteger k2 = a.multiply(k1).add(k0);
-                if (k2.compareTo(maxDenominator) > 0)
-                    break;
-                h0 = h1;
-                h1 = h2;
-                k0 = k1;
-                k1 = k2;
-                BigDecimal remainder = f.subtract(new BigDecimal(a));
-                if (remainder.compareTo(BigDecimal.ZERO) == 0)
-                    break;
-                f = BigDecimal.ONE.divide(remainder, mc);
-            }
-            numerator = a0.multiply(k1).add(h1);
-            denominator = k1;
-        }
-        if (yNeg)
-            numerator = numerator.negate();
-        if (negativeBase) {
-            if (!denominator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
-                throw new DevoreRuntimeException("x^y要求但y为非整数且分母为偶数时, x不能为负数.");
-            result = exp(y.multiply(ln(absX, mc), mc), mc);
-            if (numerator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
-                result = result.negate();
-        } else
-            result = exp(y.multiply(ln(x, mc), mc), mc);
-        BigDecimal eps = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
-        BigDecimal rounded = result.setScale(0, RoundingMode.HALF_UP);
-        if (rounded.subtract(result).abs().compareTo(eps) <= 0)
-            return rounded;
-        if (!denominator.equals(BigInteger.ONE)) {
-            BigDecimal exactFraction = new BigDecimal(numerator)
-                    .divide(new BigDecimal(denominator), mc);
-            if (exactFraction.subtract(result).abs().compareTo(eps) <= 0)
-                return exactFraction;
-        }
+        Fraction exponent = approximateFraction(y.abs(), mc);
+        BigDecimal exponentValue = new BigDecimal(exponent.numerator).divide(new BigDecimal(exponent.denominator), mc);
+        if (x.compareTo(BigDecimal.ZERO) > 0)
+            return powPositiveBase(x, exponentValue, y.signum() < 0, mc);
+        if (!exponent.denominator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
+            throw new DevoreRuntimeException("x^y要求但y为非整数且分母为偶数时, x不能为负数.");
+        BigDecimal result = powPositiveBase(x.abs(), exponentValue, y.signum() < 0, mc);
+        if (exponent.numerator.testBit(0))
+            result = result.negate();
         return result;
+    }
+
+    /**
+     * 将有限小数近似为分母较小的分数
+     *
+     * @param value 非负数
+     * @param mc    精度
+     * @return 分数
+     */
+    private static Fraction approximateFraction(BigDecimal value, MathContext mc) {
+        value = value.stripTrailingZeros();
+        if (isInt(value))
+            return new Fraction(value.toBigInteger(), BigInteger.ONE);
+        int scale = Math.max(1, value.scale());
+        BigDecimal tolerance = BigDecimal.valueOf(5).scaleByPowerOfTen(-scale - 1);
+        BigInteger maxDenominator = BigInteger.TEN.pow(Math.max(1, mc.getPrecision() / 2));
+        MathContext workMc = new MathContext(mc.getPrecision() + 5, mc.getRoundingMode());
+        BigInteger h0 = BigInteger.ZERO;
+        BigInteger h1 = BigInteger.ONE;
+        BigInteger k0 = BigInteger.ONE;
+        BigInteger k1 = BigInteger.ZERO;
+        BigDecimal current = value;
+        Fraction best;
+        while (true) {
+            BigInteger a = current.toBigInteger();
+            BigInteger h2 = a.multiply(h1).add(h0);
+            BigInteger k2 = a.multiply(k1).add(k0);
+            if (k2.compareTo(maxDenominator) > 0)
+                break;
+            best = new Fraction(h2, k2);
+            BigDecimal approximation = new BigDecimal(h2).divide(new BigDecimal(k2), workMc);
+            if (approximation.subtract(value).abs().compareTo(tolerance) <= 0)
+                return best;
+            BigDecimal remainder = current.subtract(new BigDecimal(a));
+            if (remainder.compareTo(BigDecimal.ZERO) == 0)
+                return best;
+            h0 = h1;
+            h1 = h2;
+            k0 = k1;
+            k1 = k2;
+            current = BigDecimal.ONE.divide(remainder, workMc);
+        }
+        BigInteger denominator = BigInteger.TEN.pow(scale);
+        BigInteger numerator = value.movePointRight(scale).toBigInteger();
+        BigInteger gcd = gcd(numerator, denominator);
+        return new Fraction(numerator.divide(gcd), denominator.divide(gcd));
+    }
+
+    /**
+     * 正底数幂
+     *
+     * @param x        正底数
+     * @param exponent 正指数
+     * @param inverse  是否取倒数
+     * @param mc       精度
+     * @return x^exponent 或其倒数
+     */
+    private static BigDecimal powPositiveBase(BigDecimal x, BigDecimal exponent, boolean inverse, MathContext mc) {
+        BigDecimal result = roundIfCloseToInteger(exp(exponent.multiply(ln(x, mc), mc), mc), mc);
+        return inverse ? BigDecimal.ONE.divide(result, mc) : result;
+    }
+
+    /**
+     * 将非常接近整数的结果修正为整数
+     *
+     * @param value 值
+     * @param mc    精度
+     * @return 修正后的值
+     */
+    private static BigDecimal roundIfCloseToInteger(BigDecimal value, MathContext mc) {
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-Math.max(1, mc.getPrecision() - 4));
+        BigDecimal rounded = value.setScale(0, RoundingMode.HALF_UP);
+        return rounded.subtract(value).abs().compareTo(tolerance) <= 0 ? rounded : value;
+    }
+
+    /**
+     * 分数
+     */
+    private static class Fraction {
+        private final BigInteger numerator;     // 分子
+        private final BigInteger denominator;   // 分母
+
+        private Fraction(BigInteger numerator, BigInteger denominator) {
+            this.numerator = numerator;
+            this.denominator = denominator;
+        }
     }
 
     /**

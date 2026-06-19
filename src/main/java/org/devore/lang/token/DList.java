@@ -19,13 +19,6 @@ public class DList extends DToken {
     }
 
     /**
-     * 清空列表
-     */
-    public void clear() {
-        this.list.clear();
-    }
-
-    /**
      * 排序
      *
      * @param force 是否更改原列表
@@ -186,7 +179,7 @@ public class DList extends DToken {
      */
     public DList subList(int fromIndex, int toIndex, boolean force) {
         if (force) {
-            List<DToken> view = this.list.subList(fromIndex, toIndex);
+            List<DToken> view = new ArrayList<>(this.list.subList(fromIndex, toIndex));
             this.list.clear();
             this.list.addAll(view);
             return this;
