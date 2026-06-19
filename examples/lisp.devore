@@ -55,7 +55,7 @@
                                                 (begin
                                                     (set! builder (++ builder (list-get code_array index)))
                                                     (set! index (+ index 1)))))
-                                        (list-add! token builder))))]))) token))
+                                        (list-add! token builder)))))])) token))
 (def (parse tokens)
     (let ([ast (list)]
           [stack (list)]

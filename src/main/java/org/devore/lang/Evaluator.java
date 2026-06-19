@@ -22,7 +22,7 @@ public class Evaluator {
         int index = node.index;
         try {
             if (node.symbol instanceof Ast)
-                node.symbol = eval(env, (Ast) node.symbol);
+                node.symbol = eval(env, ((Ast) node.symbol).copy());
             while (true) {
                 if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString()))
                     node.symbol = env.get(node.symbol.toString());
