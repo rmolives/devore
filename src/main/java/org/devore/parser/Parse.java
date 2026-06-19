@@ -1,11 +1,11 @@
 package org.devore.parser;
 
 import org.devore.exception.DevoreParseException;
-import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class Parse {
                     continue;
                 }
                 if (token == DWord.LB) {
-                    tokens.add(index, new Lexer.SourceToken(DSymbol.valueOf("apply"), tokenIndex));
+                    tokens.add(index, new Lexer.SourceToken(Ast.empty, tokenIndex));
                     continue;
                 }
                 temp = new Ast(token);
@@ -59,7 +59,7 @@ public class Parse {
                     continue;
                 }
                 if (token == DWord.LB) {
-                    tokens.add(index, new Lexer.SourceToken(DSymbol.valueOf("apply"), tokenIndex));
+                    tokens.add(index, new Lexer.SourceToken(Ast.empty, tokenIndex));
                     continue;
                 }
                 temp = new Ast(token);
@@ -80,12 +80,20 @@ public class Parse {
                 }
                 if (stack.isEmpty())
                     throw new DevoreParseException("语法解析中栈顶为空.");
+                if (stack.peek().symbol == Ast.empty) {
+                    List<Ast> childrenCopy = new ArrayList<>(stack.peek().children);
+                    stack.peek().type = Ast.Type.PROCEDURE;
+                    stack.peek().symbol = stack.peek().children.isEmpty() ? Ast.empty : stack.peek().children.get(0);
+                    stack.peek().children = stack.peek().children.size() > 1 ? childrenCopy.subList(1, childrenCopy.size()) : new ArrayList<>();
+                }
                 stack.pop();
             } else {
                 if (stack.isEmpty())
                     throw new DevoreParseException("语法解析中栈顶为空.");
                 temp = new Ast(token);
                 temp.index = tokenIndex;
+                if (stack.peek() == null)
+                    throw new DevoreParseException("语法解析中栈顶为null.");
                 stack.peek().add(temp);
             }
             ++index;

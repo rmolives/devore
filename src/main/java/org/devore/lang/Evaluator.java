@@ -21,6 +21,8 @@ public class Evaluator {
         String expression = node.toString();
         int index = node.index;
         try {
+            if (node.symbol instanceof Ast)
+                node.symbol = eval(env, (Ast) node.symbol);
             while (true) {
                 if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString()))
                     node.symbol = env.get(node.symbol.toString());

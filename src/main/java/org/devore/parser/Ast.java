@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 抽象语法树
  */
-public class Ast {
+public class Ast extends DToken {
     public final static Ast empty = new Ast(DWord.NIL);         // 空白语法树
     public List<Ast> children;                                  // 子树
     public DToken symbol;                                       // 符号
@@ -129,13 +129,13 @@ public class Ast {
         return this.symbol != DWord.NIL;
     }
 
-    /**
-     * 转换为字符串
-     *
-     * @return 字符串
-     */
     @Override
-    public String toString() {
+    public String type() {
+        return "ast";
+    }
+
+    @Override
+    protected String str() {
         StringBuilder builder = new StringBuilder();
         if (this.isEmpty()) {
             if (this.symbol instanceof DString)
@@ -155,6 +155,21 @@ public class Ast {
             builder.append(")");
         }
         return builder.toString();
+    }
+
+    @Override
+    public int compareTo(DToken t) {
+        return t instanceof Ast && t.hashCode() == this.hashCode() ? -1 : 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = this.type().hashCode();
+        result = 31 * result + this.symbol.hashCode();
+        result = 31 * result + this.children.hashCode();
+        result = 31 * result + this.type.hashCode();
+        result = 31 * result + this.index;
+        return result;
     }
 
     /**

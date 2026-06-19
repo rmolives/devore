@@ -425,7 +425,10 @@ public class Core {
         }), 2, true);
         dEnv.addAstProcedure("let", ((ast, env) -> {
             Env newEnv = env.createChild();
-            for (Ast node : ast.get(0).children) {
+            List<Ast> nodes = ast.get(0).children;
+            if (ast.get(0).symbol instanceof Ast)
+                nodes.add(0, (Ast) ast.get(0).symbol);
+            for (Ast node : nodes) {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
                 if (node.children.size() != 1)
@@ -439,7 +442,10 @@ public class Core {
         }), 2, true);
         dEnv.addAstProcedure("let*", ((ast, env) -> {
             Env newEnv = env.createChild();
-            for (Ast node : ast.get(0).children) {
+            List<Ast> nodes = ast.get(0).children;
+            if (ast.get(0).symbol instanceof Ast)
+                nodes.add(0, (Ast) ast.get(0).symbol);
+            for (Ast node : nodes) {
                 if (!(node.symbol instanceof DSymbol))
                     throw new DevoreCastException(node.symbol.type(), "symbol");
                 if (node.children.size() != 1)
@@ -547,10 +553,8 @@ public class Core {
                         result = Evaluator.eval(env, node.get(i).copy());
                     break;
                 } else {
-                    if (!(node.symbol instanceof DSymbol && "apply".equals(node.symbol.toString()))) {
+                    if (node.symbol instanceof Ast)
                         node.add(0, new Ast(node.symbol));
-                        node.symbol = DSymbol.valueOf("apply");
-                    }
                     DToken condition = Evaluator.eval(env, node.get(0).copy());
                     if (!(condition instanceof DBool))
                         throw new DevoreCastException(condition.type(), "bool");
