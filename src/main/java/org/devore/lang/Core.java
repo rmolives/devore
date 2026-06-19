@@ -553,14 +553,12 @@ public class Core {
                         result = Evaluator.eval(env, node.get(i).copy());
                     break;
                 } else {
-                    if (node.symbol instanceof Ast)
-                        node.add(0, new Ast(node.symbol));
-                    DToken condition = Evaluator.eval(env, node.get(0).copy());
+                    DToken condition = Evaluator.eval(env, new Ast(node.symbol).copy());
                     if (!(condition instanceof DBool))
                         throw new DevoreCastException(condition.type(), "bool");
                     if (((DBool) condition).bool) {
-                        for (int i = 1; i < node.size(); ++i)
-                            result = Evaluator.eval(env, node.get(i).copy());
+                        for (Ast temp : node.children)
+                            result = Evaluator.eval(env, temp.copy());
                         break;
                     }
                 }
