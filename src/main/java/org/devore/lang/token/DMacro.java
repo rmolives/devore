@@ -84,10 +84,8 @@ public class DMacro extends DToken {
         int paramIndex = paramIndex(body.symbol);
         if (paramIndex >= 0 && body.isEmpty())
             return nodes.get(paramIndex).copy();
-        if (paramIndex >= 0) {
-            body.symbol = DSymbol.valueOf("apply");
-            body.add(0, nodes.get(paramIndex).copy());
-        }
+        if (paramIndex >= 0)
+            body.symbol = nodes.get(paramIndex).copy();
         for (int i = 0; i < body.size(); ++i) {
             body.set(i, expand(body.get(i), nodes));
         }
