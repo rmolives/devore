@@ -65,9 +65,9 @@ public class Repl {
                 continue;
             try {
                 DToken result = Devore.call(env, code, "<#" + sourceIndex + ">");
-                codeBuilder = new StringBuilder();
                 if (result != DWord.NIL)
                     out.println(result.toString());
+                codeBuilder = new StringBuilder();
             } catch (DevoreRuntimeException e) {
                 out.println(e.getMessage());
                 codeBuilder = new StringBuilder();
