@@ -160,24 +160,44 @@ public class Ast extends DToken {
     @Override
     protected String str() {
         StringBuilder builder = new StringBuilder();
+        this.appendTo(builder);
+        return builder.toString();
+    }
+
+    /**
+     * 将语法树追加到builder
+     *
+     * @param builder 字符串构造器
+     */
+    private void appendTo(StringBuilder builder) {
         if (this.isEmpty()) {
             if (this.symbol instanceof DString)
-                builder.append("\"").append(this.symbol).append("\"");
+                this.appendSymbolTo(builder);
             else if (this.type == Type.PROCEDURE)
                 builder.append("(").append(this.symbol).append(")");
             else
                 builder.append(this.symbol);
         } else {
             builder.append("(");
-            if (this.symbol instanceof DString)
-                builder.append("\"").append(this.symbol).append("\"");
-            else
-                builder.append(this.symbol);
-            for (Ast node : this.children)
-                builder.append(" ").append(node.toString());
+            this.appendSymbolTo(builder);
+            for (Ast node : this.children) {
+                builder.append(" ");
+                node.appendTo(builder);
+            }
             builder.append(")");
         }
-        return builder.toString();
+    }
+
+    /**
+     * 将语法树symbol追加到builder
+     *
+     * @param builder 字符串构造器
+     */
+    private void appendSymbolTo(StringBuilder builder) {
+        if (this.symbol instanceof DString)
+            builder.append("\"").append(this.symbol).append("\"");
+        else
+            builder.append(this.symbol);
     }
 
     @Override
