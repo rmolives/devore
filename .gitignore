@@ -6,6 +6,8 @@ build/
 
 ### IntelliJ IDEA ###
 .idea/
+.agents/
+.codex/
 
 ### Eclipse ###
 .apt_generated
