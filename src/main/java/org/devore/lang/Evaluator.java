@@ -53,10 +53,11 @@ public class Evaluator {
                 }
             return node.symbol;
         } catch (StackOverflowError e) {
-            throw new DevoreRuntimeException("栈溢出，可能存在无限递归或递归宏展开.", expression, index);
+            throw new DevoreRuntimeException("栈溢出，可能存在无限递归或递归宏展开.",
+                    expression, index, node.source, node.code);
         } catch (DevoreRuntimeException e) {
-            e.setExpressionIfAbsent(expression, index);
-            e.addFrameIfAbsent(expression, index);
+            e.setExpressionIfAbsent(expression, index, node.source, node.code);
+            e.addFrameIfAbsent(expression, index, node.source, node.code);
             throw e;
         }
     }

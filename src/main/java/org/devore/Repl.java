@@ -22,14 +22,15 @@ public class Repl {
     public static void repl(Env env) throws IOException {
         PrintStream out = env.io.out;
         StringBuilder codeBuilder = new StringBuilder();
+        int sourceIndex = 0;
         label:
         while (true) {
             if (codeBuilder.length() == 0 && !env.io.reader.ready())
-                out.print("[Devore] >>> ");
+                out.print("[Devore#" + ++sourceIndex + "] >>> ");
             String read = env.io.reader.readLine();
             if (read == null) {
                 if (codeBuilder.length() > 0)
-                    printError(out, codeBuilder.toString());
+                    printError(out, codeBuilder.toString(), sourceIndex);
                 break;
             }
             if (codeBuilder.length() == 0) {
@@ -63,7 +64,7 @@ public class Repl {
             if (isIncomplete(code))
                 continue;
             try {
-                DToken result = Devore.call(env, code, "<repl>");
+                DToken result = Devore.call(env, code, "<#" + sourceIndex + ">");
                 codeBuilder = new StringBuilder();
                 if (result != DWord.NIL)
                     out.println(result.toString());
@@ -122,9 +123,9 @@ public class Repl {
      * @param out  输出
      * @param code 代码
      */
-    private static void printError(PrintStream out, String code) {
+    private static void printError(PrintStream out, String code, int sourceIndex) {
         try {
-            Devore.call(Env.newEnv(), code, "<repl>");
+            Devore.call(Env.newEnv(), code, "<#" +  sourceIndex + ">");
         } catch (DevoreRuntimeException e) {
             out.println(e.getMessage());
         }

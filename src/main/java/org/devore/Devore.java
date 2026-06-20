@@ -8,6 +8,7 @@ import org.devore.lang.token.DWord;
 import org.devore.parser.Lexer;
 import org.devore.parser.Parse;
 import org.devore.exception.DevoreParseException;
+import org.devore.parser.Ast;
 
 import java.util.List;
 
@@ -35,7 +36,9 @@ public class Devore {
         DToken result = DWord.NIL;
         for (Lexer.SourceExpression exp : codes) {
             try {
-                result = Evaluator.eval(env, Parse.parse(Lexer.lexer(exp.expression, exp.startIndex)));
+                Ast ast = Parse.parse(Lexer.lexer(exp.expression, exp.startIndex));
+                ast.setSource(source, code);
+                result = Evaluator.eval(env, ast);
             } catch (StackOverflowError e) {
                 throw new DevoreRuntimeException(formatError(code, source, exp,
                         new StackOverflowError("栈溢出，可能存在无限递归或递归宏展开.")));
@@ -61,8 +64,15 @@ public class Devore {
 
     private static String formatError(String code, String source, int index, String expression, Throwable e) {
         String message = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-        if (e instanceof DevoreRuntimeException && ((DevoreRuntimeException) e).index() >= 0)
-            index = ((DevoreRuntimeException) e).index();
+        if (e instanceof DevoreRuntimeException) {
+            DevoreRuntimeException runtimeException = (DevoreRuntimeException) e;
+            if (runtimeException.index() >= 0)
+                index = runtimeException.index();
+            if (runtimeException.source() != null)
+                source = runtimeException.source();
+            if (runtimeException.code() != null)
+                code = runtimeException.code();
+        }
         Position position = position(code, index);
         StringBuilder builder = new StringBuilder()
                 .append("错误位置: ").append(source).append(":").append(position.line).append(":").append(position.column).append("\n");
@@ -76,9 +86,11 @@ public class Devore {
             List<DevoreRuntimeException.Frame> trace = ((DevoreRuntimeException) e).trace();
             for (int i = trace.size() - 1; i >= 0; --i) {
                 DevoreRuntimeException.Frame frame = trace.get(i);
-                Position framePosition = position(code, frame.index);
+                String frameSource = frame.source == null ? source : frame.source;
+                String frameCode = frame.code == null ? code : frame.code;
+                Position framePosition = position(frameCode, frame.index);
                 builder.append("  at ")
-                        .append(source).append(":").append(framePosition.line).append(":").append(framePosition.column)
+                        .append(frameSource).append(":").append(framePosition.line).append(":").append(framePosition.column)
                         .append(" ").append(preview(frame.expression)).append("\n");
             }
         }
