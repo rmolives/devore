@@ -3,6 +3,7 @@ package org.devore.exception;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 运行错误
@@ -72,7 +73,7 @@ public class DevoreRuntimeException extends RuntimeException {
         if (expression == null || expression.isEmpty())
             return;
         if (!this.trace.isEmpty()) {
-            Frame last = this.trace.getLast();
+            Frame last = this.trace.get(this.trace.size() - 1);
             if (last.expression.equals(expression) && last.index == index && equals(last.source, source))
                 return;
         }
@@ -98,6 +99,6 @@ public class DevoreRuntimeException extends RuntimeException {
     }
 
     private static boolean equals(String left, String right) {
-        return left == null ? right == null : left.equals(right);
+        return Objects.equals(left, right);
     }
 }
