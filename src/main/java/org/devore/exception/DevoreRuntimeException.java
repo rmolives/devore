@@ -74,7 +74,8 @@ public class DevoreRuntimeException extends RuntimeException {
             return;
         if (!this.trace.isEmpty()) {
             Frame last = this.trace.get(this.trace.size() - 1);
-            if (last.expression.equals(expression) && last.index == index && equals(last.source, source))
+            if (last.expression.equals(expression) && last.index == index
+                    && Objects.equals(last.source, source))
                 return;
         }
         this.trace.add(new Frame(expression, index, source, code));
@@ -96,9 +97,5 @@ public class DevoreRuntimeException extends RuntimeException {
             this.source = source;
             this.code = code;
         }
-    }
-
-    private static boolean equals(String left, String right) {
-        return Objects.equals(left, right);
     }
 }
