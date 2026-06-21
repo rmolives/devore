@@ -606,15 +606,15 @@ public class Core {
             return result;
         }, 2, true);
         dEnv.addTokenProcedure("read-line", ((args, env) ->
-                DString.valueOf(env.io.readLine())), 0, false);
+                DString.valueOf(env.io.scanner.nextLine())), 0, false);
         dEnv.addTokenProcedure("read-int", ((args, env) ->
-                DNumber.valueOf(env.io.readBigInteger())), 0, false);
+                DNumber.valueOf(env.io.scanner.nextBigInteger())), 0, false);
         dEnv.addTokenProcedure("read-float", ((args, env) ->
-                DNumber.valueOf(env.io.readBigDecimal())), 0, false);
+                DNumber.valueOf(env.io.scanner.nextBigDecimal())), 0, false);
         dEnv.addTokenProcedure("read-bool", ((args, env) ->
-                DBool.valueOf(env.io.readBoolean())), 0, false);
+                DBool.valueOf(env.io.scanner.nextBoolean())), 0, false);
         dEnv.addTokenProcedure("read", ((args, env) ->
-                DString.valueOf(env.io.read())), 0, false);
+                DString.valueOf(env.io.scanner.next())), 0, false);
         dEnv.addTokenProcedure("newline", ((args, env) -> {
             env.io.out.println();
             return DWord.NIL;
