@@ -1202,7 +1202,7 @@ public class Core {
             String s = args.get(0).toString();
             int index = DIntUtils.toIndex((DInt) args.get(1));
             if (index >= s.length())
-                throw new DevoreRuntimeException("字符串访问过界, 下标=" + index + ", 但列表只有" + s.length() + "个字符.");
+                throw new DevoreRuntimeException("字符串访问过界, 下标=" + index + ", 但字符串只有" + s.length() + "个字符.");
             return DString.valueOf(String.valueOf(args.get(0).toString().toCharArray()[index]));
         }), 2, false);
         dEnv.addTokenProcedure("string-sub", ((args, env) -> {
@@ -1213,7 +1213,7 @@ public class Core {
             String s = args.get(0).toString();
             int fromIndex = DIntUtils.toIndex((DInt) args.get(1));
             if (fromIndex >= s.length() || fromIndex < 0)
-                throw new DevoreRuntimeException("字符串截取过界, 下标=" + fromIndex + ", 但列表只有" + s.length() + "个字符.");
+                throw new DevoreRuntimeException("字符串截取过界, 下标=" + fromIndex + ", 但字符串只有" + s.length() + "个字符.");
             return DString.valueOf(s.substring(fromIndex));
         }), 2, false);
         dEnv.addTokenProcedure("string-sub", ((args, env) -> {
@@ -1226,12 +1226,12 @@ public class Core {
             String s = args.get(0).toString();
             int fromIndex = DIntUtils.toIndex((DInt) args.get(1));
             int toIndex = DIntUtils.toIndex((DInt) args.get(2));
-            if (toIndex > fromIndex)
+            if (fromIndex > toIndex)
                 throw new DevoreRuntimeException("字符串截取起始下标大于目标下标.");
             if (fromIndex >= s.length() || fromIndex < 0)
-                throw new DevoreRuntimeException("字符串截取过界, 下标=" + fromIndex + ", 但列表只有" + s.length() + "个字符.");
-            if (toIndex < 0)
-                throw new DevoreRuntimeException("字符串截取过界, 下标=" + toIndex + ", 但列表只有" + s.length() + "个字符.");
+                throw new DevoreRuntimeException("字符串截取过界, 下标=" + fromIndex + ", 但字符串只有" + s.length() + "个字符.");
+            if (toIndex >= s.length())
+                throw new DevoreRuntimeException("字符串截取过界, 下标=" + toIndex + ", 但字符串只有" + s.length() + "个字符.");
             return DString.valueOf(s.substring(fromIndex, toIndex));
         }), 3, false);
     }

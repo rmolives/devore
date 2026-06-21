@@ -11,9 +11,12 @@ import java.math.RoundingMode;
  * 数学工具
  */
 public class NumberUtils {
+    public static final MathContext DEFAULT_CONTEXT = new MathContext(
+            MathContext.DECIMAL128.getPrecision() * 2,
+            MathContext.DECIMAL128.getRoundingMode());                                   // 默认计算精度
     private static final BigDecimal TWO = BigDecimal.valueOf(2);                                // 2
     private static final BigDecimal PI = approximatePi();                                       // Pi
-    private static final BigDecimal TWO_PI = PI.multiply(TWO, MathContext.DECIMAL128);          // Pi * 2
+    private static final BigDecimal TWO_PI = PI.multiply(TWO, DEFAULT_CONTEXT);                 // Pi * 2
 
     /**
      * gcd(a, b)
@@ -48,19 +51,35 @@ public class NumberUtils {
     }
 
     /**
+     * 精确除法, 仅在结果为无限小数时使用指定精度近似.
+     *
+     * @param a  被除数
+     * @param b  除数
+     * @param mc 精度
+     * @return a / b
+     */
+    public static BigDecimal divide(BigDecimal a, BigDecimal b, MathContext mc) {
+        try {
+            return a.divide(b);
+        } catch (ArithmeticException e) {
+            return a.divide(b, mc);
+        }
+    }
+
+    /**
      * 将 π 近似
      *
      * @return π 近似值
      */
     private static BigDecimal approximatePi() {
-        MathContext extendedMc = new MathContext(MathContext.DECIMAL128.getPrecision() + 10,
-                MathContext.DECIMAL128.getRoundingMode());
+        MathContext extendedMc = new MathContext(DEFAULT_CONTEXT.getPrecision() + 10,
+                DEFAULT_CONTEXT.getRoundingMode());
         BigDecimal term1 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(5), extendedMc), extendedMc);
         BigDecimal term2 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(239), extendedMc), extendedMc);
         BigDecimal pi = BigDecimal.valueOf(4).multiply(
                 BigDecimal.valueOf(4).multiply(term1, extendedMc)
                         .subtract(term2, extendedMc), extendedMc);
-        return pi.round(MathContext.DECIMAL128);
+        return pi.round(DEFAULT_CONTEXT);
     }
 
     /**
@@ -589,6 +608,9 @@ public class NumberUtils {
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ONE;
+        BigDecimal exact = exactNthRoot(x, 2);
+        if (exact != null)
+            return exact;
         BigDecimal guess = x.divide(TWO, mc);
         BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
         BigDecimal lastGuess;
@@ -609,6 +631,9 @@ public class NumberUtils {
     public static BigDecimal cbrt(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
+        BigDecimal exact = exactNthRoot(x, 3);
+        if (exact != null)
+            return exact;
         boolean negative = x.compareTo(BigDecimal.ZERO) < 0;
         BigDecimal absX = negative ? x.negate() : x;
         BigDecimal guess = absX.divide(BigDecimal.valueOf(3), mc);
@@ -645,11 +670,18 @@ public class NumberUtils {
         if (isInt(y))
             return powInt(x, y.toBigInteger(), mc);
         Fraction exponent = approximateFraction(y.abs(), mc);
-        BigDecimal exponentValue = new BigDecimal(exponent.numerator).divide(new BigDecimal(exponent.denominator), mc);
+        if (x.compareTo(BigDecimal.ZERO) < 0
+                && !exponent.denominator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
+            throw new DevoreRuntimeException("x^y要求但y为非整数且分母为偶数时, x不能为负数.");
+        BigDecimal exact = powRationalExact(x.abs(), exponent, y.signum() < 0, mc);
+        if (exact != null) {
+            if (x.compareTo(BigDecimal.ZERO) < 0 && exponent.numerator.testBit(0))
+                exact = exact.negate();
+            return exact;
+        }
+        BigDecimal exponentValue = divide(new BigDecimal(exponent.numerator), new BigDecimal(exponent.denominator), mc);
         if (x.compareTo(BigDecimal.ZERO) > 0)
             return powPositiveBase(x, exponentValue, y.signum() < 0, mc);
-        if (!exponent.denominator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
-            throw new DevoreRuntimeException("x^y要求但y为非整数且分母为偶数时, x不能为负数.");
         BigDecimal result = powPositiveBase(x.abs(), exponentValue, y.signum() < 0, mc);
         if (exponent.numerator.testBit(0))
             result = result.negate();
@@ -713,7 +745,30 @@ public class NumberUtils {
      */
     private static BigDecimal powPositiveBase(BigDecimal x, BigDecimal exponent, boolean inverse, MathContext mc) {
         BigDecimal result = roundIfCloseToInteger(exp(exponent.multiply(ln(x, mc), mc), mc), mc);
-        return inverse ? BigDecimal.ONE.divide(result, mc) : result;
+        return inverse ? divide(BigDecimal.ONE, result, mc) : result;
+    }
+
+    /**
+     * 有理数指数幂的精确路径.
+     *
+     * @param x        非负底数
+     * @param exponent 指数的绝对值
+     * @param inverse  是否取倒数
+     * @param mc       精度
+     * @return 可精确表示时返回精确结果, 否则返回null
+     */
+    private static BigDecimal powRationalExact(BigDecimal x, Fraction exponent, boolean inverse, MathContext mc) {
+        if (exponent.denominator.equals(BigInteger.ONE)) {
+            BigDecimal result = powInt(x, exponent.numerator, mc);
+            return inverse ? divide(BigDecimal.ONE, result, mc) : result;
+        }
+        if (exponent.denominator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
+            return null;
+        BigDecimal root = exactNthRoot(x, exponent.denominator.intValue());
+        if (root == null)
+            return null;
+        BigDecimal result = powInt(root, exponent.numerator, mc);
+        return inverse ? divide(BigDecimal.ONE, result, mc) : result;
     }
 
     /**
@@ -754,17 +809,80 @@ public class NumberUtils {
         if (y.signum() == 0)
             return BigDecimal.ONE;
         if (y.signum() < 0)
-            return BigDecimal.ONE.divide(powInt(x, y.negate(), mc), mc);
+            return divide(BigDecimal.ONE, powInt(x, y.negate(), mc), mc);
         BigDecimal result = BigDecimal.ONE;
         BigDecimal base = x;
         BigInteger exp = y;
         while (exp.signum() > 0) {
             if (exp.testBit(0))
-                result = result.multiply(base, mc);
-            base = base.multiply(base, mc);
+                result = result.multiply(base);
+            base = base.multiply(base);
             exp = exp.shiftRight(1);
         }
         return result;
+    }
+
+    /**
+     * 有限小数的精确n次根.
+     *
+     * @param value 值
+     * @param n     根次数
+     * @return 存在有限小数精确结果时返回结果, 否则返回null
+     */
+    private static BigDecimal exactNthRoot(BigDecimal value, int n) {
+        if (n <= 0)
+            throw new DevoreRuntimeException("n次根要求n为正数.");
+        if (n > 10000)
+            return null;
+        if (value.compareTo(BigDecimal.ZERO) == 0)
+            return BigDecimal.ZERO;
+        boolean negative = value.compareTo(BigDecimal.ZERO) < 0;
+        if (negative && n % 2 == 0)
+            return null;
+        BigDecimal normalized = value.abs().stripTrailingZeros();
+        BigInteger unscaled = normalized.unscaledValue();
+        int scale = normalized.scale();
+        if (scale < 0) {
+            unscaled = unscaled.multiply(BigInteger.TEN.pow(-scale));
+            scale = 0;
+        }
+        int padding = Math.floorMod(-scale, n);
+        if (padding > 0) {
+            unscaled = unscaled.multiply(BigInteger.TEN.pow(padding));
+            scale += padding;
+        }
+        BigInteger root = integerNthRootExact(unscaled, n);
+        if (root == null)
+            return null;
+        BigDecimal result = new BigDecimal(root, scale / n).stripTrailingZeros();
+        return negative ? result.negate() : result;
+    }
+
+    /**
+     * 整数精确n次根.
+     *
+     * @param value 非负整数
+     * @param n     根次数
+     * @return 存在整数精确结果时返回结果, 否则返回null
+     */
+    private static BigInteger integerNthRootExact(BigInteger value, int n) {
+        if (value.signum() < 0)
+            return null;
+        if (value.equals(BigInteger.ZERO) || value.equals(BigInteger.ONE))
+            return value;
+        BigInteger low = BigInteger.ONE;
+        BigInteger high = BigInteger.ONE.shiftLeft((value.bitLength() + n - 1) / n);
+        while (low.compareTo(high) <= 0) {
+            BigInteger mid = low.add(high).shiftRight(1);
+            int compare = mid.pow(n).compareTo(value);
+            if (compare == 0)
+                return mid;
+            if (compare < 0)
+                low = mid.add(BigInteger.ONE);
+            else
+                high = mid.subtract(BigInteger.ONE);
+        }
+        return null;
     }
 
     /**
@@ -807,7 +925,39 @@ public class NumberUtils {
             throw new DevoreRuntimeException("log_b(a)要求b为正数.");
         if (b.compareTo(BigDecimal.ONE) == 0)
             throw new DevoreRuntimeException("log_b(a)要求b不能为1.");
-        return ln(a, mc).divide(ln(b, mc), mc);
+        BigDecimal exact = exactIntegerLog(a, b);
+        if (exact != null)
+            return exact;
+        return roundIfCloseToInteger(divide(ln(a, mc), ln(b, mc), mc), mc);
+    }
+
+    /**
+     * 正整数之间的精确对数.
+     *
+     * @param a 真数
+     * @param b 底数
+     * @return a为b的整数次幂时返回指数, 否则返回null
+     */
+    private static BigDecimal exactIntegerLog(BigDecimal a, BigDecimal b) {
+        BigDecimal normalizedA = a.stripTrailingZeros();
+        BigDecimal normalizedB = b.stripTrailingZeros();
+        if (!isInt(normalizedA) || !isInt(normalizedB))
+            return null;
+        BigInteger value = normalizedA.toBigInteger();
+        BigInteger base = normalizedB.toBigInteger();
+        if (value.signum() <= 0 || base.compareTo(BigInteger.ONE) <= 0)
+            return null;
+        if (value.equals(BigInteger.ONE))
+            return BigDecimal.ZERO;
+        int exponent = 0;
+        while (value.compareTo(BigInteger.ONE) > 0) {
+            BigInteger[] divRem = value.divideAndRemainder(base);
+            if (divRem[1].signum() != 0)
+                return null;
+            value = divRem[0];
+            ++exponent;
+        }
+        return BigDecimal.valueOf(exponent);
     }
 
     /**
