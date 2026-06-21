@@ -1078,6 +1078,23 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DString))
                 throw new DevoreCastException(args.get(1).type(), "string");
+            String str = args.get(0).toString();
+            String sep = args.get(1).toString();
+            List<DToken> list = new ArrayList<>();
+            int start = 0;
+            int pos;
+            while ((pos = str.indexOf(sep, start)) != -1) {
+                list.add(DString.valueOf(str.substring(start, pos)));
+                start = pos + sep.length();
+            }
+            list.add(DString.valueOf(str.substring(start)));
+            return DList.valueOf(list);
+        }), 2, false);
+        dEnv.addTokenProcedure("string-split-regex", ((args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            if (!(args.get(1) instanceof DString))
+                throw new DevoreCastException(args.get(1).type(), "string");
             return DList.valueOf(Arrays.stream(args.get(0).toString()
                             .split(args.get(1).toString())).map(DString::valueOf)
                     .collect(Collectors.toList()));
