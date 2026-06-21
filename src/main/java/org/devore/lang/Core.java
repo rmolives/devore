@@ -338,8 +338,11 @@ public class Core {
             return DWord.NIL;
         }), 1, true);
         dEnv.addTokenProcedure("error", ((args, env) -> {
-            throw new DevoreRuntimeException(args.get(0).toString());
-        }), 1, false);
+            StringBuilder builder = new StringBuilder();
+            for (DToken t : args)
+                builder.append(t);
+            throw new DevoreRuntimeException(builder.toString());
+        }), 1, true);
         dEnv.addAstProcedure("undef", ((ast, env) -> {
             for (Ast child : ast.children) {
                 if (!(child.symbol instanceof DSymbol))
