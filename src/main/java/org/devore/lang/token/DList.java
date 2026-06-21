@@ -1,5 +1,7 @@
 package org.devore.lang.token;
 
+import org.devore.exception.DevoreRuntimeException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,6 +94,8 @@ public class DList extends DToken {
      * @return 元素
      */
     public DToken get(int index) {
+        if (index >= this.list.size())
+            throw new DevoreRuntimeException("列表访问过界, 下标=" + index + ", 但列表只有" + this.list.size() + "个元素.");
         return this.list.get(index);
     }
 
@@ -121,6 +125,8 @@ public class DList extends DToken {
      * @return 结果
      */
     public DList remove(int index, boolean force) {
+        if (index >= this.list.size())
+            throw new DevoreRuntimeException("列表删除过界, 下标=" + index + ", 但列表只有" + this.list.size() + "个元素.");
         if (force) {
             this.list.remove(index);
             return this;
@@ -178,6 +184,12 @@ public class DList extends DToken {
      * @return 截取后的列表
      */
     public DList subList(int fromIndex, int toIndex, boolean force) {
+        if (toIndex > fromIndex)
+            throw new DevoreRuntimeException("列表截取起始下标大于目标下标.");
+        if (fromIndex >= this.list.size() || fromIndex < 0)
+            throw new DevoreRuntimeException("列表截取过界, 下标=" + fromIndex + ", 但列表只有" + this.list.size() + "个元素.");
+        if (toIndex < 0)
+            throw new DevoreRuntimeException("列表截取过界, 下标=" + toIndex + ", 但列表只有" + this.list.size() + "个元素.");
         if (force) {
             List<DToken> view = new ArrayList<>(this.list.subList(fromIndex, toIndex));
             this.list.clear();
