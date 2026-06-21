@@ -337,6 +337,9 @@ public class Core {
             env.io.err.print(builder);
             return DWord.NIL;
         }), 1, true);
+        dEnv.addTokenProcedure("error", ((args, env) -> {
+            throw new DevoreRuntimeException(args.get(0).toString());
+        }), 1, false);
         dEnv.addAstProcedure("undef", ((ast, env) -> {
             for (Ast child : ast.children) {
                 if (!(child.symbol instanceof DSymbol))
