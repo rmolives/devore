@@ -613,7 +613,7 @@ public class Core {
             env.io.out.println();
             return DWord.NIL;
         }), 0, false);
-        dEnv.addTokenProcedure("newline", ((args, env) -> {
+        dEnv.addTokenProcedure("error-newline", ((args, env) -> {
             env.io.err.println();
             return DWord.NIL;
         }), 0, false);
