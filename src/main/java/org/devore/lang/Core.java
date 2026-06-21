@@ -4,6 +4,7 @@ import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.*;
 import org.devore.parser.Ast;
+import org.devore.utils.DIntUtils;
 import org.devore.utils.NumberUtils;
 
 import java.math.BigDecimal;
@@ -253,7 +254,7 @@ public class Core {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             return DBool.valueOf(((DInt) args.get(0)).toBigInteger()
-                    .isProbablePrime(toInt((DInt) args.get(1))));
+                    .isProbablePrime(DIntUtils.toInt((DInt) args.get(1))));
         }), 2, false);
         dEnv.addTokenProcedure("gcd", ((args, env) -> {
             for (DToken arg : args)
@@ -682,21 +683,21 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            return ((DList) args.get(0)).get(toIndex((DInt) args.get(1)));
+            return ((DList) args.get(0)).get(DIntUtils.toIndex((DInt) args.get(1)));
         }), 2, false);
         dEnv.addTokenProcedure("list-set", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            return ((DList) args.get(0)).set(toIndex((DInt) args.get(1)), args.get(2), false);
+            return ((DList) args.get(0)).set(DIntUtils.toIndex((DInt) args.get(1)), args.get(2), false);
         }), 3, false);
         dEnv.addTokenProcedure("list-remove", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            return ((DList) args.get(0)).remove(toIndex((DInt) args.get(1)), false);
+            return ((DList) args.get(0)).remove(DIntUtils.toIndex((DInt) args.get(1)), false);
         }), 2, false);
         dEnv.addTokenProcedure("list-add", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -708,21 +709,21 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            return ((DList) args.get(0)).add(toIndex((DInt) args.get(1)), args.get(2), false);
+            return ((DList) args.get(0)).add(DIntUtils.toIndex((DInt) args.get(1)), args.get(2), false);
         }), 3, false);
         dEnv.addTokenProcedure("list-set!", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            return ((DList) args.get(0)).set(toIndex((DInt) args.get(1)), args.get(2), true);
+            return ((DList) args.get(0)).set(DIntUtils.toIndex((DInt) args.get(1)), args.get(2), true);
         }), 3, false);
         dEnv.addTokenProcedure("list-remove!", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            return ((DList) args.get(0)).remove(toIndex((DInt) args.get(1)), true);
+            return ((DList) args.get(0)).remove(DIntUtils.toIndex((DInt) args.get(1)), true);
         }), 2, false);
         dEnv.addTokenProcedure("list-add!", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -734,7 +735,7 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "list");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            return ((DList) args.get(0)).add(toIndex((DInt) args.get(1)), args.get(2), true);
+            return ((DList) args.get(0)).add(DIntUtils.toIndex((DInt) args.get(1)), args.get(2), true);
         }), 3, false);
         dEnv.addTokenProcedure("head", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -773,8 +774,8 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(2) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            return ((DList) args.get(0)).subList(toIndex((DInt) args.get(1)),
-                    toIndex((DInt) args.get(2)), false);
+            return ((DList) args.get(0)).subList(DIntUtils.toIndex((DInt) args.get(1)),
+                    DIntUtils.toIndex((DInt) args.get(2)), false);
         }), 3, false);
         dEnv.addTokenProcedure("list-sub!", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -783,8 +784,8 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "int");
             if (!(args.get(2) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            return ((DList) args.get(0)).subList(toIndex((DInt) args.get(1)),
-                    toIndex((DInt) args.get(2)), true);
+            return ((DList) args.get(0)).subList(DIntUtils.toIndex((DInt) args.get(1)),
+                    DIntUtils.toIndex((DInt) args.get(2)), true);
         }), 3, false);
         dEnv.addTokenProcedure("reverse", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -965,12 +966,12 @@ public class Core {
         dEnv.addTokenProcedure("unicode->char", ((args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            return DString.valueOf(String.valueOf((char) toInt((DInt) args.get(0))));
+            return DString.valueOf(String.valueOf((char) DIntUtils.toInt((DInt) args.get(0))));
         }), 1, false);
         dEnv.addTokenProcedure("exit", ((args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            System.exit(toInt((DInt) args.get(0)));
+            System.exit(DIntUtils.toInt((DInt) args.get(0)));
             return DWord.NIL;
         }), 1, false);
         dEnv.addTokenProcedure("sleep", ((args, env) -> {
@@ -1199,7 +1200,7 @@ public class Core {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             String s = args.get(0).toString();
-            int index = toIndex((DInt) args.get(1));
+            int index = DIntUtils.toIndex((DInt) args.get(1));
             if (index >= s.length())
                 throw new DevoreRuntimeException("字符串访问过界, 下标=" + index + ", 但列表只有" + s.length() + "个字符.");
             return DString.valueOf(String.valueOf(args.get(0).toString().toCharArray()[index]));
@@ -1210,7 +1211,7 @@ public class Core {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             String s = args.get(0).toString();
-            int fromIndex = toIndex((DInt) args.get(1));
+            int fromIndex = DIntUtils.toIndex((DInt) args.get(1));
             if (fromIndex >= s.length() || fromIndex < 0)
                 throw new DevoreRuntimeException("字符串截取过界, 下标=" + fromIndex + ", 但列表只有" + s.length() + "个字符.");
             return DString.valueOf(s.substring(fromIndex));
@@ -1223,8 +1224,8 @@ public class Core {
             if (!(args.get(2) instanceof DInt))
                 throw new DevoreCastException(args.get(2).type(), "int");
             String s = args.get(0).toString();
-            int fromIndex = toIndex((DInt) args.get(1));
-            int toIndex = toIndex((DInt) args.get(2));
+            int fromIndex = DIntUtils.toIndex((DInt) args.get(1));
+            int toIndex = DIntUtils.toIndex((DInt) args.get(2));
             if (toIndex > fromIndex)
                 throw new DevoreRuntimeException("字符串截取起始下标大于目标下标.");
             if (fromIndex >= s.length() || fromIndex < 0)
@@ -1233,22 +1234,6 @@ public class Core {
                 throw new DevoreRuntimeException("字符串截取过界, 下标=" + toIndex + ", 但列表只有" + s.length() + "个字符.");
             return DString.valueOf(s.substring(fromIndex, toIndex));
         }), 3, false);
-    }
-
-    private static int toInt(DInt value) {
-        BigInteger integer = value.toBigInteger();
-        if (integer.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0
-                || integer.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
-            throw new DevoreRuntimeException("整数超出int范围: " + integer + ".");
-        return integer.intValue();
-    }
-
-    private static int toIndex(DInt value) {
-        BigInteger integer = value.toBigInteger();
-        if (integer.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0
-                || integer.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
-            throw new DevoreRuntimeException("下标超出int范围: " + integer + ".");
-        return integer.intValue();
     }
 
     private static BigInteger random(BigInteger start, BigInteger end) {
