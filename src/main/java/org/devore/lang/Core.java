@@ -323,6 +323,20 @@ public class Core {
             env.io.out.print(builder);
             return DWord.NIL;
         }), 1, true);
+        dEnv.addTokenProcedure("error-println", ((args, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (DToken t : args)
+                builder.append(t);
+            env.io.err.println(builder);
+            return DWord.NIL;
+        }), 1, true);
+        dEnv.addTokenProcedure("error-print", ((args, env) -> {
+            StringBuilder builder = new StringBuilder();
+            for (DToken t : args)
+                builder.append(t);
+            env.io.err.print(builder);
+            return DWord.NIL;
+        }), 1, true);
         dEnv.addAstProcedure("undef", ((ast, env) -> {
             for (Ast child : ast.children) {
                 if (!(child.symbol instanceof DSymbol))
@@ -597,6 +611,10 @@ public class Core {
                 DString.valueOf(env.io.read())), 0, false);
         dEnv.addTokenProcedure("newline", ((args, env) -> {
             env.io.out.println();
+            return DWord.NIL;
+        }), 0, false);
+        dEnv.addTokenProcedure("newline", ((args, env) -> {
+            env.io.err.println();
             return DWord.NIL;
         }), 0, false);
         dEnv.addTokenProcedure("and", ((args, env) -> {

@@ -17,6 +17,7 @@ import java.util.NoSuchElementException;
 public class IOConfig {
     public final InputStream in;    // 输入流
     public final PrintStream out;   // 输出流
+    public final PrintStream err;   // 异常流
     public final BufferedReader reader;   // 输入读取器
     private final Deque<String> tokens;   // 输入token缓存
 
@@ -26,9 +27,10 @@ public class IOConfig {
      * @param out 输出流
      * @param in  输入流
      */
-    public IOConfig(InputStream in, PrintStream out) {
+    public IOConfig(InputStream in, PrintStream out, PrintStream err) {
         this.in = in;
         this.out = out;
+        this.err = err;
         this.reader = new BufferedReader(new InputStreamReader(in));
         this.tokens = new ArrayDeque<>();
     }
@@ -37,7 +39,7 @@ public class IOConfig {
      * 创建默认IO表
      */
     public IOConfig() {
-        this(System.in, System.out);
+        this(System.in, System.out, System.err);
     }
 
     public String readLine() {

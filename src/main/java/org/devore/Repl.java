@@ -22,6 +22,7 @@ public class Repl {
      */
     public static void repl(Env env) throws IOException {
         PrintStream out = env.io.out;
+        PrintStream err = env.io.err;
         StringBuilder codeBuilder = new StringBuilder();
         int sourceIndex = 0;
         label:
@@ -31,7 +32,7 @@ public class Repl {
             String read = env.io.reader.readLine();
             if (read == null) {
                 if (codeBuilder.length() > 0)
-                    printError(out, codeBuilder.toString(), sourceIndex);
+                    printError(err, codeBuilder.toString(), sourceIndex);
                 break;
             }
             if (codeBuilder.length() == 0) {
@@ -48,7 +49,7 @@ public class Repl {
                         continue;
                 }
                 if (read.trim().startsWith(":load ")) {
-                    loadFiles(env, out, read.trim().substring(6).trim());
+                    loadFiles(env, err, read.trim().substring(6).trim());
                     continue;
                 }
             }
@@ -70,7 +71,7 @@ public class Repl {
                     out.println(result.toString());
                 codeBuilder = new StringBuilder();
             } catch (DevoreRuntimeException e) {
-                out.println(e.getMessage());
+                err.println(e.getMessage());
                 codeBuilder = new StringBuilder();
             }
         }
