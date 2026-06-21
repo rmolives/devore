@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * 核心
@@ -1072,6 +1073,63 @@ public class Core {
                 DBool.valueOf(args.get(0).equals(DWord.NIL))), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env) ->
                 DBool.valueOf(args.get(0).equals(DNumber.valueOf(0)))), 1, false);
+        dEnv.addTokenProcedure("string-split", ((args, env) ->
+                DList.valueOf(Arrays.stream(args.get(0).toString()
+                                .split(args.get(1).toString())).map(DString::valueOf)
+                        .collect(Collectors.toList()))), 2, false);
+        dEnv.addTokenProcedure("string-trim", ((args, env) ->
+                DString.valueOf(args.get(0).toString().trim())), 1, false);
+        dEnv.addTokenProcedure("string-trim-left", ((args, env) ->
+                DString.valueOf(args.get(0).toString()
+                        .replaceFirst("^\\s+", ""))), 1, false);
+        dEnv.addTokenProcedure("string-trim-right", ((args, env) ->
+                DString.valueOf(args.get(0).toString()
+                        .replaceFirst("\\s+$", ""))), 1, false);
+        dEnv.addTokenProcedure("string-upper", ((args, env) ->
+                DString.valueOf(args.get(0).toString().toUpperCase())), 1, false);
+        dEnv.addTokenProcedure("string-lower", ((args, env) ->
+                DString.valueOf(args.get(0).toString().toLowerCase())), 1, false);
+        dEnv.addTokenProcedure("string-replace", ((args, env) ->
+                DString.valueOf(args.get(0).toString()
+                        .replace(args.get(1).toString(), args.get(2).toString()))), 3, false);
+        dEnv.addTokenProcedure("string-replace-regex", ((args, env) ->
+                DString.valueOf(args.get(0).toString()
+                        .replaceAll(args.get(1).toString(), args.get(2).toString()))), 3, false);
+        dEnv.addTokenProcedure("string-index", ((args, env) ->
+                DInt.valueOf(args.get(0).toString().indexOf(args.get(1).toString()))), 2, false);
+        dEnv.addTokenProcedure("string-index-last", ((args, env) ->
+                DInt.valueOf(args.get(0).toString().lastIndexOf(args.get(1).toString()))), 2, false);
+        dEnv.addTokenProcedure("string-contains", ((args, env) ->
+                DBool.valueOf(args.get(0).toString().contains(args.get(1).toString()))), 2, false);
+        dEnv.addTokenProcedure("string-match", ((args, env) ->
+                DBool.valueOf(args.get(0).toString().matches(args.get(1).toString()))), 2, false);
+        dEnv.addTokenProcedure("string-empty?", ((args, env) ->
+                DBool.valueOf(args.get(0).toString().isEmpty())), 1, false);
+        dEnv.addTokenProcedure("string-starts-with", ((args, env) ->
+                DBool.valueOf(args.get(0).toString().startsWith(args.get(1).toString()))), 2, false);
+        dEnv.addTokenProcedure("string-ends-with", ((args, env) ->
+                DBool.valueOf(args.get(0).toString().endsWith(args.get(1).toString()))), 2, false);
+        dEnv.addTokenProcedure("string-get", ((args, env) -> {
+            if (!(args.get(1) instanceof DInt))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            return DString.valueOf(String.valueOf(args.get(0).toString()
+                    .toCharArray()[((DInt) args.get(1)).toBigInteger().intValue()]));
+        }), 2, false);
+        dEnv.addTokenProcedure("string-sub", ((args, env) -> {
+            if (!(args.get(1) instanceof DInt))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            return DString.valueOf(args.get(0).toString()
+                    .substring(((DInt) args.get(1)).toBigInteger().intValue()));
+        }), 2, false);
+        dEnv.addTokenProcedure("string-sub", ((args, env) -> {
+            if (!(args.get(1) instanceof DInt))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            if (!(args.get(2) instanceof DInt))
+                throw new DevoreCastException(args.get(2).type(), "int");
+            return DString.valueOf(args.get(0).toString()
+                    .substring(((DInt) args.get(1)).toBigInteger().intValue(),
+                            ((DInt) args.get(2)).toBigInteger().intValue()));
+        }), 3, false);
     }
 
     private static BigInteger random(BigInteger start, BigInteger end) {
