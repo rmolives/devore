@@ -887,8 +887,8 @@ public class Core {
                 throw new DevoreCastException(args.get(2).type(), "list");
             DToken result = args.get(1);
             List<DToken> tokens = ((DList) args.get(2)).toList();
-            for (int i = tokens.size() - 1; i >= 0; --i)
-                result = ((DProcedure) args.get(0)).call(Arrays.asList(result, tokens.get(i)), env.createChild());
+            for (DToken token : tokens)
+                result = ((DProcedure) args.get(0)).call(Arrays.asList(result, token), env.createChild());
             return result;
         }), 3, false);
         dEnv.addTokenProcedure("filter", ((args, env) -> {
