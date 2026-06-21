@@ -49,7 +49,7 @@ public class Repl {
                         continue;
                 }
                 if (read.trim().startsWith(":load ")) {
-                    loadFiles(env, err, read.trim().substring(6).trim());
+                    loadFiles(env, out, err, read.trim().substring(6).trim());
                     continue;
                 }
             }
@@ -85,7 +85,7 @@ public class Repl {
      * @param input 文件列表
      * @throws IOException 错误
      */
-    private static void loadFiles(Env env, PrintStream out, String input) throws IOException {
+    private static void loadFiles(Env env, PrintStream out, PrintStream err, String input) throws IOException {
         if (input.isEmpty()) {
             out.println(":load 需要至少一个文件路径.");
             return;
@@ -103,7 +103,7 @@ public class Repl {
                 if (result != DWord.NIL)
                     out.println(result);
             } catch (DevoreRuntimeException e) {
-                out.println(e.getMessage());
+                err.println(e.getMessage());
             }
         }
     }
@@ -127,14 +127,14 @@ public class Repl {
     /**
      * 打印错误
      *
-     * @param out  输出
+     * @param err  输出
      * @param code 代码
      */
-    private static void printError(PrintStream out, String code, int sourceIndex) {
+    private static void printError(PrintStream err, String code, int sourceIndex) {
         try {
             Devore.call(Env.newEnv(), code, "<#" +  sourceIndex + ">");
         } catch (DevoreRuntimeException e) {
-            out.println(e.getMessage());
+            err.println(e.getMessage());
         }
     }
 
