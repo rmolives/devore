@@ -61,7 +61,8 @@ public class Ast extends DToken {
         List<Ast> list = new ArrayList<>();
         for (Ast ast : this.children)
             list.add(ast.copy());
-        return new Ast(this.symbol, this.type, list, this.index, this.source, this.code);
+        DToken symbolCopy = this.symbol instanceof Ast ? ((Ast) this.symbol).copy() : this.symbol;
+        return new Ast(symbolCopy, this.type, list, this.index, this.source, this.code);
     }
 
     /**

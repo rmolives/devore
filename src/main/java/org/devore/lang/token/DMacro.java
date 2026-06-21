@@ -81,6 +81,8 @@ public class DMacro extends DToken {
      * @return 替换后的ast
      */
     private Ast expand(Ast body, List<Ast> nodes) {
+        if (body.symbol instanceof Ast)
+            body.symbol = expand(((Ast) body.symbol).copy(), nodes);
         int paramIndex = paramIndex(body.symbol);
         if (paramIndex >= 0 && body.isEmpty())
             return nodes.get(paramIndex).copy();
