@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Repl {
@@ -90,7 +91,12 @@ public class Repl {
         }
         String[] files = input.split("\\s+");
         for (String file : files) {
-            String code = new String(Files.readAllBytes(Paths.get(file)), StandardCharsets.UTF_8);
+            Path path = Paths.get(file);
+            if (!Files.exists(path)) {
+                out.println("文件不存在: " + file);
+                continue;
+            }
+            String code = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             try {
                 DToken result = Devore.call(env, code, file);
                 if (result != DWord.NIL)
