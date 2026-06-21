@@ -17,5 +17,4 @@ tasks.jar {
         attributes["Main-Class"] = "org.devore.Main"
         attributes["Implementation-Version"] = project.version
     }
-    from(configurations.runtimeClasspath.get().filter { it.exists() }.map { if (it.isDirectory) it else zipTree(it) })
 }
