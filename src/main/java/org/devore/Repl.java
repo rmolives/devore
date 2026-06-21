@@ -52,13 +52,13 @@ public class Repl {
                     break;
                 }
                 String trimmed = read.trim();
-                if (":exit".equals(trimmed))
-                    return;
                 recordHistory(read);
                 if (codeBuilder.length() == 0) {
                     if (trimmed.isEmpty())
                         continue;
                     switch (trimmed) {
+                        case ":exit":
+                            return;
                         case ":help":
                             printHelp(out);
                             continue;
