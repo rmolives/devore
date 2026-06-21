@@ -89,7 +89,7 @@ public class Core {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (args.get(1).equals(DNumber.valueOf(0)))
-                throw new DevoreRuntimeException("模数不能为0.");
+                throw new DevoreRuntimeException("模数不能为0, 被除数=" + args.get(0) + ", 模数=" + args.get(1) + ".");
             return DNumber.valueOf(((DInt) args.get(0)).toBigInteger().mod(((DInt) args.get(1)).toBigInteger()));
         }), 2, false);
         dEnv.addTokenProcedure("rem", ((args, env) -> {
@@ -98,7 +98,7 @@ public class Core {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (args.get(1).equals(DNumber.valueOf(0)))
-                throw new DevoreRuntimeException("除数不能为0.");
+                throw new DevoreRuntimeException("除数不能为0, 被除数=" + args.get(0) + ", 除数=" + args.get(1) + ".");
             return DNumber.valueOf(((DInt) args.get(0)).toBigInteger().remainder(((DInt) args.get(1)).toBigInteger()));
         }), 2, false);
         dEnv.addTokenProcedure("abs", ((args, env) -> {
@@ -1227,11 +1227,12 @@ public class Core {
             int fromIndex = DIntUtils.toIndex((DInt) args.get(1));
             int toIndex = DIntUtils.toIndex((DInt) args.get(2));
             if (fromIndex > toIndex)
-                throw new DevoreRuntimeException("字符串截取起始下标大于目标下标.");
+                throw new DevoreRuntimeException("字符串截取起始下标大于目标下标, fromIndex=" + fromIndex
+                        + ", toIndex=" + toIndex + ", length=" + s.length() + ".");
             if (fromIndex >= s.length() || fromIndex < 0)
-                throw new DevoreRuntimeException("字符串截取过界, 下标=" + fromIndex + ", 但字符串只有" + s.length() + "个字符.");
+                throw new DevoreRuntimeException("字符串截取过界, fromIndex=" + fromIndex + ", 但字符串只有" + s.length() + "个字符.");
             if (toIndex >= s.length())
-                throw new DevoreRuntimeException("字符串截取过界, 下标=" + toIndex + ", 但字符串只有" + s.length() + "个字符.");
+                throw new DevoreRuntimeException("字符串截取过界, toIndex=" + toIndex + ", 但字符串只有" + s.length() + "个字符.");
             return DString.valueOf(s.substring(fromIndex, toIndex));
         }), 3, false);
     }
@@ -1248,7 +1249,8 @@ public class Core {
 
     private static List<DToken> range(BigDecimal start, BigDecimal end, BigDecimal step) {
         if (step.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("步长不能为零.");
+            throw new DevoreRuntimeException("步长不能为零, start=" + start.toPlainString()
+                    + ", end=" + end.toPlainString() + ", step=" + step.toPlainString() + ".");
         List<DToken> list = new ArrayList<>();
         if (step.compareTo(BigDecimal.ZERO) > 0)
             for (BigDecimal current = start; current.compareTo(end) <= 0; current = current.add(step))
