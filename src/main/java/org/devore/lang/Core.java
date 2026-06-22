@@ -1420,9 +1420,9 @@ public class Core {
             if (arg.isEmpty() && arg.symbol instanceof DSymbol)
                 return DBool.valueOf(env.contains(arg.symbol.toString()));
             DToken token = Evaluator.eval(env, arg.copy());
-            if (token instanceof DString || token instanceof DSymbol)
-                return DBool.valueOf(env.contains(token.toString()));
-            throw new DevoreCastException(token.type(), "symbol");
+            if (!(token instanceof DSymbol))
+                throw new DevoreCastException(token.type(), "symbol");
+            return DBool.valueOf(env.contains(token.toString()));
         }), 1, false);
         dEnv.addTokenProcedure("number?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DNumber)), 1, false);
