@@ -1203,7 +1203,7 @@ public class Core {
     }
 
     /**
-     * 注册类型和特殊值判断过程，如number?、list?、nil?和zero?
+     * 注册类型、绑定状态和特殊值判断过程，如bound?、number?、list?、nil?和zero?
      *
      * @param dEnv 目标环境
      */
@@ -1221,6 +1221,17 @@ public class Core {
             if (arg.isEmpty() && arg.symbol instanceof DSymbol && env.contains(arg.symbol.toString()))
                 return DBool.valueOf(env.get(arg.symbol.toString()) instanceof DMacro);
             return DBool.valueOf(Evaluator.eval(env, arg.copy()) instanceof DMacro);
+        }), 1, false);
+        dEnv.addAstProcedure("bound?", ((ast, env) -> {
+            Ast arg = ast.get(0);
+            if (arg.isEmpty() && arg.symbol instanceof DSymbol)
+                return DBool.valueOf(env.contains(arg.symbol.toString()));
+            if (arg.isEmpty() && arg.symbol instanceof DString)
+                return DBool.valueOf(env.contains(arg.symbol.toString()));
+            DToken token = Evaluator.eval(env, arg.copy());
+            if (token instanceof DString || token instanceof DSymbol)
+                return DBool.valueOf(env.contains(token.toString()));
+            throw new DevoreCastException(token.type(), "string|symbol");
         }), 1, false);
         dEnv.addTokenProcedure("number?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DNumber)), 1, false);
