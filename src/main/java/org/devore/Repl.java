@@ -323,9 +323,11 @@ public class Repl {
         if (endOfInput)
             return null;
         StringBuilder line = new StringBuilder();
+        int[] cursorIndex = {0};
         int historyCursor = HISTORY.size();
         int terminalColumns = terminalColumns();
         int[] renderedRows = {displayRows(prompt, line.toString(), terminalColumns)};
+        int[] renderedCursorRow = {0};
         String currentLine = null;
         while (true) {
             int c = INPUT.read();
@@ -336,26 +338,36 @@ public class Repl {
             }
             if (c == -1 || c == 4) {
                 endOfInput = true;
-                if (manualEcho)
+                if (manualEcho) {
+                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, line.length(),
+                            renderedRows[0], renderedCursorRow, terminalColumns);
                     System.out.println();
+                }
                 return line.length() == 0 ? null : line.toString();
             }
             if (c == '\r') {
                 skipLineFeed = true;
-                if (manualEcho)
+                if (manualEcho) {
+                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, line.length(),
+                            renderedRows[0], renderedCursorRow, terminalColumns);
                     System.out.println();
+                }
                 return line.toString();
             }
             if (c == '\n') {
-                if (manualEcho)
+                if (manualEcho) {
+                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, line.length(),
+                            renderedRows[0], renderedCursorRow, terminalColumns);
                     System.out.println();
+                }
                 return line.toString();
             }
             if (manualEcho && (c == 8 || c == 127)) {
-                if (line.length() > 0) {
-                    line.deleteCharAt(line.length() - 1);
+                if (cursorIndex[0] > 0) {
+                    line.deleteCharAt(cursorIndex[0] - 1);
+                    --cursorIndex[0];
                     renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
-                            renderedRows[0], terminalColumns);
+                            cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
                 }
                 historyCursor = HISTORY.size();
                 currentLine = null;
@@ -367,18 +379,31 @@ public class Repl {
                     if (currentLine == null)
                         currentLine = line.toString();
                     historyCursor = updateHistoryLine(prompt, line, historyCursor, currentLine, key,
-                            highlightContext, terminalColumns, renderedRows);
+                            highlightContext, cursorIndex, terminalColumns, renderedRows, renderedCursorRow);
                     if (historyCursor == HISTORY.size())
                         currentLine = null;
+                } else if (key == 'C') {
+                    if (cursorIndex[0] < line.length()) {
+                        ++cursorIndex[0];
+                        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
+                                cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
+                    }
+                } else if (key == 'D') {
+                    if (cursorIndex[0] > 0) {
+                        --cursorIndex[0];
+                        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
+                                cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
+                    }
                 }
                 continue;
             }
-            line.append((char) c);
+            line.insert(cursorIndex[0], (char) c);
+            ++cursorIndex[0];
             historyCursor = HISTORY.size();
             currentLine = null;
             if (manualEcho)
                 renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
-                        renderedRows[0], terminalColumns);
+                        cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
         }
     }
 
@@ -397,7 +422,8 @@ public class Repl {
     }
 
     private static int updateHistoryLine(String prompt, StringBuilder line, int cursor, String currentLine, int key,
-                                         String highlightContext, int terminalColumns, int[] renderedRows) {
+                                         String highlightContext, int[] cursorIndex, int terminalColumns,
+                                         int[] renderedRows, int[] renderedCursorRow) {
         if (HISTORY.isEmpty())
             return cursor;
         if (key == 'A' && cursor > 0)
@@ -411,26 +437,30 @@ public class Repl {
             line.append(currentLine);
         else
             line.append(HISTORY.get(cursor));
-        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, renderedRows[0], terminalColumns);
+        cursorIndex[0] = line.length();
+        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, cursorIndex[0],
+                renderedRows[0], renderedCursorRow, terminalColumns);
         return cursor;
     }
 
-    private static int redrawLine(String prompt, String line, String highlightContext, int previousRows,
-                                  int terminalColumns) {
+    private static int redrawLine(String prompt, String line, String highlightContext, int cursorIndex,
+                                  int previousRows, int[] previousCursorRow, int terminalColumns) {
         if (!manualEcho)
             return previousRows;
-        clearRenderedInput(previousRows);
+        clearRenderedInput(previousRows, previousCursorRow[0]);
         System.out.print(prompt);
         System.out.print(highlightLine(highlightContext, line));
         System.out.print(ANSI_RESET);
         System.out.print("\033[K");
+        moveCursorToInputIndex(prompt, line, cursorIndex, terminalColumns);
         System.out.flush();
+        previousCursorRow[0] = displayPosition(prompt, line, cursorIndex, terminalColumns).row;
         return displayRows(prompt, line, terminalColumns);
     }
 
-    private static void clearRenderedInput(int rows) {
+    private static void clearRenderedInput(int rows, int cursorRow) {
         System.out.print("\r");
-        for (int i = 1; i < rows; ++i)
+        for (int i = 0; i < cursorRow; ++i)
             System.out.print("\033[1A");
         for (int i = 0; i < rows; ++i) {
             System.out.print("\033[2K");
@@ -467,28 +497,57 @@ public class Repl {
     }
 
     private static int displayRows(String prompt, String line, int terminalColumns) {
-        String[] lines = line.split("\\R", -1);
-        int rows = visualRows(displayWidth(prompt) + displayWidth(lines[0]), terminalColumns);
-        for (int i = 1; i < lines.length; ++i)
-            rows += visualRows(displayWidth(lines[i]), terminalColumns);
-        return rows;
+        return displayPosition(prompt, line, line.length(), terminalColumns).row + 1;
     }
 
-    private static int visualRows(int width, int terminalColumns) {
-        return Math.max(1, (width + terminalColumns - 1) / terminalColumns);
+    private static void moveCursorToInputIndex(String prompt, String line, int cursorIndex, int terminalColumns) {
+        DisplayPosition end = displayPosition(prompt, line, line.length(), terminalColumns);
+        DisplayPosition cursor = displayPosition(prompt, line, cursorIndex, terminalColumns);
+        if (end.row > cursor.row)
+            System.out.print("\033[" + (end.row - cursor.row) + "A");
+        else if (end.row < cursor.row)
+            System.out.print("\033[" + (cursor.row - end.row) + "B");
+        System.out.print("\r");
+        if (cursor.column > 0)
+            System.out.print("\033[" + cursor.column + "C");
     }
 
-    private static int displayWidth(String text) {
-        int width = 0;
-        for (int index = 0; index < text.length(); ) {
+    private static DisplayPosition displayPosition(String prompt, String line, int index, int terminalColumns) {
+        DisplayPosition position = new DisplayPosition();
+        advanceDisplayPosition(position, prompt, prompt.length(), terminalColumns);
+        advanceDisplayPosition(position, line, Math.min(index, line.length()), terminalColumns);
+        return position;
+    }
+
+    private static void advanceDisplayPosition(DisplayPosition position, String text, int endIndex,
+                                               int terminalColumns) {
+        for (int index = 0; index < endIndex; ) {
             int codePoint = text.codePointAt(index);
-            if (codePoint == '\t')
-                width += 4;
-            else if (!Character.isISOControl(codePoint))
-                width += isWideCodePoint(codePoint) ? 2 : 1;
+            if (codePoint == '\n') {
+                ++position.row;
+                position.column = 0;
+            } else if (codePoint == '\r') {
+                position.column = 0;
+            } else if (codePoint == '\t') {
+                advanceColumns(position, 4, terminalColumns);
+            } else if (!Character.isISOControl(codePoint)) {
+                advanceColumns(position, isWideCodePoint(codePoint) ? 2 : 1, terminalColumns);
+            }
             index += Character.charCount(codePoint);
         }
-        return width;
+    }
+
+    private static void advanceColumns(DisplayPosition position, int columns, int terminalColumns) {
+        while (columns > 0) {
+            int remaining = terminalColumns - position.column;
+            if (columns < remaining) {
+                position.column += columns;
+                return;
+            }
+            columns -= remaining;
+            ++position.row;
+            position.column = 0;
+        }
     }
 
     private static boolean isWideCodePoint(int codePoint) {
@@ -681,5 +740,10 @@ public class Repl {
         private boolean inString;
         private boolean escaped;
         private String stringColor = ANSI_GREEN;
+    }
+
+    private static class DisplayPosition {
+        private int row;
+        private int column;
     }
 }
