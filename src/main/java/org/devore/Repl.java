@@ -13,11 +13,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Repl {
     private static final int HISTORY_LIMIT = 100;
+    private static final int INDENT_SIZE = 4;
     private static final String ANSI_RESET = "\033[0m";
     private static final String ANSI_DIM = "\033[2m";
     private static final String ANSI_CYAN = "\033[36m";
@@ -36,6 +36,7 @@ public class Repl {
     private static boolean skipLineFeed;
     private static boolean endOfInput;
     private static final Reader INPUT = new InputStreamReader(System.in, StandardCharsets.UTF_8);
+    private static final Deque<String> PASTED_LINES = new ArrayDeque<>();
 
     /**
      * REPL
@@ -54,7 +55,8 @@ public class Repl {
                 String prompt = "[Devore#" + promptIndex + "] >>> ";
                 System.out.print(prompt);
                 System.out.flush();
-                String read = readLine(prompt, codeBuilder.toString());
+                String highlightContext = codeBuilder.toString();
+                String read = readLine(prompt, highlightContext, indentationForNextLine(highlightContext));
                 if (read == null) {
                     if (codeBuilder.length() > 0)
                         printError(codeBuilder.toString(), sourceIndex);
@@ -312,16 +314,34 @@ public class Repl {
     /**
      * 从标准输入逐字符读取一行。交互模式下同时负责字符回显和退格
      */
-    private static String readLine(String prompt, String highlightContext) throws IOException {
+    private static String readLine(String prompt, String highlightContext, String initialLine) throws IOException {
         if (endOfInput)
             return null;
-        StringBuilder line = new StringBuilder();
-        int[] cursorIndex = {0};
+        if (!PASTED_LINES.isEmpty()) {
+            String pastedLine = PASTED_LINES.removeFirst();
+            if (manualEcho) {
+                System.out.print(highlightLine(highlightContext, pastedLine));
+                System.out.print(ANSI_RESET);
+                System.out.println();
+            } else
+                System.out.println(pastedLine);
+            return pastedLine;
+        }
+        StringBuilder line = new StringBuilder(initialLine);
+        int[] cursorIndex = {line.length()};
         int historyCursor = HISTORY.size();
         int terminalColumns = terminalColumns();
         int[] renderedRows = {displayRows(prompt, line.toString(), terminalColumns)};
         int[] renderedCursorRow = {0};
         String currentLine = null;
+        if (!initialLine.isEmpty()) {
+            if (manualEcho) {
+                System.out.print(highlightLine(highlightContext, initialLine));
+                System.out.print(ANSI_RESET);
+            } else
+                System.out.print(initialLine);
+            System.out.flush();
+        }
         while (true) {
             int c = INPUT.read();
             if (skipLineFeed) {
@@ -337,6 +357,29 @@ public class Repl {
                     System.out.println();
                 }
                 return line.length() == 0 ? null : line.toString();
+            }
+            if (manualEcho && c != 27 && c != 8 && c != 127 && INPUT.ready()) {
+                String pastedCode = readPasteChunk((char) c);
+                String formattedCode = formatPastedCode(pastedCode, highlightContext, line, cursorIndex[0]);
+                boolean multiline = formattedCode.indexOf('\n') >= 0 || formattedCode.indexOf('\r') >= 0;
+                String[] pastedLines = formattedCode.split("\\R", -1);
+                if (isOnlyIndentBeforeCursor(line, cursorIndex[0])) {
+                    line.delete(0, cursorIndex[0]);
+                    cursorIndex[0] = 0;
+                }
+                line.insert(cursorIndex[0], pastedLines[0]);
+                cursorIndex[0] += pastedLines[0].length();
+                historyCursor = HISTORY.size();
+                currentLine = null;
+                renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
+                        cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
+                if (multiline) {
+                    for (int index = 1; index < pastedLines.length; ++index)
+                        PASTED_LINES.addLast(pastedLines[index]);
+                    System.out.println();
+                    return line.toString();
+                }
+                continue;
             }
             if (c == '\r') {
                 skipLineFeed = true;
@@ -390,6 +433,11 @@ public class Repl {
                 }
                 continue;
             }
+            if (manualEcho && (c == ')' || c == ']') && isOnlyIndentBeforeCursor(line, cursorIndex[0])) {
+                int deleteCount = Math.min(INDENT_SIZE, cursorIndex[0]);
+                line.delete(cursorIndex[0] - deleteCount, cursorIndex[0]);
+                cursorIndex[0] -= deleteCount;
+            }
             line.insert(cursorIndex[0], (char) c);
             ++cursorIndex[0];
             historyCursor = HISTORY.size();
@@ -398,6 +446,135 @@ public class Repl {
                 renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
                         cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
         }
+    }
+
+    private static String readPasteChunk(char firstChar) throws IOException {
+        StringBuilder builder = new StringBuilder().append(firstChar);
+        while (INPUT.ready())
+            builder.append((char) INPUT.read());
+        return builder.toString();
+    }
+
+    private static String formatPastedCode(String code, String highlightContext, StringBuilder line, int cursorIndex) {
+        String trimmed = trimBlankEdges(code.replace("\r\n", "\n").replace('\r', '\n'));
+        if (trimmed.isEmpty())
+            return "";
+        int baseDepth = indentState(highlightContext + "\n" + line.substring(0, cursorIndex)).bracketDepth;
+        return reindentCode(trimmed, baseDepth);
+    }
+
+    private static String trimBlankEdges(String code) {
+        int start = 0;
+        int end = code.length();
+        while (start < end && Character.isWhitespace(code.charAt(start)))
+            ++start;
+        while (end > start && Character.isWhitespace(code.charAt(end - 1)))
+            --end;
+        return code.substring(start, end);
+    }
+
+    private static String reindentCode(String code, int baseDepth) {
+        String[] lines = code.split("\n", -1);
+        StringBuilder builder = new StringBuilder();
+        int relativeDepth = 0;
+        for (int index = 0; index < lines.length; ++index) {
+            String content = lines[index].trim();
+            if (index > 0)
+                builder.append('\n');
+            if (content.isEmpty())
+                continue;
+            int lineDepth = Math.max(0, baseDepth + relativeDepth - leadingClosingBrackets(content));
+            builder.append(
+                    String.join("", Collections.nCopies(lineDepth * INDENT_SIZE, " "))
+            ).append(content);
+            relativeDepth += depthDelta(content);
+            if (baseDepth + relativeDepth < 0)
+                relativeDepth = -baseDepth;
+        }
+        return builder.toString();
+    }
+
+    private static int leadingClosingBrackets(String line) {
+        int count = 0;
+        while (count < line.length() && (line.charAt(count) == ')' || line.charAt(count) == ']'))
+            ++count;
+        return count;
+    }
+
+    private static int depthDelta(String line) {
+        int depth = 0;
+        boolean inString = false;
+        boolean escaped = false;
+        for (int index = 0; index < line.length(); ++index) {
+            char c = line.charAt(index);
+            if (inString) {
+                if (escaped)
+                    escaped = false;
+                else if (c == '\\')
+                    escaped = true;
+                else if (c == '"')
+                    inString = false;
+                continue;
+            }
+            if (c == ';')
+                break;
+            if (c == '"')
+                inString = true;
+            else if (c == '(' || c == '[')
+                ++depth;
+            else if (c == ')' || c == ']')
+                --depth;
+        }
+        return depth;
+    }
+
+    private static String indentationForNextLine(String code) {
+        if (code.isEmpty())
+            return "";
+        IndentState state = indentState(code);
+        if (state.inString)
+            return "";
+        int width = Math.max(0, state.bracketDepth) * INDENT_SIZE;
+        return String.join("", Collections.nCopies(width, " "));
+    }
+
+    private static IndentState indentState(String code) {
+        IndentState state = new IndentState();
+        for (int index = 0; index < code.length(); ++index) {
+            char c = code.charAt(index);
+            if (state.inString) {
+                if (state.escaped)
+                    state.escaped = false;
+                else if (c == '\\')
+                    state.escaped = true;
+                else if (c == '"')
+                    state.inString = false;
+                continue;
+            }
+            if (c == ';') {
+                while (index + 1 < code.length() && code.charAt(index + 1) != '\n'
+                        && code.charAt(index + 1) != '\r')
+                    ++index;
+                continue;
+            }
+            if (c == '"') {
+                state.inString = true;
+                state.escaped = false;
+            } else if (c == '(' || c == '[')
+                ++state.bracketDepth;
+            else if ((c == ')' || c == ']') && state.bracketDepth > 0)
+                --state.bracketDepth;
+        }
+        return state;
+    }
+
+    private static boolean isOnlyIndentBeforeCursor(StringBuilder line, int cursorIndex) {
+        if (cursorIndex == 0)
+            return false;
+        for (int index = 0; index < cursorIndex; ++index)
+            if (line.charAt(index) != ' ')
+                return false;
+        return true;
     }
 
     private static int readEscapeSequence() throws IOException {
@@ -739,6 +916,12 @@ public class Repl {
         private boolean escaped;
         private boolean lambdaParamsPending;
         private String stringColor = ANSI_GREEN;
+    }
+
+    private static class IndentState {
+        private int bracketDepth;
+        private boolean inString;
+        private boolean escaped;
     }
 
     private static class DisplayPosition {
