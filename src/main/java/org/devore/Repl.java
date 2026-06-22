@@ -15,6 +15,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * REPL
+ */
 public class Repl {
     private static final int HISTORY_LIMIT = 100;
     private static final int INDENT_SIZE = 4;
