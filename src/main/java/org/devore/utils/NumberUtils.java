@@ -13,10 +13,10 @@ import java.math.RoundingMode;
 public class NumberUtils {
     public static final MathContext DEFAULT_CONTEXT = new MathContext(
             MathContext.DECIMAL128.getPrecision() * 2,
-            MathContext.DECIMAL128.getRoundingMode());                                          // 默认计算精度
-    private static final BigDecimal TWO = BigDecimal.valueOf(2);                                // 2
-    private static final BigDecimal PI = approximatePi();                                       // Pi
-    private static final BigDecimal TWO_PI = PI.multiply(TWO, DEFAULT_CONTEXT);                 // Pi * 2
+            MathContext.DECIMAL128.getRoundingMode());                              // 默认计算精度
+    private static final BigDecimal TWO = BigDecimal.valueOf(2);                    // 2
+    private static final BigDecimal PI = approximatePi();                           // Pi
+    private static final BigDecimal TWO_PI = PI.multiply(TWO, DEFAULT_CONTEXT);     // Pi * 2
 
     private static String plain(BigDecimal value) {
         return value.stripTrailingZeros().toPlainString();
