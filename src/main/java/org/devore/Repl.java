@@ -19,6 +19,18 @@ import java.util.List;
 
 public class Repl {
     private static final int HISTORY_LIMIT = 100;
+    private static final String ANSI_RESET = "\033[0m";
+    private static final String ANSI_DIM = "\033[2m";
+    private static final String ANSI_CYAN = "\033[36m";
+    private static final String ANSI_GREEN = "\033[32m";
+    private static final String ANSI_MAGENTA = "\033[35m";
+    private static final String ANSI_SYMBOL = "\033[38;5;111m";
+    private static final String ANSI_WHITE = "\033[97m";
+    private static final String ANSI_YELLOW = "\033[33m";
+    private static final String[] RAINBOW_BRACKET_COLORS = {
+            "\033[38;5;214m", "\033[38;5;177m", "\033[38;5;81m",
+            "\033[38;5;119m", "\033[38;5;75m", "\033[38;5;203m"
+    };
     private static final List<String> HISTORY = new ArrayList<>();
     private static String terminalState;
     private static boolean manualEcho;
@@ -45,7 +57,7 @@ public class Repl {
                 String prompt = "[Devore#" + promptIndex + "] >>> ";
                 out.print(prompt);
                 out.flush();
-                String read = readLine(prompt);
+                String read = readLine(prompt, codeBuilder.toString());
                 if (read == null) {
                     if (codeBuilder.length() > 0)
                         printError(err, codeBuilder.toString(), sourceIndex);
@@ -153,7 +165,7 @@ public class Repl {
     }
 
     /**
-     * 判断当前输入是否需要继续读取。
+     * 判断当前输入是否需要继续读取
      *
      * @param code 代码
      * @return 是否未完成
@@ -184,8 +196,8 @@ public class Repl {
     }
 
     /**
-     * 在交互终端中关闭行缓冲和终端回显。
-     * 输入改由本程序逐字符回显，因而多行粘贴时每行都能先显示提示符。
+     * 在交互终端中关闭行缓冲和终端回显
+     * 输入改由本程序逐字符回显，因而多行粘贴时每行都能先显示提示符
      */
     private static void enableManualEcho() {
         String os = System.getProperty("os.name", "").toLowerCase();
@@ -301,9 +313,9 @@ public class Repl {
     }
 
     /**
-     * 从标准输入逐字符读取一行。交互模式下同时负责字符回显和退格。
+     * 从标准输入逐字符读取一行。交互模式下同时负责字符回显和退格
      */
-    private static String readLine(String prompt) throws IOException {
+    private static String readLine(String prompt, String highlightContext) throws IOException {
         if (endOfInput)
             return null;
         StringBuilder line = new StringBuilder();
@@ -336,8 +348,7 @@ public class Repl {
             if (manualEcho && (c == 8 || c == 127)) {
                 if (line.length() > 0) {
                     line.deleteCharAt(line.length() - 1);
-                    System.out.print("\b \b");
-                    System.out.flush();
+                    redrawLine(prompt, line.toString(), highlightContext);
                 }
                 historyCursor = HISTORY.size();
                 currentLine = null;
@@ -348,7 +359,7 @@ public class Repl {
                 if (key == 'A' || key == 'B') {
                     if (currentLine == null)
                         currentLine = line.toString();
-                    historyCursor = updateHistoryLine(prompt, line, historyCursor, currentLine, key);
+                    historyCursor = updateHistoryLine(prompt, line, historyCursor, currentLine, key, highlightContext);
                     if (historyCursor == HISTORY.size())
                         currentLine = null;
                 }
@@ -357,10 +368,8 @@ public class Repl {
             line.append((char) c);
             historyCursor = HISTORY.size();
             currentLine = null;
-            if (manualEcho) {
-                System.out.print((char) c);
-                System.out.flush();
-            }
+            if (manualEcho)
+                redrawLine(prompt, line.toString(), highlightContext);
         }
     }
 
@@ -378,7 +387,8 @@ public class Repl {
         return 0;
     }
 
-    private static int updateHistoryLine(String prompt, StringBuilder line, int cursor, String currentLine, int key) {
+    private static int updateHistoryLine(String prompt, StringBuilder line, int cursor, String currentLine, int key,
+                                         String highlightContext) {
         if (HISTORY.isEmpty())
             return cursor;
         if (key == 'A' && cursor > 0)
@@ -392,17 +402,198 @@ public class Repl {
             line.append(currentLine);
         else
             line.append(HISTORY.get(cursor));
-        redrawLine(prompt, line.toString());
+        redrawLine(prompt, line.toString(), highlightContext);
         return cursor;
     }
 
-    private static void redrawLine(String prompt, String line) {
+    private static void redrawLine(String prompt, String line, String highlightContext) {
         if (!manualEcho)
             return;
         System.out.print("\r");
         System.out.print(prompt);
-        System.out.print(line);
+        System.out.print(highlightLine(highlightContext, line));
+        System.out.print(ANSI_RESET);
         System.out.print("\033[K");
         System.out.flush();
+    }
+
+    private static String highlightLine(String context, String line) {
+        StringBuilder builder = new StringBuilder();
+        HighlightState state = highlightState(context);
+        scanHighlight(line, state, builder);
+        return builder.toString();
+    }
+
+    private static HighlightState highlightState(String context) {
+        HighlightState state = new HighlightState();
+        scanHighlight(context, state, null);
+        return state;
+    }
+
+    private static void scanHighlight(String text, HighlightState state, StringBuilder builder) {
+        int index = 0;
+        while (index < text.length()) {
+            char c = text.charAt(index);
+            if (state.inString) {
+                appendColored(builder, String.valueOf(c), state.stringColor);
+                if (state.escaped)
+                    state.escaped = false;
+                else if (c == '\\')
+                    state.escaped = true;
+                else if (c == '"') {
+                    state.inString = false;
+                    state.stringColor = ANSI_GREEN;
+                }
+                ++index;
+                continue;
+            }
+            if (c == ';') {
+                int end = readCommentEnd(text, index);
+                appendColored(builder, text.substring(index, end), ANSI_DIM + ANSI_GREEN);
+                index = end;
+                continue;
+            }
+            if (c == '"') {
+                boolean listHead = isExpectingHead(state);
+                String bracketColor = currentBracketColor(state);
+                consumeExpectedHead(state);
+                state.stringColor = listHead ? avoidColor(ANSI_GREEN, bracketColor) : ANSI_GREEN;
+                appendColored(builder, String.valueOf(c), state.stringColor);
+                state.inString = true;
+                state.escaped = false;
+                ++index;
+                continue;
+            }
+            if (c == '(' || c == '[') {
+                consumeExpectedHead(state);
+                String color = bracketColor(state.bracketColors.size());
+                state.bracketColors.add(color);
+                state.expectingHead.add(true);
+                appendColored(builder, String.valueOf(c), color);
+                ++index;
+                continue;
+            }
+            if (c == ')' || c == ']') {
+                String color = state.bracketColors.isEmpty()
+                        ? bracketColor(0)
+                        : state.bracketColors.remove(state.bracketColors.size() - 1);
+                appendColored(builder, String.valueOf(c), color);
+                if (!state.expectingHead.isEmpty())
+                    state.expectingHead.remove(state.expectingHead.size() - 1);
+                ++index;
+                continue;
+            }
+            if (Character.isWhitespace(c)) {
+                if (builder != null)
+                    builder.append(c);
+                ++index;
+                continue;
+            }
+            int tokenEnd = readTokenEnd(text, index);
+            String token = text.substring(index, tokenEnd);
+            boolean listHead = isExpectingHead(state);
+            String bracketColor = currentBracketColor(state);
+            consumeExpectedHead(state);
+            appendColored(builder, token, colorForToken(token, index, listHead, bracketColor));
+            index = tokenEnd;
+        }
+    }
+
+    private static int readCommentEnd(String text, int start) {
+        int index = start;
+        while (index < text.length() && text.charAt(index) != '\n' && text.charAt(index) != '\r')
+            ++index;
+        return index;
+    }
+
+    private static int readTokenEnd(String line, int start) {
+        int index = start;
+        while (index < line.length()) {
+            char c = line.charAt(index);
+            if (Character.isWhitespace(c) || c == '(' || c == ')' || c == '[' || c == ']' || c == ';')
+                break;
+            ++index;
+        }
+        return index;
+    }
+
+    private static String bracketColor(int depth) {
+        return RAINBOW_BRACKET_COLORS[depth % RAINBOW_BRACKET_COLORS.length];
+    }
+
+    private static boolean isExpectingHead(HighlightState state) {
+        return !state.expectingHead.isEmpty() && state.expectingHead.get(state.expectingHead.size() - 1);
+    }
+
+    private static String currentBracketColor(HighlightState state) {
+        if (state.bracketColors.isEmpty())
+            return null;
+        return state.bracketColors.get(state.bracketColors.size() - 1);
+    }
+
+    private static void consumeExpectedHead(HighlightState state) {
+        if (isExpectingHead(state))
+            state.expectingHead.set(state.expectingHead.size() - 1, false);
+    }
+
+    private static String colorForToken(String token, int index, boolean listHead, String bracketColor) {
+        if (index == 0 && token.startsWith(":"))
+            return ANSI_CYAN;
+        String color;
+        if (isNumberToken(token))
+            color = ANSI_YELLOW;
+        else if ("true".equals(token) || "false".equals(token) || "nil".equals(token))
+            color = ANSI_MAGENTA;
+        else if (listHead)
+            color = ANSI_CYAN;
+        else
+            color = ANSI_SYMBOL;
+        return listHead ? avoidColor(color, bracketColor) : avoidColor(color, bracketColor, ANSI_CYAN);
+    }
+
+    private static String avoidColor(String color, String... forbiddenColors) {
+        if (color == null)
+            return null;
+        for (String forbiddenColor : forbiddenColors) {
+            if (color.equals(forbiddenColor))
+                return ANSI_WHITE;
+        }
+        return color;
+    }
+
+    private static boolean isNumberToken(String token) {
+        int index = token.startsWith("-") ? 1 : 0;
+        if (index == token.length())
+            return false;
+        boolean digit = false;
+        while (index < token.length() && Character.isDigit(token.charAt(index))) {
+            digit = true;
+            ++index;
+        }
+        if (index < token.length() && token.charAt(index) == '.') {
+            ++index;
+            while (index < token.length() && Character.isDigit(token.charAt(index))) {
+                digit = true;
+                ++index;
+            }
+        }
+        return digit && index == token.length();
+    }
+
+    private static void appendColored(StringBuilder builder, String text, String color) {
+        if (builder == null)
+            return;
+        if (color == null)
+            builder.append(text);
+        else
+            builder.append(color).append(text).append(ANSI_RESET);
+    }
+
+    private static class HighlightState {
+        private final List<Boolean> expectingHead = new ArrayList<>();
+        private final List<String> bracketColors = new ArrayList<>();
+        private boolean inString;
+        private boolean escaped;
+        private String stringColor = ANSI_GREEN;
     }
 }
