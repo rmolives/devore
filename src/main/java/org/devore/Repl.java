@@ -45,8 +45,8 @@ public class Repl {
      * @throws IOException 错误
      */
     public static void repl(Env env) throws IOException {
-        PrintStream out = env.io.out;
-        PrintStream err = env.io.err;
+        PrintStream out = System.out;
+        PrintStream err = System.err;
         StringBuilder codeBuilder = new StringBuilder();
         int sourceIndex = 0;
         resetInputState();
