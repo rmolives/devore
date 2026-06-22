@@ -55,7 +55,7 @@ public class NumberUtils {
     }
 
     /**
-     * 精确除法, 仅在结果为无限小数时使用指定精度近似.
+     * 精确除法, 仅在结果为无限小数时使用指定精度近似
      *
      * @param a  被除数
      * @param b  除数
@@ -762,7 +762,7 @@ public class NumberUtils {
     }
 
     /**
-     * 有理数指数幂的精确路径.
+     * 有理数指数幂的精确路径
      *
      * @param x        非负底数
      * @param exponent 指数的绝对值
@@ -836,7 +836,7 @@ public class NumberUtils {
     }
 
     /**
-     * 有限小数的精确n次根.
+     * 有限小数的精确n次根
      *
      * @param value 值
      * @param n     根次数
@@ -872,7 +872,7 @@ public class NumberUtils {
     }
 
     /**
-     * 整数精确n次根.
+     * 整数精确n次根
      *
      * @param value 非负整数
      * @param n     根次数
@@ -945,7 +945,7 @@ public class NumberUtils {
     }
 
     /**
-     * 正整数之间的精确对数.
+     * 正整数之间的精确对数
      *
      * @param a 真数
      * @param b 底数
