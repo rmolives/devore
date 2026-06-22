@@ -1089,6 +1089,8 @@ public class Core {
                 start = pos + sep.length();
             }
             list.add(DString.valueOf(str.substring(start)));
+            while (!list.isEmpty() && list.get(list.size() - 1).toString().isEmpty())
+                list.remove(list.size() - 1);
             return DList.valueOf(list);
         }), 2, false);
         dEnv.addTokenProcedure("string-split-regex", ((args, env) -> {
