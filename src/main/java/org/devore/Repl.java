@@ -8,7 +8,6 @@ import org.devore.parser.Lexer;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,8 +44,6 @@ public class Repl {
      * @throws IOException 错误
      */
     public static void repl(Env env) throws IOException {
-        PrintStream out = System.out;
-        PrintStream err = System.err;
         StringBuilder codeBuilder = new StringBuilder();
         int sourceIndex = 0;
         resetInputState();
@@ -55,12 +52,12 @@ public class Repl {
             while (true) {
                 int promptIndex = codeBuilder.length() == 0 ? sourceIndex + 1 : sourceIndex;
                 String prompt = "[Devore#" + promptIndex + "] >>> ";
-                out.print(prompt);
-                out.flush();
+                System.out.print(prompt);
+                System.out.flush();
                 String read = readLine(prompt, codeBuilder.toString());
                 if (read == null) {
                     if (codeBuilder.length() > 0)
-                        printError(err, codeBuilder.toString(), sourceIndex);
+                        printError(codeBuilder.toString(), sourceIndex);
                     break;
                 }
                 String trimmed = read.trim();
@@ -73,16 +70,16 @@ public class Repl {
                             return;
                         case ":help":
                             recordHistory(read);
-                            printHelp(out);
+                            printHelp();
                             continue;
                         case ":version":
                             recordHistory(read);
-                            out.println(Devore.VERSION_MESSAGE);
+                            System.out.println(Devore.VERSION_MESSAGE);
                             continue;
                     }
                     if (trimmed.startsWith(":load ")) {
                         recordHistory(read);
-                        loadFiles(env, out, err, trimmed.substring(6).trim());
+                        loadFiles(env, trimmed.substring(6).trim());
                         continue;
                     }
                 }
@@ -98,10 +95,10 @@ public class Repl {
                 try {
                     DToken result = Devore.call(env, code, "<#" + sourceIndex + ">");
                     if (result != DWord.NIL)
-                        out.println(result.toString());
+                        System.out.println(result.toString());
                     codeBuilder = new StringBuilder();
                 } catch (DevoreRuntimeException e) {
-                    err.println(e.getMessage());
+                    System.err.println(e.getMessage());
                     codeBuilder = new StringBuilder();
                 }
             }
@@ -129,43 +126,40 @@ public class Repl {
      * 加载文件
      *
      * @param env   环境
-     * @param out   输出
      * @param input 文件列表
      * @throws IOException 错误
      */
-    private static void loadFiles(Env env, PrintStream out, PrintStream err, String input) throws IOException {
+    private static void loadFiles(Env env, String input) throws IOException {
         if (input.isEmpty()) {
-            err.println(":load 需要至少一个文件路径.");
+            System.err.println(":load 需要至少一个文件路径.");
             return;
         }
         String[] files = input.split("\\s+");
         for (String file : files) {
             Path path = Paths.get(file);
             if (!Files.exists(path)) {
-                err.println("文件不存在: " + file);
+                System.err.println("文件不存在: " + file);
                 continue;
             }
             String code = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             try {
                 DToken result = Devore.call(env, code, file);
                 if (result != DWord.NIL)
-                    out.println(result);
+                    System.out.println(result);
             } catch (DevoreRuntimeException e) {
-                err.println(e.getMessage());
+                System.err.println(e.getMessage());
             }
         }
     }
 
     /**
      * 打印帮助
-     *
-     * @param out 输出
      */
-    private static void printHelp(PrintStream out) {
-        out.println(":help      显示帮助");
-        out.println(":version   显示版本");
-        out.println(":load FILE 加载文件, 可一次加载多个");
-        out.println(":exit      退出");
+    private static void printHelp() {
+        System.out.println(":help      显示帮助");
+        System.out.println(":version   显示版本");
+        System.out.println(":load FILE 加载文件, 可一次加载多个");
+        System.out.println(":exit      退出");
     }
 
     /**
@@ -187,15 +181,14 @@ public class Repl {
     /**
      * 打印错误
      *
-     * @param err         输出
      * @param code        代码
      * @param sourceIndex 定位
      */
-    private static void printError(PrintStream err, String code, int sourceIndex) {
+    private static void printError(String code, int sourceIndex) {
         try {
             Devore.call(Env.newEnv(), code, "<#" + sourceIndex + ">");
         } catch (DevoreRuntimeException e) {
-            err.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
