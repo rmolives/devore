@@ -216,7 +216,19 @@ public class DList extends DToken {
 
     @Override
     protected String str() {
-        return this.list.toString();
+        StringBuilder builder = new StringBuilder("[");
+        for (int i = 0; i < this.list.size(); ++i) {
+            if (i > 0)
+                builder.append(", ");
+            builder.append(this.formatToken(this.list.get(i)));
+        }
+        return builder.append("]").toString();
+    }
+
+    private String formatToken(DToken token) {
+        if (token instanceof DString)
+            return "\"" + token + "\"";
+        return token.toString();
     }
 
     @Override
