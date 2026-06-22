@@ -230,11 +230,11 @@ public class Repl {
     private static boolean loadWindowsNative() {
         if (windowsNativeLoaded)
             return true;
-        String resource = "/native/" + System.mapLibraryName("devore-repl");
+        String resource = "/native/" + System.mapLibraryName("devore-repl-console");
         try (InputStream input = Repl.class.getResourceAsStream(resource)) {
             if (input == null)
                 return false;
-            Path library = Files.createTempFile("devore-repl-", ".dll");
+            Path library = Files.createTempFile("devore-repl-console-", ".dll");
             Files.copy(input, library, StandardCopyOption.REPLACE_EXISTING);
             library.toFile().deleteOnExit();
             System.load(library.toAbsolutePath().toString());

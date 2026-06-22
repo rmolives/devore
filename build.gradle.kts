@@ -22,7 +22,7 @@ val compileWindowsReplJni by tasks.registering(Exec::class) {
     enabled = isWindows
     onlyIf { isWindows }
     inputs.file("src/main/native/windows/repl_console.c")
-    outputs.file(windowsNativeBuildDir.map { it.file("devore-repl.dll") })
+    outputs.file(windowsNativeBuildDir.map { it.file("devore-repl-console.dll") })
     doFirst {
         windowsNativeBuildDir.get().asFile.mkdirs()
         val javaHome = providers.environmentVariable("JAVA_HOME").orNull
@@ -41,10 +41,10 @@ val compileWindowsReplJni by tasks.registering(Exec::class) {
             "/I${jdkHome}\\include\\win32",
             "/Fo:${windowsNativeBuildDir.get().asFile}\\",
             "src\\main\\native\\windows\\repl_console.c",
-            "/Fe:${windowsNativeBuildDir.get().asFile}\\devore-repl.dll",
+            "/Fe:${windowsNativeBuildDir.get().asFile}\\devore-repl-console.dll",
             "/link",
             "/NOLOGO",
-            "/IMPLIB:${windowsNativeBuildDir.get().asFile}\\devore-repl.lib"
+            "/IMPLIB:${windowsNativeBuildDir.get().asFile}\\devore-repl-console.lib"
         )
     }
 }
@@ -53,7 +53,7 @@ tasks.processResources {
     if (isWindows) {
         dependsOn(compileWindowsReplJni)
         from(windowsNativeBuildDir) {
-            include("devore-repl.dll")
+            include("devore-repl-console.dll")
             into("native")
         }
     }
