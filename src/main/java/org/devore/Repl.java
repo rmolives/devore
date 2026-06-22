@@ -199,11 +199,6 @@ public class Repl {
      * 输入改由本程序逐字符回显，因而多行粘贴时每行都能先显示提示符
      */
     private static void enableManualEcho() {
-        String os = System.getProperty("os.name", "").toLowerCase();
-        if (os.contains("win")) {
-            enableWindowsManualEcho();
-            return;
-        }
         enableUnixManualEcho();
     }
 
@@ -215,21 +210,6 @@ public class Repl {
                 return;
             }
             runStty("-icanon", "-echo", "min", "1", "time", "0");
-            manualEcho = true;
-            Runtime.getRuntime().addShutdownHook(new Thread(Repl::restoreTerminal));
-        } catch (Exception ignored) {
-            terminalState = null;
-            manualEcho = false;
-        }
-    }
-
-    private static void enableWindowsManualEcho() {
-        try {
-            int mode = Integer.parseInt(runPowerShell(windowsConsoleModeScript(null)).trim());
-            int newMode = mode & ~0x0006; // ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-            if (newMode != mode)
-                runPowerShell(windowsConsoleModeScript(newMode));
-            terminalState = "windows:" + mode;
             manualEcho = true;
             Runtime.getRuntime().addShutdownHook(new Thread(Repl::restoreTerminal));
         } catch (Exception ignored) {
@@ -255,57 +235,12 @@ public class Repl {
         return output.toString();
     }
 
-    private static String runPowerShell(String script) throws IOException, InterruptedException {
-        ProcessBuilder builder = new ProcessBuilder(
-                "powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script);
-        builder.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        builder.redirectErrorStream(true);
-        Process process = builder.start();
-        StringBuilder output = new StringBuilder();
-        int c;
-        while ((c = process.getInputStream().read()) != -1)
-            output.append((char) c);
-        if (process.waitFor() != 0)
-            throw new IOException("powershell failed");
-        return output.toString();
-    }
-
-    private static String windowsConsoleModeScript(Integer mode) {
-        StringBuilder script = new StringBuilder()
-                .append("$signature=@'\n")
-                .append("using System;\n")
-                .append("using System.Runtime.InteropServices;\n")
-                .append("public static class ConsoleMode {\n")
-                .append("[DllImport(\"kernel32.dll\", SetLastError=true)] ")
-                .append("public static extern IntPtr GetStdHandle(int nStdHandle);\n")
-                .append("[DllImport(\"kernel32.dll\", SetLastError=true)] ")
-                .append("public static extern bool GetConsoleMode(IntPtr hConsoleHandle, out int lpMode);\n")
-                .append("[DllImport(\"kernel32.dll\", SetLastError=true)] ")
-                .append("public static extern bool SetConsoleMode(IntPtr hConsoleHandle, int dwMode);\n")
-                .append("}\n")
-                .append("'@;\n")
-                .append("Add-Type $signature;\n")
-                .append("$handle=[ConsoleMode]::GetStdHandle(-10);\n");
-        if (mode == null)
-            script.append("$mode=0;\n")
-                    .append("if(-not [ConsoleMode]::GetConsoleMode($handle,[ref]$mode)){exit 1};\n")
-                    .append("Write-Output $mode;\n");
-        else
-            script.append("if(-not [ConsoleMode]::SetConsoleMode($handle,")
-                    .append(mode)
-                    .append(")){exit 1};\n");
-        return script.toString();
-    }
-
     private static synchronized void restoreTerminal() {
         if (!manualEcho || terminalState == null)
             return;
         manualEcho = false;
         try {
-            if (terminalState.startsWith("windows:"))
-                runPowerShell(windowsConsoleModeScript(Integer.parseInt(terminalState.substring(8))));
-            else
-                runStty(terminalState);
+            runStty(terminalState);
         } catch (Exception ignored) {
             // JVM 退出时不能再向调用方报告恢复失败。
         }
