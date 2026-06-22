@@ -34,7 +34,7 @@ public class Core {
         initIOProcedures(dEnv);             // 标准输入输出
         initErrorProcedures(dEnv);          // 错误输出和抛错
         initModuleProcedures(dEnv);         // 模块加载
-        initDefinitionProcedures(dEnv);     // 定义、宏和函数调用
+        initDefinitionProcedures(dEnv);     // 定义、库定义、宏和函数调用
         initComparisonProcedures(dEnv);     // 通用比较
         initControlProcedures(dEnv);        // 控制流
         initLogicAndRandomProcedures(dEnv); // 布尔逻辑和随机数
@@ -430,6 +430,11 @@ public class Core {
      * @param dEnv 目标环境
      */
     private static void initModuleProcedures(Env dEnv) {
+        dEnv.addAstProcedure("module", ((ast, env) -> {
+            for (Ast node : ast.children)
+                defineModuleBinding(env, node);
+            return DWord.NIL;
+        }), 1, true);
         dEnv.addTokenProcedure("require", ((args, env) -> {
             DToken result = DWord.NIL;
             for (DToken arg : args) {
@@ -450,7 +455,7 @@ public class Core {
     }
 
     /**
-     * 注册定义和函数调用相关过程，包括def、set!、宏、let、lambda、apply和act
+     * 注册定义和函数调用相关过程，包括def、lib、set!、宏、let、lambda、apply和act
      *
      * @param dEnv 目标环境
      */
@@ -615,6 +620,194 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "list");
             return ((DProcedure) args.get(0)).call(((DList) args.get(1)).toList(), env);
         }), 2, false);
+    }
+
+    /**
+     * 根据module子项形态分发为值、过程、宏或更新绑定
+     *
+     * @param env  环境
+     * @param node lib子项
+     */
+    private static void defineModuleBinding(Env env, Ast node) {
+        if (node.symbol instanceof Ast) {
+            defineModuleProcedure(env, (Ast) node.symbol, node.children);
+            return;
+        }
+        if (node.symbol instanceof DSymbol && "procedure".equals(node.symbol.toString())) {
+            if (node.isEmpty())
+                throw new DevoreRuntimeException("module过程绑定必须包含签名和过程体.");
+            defineModuleProcedure(env, node.get(0), node.children.subList(1, node.size()));
+            return;
+        }
+        if (node.symbol instanceof DSymbol && "macro".equals(node.symbol.toString())) {
+            if (node.isEmpty())
+                throw new DevoreRuntimeException("module宏绑定必须包含签名和宏体.");
+            defineModuleMacro(env, node.get(0), node.children.subList(1, node.size()));
+            return;
+        }
+        if (node.symbol instanceof DSymbol && "set!".equals(node.symbol.toString())) {
+            defineModuleSet(env, node);
+            return;
+        }
+        if (node.symbol instanceof DSymbol && "set-macro!".equals(node.symbol.toString())) {
+            defineModuleSetMacro(env, node);
+            return;
+        }
+        defineModuleValue(env, node);
+    }
+
+    /**
+     * 注册module值绑定，已绑定名称会被跳过
+     *
+     * @param env  环境
+     * @param node 值绑定节点
+     */
+    private static void defineModuleValue(Env env, Ast node) {
+        if (!(node.symbol instanceof DSymbol))
+            throw new DevoreCastException(node.symbol.type(), "symbol");
+        if (node.isEmpty())
+            throw new DevoreRuntimeException("module绑定必须包含名称和值.");
+        String name = node.symbol.toString();
+        if (env.contains(name))
+            return;
+        Env newEnv = env.createChild();
+        DToken result = DWord.NIL;
+        for (Ast value : node.children)
+            result = Evaluator.eval(newEnv, value.copy());
+        env.put(name, result);
+    }
+
+    /**
+     * 注册module过程绑定，已绑定名称会被跳过
+     *
+     * @param env       环境
+     * @param signature 过程签名
+     * @param bodyNodes 过程体
+     */
+    private static void defineModuleProcedure(Env env, Ast signature, List<Ast> bodyNodes) {
+        String name = moduleBindingName(signature);
+        if (bodyNodes.isEmpty())
+            throw new DevoreRuntimeException("module过程绑定必须包含过程体.");
+        if (env.contains(name))
+            return;
+        List<String> params = moduleBindingParams(signature);
+        List<Ast> nodes = bodyNodes.stream().map(Ast::copy).collect(Collectors.toList());
+        env.addTokenProcedure(name, ((cArgs, cEnv) -> {
+            Env newEnv = env.createChild();
+            for (int i = 0; i < params.size(); ++i)
+                newEnv.put(params.get(i), cArgs.get(i));
+            DToken result = DWord.NIL;
+            for (Ast body : nodes)
+                result = Evaluator.eval(newEnv, body.copy());
+            return result;
+        }), params.size(), false);
+    }
+
+    /**
+     * 注册module宏绑定，已绑定名称会被跳过
+     *
+     * @param env       环境
+     * @param signature 宏签名
+     * @param bodyNodes 宏体
+     */
+    private static void defineModuleMacro(Env env, Ast signature, List<Ast> bodyNodes) {
+        String name = moduleBindingName(signature);
+        if (bodyNodes.isEmpty())
+            throw new DevoreRuntimeException("module宏绑定必须包含宏体.");
+        if (env.contains(name))
+            return;
+        env.addMacro(name, DMacro.newMacro(moduleBindingParams(signature),
+                bodyNodes.stream().map(Ast::copy).collect(Collectors.toList())));
+    }
+
+    /**
+     * 执行module中的set!更新，支持值和过程
+     *
+     * @param env  环境
+     * @param node set!节点
+     */
+    private static void defineModuleSet(Env env, Ast node) {
+        if (node.size() < 2)
+            throw new DevoreRuntimeException("module中的set!必须包含目标和值.");
+        Ast target = node.get(0);
+        if (!(target.symbol instanceof DSymbol))
+            throw new DevoreCastException(target.symbol.type(), "symbol");
+        if (target.isEmpty() && target.type != Ast.Type.PROCEDURE) {
+            Env newEnv = env.createChild();
+            DToken result = DWord.NIL;
+            for (int i = 1; i < node.size(); ++i)
+                result = Evaluator.eval(newEnv, node.get(i).copy());
+            env.set(target.symbol.toString(), result);
+            return;
+        }
+        setModuleProcedure(env, target, node.children.subList(1, node.size()));
+    }
+
+    /**
+     * 执行module中的set-macro!更新
+     *
+     * @param env  环境
+     * @param node set-macro!节点
+     */
+    private static void defineModuleSetMacro(Env env, Ast node) {
+        if (node.size() < 2)
+            throw new DevoreRuntimeException("module中的set-macro!必须包含签名和宏体.");
+        Ast signature = node.get(0);
+        String name = moduleBindingName(signature);
+        env.setMacro(name, DMacro.newMacro(moduleBindingParams(signature),
+                node.children.subList(1, node.size()).stream().map(Ast::copy).collect(Collectors.toList())));
+    }
+
+    /**
+     * 更新module过程绑定
+     *
+     * @param env       环境
+     * @param signature 过程签名
+     * @param bodyNodes 过程体
+     */
+    private static void setModuleProcedure(Env env, Ast signature, List<Ast> bodyNodes) {
+        String name = moduleBindingName(signature);
+        if (bodyNodes.isEmpty())
+            throw new DevoreRuntimeException("module中的set!过程绑定必须包含过程体.");
+        List<String> params = moduleBindingParams(signature);
+        List<Ast> nodes = bodyNodes.stream().map(Ast::copy).collect(Collectors.toList());
+        env.setTokenProcedure(name, ((cArgs, cEnv) -> {
+            Env newEnv = env.createChild();
+            for (int i = 0; i < params.size(); ++i)
+                newEnv.put(params.get(i), cArgs.get(i));
+            DToken result = DWord.NIL;
+            for (Ast body : nodes)
+                result = Evaluator.eval(newEnv, body.copy());
+            return result;
+        }), params.size(), false);
+    }
+
+    /**
+     * 获取module过程或宏签名中的绑定名称
+     *
+     * @param signature 绑定签名
+     * @return 绑定名称
+     */
+    private static String moduleBindingName(Ast signature) {
+        if (!(signature.symbol instanceof DSymbol))
+            throw new DevoreCastException(signature.symbol.type(), "symbol");
+        return signature.symbol.toString();
+    }
+
+    /**
+     * 获取module过程或宏签名中的参数名
+     *
+     * @param signature 绑定签名
+     * @return 参数名列表
+     */
+    private static List<String> moduleBindingParams(Ast signature) {
+        List<String> params = new ArrayList<>();
+        for (Ast param : signature.children) {
+            if (!(param.symbol instanceof DSymbol))
+                throw new DevoreCastException(param.symbol.type(), "symbol");
+            params.add(param.symbol.toString());
+        }
+        return params;
     }
 
     /**
