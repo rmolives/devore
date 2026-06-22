@@ -7,12 +7,14 @@ import org.devore.lang.token.DWord;
 import org.devore.parser.Lexer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 /**
@@ -35,7 +37,9 @@ public class Repl {
     };
     private static final List<String> HISTORY = new ArrayList<>();
     private static String terminalState;
+    private static int windowsConsoleMode = -1;
     private static boolean manualEcho;
+    private static boolean windowsNativeLoaded;
     private static boolean skipLineFeed;
     private static boolean endOfInput;
     private static final Reader INPUT = new InputStreamReader(System.in, StandardCharsets.UTF_8);
@@ -202,7 +206,44 @@ public class Repl {
      * 输入改由本程序逐字符回显，因而多行粘贴时每行都能先显示提示符
      */
     private static void enableManualEcho() {
-        enableUnixManualEcho();
+        if (isWindows())
+            enableWindowsManualEcho();
+        else
+            enableUnixManualEcho();
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
+    }
+
+    private static void enableWindowsManualEcho() {
+        if (!loadWindowsNative())
+            return;
+        int mode = enableWindowsConsoleManualEcho();
+        if (mode < 0)
+            return;
+        windowsConsoleMode = mode;
+        manualEcho = true;
+        Runtime.getRuntime().addShutdownHook(new Thread(Repl::restoreTerminal));
+    }
+
+    private static boolean loadWindowsNative() {
+        if (windowsNativeLoaded)
+            return true;
+        String resource = "/native/" + System.mapLibraryName("devore-repl");
+        try (InputStream input = Repl.class.getResourceAsStream(resource)) {
+            if (input == null)
+                return false;
+            Path library = Files.createTempFile("devore-repl-", ".dll");
+            Files.copy(input, library, StandardCopyOption.REPLACE_EXISTING);
+            library.toFile().deleteOnExit();
+            System.load(library.toAbsolutePath().toString());
+            windowsNativeLoaded = true;
+            return true;
+        } catch (UnsatisfiedLinkError | IOException | SecurityException ignored) {
+            windowsNativeLoaded = false;
+            return false;
+        }
     }
 
     private static void enableUnixManualEcho() {
@@ -239,15 +280,25 @@ public class Repl {
     }
 
     private static synchronized void restoreTerminal() {
-        if (!manualEcho || terminalState == null)
+        if (!manualEcho)
             return;
         manualEcho = false;
-        try {
-            runStty(terminalState);
-        } catch (Exception ignored) {
-            // JVM 退出时不能再向调用方报告恢复失败。
+        if (isWindows()) {
+            if (windowsNativeLoaded && windowsConsoleMode >= 0)
+                restoreWindowsConsole(windowsConsoleMode);
+            windowsConsoleMode = -1;
+        } else if (terminalState != null) {
+            try {
+                runStty(terminalState);
+            } catch (Exception ignored) {
+                // JVM 退出时不能再向调用方报告恢复失败。
+            }
         }
     }
+
+    private static native int enableWindowsConsoleManualEcho();
+
+    private static native void restoreWindowsConsole(int mode);
 
     /**
      * 从标准输入逐字符读取一行。交互模式下同时负责字符回显和退格

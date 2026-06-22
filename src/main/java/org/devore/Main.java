@@ -11,11 +11,9 @@ import java.nio.file.Paths;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        if (args.length == 0) {
-            if (isWindows())
-                throw new UnsupportedOperationException("REPL 不支持 Windows, 请在 Unix 环境中运行.");
+        if (args.length == 0)
             Repl.repl(Env.newEnv());
-        } else if ("--version".equals(args[0]) || "-v".equals(args[0]))
+        else if ("--version".equals(args[0]) || "-v".equals(args[0]))
             System.out.println(Devore.VERSION_MESSAGE);
         else {
             Env env = Env.newEnv();
@@ -33,9 +31,5 @@ public class Main {
                 }
             }
         }
-    }
-
-    private static boolean isWindows() {
-        return System.getProperty("os.name", "").toLowerCase().contains("win");
     }
 }
