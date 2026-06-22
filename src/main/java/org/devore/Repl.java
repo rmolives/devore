@@ -748,7 +748,7 @@ public class Repl {
             boolean listHead = isExpectingHead(state);
             String bracketColor = currentBracketColor(state);
             consumeExpectedHead(state);
-            appendColored(builder, token, colorForToken(token, index, listHead, bracketColor));
+            appendColored(builder, token, colorForToken(token, isCommandToken(text, index), listHead, bracketColor));
             if (listHead && "lambda".equals(token))
                 state.lambdaParamsPending = true;
             else if (!Character.isWhitespace(c))
@@ -794,8 +794,17 @@ public class Repl {
             state.expectingHead.set(state.expectingHead.size() - 1, false);
     }
 
-    private static String colorForToken(String token, int index, boolean listHead, String bracketColor) {
-        if (index == 0 && token.startsWith(":"))
+    private static boolean isCommandToken(String text, int tokenStart) {
+        if (tokenStart >= text.length() || text.charAt(tokenStart) != ':')
+            return false;
+        for (int index = 0; index < tokenStart; ++index)
+            if (!Character.isWhitespace(text.charAt(index)))
+                return false;
+        return true;
+    }
+
+    private static String colorForToken(String token, boolean commandToken, boolean listHead, String bracketColor) {
+        if (commandToken)
             return ANSI_CYAN;
         String color;
         if (isNumberToken(token))
