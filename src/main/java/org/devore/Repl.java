@@ -64,21 +64,24 @@ public class Repl {
                     break;
                 }
                 String trimmed = read.trim();
-                recordHistory(read);
                 if (codeBuilder.length() == 0) {
                     if (trimmed.isEmpty())
                         continue;
                     switch (trimmed) {
                         case ":exit":
+                            recordHistory(read);
                             return;
                         case ":help":
+                            recordHistory(read);
                             printHelp(out);
                             continue;
                         case ":version":
+                            recordHistory(read);
                             out.println(Devore.VERSION_MESSAGE);
                             continue;
                     }
                     if (trimmed.startsWith(":load ")) {
+                        recordHistory(read);
                         loadFiles(env, out, err, trimmed.substring(6).trim());
                         continue;
                     }
@@ -91,6 +94,7 @@ public class Repl {
                 String code = codeBuilder.toString();
                 if (isIncomplete(code))
                     continue;
+                recordHistory(code);
                 try {
                     DToken result = Devore.call(env, code, "<#" + sourceIndex + ">");
                     if (result != DWord.NIL)
@@ -463,7 +467,14 @@ public class Repl {
     }
 
     private static int displayRows(String prompt, String line, int terminalColumns) {
-        int width = displayWidth(prompt) + displayWidth(line);
+        String[] lines = line.split("\\R", -1);
+        int rows = visualRows(displayWidth(prompt) + displayWidth(lines[0]), terminalColumns);
+        for (int i = 1; i < lines.length; ++i)
+            rows += visualRows(displayWidth(lines[i]), terminalColumns);
+        return rows;
+    }
+
+    private static int visualRows(int width, int terminalColumns) {
         return Math.max(1, (width + terminalColumns - 1) / terminalColumns);
     }
 
