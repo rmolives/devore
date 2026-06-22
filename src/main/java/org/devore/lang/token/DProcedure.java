@@ -58,7 +58,7 @@ public class DProcedure extends DToken {
      */
     public DProcedure addProcedure(String name, DProcedure procedure) {
         if (this.match(procedure.argc) != null)
-            throw new DevoreRuntimeException("过程定义冲突: " + name + ".");
+            throw new DevoreRuntimeException("过程定义冲突: " + name);
         this.children.add(procedure);
         return this;
     }

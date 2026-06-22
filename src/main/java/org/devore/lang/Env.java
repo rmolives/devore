@@ -71,7 +71,7 @@ public class Env {
      */
     public Env put(String key, DToken value) {
         if (this.table.containsKey(key))
-            throw new DevoreRuntimeException("定义冲突: " + key + ".");
+            throw new DevoreRuntimeException("定义冲突: " + key);
         this.table.put(key, value);
         return this;
     }

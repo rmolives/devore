@@ -52,7 +52,7 @@ public class DMacro extends DToken {
      */
     public DMacro addMacro(String name, DMacro macro) {
         if (this.match(macro.params.size()) != null)
-            throw new DevoreRuntimeException("宏定义冲突: " + name + ".");
+            throw new DevoreRuntimeException("宏定义冲突: " + name);
         this.children.add(macro);
         return this;
     }
