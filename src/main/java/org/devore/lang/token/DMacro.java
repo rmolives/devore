@@ -46,12 +46,13 @@ public class DMacro extends DToken {
     /**
      * 添加宏
      *
+     * @param name  宏名
      * @param macro 宏
      * @return this
      */
-    public DMacro addMacro(DMacro macro) {
+    public DMacro addMacro(String name, DMacro macro) {
         if (this.match(macro.params.size()) != null)
-            throw new DevoreRuntimeException("宏定义冲突.");
+            throw new DevoreRuntimeException("宏定义冲突: " + name + ".");
         this.children.add(macro);
         return this;
     }

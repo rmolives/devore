@@ -15,8 +15,8 @@ import java.util.function.BiFunction;
 
 public class Env {
     public final Map<String, DToken> table;  // 环境表
-    public final Env father;                // 父环境
-    public final IOConfig io;               // IO表
+    public final Env father;                 // 父环境
+    public final IOConfig io;                // IO表
 
     /**
      * 创建环境
@@ -71,7 +71,7 @@ public class Env {
      */
     public Env put(String key, DToken value) {
         if (this.table.containsKey(key))
-            throw new DevoreRuntimeException("定义冲突: " + key);
+            throw new DevoreRuntimeException("定义冲突: " + key + ".");
         this.table.put(key, value);
         return this;
     }
@@ -85,7 +85,7 @@ public class Env {
      */
     public Env addMacro(String key, DMacro macro) {
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DMacro) this.table.get(key)).addMacro(macro));
+            this.table.put(key, ((DMacro) this.table.get(key)).addMacro(key, macro));
             return this;
         }
         this.table.put(key, macro);
@@ -118,7 +118,7 @@ public class Env {
      */
     public Env addAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(DProcedure.newProcedure(procedure, argc, vararg)));
+            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(procedure, argc, vararg)));
             return this;
         }
         this.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
@@ -144,7 +144,7 @@ public class Env {
             return procedure.apply(args, env);
         };
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(DProcedure.newProcedure(df, argc, vararg)));
+            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(df, argc, vararg)));
             return this;
         }
         this.table.put(key, DProcedure.newProcedure(df, argc, vararg));

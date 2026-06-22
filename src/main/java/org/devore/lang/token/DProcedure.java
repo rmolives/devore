@@ -52,12 +52,13 @@ public class DProcedure extends DToken {
     /**
      * 添加新过程
      *
+     * @param name      过程名
      * @param procedure 过程
      * @return this
      */
-    public DProcedure addProcedure(DProcedure procedure) {
+    public DProcedure addProcedure(String name, DProcedure procedure) {
         if (this.match(procedure.argc) != null)
-            throw new DevoreRuntimeException("过程定义冲突.");
+            throw new DevoreRuntimeException("过程定义冲突: " + name + ".");
         this.children.add(procedure);
         return this;
     }
