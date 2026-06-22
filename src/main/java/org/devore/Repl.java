@@ -320,6 +320,8 @@ public class Repl {
             return null;
         StringBuilder line = new StringBuilder();
         int historyCursor = HISTORY.size();
+        int terminalColumns = terminalColumns();
+        int[] renderedRows = {displayRows(prompt, line.toString(), terminalColumns)};
         String currentLine = null;
         while (true) {
             int c = INPUT.read();
@@ -348,7 +350,8 @@ public class Repl {
             if (manualEcho && (c == 8 || c == 127)) {
                 if (line.length() > 0) {
                     line.deleteCharAt(line.length() - 1);
-                    redrawLine(prompt, line.toString(), highlightContext);
+                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
+                            renderedRows[0], terminalColumns);
                 }
                 historyCursor = HISTORY.size();
                 currentLine = null;
@@ -359,7 +362,8 @@ public class Repl {
                 if (key == 'A' || key == 'B') {
                     if (currentLine == null)
                         currentLine = line.toString();
-                    historyCursor = updateHistoryLine(prompt, line, historyCursor, currentLine, key, highlightContext);
+                    historyCursor = updateHistoryLine(prompt, line, historyCursor, currentLine, key,
+                            highlightContext, terminalColumns, renderedRows);
                     if (historyCursor == HISTORY.size())
                         currentLine = null;
                 }
@@ -369,7 +373,8 @@ public class Repl {
             historyCursor = HISTORY.size();
             currentLine = null;
             if (manualEcho)
-                redrawLine(prompt, line.toString(), highlightContext);
+                renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
+                        renderedRows[0], terminalColumns);
         }
     }
 
@@ -388,7 +393,7 @@ public class Repl {
     }
 
     private static int updateHistoryLine(String prompt, StringBuilder line, int cursor, String currentLine, int key,
-                                         String highlightContext) {
+                                         String highlightContext, int terminalColumns, int[] renderedRows) {
         if (HISTORY.isEmpty())
             return cursor;
         if (key == 'A' && cursor > 0)
@@ -402,19 +407,89 @@ public class Repl {
             line.append(currentLine);
         else
             line.append(HISTORY.get(cursor));
-        redrawLine(prompt, line.toString(), highlightContext);
+        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, renderedRows[0], terminalColumns);
         return cursor;
     }
 
-    private static void redrawLine(String prompt, String line, String highlightContext) {
+    private static int redrawLine(String prompt, String line, String highlightContext, int previousRows,
+                                  int terminalColumns) {
         if (!manualEcho)
-            return;
-        System.out.print("\r");
+            return previousRows;
+        clearRenderedInput(previousRows);
         System.out.print(prompt);
         System.out.print(highlightLine(highlightContext, line));
         System.out.print(ANSI_RESET);
         System.out.print("\033[K");
         System.out.flush();
+        return displayRows(prompt, line, terminalColumns);
+    }
+
+    private static void clearRenderedInput(int rows) {
+        System.out.print("\r");
+        for (int i = 1; i < rows; ++i)
+            System.out.print("\033[1A");
+        for (int i = 0; i < rows; ++i) {
+            System.out.print("\033[2K");
+            if (i < rows - 1)
+                System.out.print("\033[1B");
+        }
+        System.out.print("\r");
+        for (int i = 1; i < rows; ++i)
+            System.out.print("\033[1A");
+    }
+
+    private static int terminalColumns() {
+        String columns = System.getenv("COLUMNS");
+        if (columns != null) {
+            try {
+                int value = Integer.parseInt(columns);
+                if (value > 0)
+                    return value;
+            } catch (NumberFormatException ignored) {
+                // 继续尝试 stty。
+            }
+        }
+        try {
+            String[] size = runStty("size").trim().split("\\s+");
+            if (size.length == 2) {
+                int value = Integer.parseInt(size[1]);
+                if (value > 0)
+                    return value;
+            }
+        } catch (Exception ignored) {
+            // 非交互输入或不支持 stty 时使用保守默认值。
+        }
+        return 80;
+    }
+
+    private static int displayRows(String prompt, String line, int terminalColumns) {
+        int width = displayWidth(prompt) + displayWidth(line);
+        return Math.max(1, (width + terminalColumns - 1) / terminalColumns);
+    }
+
+    private static int displayWidth(String text) {
+        int width = 0;
+        for (int index = 0; index < text.length(); ) {
+            int codePoint = text.codePointAt(index);
+            if (codePoint == '\t')
+                width += 4;
+            else if (!Character.isISOControl(codePoint))
+                width += isWideCodePoint(codePoint) ? 2 : 1;
+            index += Character.charCount(codePoint);
+        }
+        return width;
+    }
+
+    private static boolean isWideCodePoint(int codePoint) {
+        Character.UnicodeBlock block = Character.UnicodeBlock.of(codePoint);
+        return block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+                || block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+                || block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+                || block == Character.UnicodeBlock.HIRAGANA
+                || block == Character.UnicodeBlock.KATAKANA
+                || block == Character.UnicodeBlock.HANGUL_SYLLABLES
+                || block == Character.UnicodeBlock.HANGUL_JAMO
+                || block == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO;
     }
 
     private static String highlightLine(String context, String line) {
