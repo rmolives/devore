@@ -56,7 +56,7 @@
         (let ([actual expr])
             (fail name (++ "expected error, got " actual)))
         (catch e
-            (pass (++ name " caught: " e)))))
+            (pass name))))
 
 (println "== Devore Core test ==")
 
