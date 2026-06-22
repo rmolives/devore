@@ -29,22 +29,22 @@ public class Core {
      * @param dEnv 目标环境
      */
     public static void init(Env dEnv) {
-        initConstants(dEnv);
-        initNumberProcedures(dEnv);
-        initIOProcedures(dEnv);
-        initErrorProcedures(dEnv);
-        initModuleProcedures(dEnv);
-        initDefinitionProcedures(dEnv);
-        initComparisonProcedures(dEnv);
-        initControlProcedures(dEnv);
-        initLogicAndRandomProcedures(dEnv);
-        initListProcedures(dEnv);
-        initConversionProcedures(dEnv);
-        initSystemProcedures(dEnv);
-        initTableProcedures(dEnv);
-        initAggregateProcedures(dEnv);
-        initPredicateProcedures(dEnv);
-        initStringProcedures(dEnv);
+        initConstants(dEnv);                // 基础常量
+        initNumberProcedures(dEnv);         // 数值计算
+        initIOProcedures(dEnv);             // 标准输入输出
+        initErrorProcedures(dEnv);          // 错误输出和抛错
+        initModuleProcedures(dEnv);         // 模块加载
+        initDefinitionProcedures(dEnv);     // 定义、宏和函数调用
+        initComparisonProcedures(dEnv);     // 通用比较
+        initControlProcedures(dEnv);        // 控制流
+        initLogicAndRandomProcedures(dEnv); // 布尔逻辑和随机数
+        initListProcedures(dEnv);           // 列表、序列和高阶遍历
+        initConversionProcedures(dEnv);     // 类型转换
+        initSystemProcedures(dEnv);         // 系统级过程
+        initTableProcedures(dEnv);          // 表结构
+        initAggregateProcedures(dEnv);      // 聚合比较
+        initPredicateProcedures(dEnv);      // 类型和特殊值判断
+        initStringProcedures(dEnv);         // 字符串处理
     }
 
     /**
