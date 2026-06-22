@@ -1,5 +1,6 @@
 package org.devore.lang;
 
+import org.devore.Devore;
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.*;
@@ -7,8 +8,13 @@ import org.devore.parser.Ast;
 import org.devore.utils.DIntUtils;
 import org.devore.utils.NumberUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -17,10 +23,47 @@ import java.util.stream.Collectors;
  * 核心
  */
 public class Core {
+    /**
+     * 初始化核心环境，按功能分类注册全部内置常量和过程
+     *
+     * @param dEnv 目标环境
+     */
     public static void init(Env dEnv) {
+        initConstants(dEnv);
+        initNumberProcedures(dEnv);
+        initIOProcedures(dEnv);
+        initErrorProcedures(dEnv);
+        initModuleProcedures(dEnv);
+        initDefinitionProcedures(dEnv);
+        initComparisonProcedures(dEnv);
+        initControlProcedures(dEnv);
+        initLogicAndRandomProcedures(dEnv);
+        initListProcedures(dEnv);
+        initConversionProcedures(dEnv);
+        initSystemProcedures(dEnv);
+        initTableProcedures(dEnv);
+        initAggregateProcedures(dEnv);
+        initPredicateProcedures(dEnv);
+        initStringProcedures(dEnv);
+    }
+
+    /**
+     * 注册基础常量，如nil、true和false
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initConstants(Env dEnv) {
         dEnv.put("nil", DWord.NIL);
         dEnv.put("true", DBool.TRUE);
         dEnv.put("false", DBool.FALSE);
+    }
+
+    /**
+     * 注册数值计算相关过程，包括四则运算、幂、取模、三角函数、对数和取整等
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initNumberProcedures(Env dEnv) {
         dEnv.addTokenProcedure("+", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
@@ -311,6 +354,14 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).round();
         }), 1, false);
+    }
+
+    /**
+     * 注册标准输入输出相关过程，包括print、println、read系列和换行
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initIOProcedures(Env dEnv) {
         dEnv.addTokenProcedure("println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (DToken t : args)
@@ -325,6 +376,28 @@ public class Core {
             env.io.out.print(builder);
             return DWord.NIL;
         }), 1, true);
+        dEnv.addTokenProcedure("read-line", ((args, env) ->
+                DString.valueOf(env.io.scanner.nextLine())), 0, false);
+        dEnv.addTokenProcedure("read-int", ((args, env) ->
+                DNumber.valueOf(env.io.scanner.nextBigInteger())), 0, false);
+        dEnv.addTokenProcedure("read-float", ((args, env) ->
+                DNumber.valueOf(env.io.scanner.nextBigDecimal())), 0, false);
+        dEnv.addTokenProcedure("read-bool", ((args, env) ->
+                DBool.valueOf(env.io.scanner.nextBoolean())), 0, false);
+        dEnv.addTokenProcedure("read", ((args, env) ->
+                DString.valueOf(env.io.scanner.next())), 0, false);
+        dEnv.addTokenProcedure("newline", ((args, env) -> {
+            env.io.out.println();
+            return DWord.NIL;
+        }), 0, false);
+    }
+
+    /**
+     * 注册错误输出和主动抛出运行时错误的过程
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initErrorProcedures(Env dEnv) {
         dEnv.addTokenProcedure("error-println", ((args, env) -> {
             StringBuilder builder = new StringBuilder();
             for (DToken t : args)
@@ -345,6 +418,43 @@ public class Core {
                 builder.append(t);
             throw new DevoreRuntimeException(builder.toString());
         }), 1, true);
+        dEnv.addTokenProcedure("error-newline", ((args, env) -> {
+            env.io.err.println();
+            return DWord.NIL;
+        }), 0, false);
+    }
+
+    /**
+     * 注册模块加载过程，用于导入并执行外部Devore文件
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initModuleProcedures(Env dEnv) {
+        dEnv.addTokenProcedure("require", ((args, env) -> {
+            DToken result = DWord.NIL;
+            for (DToken arg : args) {
+                if (!(arg instanceof DString))
+                    throw new DevoreCastException(arg.type(), "string");
+                String file = arg.toString();
+                Path path = Paths.get(file);
+                if (!Files.exists(path))
+                    throw new DevoreRuntimeException("文件不存在: " + file);
+                try {
+                    result = Devore.call(env, new String(Files.readAllBytes(path), StandardCharsets.UTF_8), file);
+                } catch (IOException e) {
+                    throw new DevoreRuntimeException("读取文件失败: " + file + ", " + e.getMessage());
+                }
+            }
+            return result;
+        }), 1, true);
+    }
+
+    /**
+     * 注册定义和函数调用相关过程，包括def、set!、宏、let、lambda、apply和act
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initDefinitionProcedures(Env dEnv) {
         dEnv.addAstProcedure("undef", ((ast, env) -> {
             for (Ast child : ast.children) {
                 if (!(child.symbol instanceof DSymbol))
@@ -505,6 +615,14 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "list");
             return ((DProcedure) args.get(0)).call(((DList) args.get(1)).toList(), env);
         }), 2, false);
+    }
+
+    /**
+     * 注册通用比较过程，包括大小比较、相等和不等
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initComparisonProcedures(Env dEnv) {
         dEnv.addTokenProcedure(">", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 2, false);
         dEnv.addTokenProcedure("<", ((args, env) ->
@@ -517,6 +635,14 @@ public class Core {
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) >= 0)), 2, false);
         dEnv.addTokenProcedure("<=", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) <= 0)), 2, false);
+    }
+
+    /**
+     * 注册控制流过程，包括条件分支、异常捕获、begin和while
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initControlProcedures(Env dEnv) {
         dEnv.addAstProcedure("unless", (ast, env) -> {
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool))
@@ -607,24 +733,14 @@ public class Core {
             }
             return result;
         }, 2, true);
-        dEnv.addTokenProcedure("read-line", ((args, env) ->
-                DString.valueOf(env.io.scanner.nextLine())), 0, false);
-        dEnv.addTokenProcedure("read-int", ((args, env) ->
-                DNumber.valueOf(env.io.scanner.nextBigInteger())), 0, false);
-        dEnv.addTokenProcedure("read-float", ((args, env) ->
-                DNumber.valueOf(env.io.scanner.nextBigDecimal())), 0, false);
-        dEnv.addTokenProcedure("read-bool", ((args, env) ->
-                DBool.valueOf(env.io.scanner.nextBoolean())), 0, false);
-        dEnv.addTokenProcedure("read", ((args, env) ->
-                DString.valueOf(env.io.scanner.next())), 0, false);
-        dEnv.addTokenProcedure("newline", ((args, env) -> {
-            env.io.out.println();
-            return DWord.NIL;
-        }), 0, false);
-        dEnv.addTokenProcedure("error-newline", ((args, env) -> {
-            env.io.err.println();
-            return DWord.NIL;
-        }), 0, false);
+    }
+
+    /**
+     * 注册布尔逻辑和随机数相关过程
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initLogicAndRandomProcedures(Env dEnv) {
         dEnv.addTokenProcedure("and", ((args, env) -> {
             for (DToken arg : args) {
                 if (!(arg instanceof DBool))
@@ -661,6 +777,14 @@ public class Core {
             return DNumber.valueOf(random(((DInt) args.get(0)).toBigInteger(),
                     ((DInt) args.get(1)).toBigInteger().subtract(BigInteger.ONE)));
         }), 2, false);
+    }
+
+    /**
+     * 注册列表、序列和高阶遍历相关过程，包括list、map、fold、filter和range
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initListProcedures(Env dEnv) {
         dEnv.addTokenProcedure("list", ((args, env) ->
                 DList.valueOf(new ArrayList<>(args))), 0, true);
         dEnv.addTokenProcedure("list-contains", ((args, env) -> {
@@ -932,6 +1056,14 @@ public class Core {
             return DList.valueOf(range(((DNumber) args.get(0)).toBigDecimal(),
                     ((DNumber) args.get(1)).toBigDecimal().subtract(step), step));
         }), 3, false);
+    }
+
+    /**
+     * 注册类型转换过程，包括字符串、符号、数字、布尔、列表和Unicode字符转换
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initConversionProcedures(Env dEnv) {
         dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
@@ -968,6 +1100,14 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "int");
             return DString.valueOf(String.valueOf((char) DIntUtils.toInt((DInt) args.get(0))));
         }), 1, false);
+    }
+
+    /**
+     * 注册系统级过程，包括退出、休眠、取类型和当前时间
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initSystemProcedures(Env dEnv) {
         dEnv.addTokenProcedure("exit", ((args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
@@ -988,6 +1128,14 @@ public class Core {
                 DString.valueOf(args.get(0).type())), 1, false);
         dEnv.addTokenProcedure("time", ((args, env) ->
                 DNumber.valueOf(System.currentTimeMillis())), 0, false);
+    }
+
+    /**
+     * 注册表结构相关过程，包括创建、查询、写入、删除和获取键列表
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initTableProcedures(Env dEnv) {
         dEnv.addTokenProcedure("table", ((args, env) ->
                 DTable.valueOf(new HashMap<>())), 0, false);
         dEnv.addTokenProcedure("table-get", ((args, env) -> {
@@ -1030,6 +1178,14 @@ public class Core {
                 throw new DevoreCastException(args.get(0).type(), "table");
             return DList.valueOf(new ArrayList<>(((DTable) args.get(0)).keys()));
         }), 1, false);
+    }
+
+    /**
+     * 注册聚合比较过程，如max和min
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initAggregateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("max", ((args, env) -> {
             DToken t = args.get(0);
             for (int i = 1; i < args.size(); ++i)
@@ -1044,6 +1200,14 @@ public class Core {
                     t = args.get(i);
             return t;
         }), 1, true);
+    }
+
+    /**
+     * 注册类型和特殊值判断过程，如number?、list?、nil?和zero?
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initPredicateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("bool?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DBool)), 1, false);
         dEnv.addTokenProcedure("float?", ((args, env) ->
@@ -1074,6 +1238,14 @@ public class Core {
                 DBool.valueOf(args.get(0).equals(DWord.NIL))), 1, false);
         dEnv.addTokenProcedure("zero?", ((args, env) ->
                 DBool.valueOf(args.get(0).equals(DNumber.valueOf(0)))), 1, false);
+    }
+
+    /**
+     * 注册字符串处理过程，包括拆分、裁剪、大小写、替换、匹配、索引和截取
+     *
+     * @param dEnv 目标环境
+     */
+    private static void initStringProcedures(Env dEnv) {
         dEnv.addTokenProcedure("string-split", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
@@ -1239,6 +1411,13 @@ public class Core {
         }), 3, false);
     }
 
+    /**
+     * 生成闭区间内的随机整数
+     *
+     * @param start 起始值，包含
+     * @param end   结束值，包含
+     * @return 随机整数
+     */
     private static BigInteger random(BigInteger start, BigInteger end) {
         Random rand = new Random();
         BigInteger range = end.subtract(start).add(BigInteger.ONE);
@@ -1249,6 +1428,14 @@ public class Core {
         return randomValue.add(start);
     }
 
+    /**
+     * 按给定步长生成数值序列，包含起点和终点
+     *
+     * @param start 起始值
+     * @param end   结束值
+     * @param step  步长，不能为零
+     * @return 数值token列表
+     */
     private static List<DToken> range(BigDecimal start, BigDecimal end, BigDecimal step) {
         if (step.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("步长不能为零, start=" + start.toPlainString()
