@@ -606,7 +606,8 @@ public class Repl {
                 consumeExpectedHead(state);
                 String color = bracketColor(state.bracketColors.size());
                 state.bracketColors.add(color);
-                state.expectingHead.add(true);
+                state.expectingHead.add(!state.lambdaParamsPending);
+                state.lambdaParamsPending = false;
                 appendColored(builder, String.valueOf(c), color);
                 ++index;
                 continue;
@@ -633,6 +634,10 @@ public class Repl {
             String bracketColor = currentBracketColor(state);
             consumeExpectedHead(state);
             appendColored(builder, token, colorForToken(token, index, listHead, bracketColor));
+            if (listHead && "lambda".equals(token))
+                state.lambdaParamsPending = true;
+            else if (!Character.isWhitespace(c))
+                state.lambdaParamsPending = false;
             index = tokenEnd;
         }
     }
@@ -732,6 +737,7 @@ public class Repl {
         private final List<String> bracketColors = new ArrayList<>();
         private boolean inString;
         private boolean escaped;
+        private boolean lambdaParamsPending;
         private String stringColor = ANSI_GREEN;
     }
 
