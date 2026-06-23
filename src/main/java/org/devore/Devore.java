@@ -109,7 +109,7 @@ public class Devore {
     private static DToken evalExpression(Env env, String code, String source, Lexer.SourceExpression exp) {
         try {
             Ast ast = Parse.parse(Lexer.lexer(exp.expression, exp.startIndex));
-            ast.setSource(source, code);
+            ast.setSource(source);
             return Evaluator.eval(env, ast);
         } catch (StackOverflowError e) {
             throw new DevoreRuntimeException(formatError(code, source, exp,
