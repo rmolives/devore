@@ -520,9 +520,12 @@ public class Core {
             } else {
                 List<String> params = ast.get(0).children.stream()
                         .map(param -> {
-                            if (!(param.symbol instanceof DSymbol))
+                            DToken temp = param.symbol;
+                            if (!param.isEmpty())
+                                temp = Evaluator.eval(env, param);
+                            if (!(temp instanceof DSymbol))
                                 throw new DevoreCastException(param.symbol.type(), "symbol");
-                            return param.symbol.toString();
+                            return temp.toString();
                         })
                         .collect(Collectors.toList());
                 List<Ast> nodes = ast.children.subList(1, ast.size()).stream()
@@ -553,9 +556,12 @@ public class Core {
             } else {
                 List<String> params = ast.get(0).children.stream()
                         .map(param -> {
-                            if (!(param.symbol instanceof DSymbol))
+                            DToken temp = param.symbol;
+                            if (!param.isEmpty())
+                                temp = Evaluator.eval(env, param);
+                            if (!(temp instanceof DSymbol))
                                 throw new DevoreCastException(param.symbol.type(), "symbol");
-                            return param.symbol.toString();
+                            return temp.toString();
                         })
                         .collect(Collectors.toList());
                 List<Ast> nodes = ast.children.subList(1, ast.size()).stream()
@@ -594,9 +600,12 @@ public class Core {
             List<String> params = ast.get(0).isNotNil()
                     ? Stream.concat(Stream.of(ast.get(0)), ast.get(0).children.stream())
                     .map(param -> {
-                        if (!(param.symbol instanceof DSymbol))
+                        DToken temp = param.symbol;
+                        if (param != ast.get(0) && !param.isEmpty())
+                            temp = Evaluator.eval(env, param);
+                        if (!(temp instanceof DSymbol))
                             throw new DevoreCastException(param.symbol.type(), "symbol");
-                        return param.symbol.toString();
+                        return temp.toString();
                     })
                     .collect(Collectors.toList())
                     : Collections.emptyList();
@@ -697,7 +706,7 @@ public class Core {
      * @param bodyNodes 过程体
      */
     private static void defineModuleProcedure(Env env, Ast signature, List<Ast> bodyNodes) {
-        String name = moduleBindingName(signature);
+        String name = moduleBindingName(env, signature);
         if (bodyNodes.isEmpty())
             throw new DevoreRuntimeException("module过程绑定必须包含过程体.");
         if (env.contains(name))
@@ -725,7 +734,7 @@ public class Core {
      * @param bodyNodes 宏体
      */
     private static void defineModuleMacro(Env env, Ast signature, List<Ast> bodyNodes) {
-        String name = moduleBindingName(signature);
+        String name = moduleBindingName(env, signature);
         if (bodyNodes.isEmpty())
             throw new DevoreRuntimeException("module宏绑定必须包含宏体.");
         if (env.contains(name))
@@ -767,7 +776,7 @@ public class Core {
         if (node.size() < 2)
             throw new DevoreRuntimeException("module中的set-macro!必须包含签名和宏体.");
         Ast signature = node.get(0);
-        String name = moduleBindingName(signature);
+        String name = moduleBindingName(env, signature);
         env.setMacro(name, moduleBindingParams(signature),
                 node.children.subList(1, node.size()).stream().map(Ast::copy).collect(Collectors.toList()));
     }
@@ -780,7 +789,7 @@ public class Core {
      * @param bodyNodes 过程体
      */
     private static void setModuleProcedure(Env env, Ast signature, List<Ast> bodyNodes) {
-        String name = moduleBindingName(signature);
+        String name = moduleBindingName(env, signature);
         if (bodyNodes.isEmpty())
             throw new DevoreRuntimeException("module中的set!过程绑定必须包含过程体.");
         List<String> params = moduleBindingParams(signature);
@@ -801,13 +810,17 @@ public class Core {
     /**
      * 获取module过程或宏签名中的绑定名称
      *
+     * @param env       环境
      * @param signature 绑定签名
      * @return 绑定名称
      */
-    private static String moduleBindingName(Ast signature) {
-        if (!(signature.symbol instanceof DSymbol))
+    private static String moduleBindingName(Env env, Ast signature) {
+        DToken temp = signature.symbol;
+        if (!signature.isEmpty())
+            temp = Evaluator.eval(env, signature);
+        if (!(temp instanceof DSymbol))
             throw new DevoreCastException(signature.symbol.type(), "symbol");
-        return signature.symbol.toString();
+        return temp.toString();
     }
 
     /**
