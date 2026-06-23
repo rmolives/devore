@@ -675,7 +675,7 @@ public class Core {
      * 根据module子项形态分发为值、过程、宏或更新绑定
      *
      * @param env  环境
-     * @param node lib子项
+     * @param node module子项
      */
     private static void defineModuleBinding(Env env, Ast node) {
         if (node.symbol instanceof Ast) {
