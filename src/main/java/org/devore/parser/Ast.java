@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
  * 抽象语法树
  */
 public class Ast extends DToken {
-    public final static Ast empty = new Ast(DWord.NIL);         // 空白语法树
-    public List<Ast> children;                                  // 子树
-    public DToken symbol;                                       // 符号
-    public Type type;                                           // 语法树类型
-    public int index;                                           // 源码位置
-    public String source;                                       // 代码来源
-    public String code;                                         // 完整源码
+    public final static Ast empty = new Ast(DWord.NIL);     // 空白语法树
+    public List<Ast> children;                              // 子树
+    public DToken symbol;                                   // 符号
+    public Type type;                                       // 语法树类型
+    public int index;                                       // 源码位置
+    public String source;                                   // 代码来源
+    public String code;                                     // 完整源码
 
     /**
      * 创建语法树
