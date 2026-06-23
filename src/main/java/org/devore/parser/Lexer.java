@@ -106,6 +106,10 @@ public class Lexer {
                             } else
                                 break;
                         } else if (skip) {
+                            if (codeCharArray[index] != 'n' && codeCharArray[index] != 'r'
+                                    && codeCharArray[index] != 't' && codeCharArray[index] != 'b'
+                                    && codeCharArray[index] != 'f')
+                                throw new DevoreParseException("字符串转译错误: " + codeCharArray[index], index);
                             value.append("\\").append(codeCharArray[index]);
                             skip = false;
                             continue;
@@ -233,9 +237,6 @@ public class Lexer {
                                 break;
                             case 'f':
                                 builder.append("\f");
-                                break;
-                            default:
-                                builder.append("\\").append(expressionCharArray[index]);
                                 break;
                         }
                     } else
