@@ -2,6 +2,7 @@ package org.devore;
 
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
+import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 import org.devore.parser.Lexer;
@@ -106,7 +107,7 @@ public class Repl {
                 recordHistory(code);
                 try {
                     env.io.resetLineState();
-                    DToken result = executeCode(env, code, "<#" + sourceIndex + ">");
+                    DToken result = executeReplCode(env, code, "<#" + sourceIndex + ">");
                     ensureOutputLineBreak(env);
                     if (result != DWord.NIL)
                         System.out.println(result.toString());
@@ -196,6 +197,24 @@ public class Repl {
         } finally {
             restoreManualEchoAfterExecution(shouldRestoreManualEcho);
         }
+    }
+
+    private static DToken executeReplCode(Env env, String code, String source) {
+        DToken token = singleBareToken(code);
+        if (token instanceof DSymbol && env.contains(token.toString()))
+            return env.get(token.toString());
+        if (token != null)
+            return token;
+        return executeCode(env, code, source);
+    }
+
+    private static DToken singleBareToken(String code) {
+        String trimmed = code.trim();
+        if (trimmed.isEmpty() || trimmed.indexOf('(') >= 0 || trimmed.indexOf(')') >= 0
+                || trimmed.indexOf('[') >= 0 || trimmed.indexOf(']') >= 0)
+            return null;
+        List<Lexer.SourceToken> tokens = Lexer.lexer(trimmed, 0);
+        return tokens.size() == 1 && tokens.get(0).token.toString().equals(trimmed) ? tokens.get(0).token : null;
     }
 
     private static boolean disableManualEchoForExecution() {
