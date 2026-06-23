@@ -418,8 +418,7 @@ public abstract class DNumber extends DToken {
 
     @Override
     protected String str() {
-        return NumberUtils.isInt(this.toBigDecimal()) ? this.toBigInteger().toString()
-                : NumberUtils.plain(this.toBigDecimal());
+        return NumberUtils.plain(this.toBigDecimal());
     }
 
     @Override
