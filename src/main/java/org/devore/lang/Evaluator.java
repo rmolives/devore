@@ -1,7 +1,6 @@
 package org.devore.lang;
 
 import org.devore.exception.DevoreRuntimeException;
-import org.devore.exception.DevoreCastException;
 import org.devore.lang.token.*;
 import org.devore.parser.Ast;
 
@@ -36,7 +35,7 @@ public class Evaluator {
             if (node.isEmpty() && node.type != Ast.Type.PROCEDURE)
                 return node.symbol;
             if (node.type == Ast.Type.PROCEDURE && !(node.symbol instanceof DProcedure))
-                throw new DevoreCastException(node.symbol.type(), "procedure");
+                throw new DevoreRuntimeException("找不到匹配条件的过程: " + node.symbol);
             if (node.symbol instanceof DProcedure) {
                 DProcedure procedure = (DProcedure) node.symbol;
                 node.symbol = procedure.call(node, env);

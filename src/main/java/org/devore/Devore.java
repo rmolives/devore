@@ -11,6 +11,7 @@ import org.devore.exception.DevoreParseException;
 import org.devore.parser.Ast;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class Devore {
     // 版本
@@ -33,20 +34,10 @@ public class Devore {
         } catch (DevoreParseException e) {
             throw new DevoreRuntimeException(formatError(code, source, e.index(), "", e));
         }
-        DToken result = DWord.NIL;
-        for (Lexer.SourceExpression exp : codes) {
-            try {
-                Ast ast = Parse.parse(Lexer.lexer(exp.expression, exp.startIndex));
-                ast.setSource(source, code);
-                result = Evaluator.eval(env, ast);
-            } catch (StackOverflowError e) {
-                throw new DevoreRuntimeException(formatError(code, source, exp,
-                        new StackOverflowError("栈溢出，可能存在无限递归或递归宏展开.")));
-            } catch (RuntimeException e) {
-                throw new DevoreRuntimeException(formatError(code, source, exp, e));
-            }
-        }
-        return result;
+        return codes.stream()
+                .map(exp -> evalExpression(env, code, source, exp))
+                .reduce((previous, current) -> current)
+                .orElse(DWord.NIL);
     }
 
     /**
@@ -84,30 +75,48 @@ public class Devore {
         if (e instanceof DevoreRuntimeException && !((DevoreRuntimeException) e).trace().isEmpty()) {
             builder.append("调用链:\n");
             List<DevoreRuntimeException.Frame> trace = ((DevoreRuntimeException) e).trace();
-            for (int i = trace.size() - 1; i >= 0; --i) {
-                DevoreRuntimeException.Frame frame = trace.get(i);
-                String frameSource = frame.source == null ? source : frame.source;
-                String frameCode = frame.code == null ? code : frame.code;
-                Position framePosition = position(frameCode, frame.index);
-                builder.append("  at ")
-                        .append(frameSource).append(":").append(framePosition.line).append(":").append(framePosition.column)
-                        .append(" ").append(preview(frame.expression)).append("\n");
-            }
+            final String errorSource = source;
+            final String errorCode = code;
+            IntStream.range(0, trace.size())
+                    .map(i -> trace.size() - i - 1)
+                    .mapToObj(trace::get)
+                    .forEach(frame -> {
+                        String frameSource = frame.source == null ? errorSource : frame.source;
+                        String frameCode = frame.code == null ? errorCode : frame.code;
+                        Position framePosition = position(frameCode, frame.index);
+                        builder.append("  at ")
+                                .append(frameSource).append(":").append(framePosition.line).append(":").append(framePosition.column)
+                                .append(" ").append(preview(frame.expression)).append("\n");
+                    });
         }
         return builder.append("错误信息: ").append(message).toString();
     }
 
     private static Position position(String code, int index) {
-        int line = 1;
-        int column = 1;
-        for (int i = 0; i < index && i < code.length(); ++i) {
-            if (code.charAt(i) == '\n') {
-                ++line;
-                column = 1;
-            } else
-                ++column;
-        }
+        int end = Math.min(index, code.length());
+        int line = (int) IntStream.range(0, end)
+                .filter(i -> code.charAt(i) == '\n')
+                .count() + 1;
+        int lastLineStart = IntStream.range(0, end)
+                .map(i -> end - i - 1)
+                .filter(i -> code.charAt(i) == '\n')
+                .findFirst()
+                .orElse(-1) + 1;
+        int column = end - lastLineStart + 1;
         return new Position(line, column);
+    }
+
+    private static DToken evalExpression(Env env, String code, String source, Lexer.SourceExpression exp) {
+        try {
+            Ast ast = Parse.parse(Lexer.lexer(exp.expression, exp.startIndex));
+            ast.setSource(source, code);
+            return Evaluator.eval(env, ast);
+        } catch (StackOverflowError e) {
+            throw new DevoreRuntimeException(formatError(code, source, exp,
+                    new StackOverflowError("栈溢出，可能存在无限递归或递归宏展开.")));
+        } catch (RuntimeException e) {
+            throw new DevoreRuntimeException(formatError(code, source, exp, e));
+        }
     }
 
     private static class Position {

@@ -8,6 +8,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 语法分析器
@@ -20,14 +22,14 @@ public class Parse {
      * @return 语法树
      */
     public static Ast parse(List<Lexer.SourceToken> tokens) {
-        Ast node = null;
+        Ast[] node = new Ast[1];
         Deque<Ast> stack = new ArrayDeque<>();
-        for (Lexer.SourceToken sourceToken : tokens) {
+        tokens.forEach(sourceToken -> {
             DToken token = sourceToken.token;
             if (token == DWord.LB) {
                 Ast current = newNode(Ast.empty, sourceToken.index);
                 if (stack.isEmpty())
-                    node = current;
+                    node[0] = current;
                 else
                     stack.peek().add(current);
                 stack.push(current);
@@ -40,12 +42,12 @@ public class Parse {
                     throw new DevoreParseException("语法解析中栈顶为空.");
                 stack.peek().add(newNode(token, sourceToken.index));
             }
-        }
-        if (node == null)
+        });
+        if (node[0] == null)
             throw new DevoreParseException("语法解析出的AST为null.");
         if (!stack.isEmpty())
             throw new DevoreParseException("语法解析中括号未闭合.");
-        return node;
+        return node[0];
     }
 
     /**
@@ -76,11 +78,13 @@ public class Parse {
         Ast symbolNode = childrenCopy.get(0);
         if (symbolNode.type == Ast.Type.PROCEDURE) {
             node.symbol = symbolNode;
-            node.children = new ArrayList<>(childrenCopy.subList(1, childrenCopy.size()));
+            node.children = childrenCopy.stream()
+                    .skip(1)
+                    .collect(Collectors.toList());
             return;
         }
         node.symbol = symbolNode.symbol;
-        node.children = new ArrayList<>(symbolNode.children);
-        node.children.addAll(childrenCopy.subList(1, childrenCopy.size()));
+        node.children = Stream.concat(symbolNode.children.stream(), childrenCopy.stream().skip(1))
+                .collect(Collectors.toList());
     }
 }

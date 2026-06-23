@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.stream.IntStream;
 
 /**
  * 数学工具
@@ -823,16 +824,14 @@ public class NumberUtils {
             return BigDecimal.ONE;
         if (y.signum() < 0)
             return divide(BigDecimal.ONE, powInt(x, y.negate(), mc), mc);
-        BigDecimal result = BigDecimal.ONE;
-        BigDecimal base = x;
-        BigInteger exp = y;
-        while (exp.signum() > 0) {
-            if (exp.testBit(0))
-                result = result.multiply(base);
-            base = base.multiply(base);
-            exp = exp.shiftRight(1);
-        }
-        return result;
+        BigDecimal[] result = {BigDecimal.ONE};
+        BigDecimal[] base = {x};
+        IntStream.range(0, y.bitLength()).forEach(i -> {
+            if (y.testBit(i))
+                result[0] = result[0].multiply(base[0]);
+            base[0] = base[0].multiply(base[0]);
+        });
+        return result[0];
     }
 
     /**

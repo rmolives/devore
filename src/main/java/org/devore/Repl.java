@@ -10,12 +10,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * REPL
@@ -144,20 +146,29 @@ public class Repl {
             return;
         }
         String[] files = input.split("\\s+");
-        for (String file : files) {
-            Path path = Paths.get(file);
-            if (!Files.exists(path)) {
-                System.err.println("文件不存在: " + file);
-                continue;
-            }
-            String code = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            try {
-                DToken result = Devore.call(env, code, file);
-                if (result != DWord.NIL)
-                    System.out.println(result);
-            } catch (DevoreRuntimeException e) {
-                System.err.println(e.getMessage());
-            }
+        try {
+            Arrays.stream(files).forEach(file -> {
+                Path path = Paths.get(file);
+                if (!Files.exists(path)) {
+                    System.err.println("文件不存在: " + file);
+                    return;
+                }
+                String code;
+                try {
+                    code = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+                try {
+                    DToken result = Devore.call(env, code, file);
+                    if (result != DWord.NIL)
+                        System.out.println(result);
+                } catch (DevoreRuntimeException e) {
+                    System.err.println(e.getMessage());
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
     }
 
@@ -363,8 +374,8 @@ public class Repl {
                 renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
                         cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
                 if (multiline) {
-                    for (int index = 1; index < pastedLines.length; ++index)
-                        PASTED_LINES.addLast(pastedLines[index]);
+                    Arrays.stream(pastedLines, 1, pastedLines.length)
+                            .forEach(PASTED_LINES::addLast);
                     System.out.println();
                     return line.toString();
                 }
@@ -453,41 +464,44 @@ public class Repl {
     }
 
     private static String trimBlankEdges(String code) {
-        int start = 0;
-        int end = code.length();
-        while (start < end && Character.isWhitespace(code.charAt(start)))
-            ++start;
-        while (end > start && Character.isWhitespace(code.charAt(end - 1)))
-            --end;
+        int start = IntStream.range(0, code.length())
+                .filter(index -> !Character.isWhitespace(code.charAt(index)))
+                .findFirst()
+                .orElse(code.length());
+        int end = IntStream.iterate(code.length() - 1, index -> index - 1)
+                .limit(code.length() - start)
+                .filter(index -> !Character.isWhitespace(code.charAt(index)))
+                .findFirst()
+                .orElse(start - 1) + 1;
         return code.substring(start, end);
     }
 
     private static String reindentCode(String code, int baseDepth) {
         String[] lines = code.split("\n", -1);
         StringBuilder builder = new StringBuilder();
-        int relativeDepth = 0;
-        for (int index = 0; index < lines.length; ++index) {
+        int[] relativeDepth = {0};
+        IntStream.range(0, lines.length).forEach(index -> {
             String content = lines[index].trim();
             if (index > 0)
                 builder.append('\n');
             if (content.isEmpty())
-                continue;
-            int lineDepth = Math.max(0, baseDepth + relativeDepth - leadingClosingBrackets(content));
+                return;
+            int lineDepth = Math.max(0, baseDepth + relativeDepth[0] - leadingClosingBrackets(content));
             builder.append(
                     String.join("", Collections.nCopies(lineDepth * INDENT_SIZE, " "))
             ).append(content);
-            relativeDepth += depthDelta(content);
-            if (baseDepth + relativeDepth < 0)
-                relativeDepth = -baseDepth;
-        }
+            relativeDepth[0] += depthDelta(content);
+            if (baseDepth + relativeDepth[0] < 0)
+                relativeDepth[0] = -baseDepth;
+        });
         return builder.toString();
     }
 
     private static int leadingClosingBrackets(String line) {
-        int count = 0;
-        while (count < line.length() && (line.charAt(count) == ')' || line.charAt(count) == ']'))
-            ++count;
-        return count;
+        return IntStream.range(0, line.length())
+                .filter(index -> line.charAt(index) != ')' && line.charAt(index) != ']')
+                .findFirst()
+                .orElse(line.length());
     }
 
     private static int depthDelta(String line) {
@@ -560,10 +574,8 @@ public class Repl {
     private static boolean isOnlyIndentBeforeCursor(StringBuilder line, int cursorIndex) {
         if (cursorIndex == 0)
             return false;
-        for (int index = 0; index < cursorIndex; ++index)
-            if (line.charAt(index) != ' ')
-                return false;
-        return true;
+        return IntStream.range(0, cursorIndex)
+                .allMatch(index -> line.charAt(index) == ' ');
     }
 
     private static int readEscapeSequence() throws IOException {
@@ -619,16 +631,16 @@ public class Repl {
 
     private static void clearRenderedInput(int rows, int cursorRow) {
         System.out.print("\r");
-        for (int i = 0; i < cursorRow; ++i)
-            System.out.print("\033[1A");
-        for (int i = 0; i < rows; ++i) {
+        IntStream.range(0, cursorRow)
+                .forEach(i -> System.out.print("\033[1A"));
+        IntStream.range(0, rows).forEach(i -> {
             System.out.print("\033[2K");
             if (i < rows - 1)
                 System.out.print("\033[1B");
-        }
+        });
         System.out.print("\r");
-        for (int i = 1; i < rows; ++i)
-            System.out.print("\033[1A");
+        IntStream.range(1, rows)
+                .forEach(i -> System.out.print("\033[1A"));
     }
 
     private static int terminalColumns() {
@@ -848,10 +860,8 @@ public class Repl {
     private static boolean isCommandToken(String text, int tokenStart) {
         if (tokenStart >= text.length() || text.charAt(tokenStart) != ':')
             return false;
-        for (int index = 0; index < tokenStart; ++index)
-            if (!Character.isWhitespace(text.charAt(index)))
-                return false;
-        return true;
+        return IntStream.range(0, tokenStart)
+                .allMatch(index -> Character.isWhitespace(text.charAt(index)));
     }
 
     private static String colorForToken(String token, boolean commandToken, boolean listHead, String bracketColor) {
@@ -872,30 +882,23 @@ public class Repl {
     private static String avoidColor(String color, String... forbiddenColors) {
         if (color == null)
             return null;
-        for (String forbiddenColor : forbiddenColors) {
-            if (color.equals(forbiddenColor))
-                return ANSI_WHITE;
-        }
-        return color;
+        return Arrays.asList(forbiddenColors).contains(color) ? ANSI_WHITE : color;
     }
 
     private static boolean isNumberToken(String token) {
-        int index = token.startsWith("-") ? 1 : 0;
-        if (index == token.length())
+        int start = token.startsWith("-") ? 1 : 0;
+        if (start == token.length())
             return false;
-        boolean digit = false;
-        while (index < token.length() && Character.isDigit(token.charAt(index))) {
-            digit = true;
-            ++index;
-        }
-        if (index < token.length() && token.charAt(index) == '.') {
-            ++index;
-            while (index < token.length() && Character.isDigit(token.charAt(index))) {
-                digit = true;
-                ++index;
-            }
-        }
-        return digit && index == token.length();
+        if (!Character.isDigit(token.charAt(start)))
+            return false;
+        int dot = token.indexOf('.', start);
+        if (dot >= 0 && token.indexOf('.', dot + 1) >= 0)
+            return false;
+        return IntStream.range(start, token.length())
+                .filter(index -> token.charAt(index) != '.')
+                .allMatch(index -> Character.isDigit(token.charAt(index)))
+                && IntStream.range(start, token.length())
+                .anyMatch(index -> Character.isDigit(token.charAt(index)));
     }
 
     private static void appendColored(StringBuilder builder, String text, String color) {

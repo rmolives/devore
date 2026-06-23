@@ -2,7 +2,9 @@ package org.devore.lang.token;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 表
@@ -115,7 +117,15 @@ public class DTable extends DToken {
 
     @Override
     protected String str() {
-        return this.table.toString();
+        return this.table.entrySet().stream()
+                .map(entry -> formatToken(entry.getKey()) + "=" + formatToken(entry.getValue()))
+                .collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    private String formatToken(DToken token) {
+        if (token instanceof DString)
+            return "\"" + token + "\"";
+        return token.toString();
     }
 
     @Override
@@ -123,7 +133,11 @@ public class DTable extends DToken {
         if (!(t instanceof DTable))
             return -1;
         DTable other = (DTable) t;
-        return this.table.equals(other.table) ? 0 : -1;
+        if (this.table.size() != other.table.size())
+            return -1;
+        return this.table.entrySet().stream()
+                .allMatch(entry -> other.table.containsKey(entry.getKey())
+                        && Objects.equals(entry.getValue(), other.table.get(entry.getKey()))) ? 0 : -1;
     }
 
     @Override

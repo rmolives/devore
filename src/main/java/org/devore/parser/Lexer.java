@@ -6,8 +6,12 @@ import org.devore.lang.token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 词法分析器
@@ -54,10 +58,10 @@ public class Lexer {
             StringBuilder builder = new StringBuilder();
             while (index < codeCharArray.length) {
                 if (codeCharArray[index] == ';')
-                    while (index < codeCharArray.length &&
-                            codeCharArray[index] != '\n' &&
-                            codeCharArray[index] != '\r')
-                        ++index;
+                    index = IntStream.range(index, codeCharArray.length)
+                            .filter(i -> codeCharArray[i] == '\n' || codeCharArray[i] == '\r')
+                            .findFirst()
+                            .orElse(codeCharArray.length);
                 else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
                     break;
                 else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
@@ -68,14 +72,14 @@ public class Lexer {
             if (index >= codeCharArray.length)
                 return expressions;
             int startIndex = index;
-            List<Character> brackets = new ArrayList<>();
-            List<Integer> bracketIndexes = new ArrayList<>();
+            Deque<Character> brackets = new ArrayDeque<>();
+            Deque<Integer> bracketIndexes = new ArrayDeque<>();
             while (index < codeCharArray.length) {
                 if (codeCharArray[index] == ';') {
-                    while (index < codeCharArray.length &&
-                            codeCharArray[index] != '\n' &&
-                            codeCharArray[index] != '\r')
-                        ++index;
+                    index = IntStream.range(index, codeCharArray.length)
+                            .filter(i -> codeCharArray[i] == '\n' || codeCharArray[i] == '\r')
+                            .findFirst()
+                            .orElse(codeCharArray.length);
                     continue;
                 }
                 if (codeCharArray[index] == '\"') {
@@ -113,13 +117,13 @@ public class Lexer {
                     continue;
                 }
                 if (codeCharArray[index] == '(' || codeCharArray[index] == '[') {
-                    brackets.add(codeCharArray[index]);
-                    bracketIndexes.add(index);
+                    brackets.push(codeCharArray[index]);
+                    bracketIndexes.push(index);
                 } else if (codeCharArray[index] == ')' || codeCharArray[index] == ']') {
                     if (brackets.isEmpty())
                         throw new DevoreParseException("多余的右括号: " + codeCharArray[index], index);
-                    char left = brackets.remove(brackets.size() - 1);
-                    bracketIndexes.remove(bracketIndexes.size() - 1);
+                    char left = brackets.pop();
+                    bracketIndexes.pop();
                     if (!(left == '(' && codeCharArray[index] == ')' || left == '[' && codeCharArray[index] == ']'))
                         throw new DevoreParseException("括号不匹配: " + left + " 与 " + codeCharArray[index], index);
                 }
@@ -128,8 +132,7 @@ public class Lexer {
                     break;
             }
             if (!brackets.isEmpty())
-                throw new DevoreParseException("括号未闭合: " + brackets.get(brackets.size() - 1),
-                        bracketIndexes.get(bracketIndexes.size() - 1));
+                throw new DevoreParseException("括号未闭合: " + brackets.peek(), bracketIndexes.getFirst());
             expressions.add(new SourceExpression(builder.toString(), startIndex));
         }
         return expressions;
@@ -167,32 +170,29 @@ public class Lexer {
                 ++index;
             }
             if (Character.isDigit(expressionCharArray[index])) {
-                BigInteger v = BigInteger.ZERO;
-                while (true) {
-                    if (index >= expressionCharArray.length - 1 || !Character.isDigit(expressionCharArray[index])) {
-                        --index;
-                        break;
-                    }
-                    v = v.multiply(BigInteger.valueOf(10)).add(BigInteger.valueOf(((int) expressionCharArray[index]) - 48));
+                int integerStart = index;
+                while (index < expressionCharArray.length && Character.isDigit(expressionCharArray[index]))
                     ++index;
-                }
-                if (expressionCharArray[index + 1] != '.') {
+                int integerEnd = index;
+                BigInteger v = IntStream.range(integerStart, integerEnd)
+                        .mapToObj(i -> BigInteger.valueOf(Character.digit(expressionCharArray[i], 10)))
+                        .reduce(BigInteger.ZERO, (result, digit) -> result.multiply(BigInteger.TEN).add(digit));
+                if (index >= expressionCharArray.length || expressionCharArray[index] != '.'
+                        || index >= expressionCharArray.length - 1 || !Character.isDigit(expressionCharArray[index + 1])) {
+                    --index;
                     tokens.add(new SourceToken(DNumber.valueOf(negative ? v.negate() : v), baseIndex + tokenIndex));
                     continue;
                 }
-                BigDecimal x = new BigDecimal(v);
-                BigDecimal d = BigDecimal.valueOf(10);
                 ++index;
-                while (true) {
+                int fractionStart = index;
+                while (index < expressionCharArray.length && Character.isDigit(expressionCharArray[index]))
                     ++index;
-                    if (index >= expressionCharArray.length - 1 || !Character.isDigit(expressionCharArray[index])) {
-                        --index;
-                        break;
-                    }
-                    x = x.add(BigDecimal.valueOf(Character.getNumericValue(expressionCharArray[index]))
-                            .divide(d, MathContext.DECIMAL128));
-                    d = d.multiply(BigDecimal.valueOf(10));
-                }
+                int fractionEnd = index;
+                BigDecimal x = IntStream.range(fractionStart, fractionEnd)
+                        .mapToObj(i -> BigDecimal.valueOf(Character.digit(expressionCharArray[i], 10))
+                                .divide(BigDecimal.TEN.pow(i - fractionStart + 1), MathContext.DECIMAL128))
+                        .reduce(new BigDecimal(v), BigDecimal::add);
+                --index;
                 tokens.add(new SourceToken(DNumber.valueOf(negative ? x.negate() : x), baseIndex + tokenIndex));
                 continue;
             }
@@ -246,17 +246,15 @@ public class Lexer {
             }
             if (!Character.isWhitespace(expressionCharArray[index]) && expressionCharArray[index] != '(' && expressionCharArray[index] != ')'
                     && expressionCharArray[index] != '[' && expressionCharArray[index] != ']') {
-                StringBuilder builder = new StringBuilder();
-                while (true) {
-                    if (index >= expressionCharArray.length - 1 || Character.isWhitespace(expressionCharArray[index])
-                            || expressionCharArray[index] == ')' || expressionCharArray[index] == ']') {
-                        --index;
-                        break;
-                    }
-                    builder.append(expressionCharArray[index]);
+                int symbolStart = index;
+                while (index < expressionCharArray.length && !Character.isWhitespace(expressionCharArray[index])
+                        && expressionCharArray[index] != ')' && expressionCharArray[index] != ']')
                     ++index;
-                }
-                tokens.add(new SourceToken(DSymbol.valueOf(builder.toString()), baseIndex + tokenIndex));
+                String symbol = IntStream.range(symbolStart, index)
+                        .mapToObj(i -> String.valueOf(expressionCharArray[i]))
+                        .collect(Collectors.joining());
+                --index;
+                tokens.add(new SourceToken(DSymbol.valueOf(symbol), baseIndex + tokenIndex));
             }
         }
         return tokens;

@@ -5,6 +5,8 @@ import org.devore.exception.DevoreRuntimeException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 列表
@@ -216,13 +218,9 @@ public class DList extends DToken {
 
     @Override
     protected String str() {
-        StringBuilder builder = new StringBuilder("[");
-        for (int i = 0; i < this.list.size(); ++i) {
-            if (i > 0)
-                builder.append(", ");
-            builder.append(this.formatToken(this.list.get(i)));
-        }
-        return builder.append("]").toString();
+        return this.list.stream()
+                .map(this::formatToken)
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 
     private String formatToken(DToken token) {
@@ -238,10 +236,8 @@ public class DList extends DToken {
         DList other = (DList) t;
         if (other.size() != this.size())
             return -1;
-        for (int i = 0; i < this.size(); ++i)
-            if (!other.get(i).equals(this.get(i)))
-                return -1;
-        return 0;
+        return IntStream.range(0, this.size())
+                .allMatch(i -> other.get(i).equals(this.get(i))) ? 0 : -1;
     }
 
     @Override

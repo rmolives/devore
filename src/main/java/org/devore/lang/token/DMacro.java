@@ -5,16 +5,21 @@ import org.devore.parser.Ast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 宏
  */
 public class DMacro extends DToken {
+    private final String name;              // 宏名
     private final List<String> params;      // params
     private final List<Ast> bodys;          // bodys
     private final List<DMacro> children;    // 子宏
 
-    private DMacro(List<String> params, List<Ast> bodys, List<DMacro> children) {
+    private DMacro(String name, List<String> params, List<Ast> bodys, List<DMacro> children) {
+        this.name = name;
         this.params = params;
         this.bodys = bodys;
         this.children = children;
@@ -28,19 +33,20 @@ public class DMacro extends DToken {
      * @param children 子宏
      * @return this
      */
-    public static DMacro newMacro(List<String> params, List<Ast> bodys, List<DMacro> children) {
-        return new DMacro(params, bodys, children);
+    public static DMacro newMacro(String name, List<String> params, List<Ast> bodys, List<DMacro> children) {
+        return new DMacro(name, params, bodys, children);
     }
 
     /**
      * 创建宏
      *
+     * @param name   宏名
      * @param params params
      * @param bodys  bodys
      * @return this
      */
-    public static DMacro newMacro(List<String> params, List<Ast> bodys) {
-        return newMacro(params, bodys, new ArrayList<>());
+    public static DMacro newMacro(String name, List<String> params, List<Ast> bodys) {
+        return newMacro(name, params, bodys, new ArrayList<>());
     }
 
     /**
@@ -66,12 +72,11 @@ public class DMacro extends DToken {
     private DMacro match(int argc) {
         if (this.params.size() == argc)
             return this;
-        for (DMacro dm : children) {
-            DMacro temp = dm.match(argc);
-            if (temp != null)
-                return temp;
-        }
-        return null;
+        return children.stream()
+                .map(dm -> dm.match(argc))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -89,9 +94,8 @@ public class DMacro extends DToken {
             return nodes.get(paramIndex).copy();
         if (paramIndex >= 0)
             body.symbol = nodes.get(paramIndex).copy();
-        for (int i = 0; i < body.size(); ++i) {
-            body.set(i, expand(body.get(i), nodes));
-        }
+        IntStream.range(0, body.size())
+                .forEach(i -> body.set(i, expand(body.get(i), nodes)));
         return body;
     }
 
@@ -104,10 +108,10 @@ public class DMacro extends DToken {
     private int paramIndex(DToken token) {
         if (!(token instanceof DSymbol))
             return -1;
-        for (int i = 0; i < this.params.size(); ++i)
-            if (token.toString().equals(this.params.get(i)))
-                return i;
-        return -1;
+        return IntStream.range(0, this.params.size())
+                .filter(i -> token.toString().equals(this.params.get(i)))
+                .findFirst()
+                .orElse(-1);
     }
 
     /**
@@ -119,11 +123,10 @@ public class DMacro extends DToken {
     public List<Ast> expand(List<Ast> nodes) {
         DMacro dm = this.match(nodes.size());
         if (dm == null)
-            throw new DevoreRuntimeException("找不到匹配条件的宏.");
-        List<Ast> result = new ArrayList<>();
-        for (Ast body : dm.bodys)
-            result.add(dm.expand(body.copy(), nodes));
-        return result;
+            throw new DevoreRuntimeException("找不到匹配条件的宏: " + this.name);
+        return dm.bodys.stream()
+                .map(body -> dm.expand(body.copy(), nodes))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -143,24 +146,25 @@ public class DMacro extends DToken {
         if (!(t instanceof DMacro))
             return -1;
         DMacro other = (DMacro) t;
+        if (!this.name.equals(other.name))
+            return -1;
         if (!this.params.equals(other.params))
             return -1;
         if (this.bodys.size() != other.bodys.size())
             return -1;
-        for (int i = 0; i < this.bodys.size(); ++i)
-            if (!this.bodys.get(i).equals(other.bodys.get(i)))
-                return -1;
+        if (!IntStream.range(0, this.bodys.size())
+                .allMatch(i -> this.bodys.get(i).equals(other.bodys.get(i))))
+            return -1;
         if (this.children.size() != other.children.size())
             return -1;
-        for (int i = 0; i < this.children.size(); ++i)
-            if (this.children.get(i).compareTo(other.children.get(i)) != 0)
-                return -1;
-        return 0;
+        return IntStream.range(0, this.children.size())
+                .allMatch(i -> this.children.get(i).compareTo(other.children.get(i)) == 0) ? 0 : -1;
     }
 
     @Override
     public int hashCode() {
         int result = this.type().hashCode();
+        result = 31 * result + this.name.hashCode();
         result = 31 * result + this.params.hashCode();
         result = 31 * result + this.bodys.hashCode();
         result = 31 * result + this.children.hashCode();

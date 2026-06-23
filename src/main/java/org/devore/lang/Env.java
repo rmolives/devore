@@ -79,31 +79,33 @@ public class Env {
     /**
      * 添加宏
      *
-     * @param key   key
-     * @param macro 宏
+     * @param key    key
+     * @param params params
+     * @param bodys  bodys
      * @return 环境
      */
-    public Env addMacro(String key, DMacro macro) {
+    public Env addMacro(String key, List<String> params, List<Ast> bodys) {
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DMacro) this.table.get(key)).addMacro(key, macro));
+            this.table.put(key, ((DMacro) this.table.get(key)).addMacro(key, DMacro.newMacro(key, params, bodys)));
             return this;
         }
-        this.table.put(key, macro);
+        this.table.put(key, DMacro.newMacro(key, params, bodys));
         return this;
     }
 
     /**
      * 更改宏
      *
-     * @param key   key
-     * @param macro 宏
+     * @param key    key
+     * @param params params
+     * @param bodys  bodys
      * @return 环境
      */
-    public Env setMacro(String key, DMacro macro) {
+    public Env setMacro(String key, List<String> params, List<Ast> bodys) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        temp.table.put(key, macro);
+        temp.table.put(key, DMacro.newMacro(key, params, bodys));
         return this;
     }
 
@@ -118,10 +120,10 @@ public class Env {
      */
     public Env addAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(procedure, argc, vararg)));
+            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(key, procedure, argc, vararg)));
             return this;
         }
-        this.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
+        this.table.put(key, DProcedure.newProcedure(key, procedure, argc, vararg));
         return this;
     }
 
@@ -144,10 +146,10 @@ public class Env {
             return procedure.apply(args, env);
         };
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(df, argc, vararg)));
+            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(key, df, argc, vararg)));
             return this;
         }
-        this.table.put(key, DProcedure.newProcedure(df, argc, vararg));
+        this.table.put(key, DProcedure.newProcedure(key, df, argc, vararg));
         return this;
     }
 
@@ -164,7 +166,7 @@ public class Env {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        temp.table.put(key, DProcedure.newProcedure(procedure, argc, vararg));
+        temp.table.put(key, DProcedure.newProcedure(key, procedure, argc, vararg));
         return this;
     }
 
@@ -189,7 +191,7 @@ public class Env {
             }
             return procedure.apply(args, env);
         };
-        temp.table.put(key, DProcedure.newProcedure(df, argc, vararg));
+        temp.table.put(key, DProcedure.newProcedure(key, df, argc, vararg));
         return this;
     }
 

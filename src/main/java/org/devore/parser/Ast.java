@@ -6,6 +6,7 @@ import org.devore.lang.token.DWord;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 抽象语法树
@@ -58,9 +59,9 @@ public class Ast extends DToken {
      * @return 复制
      */
     public Ast copy() {
-        List<Ast> list = new ArrayList<>();
-        for (Ast ast : this.children)
-            list.add(ast.copy());
+        List<Ast> list = this.children.stream()
+                .map(Ast::copy)
+                .collect(Collectors.toList());
         DToken symbolCopy = this.symbol instanceof Ast ? ((Ast) this.symbol).copy() : this.symbol;
         return new Ast(symbolCopy, this.type, list, this.index, this.source, this.code);
     }
@@ -74,8 +75,7 @@ public class Ast extends DToken {
     public void setSource(String source, String code) {
         this.source = source;
         this.code = code;
-        for (Ast child : this.children)
-            child.setSource(source, code);
+        this.children.forEach(child -> child.setSource(source, code));
         if (this.symbol instanceof Ast)
             ((Ast) this.symbol).setSource(source, code);
     }
@@ -181,10 +181,10 @@ public class Ast extends DToken {
         } else {
             builder.append("(");
             this.appendSymbolTo(builder);
-            for (Ast node : this.children) {
+            this.children.forEach(node -> {
                 builder.append(" ");
                 node.appendTo(builder);
-            }
+            });
             builder.append(")");
         }
     }
