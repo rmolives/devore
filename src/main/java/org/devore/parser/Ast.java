@@ -3,6 +3,7 @@ package org.devore.parser;
 import org.devore.lang.token.DString;
 import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
+import org.devore.utils.FormatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,32 +174,20 @@ public class Ast extends DToken {
     private void appendTo(StringBuilder builder) {
         if (this.isEmpty()) {
             if (this.symbol instanceof DString)
-                this.appendSymbolTo(builder);
+                builder.append(FormatUtils.formatToken(this.symbol));
             else if (this.type == Type.PROCEDURE)
                 builder.append("(").append(this.symbol).append(")");
             else
                 builder.append(this.symbol);
         } else {
             builder.append("(");
-            this.appendSymbolTo(builder);
+            builder.append(FormatUtils.formatToken(this.symbol));
             this.children.forEach(node -> {
                 builder.append(" ");
                 node.appendTo(builder);
             });
             builder.append(")");
         }
-    }
-
-    /**
-     * 将语法树symbol追加到builder
-     *
-     * @param builder 字符串构造器
-     */
-    private void appendSymbolTo(StringBuilder builder) {
-        if (this.symbol instanceof DString)
-            builder.append("\"").append(this.symbol).append("\"");
-        else
-            builder.append(this.symbol);
     }
 
     @Override

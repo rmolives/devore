@@ -1,5 +1,7 @@
 package org.devore.lang.token;
 
+import org.devore.utils.FormatUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -118,14 +120,9 @@ public class DTable extends DToken {
     @Override
     protected String str() {
         return this.table.entrySet().stream()
-                .map(entry -> formatToken(entry.getKey()) + "=" + formatToken(entry.getValue()))
+                .map(entry -> FormatUtils.formatToken(entry.getKey())
+                        + "=" + FormatUtils.formatToken(entry.getValue()))
                 .collect(Collectors.joining(", ", "{", "}"));
-    }
-
-    private String formatToken(DToken token) {
-        if (token instanceof DString)
-            return "\"" + token + "\"";
-        return token.toString();
     }
 
     @Override

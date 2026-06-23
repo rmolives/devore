@@ -1,6 +1,7 @@
 package org.devore.lang.token;
 
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.utils.FormatUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -219,14 +220,8 @@ public class DList extends DToken {
     @Override
     protected String str() {
         return this.list.stream()
-                .map(this::formatToken)
+                .map(FormatUtils::formatToken)
                 .collect(Collectors.joining(", ", "[", "]"));
-    }
-
-    private String formatToken(DToken token) {
-        if (token instanceof DString)
-            return "\"" + token + "\"";
-        return token.toString();
     }
 
     @Override
