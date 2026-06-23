@@ -1,14 +1,12 @@
-# Devore Language
+# Devore语言
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-## About
+## 关于
 
-This is the interpreter of Devore Language, a dialect of Lisp, running on JVM platform.
+这是Devore语言（一种Lisp方言）的解释器，运行于JVM平台。
 
-Once a feature is finished and tested, and not considered harmful, I'll copy the codes here and publish releases.
-
-## Examples
+## 示例
 
 ### Sqrt
 
