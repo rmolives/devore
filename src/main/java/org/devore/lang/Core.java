@@ -1383,11 +1383,9 @@ public class Core {
      */
     private static void initAggregateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("max", ((args, env) -> args.stream()
-                .max(DToken::compareTo)
-                .orElseThrow(() -> new DevoreRuntimeException("max至少需要一个参数."))), 1, true);
+                .max(DToken::compareTo).orElse(DInt.valueOf(-1))), 1, true);
         dEnv.addTokenProcedure("min", ((args, env) -> args.stream()
-                .min(DToken::compareTo)
-                .orElseThrow(() -> new DevoreRuntimeException("min至少需要一个参数."))), 1, true);
+                .min(DToken::compareTo).orElse(DInt.valueOf(-1))), 1, true);
     }
 
     /**
