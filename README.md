@@ -49,3 +49,17 @@
           [else (+ (fib (- n 1)) (fib (- n 2)))]))
 (println (fib 10))
 ```
+
+### Quicksort
+
+```scheme
+(def (qsort xs)
+    (if (<= (length xs) 1)
+        xs
+        (++ (qsort (filter
+            (lambda (x) (< x (head xs))) (tail xs)))
+            (list (head xs))
+            (qsort (filter
+                (lambda (x) (>= x (head xs))) (tail xs))))))
+(println (qsort (list 3 1 4 1 5 9 2 6)))
+```
