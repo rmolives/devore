@@ -22,84 +22,65 @@ public class Parse {
     public static Ast parse(List<Lexer.SourceToken> tokens) {
         Ast node = null;
         Deque<Ast> stack = new ArrayDeque<>();
-        int state = -1;
-        Ast temp;
-        int index = 0;
-        int expressionIndex = -1;
-        while (index < tokens.size()) {
-            DToken token = tokens.get(index).token;
-            int tokenIndex = tokens.get(index).index;
-            if (state == 1) {
-                if (token == DWord.RB) {
-                    temp = Ast.empty.copy();
-                    temp.index = expressionIndex;
-                    stack.push(temp);
-                    state = -1;
-                    ++index;
-                    continue;
-                }
-                if (token == DWord.LB) {
-                    tokens.add(index, new Lexer.SourceToken(Ast.empty, tokenIndex));
-                    continue;
-                }
-                temp = new Ast(token);
-                temp.index = expressionIndex;
-                stack.push(temp);
-                node = temp;
-                state = -1;
-            } else if (state == 2) {
-                if (token == DWord.RB) {
-                    temp = Ast.empty.copy();
-                    temp.index = expressionIndex;
-                    if (stack.peek() == null)
-                        throw new DevoreParseException("语法解析中栈顶为null.");
-                    stack.peek().add(temp);
-                    state = -1;
-                    ++index;
-                    continue;
-                }
-                if (token == DWord.LB) {
-                    tokens.add(index, new Lexer.SourceToken(Ast.empty, tokenIndex));
-                    continue;
-                }
-                temp = new Ast(token);
-                temp.index = expressionIndex;
-                if (stack.peek() == null)
-                    throw new DevoreParseException("语法解析中栈顶为null.");
-                stack.peek().add(temp);
-                stack.push(temp);
-                state = -1;
-            } else if (token == DWord.LB) {
-                expressionIndex = tokenIndex;
-                state = stack.isEmpty() ? 1 : 2;
+        for (Lexer.SourceToken sourceToken : tokens) {
+            DToken token = sourceToken.token;
+            if (token == DWord.LB) {
+                Ast current = newNode(Ast.empty, sourceToken.index);
+                if (stack.isEmpty())
+                    node = current;
+                else
+                    stack.peek().add(current);
+                stack.push(current);
             } else if (token == DWord.RB) {
-                if (index >= 2 && tokens.get(index - 2).token == DWord.LB) {
-                    if (stack.peek() == null)
-                        throw new DevoreParseException("语法解析中栈顶为null.");
-                    stack.peek().type = Ast.Type.PROCEDURE;
-                }
                 if (stack.isEmpty())
                     throw new DevoreParseException("语法解析中栈顶为空.");
-                if (stack.peek().symbol == Ast.empty) {
-                    List<Ast> childrenCopy = new ArrayList<>(stack.peek().children);
-                    stack.peek().type = Ast.Type.PROCEDURE;
-                    stack.peek().symbol = stack.peek().children.isEmpty() ? Ast.empty : stack.peek().children.get(0);
-                    stack.peek().children = stack.peek().children.size() > 1 ? childrenCopy.subList(1, childrenCopy.size()) : new ArrayList<>();
-                }
-                stack.pop();
+                closeProcedure(stack.pop());
             } else {
                 if (stack.isEmpty())
                     throw new DevoreParseException("语法解析中栈顶为空.");
-                temp = new Ast(token);
-                temp.index = tokenIndex;
-                if (stack.peek() == null)
-                    throw new DevoreParseException("语法解析中栈顶为null.");
-                stack.peek().add(temp);
+                stack.peek().add(newNode(token, sourceToken.index));
             }
-            ++index;
         }
         if (node == null)
             throw new DevoreParseException("语法解析出的AST为null.");
+        if (!stack.isEmpty())
+            throw new DevoreParseException("语法解析中括号未闭合.");
         return node;
+    }
+
+    /**
+     * 创建带源码位置的语法树节点
+     *
+     * @param token 内容
+     * @param index 源码位置
+     * @return 语法树节点
+     */
+    private static Ast newNode(DToken token, int index) {
+        Ast node = new Ast(token);
+        node.index = index;
+        return node;
+    }
+
+    /**
+     * 归一化过程节点：首个子节点作为调用目标，剩余子节点作为参数
+     *
+     * @param node 过程节点
+     */
+    private static void closeProcedure(Ast node) {
+        node.type = Ast.Type.PROCEDURE;
+        if (node.symbol != Ast.empty)
+            return;
+        if (node.children.isEmpty())
+            return;
+        List<Ast> childrenCopy = new ArrayList<>(node.children);
+        Ast symbolNode = childrenCopy.get(0);
+        if (symbolNode.type == Ast.Type.PROCEDURE) {
+            node.symbol = symbolNode;
+            node.children = new ArrayList<>(childrenCopy.subList(1, childrenCopy.size()));
+            return;
+        }
+        node.symbol = symbolNode.symbol;
+        node.children = new ArrayList<>(symbolNode.children);
+        node.children.addAll(childrenCopy.subList(1, childrenCopy.size()));
     }
 }

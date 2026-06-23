@@ -24,17 +24,12 @@ public class Evaluator {
         try {
             if (node.symbol instanceof Ast)
                 node.symbol = eval(env, ((Ast) node.symbol).copy());
-            while (true) {
-                if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString()))
-                    node.symbol = env.get(node.symbol.toString());
-                else
-                    break;
-            }
+            node.symbol = resolveSymbol(env, node.symbol);
             if (node.symbol instanceof DMacro) {
                 DMacro macro = (DMacro) node.symbol;
-                List<Ast> bodys = macro.expand(node.children);
+                List<Ast> bodies = macro.expand(node.children);
                 DToken result = DWord.NIL;
-                for (Ast temp : bodys)
+                for (Ast temp : bodies)
                     result = eval(env, temp);
                 return result;
             }
@@ -47,14 +42,7 @@ public class Evaluator {
                 node.symbol = procedure.call(node, env);
                 node.clear();
             }
-            if (node.symbol instanceof DSymbol)
-                while (true) {
-                    if (node.symbol instanceof DSymbol && env.contains(node.symbol.toString()))
-                        node.symbol = env.get(node.symbol.toString());
-                    else
-                        break;
-                }
-            return node.symbol;
+            return resolveSymbol(env, node.symbol);
         } catch (StackOverflowError e) {
             throw new DevoreRuntimeException("栈溢出，可能存在无限递归或递归宏展开.",
                     expression, index, node.source, node.code);
@@ -63,5 +51,18 @@ public class Evaluator {
             e.addFrameIfAbsent(expression, index, node.source, node.code);
             throw e;
         }
+    }
+
+    /**
+     * 解析符号绑定，直到得到非符号值或环境中不存在该符号
+     *
+     * @param env   环境
+     * @param token token
+     * @return 解析结果
+     */
+    private static DToken resolveSymbol(Env env, DToken token) {
+        while (token instanceof DSymbol && env.contains(token.toString()))
+            token = env.get(token.toString());
+        return token;
     }
 }
