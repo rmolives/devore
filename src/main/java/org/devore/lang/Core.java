@@ -577,7 +577,7 @@ public class Core {
                 List<String> params = ast.get(0).children.stream()
                         .map(param -> {
                             DToken temp = param.symbol;
-                            if (!param.isEmpty())
+                            if (param.type == Ast.Type.PROCEDURE)
                                 temp = Evaluator.eval(env, param);
                             if (!(temp instanceof DSymbol))
                                 throw new DevoreCastException(temp.type(), "symbol");
@@ -845,7 +845,7 @@ public class Core {
      */
     private static String moduleBindingName(Env env, Ast signature) {
         DToken temp = signature.symbol;
-        if (!signature.isEmpty())
+        if (signature.type == Ast.Type.PROCEDURE)
             temp = Evaluator.eval(env, signature);
         if (!(temp instanceof DSymbol))
             throw new DevoreCastException(temp.type(), "symbol");
@@ -862,7 +862,7 @@ public class Core {
         return signature.children.stream()
                 .map(param -> {
                     DToken temp = param.symbol;
-                    if (!param.isEmpty())
+                    if (param.type == Ast.Type.PROCEDURE)
                         temp = Evaluator.eval(env, param);
                     if (!(temp instanceof DSymbol))
                         throw new DevoreCastException(temp.type(), "symbol");
