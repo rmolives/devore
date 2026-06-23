@@ -235,7 +235,7 @@ public class Lexer {
                                 builder.append("\f");
                                 break;
                             default:
-                                builder.append(expressionCharArray[index]);
+                                builder.append("\\").append(expressionCharArray[index]);
                                 break;
                         }
                     } else
