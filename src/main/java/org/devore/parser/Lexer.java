@@ -235,7 +235,8 @@ public class Lexer {
                                 builder.append("\f");
                                 break;
                             default:
-                                throw new DevoreParseException("异常转义符：\\"  + expressionCharArray[index], index);
+                                builder.append(expressionCharArray[index]);
+                                break;
                         }
                     } else
                         builder.append(expressionCharArray[index]);
