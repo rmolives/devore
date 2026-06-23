@@ -1383,9 +1383,9 @@ public class Core {
      */
     private static void initAggregateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("max", ((args, env) -> args.stream()
-                .max(DToken::compareTo).orElse(DInt.valueOf(-1))), 1, true);
+                .max(DToken::compareTo).orElse(args.get(0))), 1, true);
         dEnv.addTokenProcedure("min", ((args, env) -> args.stream()
-                .min(DToken::compareTo).orElse(DInt.valueOf(-1))), 1, true);
+                .min(DToken::compareTo).orElse(args.get(0))), 1, true);
     }
 
     /**
