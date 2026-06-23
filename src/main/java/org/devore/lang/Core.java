@@ -439,19 +439,11 @@ public class Core {
      */
     private static void initModuleProcedures(Env dEnv) {
         dEnv.addAstProcedure("module", ((ast, env) -> {
-            Function<Ast, String> bindingName = signature -> {
-                DToken temp = signature.symbol;
-                if (signature.symbol instanceof Ast)
-                    temp = Evaluator.eval(env, (Ast) signature.symbol);
-                if (!(temp instanceof DSymbol))
-                    throw new DevoreCastException(temp.type(), "symbol");
-                return temp.toString();
-            };
             Function<Ast, List<String>> bindingParams = signature -> signature.children.stream()
                     .map(param -> {
                         DToken temp = param.symbol;
                         if (param.type == Ast.Type.PROCEDURE)
-                            temp = Evaluator.eval(env, param);
+                            temp = Evaluator.eval(env, param.copy());
                         if (!(temp instanceof DSymbol))
                             throw new DevoreCastException(temp.type(), "symbol");
                         return temp.toString();
@@ -460,16 +452,20 @@ public class Core {
             ast.children.forEach(node -> {
                 if (node.symbol instanceof Ast) {
                     Ast signature = (Ast) node.symbol;
-                    String name = bindingName.apply(signature);
+                    DToken name = signature.symbol;
+                    if (signature.symbol instanceof Ast)
+                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
+                    if (!(name instanceof DSymbol))
+                        throw new DevoreCastException(name.type(), "symbol");
                     if (node.children.isEmpty())
                         throw new DevoreRuntimeException("module过程绑定必须包含过程体.");
-                    if (env.contains(name))
+                    if (env.contains(name.toString()))
                         return;
                     List<String> params = bindingParams.apply(signature);
                     List<Ast> nodes = node.children.stream()
                             .map(Ast::copy)
                             .collect(Collectors.toList());
-                    env.addTokenProcedure(name, ((cArgs, cEnv) -> {
+                    env.addTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
                         Env newEnv = env.createChild();
                         IntStream.range(0, params.size())
                                 .forEach(i -> newEnv.put(params.get(i), cArgs.get(i)));
@@ -484,17 +480,21 @@ public class Core {
                     if (node.isEmpty())
                         throw new DevoreRuntimeException("module过程绑定必须包含签名和过程体.");
                     Ast signature = node.get(0);
-                    String name = bindingName.apply(signature);
+                    DToken name = signature.symbol;
+                    if (signature.symbol instanceof Ast)
+                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
+                    if (!(name instanceof DSymbol))
+                        throw new DevoreCastException(name.type(), "symbol");
                     List<Ast> bodyNodes = node.children.subList(1, node.size());
                     if (bodyNodes.isEmpty())
                         throw new DevoreRuntimeException("module过程绑定必须包含过程体.");
-                    if (env.contains(name))
+                    if (env.contains(name.toString()))
                         return;
                     List<String> params = bindingParams.apply(signature);
                     List<Ast> nodes = bodyNodes.stream()
                             .map(Ast::copy)
                             .collect(Collectors.toList());
-                    env.addTokenProcedure(name, ((cArgs, cEnv) -> {
+                    env.addTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
                         Env newEnv = env.createChild();
                         IntStream.range(0, params.size())
                                 .forEach(i -> newEnv.put(params.get(i), cArgs.get(i)));
@@ -509,13 +509,17 @@ public class Core {
                     if (node.isEmpty())
                         throw new DevoreRuntimeException("module宏绑定必须包含签名和宏体.");
                     Ast signature = node.get(0);
-                    String name = bindingName.apply(signature);
+                    DToken name = signature.symbol;
+                    if (signature.symbol instanceof Ast)
+                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
+                    if (!(name instanceof DSymbol))
+                        throw new DevoreCastException(name.type(), "symbol");
                     List<Ast> bodyNodes = node.children.subList(1, node.size());
                     if (bodyNodes.isEmpty())
                         throw new DevoreRuntimeException("module宏绑定必须包含宏体.");
-                    if (env.contains(name))
+                    if (env.contains(name.toString()))
                         return;
-                    env.addMacro(name, bindingParams.apply(signature),
+                    env.addMacro(name.toString(), bindingParams.apply(signature),
                             bodyNodes.stream().map(Ast::copy).collect(Collectors.toList()));
                     return;
                 }
@@ -533,7 +537,11 @@ public class Core {
                                 .orElse(DWord.NIL));
                         return;
                     }
-                    String name = bindingName.apply(target);
+                    DToken name = target.symbol;
+                    if (target.symbol instanceof Ast)
+                        name = Evaluator.eval(env, ((Ast) target.symbol).copy());
+                    if (!(name instanceof DSymbol))
+                        throw new DevoreCastException(name.type(), "symbol");
                     List<Ast> bodyNodes = node.children.subList(1, node.size());
                     if (bodyNodes.isEmpty())
                         throw new DevoreRuntimeException("module中的set!过程绑定必须包含过程体.");
@@ -541,7 +549,7 @@ public class Core {
                     List<Ast> nodes = bodyNodes.stream()
                             .map(Ast::copy)
                             .collect(Collectors.toList());
-                    env.setTokenProcedure(name, ((cArgs, cEnv) -> {
+                    env.setTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
                         Env newEnv = env.createChild();
                         IntStream.range(0, params.size())
                                 .forEach(i -> newEnv.put(params.get(i), cArgs.get(i)));
@@ -556,8 +564,12 @@ public class Core {
                     if (node.size() < 2)
                         throw new DevoreRuntimeException("module中的set-macro!必须包含签名和宏体.");
                     Ast signature = node.get(0);
-                    String name = bindingName.apply(signature);
-                    env.setMacro(name, bindingParams.apply(signature),
+                    DToken name = signature.symbol;
+                    if (signature.symbol instanceof Ast)
+                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
+                    if (!(name instanceof DSymbol))
+                        throw new DevoreCastException(name.type(), "symbol");
+                    env.setMacro(name.toString(), bindingParams.apply(signature),
                             node.children.subList(1, node.size()).stream().map(Ast::copy).collect(Collectors.toList()));
                     return;
                 }
@@ -603,11 +615,11 @@ public class Core {
             ast.children.stream()
                     .map(child -> {
                         DToken temp = child.symbol;
-                        if (ast.get(0).type == Ast.Type.PROCEDURE)
-                            temp = Evaluator.eval(env, child);
+                        if (child.type == Ast.Type.PROCEDURE)
+                            temp = Evaluator.eval(env, child.copy());
                         if (!(temp instanceof DSymbol))
                             throw new DevoreCastException(temp.type(), "symbol");
-                        return child.toString();
+                        return temp.toString();
                     })
                     .forEach(env::remove);
             return DWord.NIL;
@@ -616,8 +628,8 @@ public class Core {
             List<String> params = ast.get(0).children.stream()
                     .map(param -> {
                         DToken temp = param.symbol;
-                        if (ast.get(0).type == Ast.Type.PROCEDURE)
-                            temp = Evaluator.eval(env, param);
+                        if (param.type == Ast.Type.PROCEDURE)
+                            temp = Evaluator.eval(env, param.copy());
                         if (!(temp instanceof DSymbol))
                             throw new DevoreCastException(temp.type(), "symbol");
                         return temp.toString();
@@ -628,7 +640,7 @@ public class Core {
                     .collect(Collectors.toList());
             DToken name = ast.get(0).symbol;
             if (ast.get(0).symbol instanceof Ast)
-                name = Evaluator.eval(env, (Ast) ast.get(0).symbol);
+                name = Evaluator.eval(env, ((Ast) ast.get(0).symbol).copy());
             if (!(name instanceof DSymbol))
                 throw new DevoreCastException(name.type(), "symbol");
             env.addMacro(name.toString(), params, bodys);
@@ -638,8 +650,8 @@ public class Core {
             List<String> params = ast.get(0).children.stream()
                     .map(param -> {
                         DToken temp = param.symbol;
-                        if (ast.get(0).type == Ast.Type.PROCEDURE)
-                            temp = Evaluator.eval(env, param);
+                        if (param.type == Ast.Type.PROCEDURE)
+                            temp = Evaluator.eval(env, param.copy());
                         if (!(temp instanceof DSymbol))
                             throw new DevoreCastException(temp.type(), "symbol");
                         return temp.toString();
@@ -650,7 +662,7 @@ public class Core {
                     .collect(Collectors.toList());
             DToken name = ast.get(0).symbol;
             if (ast.get(0).symbol instanceof Ast)
-                name = Evaluator.eval(env, (Ast) ast.get(0).symbol);
+                name = Evaluator.eval(env, ((Ast) ast.get(0).symbol).copy());
             if (!(name instanceof DSymbol))
                 throw new DevoreCastException(name.type(), "symbol");
             env.setMacro(name.toString(), params, bodys);
@@ -670,8 +682,8 @@ public class Core {
                 List<String> params = ast.get(0).children.stream()
                         .map(param -> {
                             DToken temp = param.symbol;
-                            if (ast.get(0).type == Ast.Type.PROCEDURE)
-                                temp = Evaluator.eval(env, param);
+                            if (param.type == Ast.Type.PROCEDURE)
+                                temp = Evaluator.eval(env, param.copy());
                             if (!(temp instanceof DSymbol))
                                 throw new DevoreCastException(temp.type(), "symbol");
                             return temp.toString();
@@ -682,7 +694,7 @@ public class Core {
                         .collect(Collectors.toList());
                 DToken name = ast.get(0).symbol;
                 if (ast.get(0).symbol instanceof Ast)
-                    name = Evaluator.eval(env, (Ast) ast.get(0).symbol);
+                    name = Evaluator.eval(env, ((Ast) ast.get(0).symbol).copy());
                 if (!(name instanceof DSymbol))
                     throw new DevoreCastException(name.type(), "symbol");
                 env.addTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
@@ -712,7 +724,7 @@ public class Core {
                         .map(param -> {
                             DToken temp = param.symbol;
                             if (param.type == Ast.Type.PROCEDURE)
-                                temp = Evaluator.eval(env, param);
+                                temp = Evaluator.eval(env, param.copy());
                             if (!(temp instanceof DSymbol))
                                 throw new DevoreCastException(temp.type(), "symbol");
                             return temp.toString();
@@ -723,7 +735,7 @@ public class Core {
                         .collect(Collectors.toList());
                 DToken name = ast.get(0).symbol;
                 if (ast.get(0).symbol instanceof Ast)
-                    name = Evaluator.eval(env, ast.get(0));
+                    name = Evaluator.eval(env, ((Ast) ast.get(0).symbol).copy());
                 if (!(name instanceof DSymbol))
                     throw new DevoreCastException(name.type(), "symbol");
                 env.setTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
@@ -746,7 +758,7 @@ public class Core {
             nodes.forEach(node -> {
                 DToken name = node.symbol;
                 if (node.symbol instanceof Ast)
-                    name = Evaluator.eval(env, (Ast) node.symbol);
+                    name = Evaluator.eval(env, ((Ast) node.symbol).copy());
                 if (!(name instanceof DSymbol))
                     throw new DevoreCastException(name.type(), "symbol");
                 if (node.children.size() != 1)
@@ -763,9 +775,10 @@ public class Core {
                     ? Stream.concat(Stream.of(ast.get(0)), ast.get(0).children.stream())
                     .map(param -> {
                         DToken temp = param.symbol;
-                        if ((param != ast.get(0) && param.type != Ast.Type.PROCEDURE)
-                            || (param == ast.get(0) && param.symbol instanceof Ast))
-                            temp = Evaluator.eval(env, param);
+                        if (param == ast.get(0) && param.symbol instanceof Ast)
+                            temp = Evaluator.eval(env, ((Ast) param.symbol).copy());
+                        if (param != ast.get(0) && param.type == Ast.Type.PROCEDURE)
+                            temp = Evaluator.eval(env, param.copy());
                         if (!(temp instanceof DSymbol))
                             throw new DevoreCastException(temp.type(), "symbol");
                         return temp.toString();
