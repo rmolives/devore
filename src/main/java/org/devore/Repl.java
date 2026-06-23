@@ -42,6 +42,7 @@ public class Repl {
     private static int windowsConsoleMode = -1;
     private static boolean manualEcho;
     private static boolean windowsNativeLoaded;
+    private static boolean shutdownHookRegistered;
     private static boolean skipLineFeed;
     private static boolean endOfInput;
     private static final Reader INPUT = new InputStreamReader(System.in, StandardCharsets.UTF_8);
@@ -104,11 +105,14 @@ public class Repl {
                     continue;
                 recordHistory(code);
                 try {
-                    DToken result = Devore.call(env, code, "<#" + sourceIndex + ">");
+                    env.io.resetLineState();
+                    DToken result = executeCode(env, code, "<#" + sourceIndex + ">");
+                    ensureOutputLineBreak(env);
                     if (result != DWord.NIL)
                         System.out.println(result.toString());
                     codeBuilder = new StringBuilder();
                 } catch (DevoreRuntimeException e) {
+                    ensureOutputLineBreak(env);
                     System.err.println(e.getMessage());
                     codeBuilder = new StringBuilder();
                 }
@@ -160,10 +164,13 @@ public class Repl {
                     throw new UncheckedIOException(e);
                 }
                 try {
-                    DToken result = Devore.call(env, code, file);
+                    env.io.resetLineState();
+                    DToken result = executeCode(env, code, file);
+                    ensureOutputLineBreak(env);
                     if (result != DWord.NIL)
                         System.out.println(result);
                 } catch (DevoreRuntimeException e) {
+                    ensureOutputLineBreak(env);
                     System.err.println(e.getMessage());
                 }
             });
@@ -180,6 +187,33 @@ public class Repl {
         System.out.println(":version   显示版本");
         System.out.println(":load FILE 加载文件, 可一次加载多个");
         System.out.println(":exit      退出");
+    }
+
+    private static DToken executeCode(Env env, String code, String source) {
+        boolean shouldRestoreManualEcho = disableManualEchoForExecution();
+        try {
+            return Devore.call(env, code, source);
+        } finally {
+            restoreManualEchoAfterExecution(shouldRestoreManualEcho);
+        }
+    }
+
+    private static boolean disableManualEchoForExecution() {
+        if (!manualEcho)
+            return false;
+        System.out.flush();
+        restoreTerminal();
+        return true;
+    }
+
+    private static void restoreManualEchoAfterExecution(boolean shouldRestoreManualEcho) {
+        if (shouldRestoreManualEcho)
+            enableManualEcho();
+    }
+
+    private static void ensureOutputLineBreak(Env env) {
+        if (!env.io.isAtLineStart())
+            env.io.out.println();
     }
 
     /**
@@ -235,7 +269,7 @@ public class Repl {
             return;
         windowsConsoleMode = mode;
         manualEcho = true;
-        Runtime.getRuntime().addShutdownHook(new Thread(Repl::restoreTerminal));
+        registerShutdownHook();
     }
 
     private static boolean loadWindowsNative() {
@@ -266,11 +300,18 @@ public class Repl {
             }
             runStty("-icanon", "-echo", "min", "1", "time", "0");
             manualEcho = true;
-            Runtime.getRuntime().addShutdownHook(new Thread(Repl::restoreTerminal));
+            registerShutdownHook();
         } catch (Exception ignored) {
             terminalState = null;
             manualEcho = false;
         }
+    }
+
+    private static synchronized void registerShutdownHook() {
+        if (shutdownHookRegistered)
+            return;
+        Runtime.getRuntime().addShutdownHook(new Thread(Repl::restoreTerminal));
+        shutdownHookRegistered = true;
     }
 
     private static String runStty(String... arguments) throws IOException, InterruptedException {
