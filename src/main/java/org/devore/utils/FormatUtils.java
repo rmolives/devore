@@ -13,8 +13,7 @@ public class FormatUtils {
     }
 
     private static String escapeString(String str) {
-        return str.chars()
-                .mapToObj(c -> {
+        return str.chars().mapToObj(c -> {
                     switch (c) {
                         case '\\':
                             return "\\\\";
@@ -33,7 +32,6 @@ public class FormatUtils {
                         default:
                             return String.valueOf((char) c);
                     }
-                })
-                .collect(Collectors.joining());
+                }).collect(Collectors.joining());
     }
 }
