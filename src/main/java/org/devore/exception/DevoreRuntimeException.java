@@ -9,11 +9,11 @@ import java.util.Objects;
  * 运行错误
  */
 public class DevoreRuntimeException extends RuntimeException {
-    private String expression;    // 出错表达式
-    private int index = -1;       // 出错位置
-    private String source;        // 代码来源
-    private String code;          // 完整源码
-    private final List<Frame> trace = new ArrayList<>();  // 调用链
+    private String expression;                              // 出错表达式
+    private int index = -1;                                 // 出错位置
+    private String source;                                  // 代码来源
+    private String code;                                    // 完整源码
+    private final List<Frame> trace = new ArrayList<>();    // 调用链
 
     public DevoreRuntimeException(String e) {
         super(e);
