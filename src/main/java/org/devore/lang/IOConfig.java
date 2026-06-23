@@ -47,20 +47,20 @@ public class IOConfig {
         private boolean atLineStart = true;
 
         private synchronized void reset() {
-            atLineStart = true;
+            this.atLineStart = true;
         }
 
         private synchronized boolean isAtLineStart() {
-            return atLineStart;
+            return this.atLineStart;
         }
 
         private synchronized void record(int b) {
-            atLineStart = b == '\n';
+            this.atLineStart = b == '\n';
         }
 
         private synchronized void record(byte[] buf, int off, int len) {
             for (int index = off; index < off + len; ++index)
-                atLineStart = buf[index] == '\n';
+                this.atLineStart = buf[index] == '\n';
         }
     }
 
@@ -75,13 +75,13 @@ public class IOConfig {
         @Override
         public void write(int b) {
             super.write(b);
-            lineState.record(b);
+            this.lineState.record(b);
         }
 
         @Override
         public void write(byte[] buf, int off, int len) {
             super.write(buf, off, len);
-            lineState.record(buf, off, len);
+            this.lineState.record(buf, off, len);
         }
     }
 
