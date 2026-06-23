@@ -845,8 +845,8 @@ public class Core {
      */
     private static String moduleBindingName(Env env, Ast signature) {
         DToken temp = signature.symbol;
-        if (signature.type == Ast.Type.PROCEDURE)
-            temp = Evaluator.eval(env, signature);
+        if (signature.symbol instanceof Ast)
+            temp = Evaluator.eval(env, (Ast) signature.symbol);
         if (!(temp instanceof DSymbol))
             throw new DevoreCastException(temp.type(), "symbol");
         return temp.toString();
