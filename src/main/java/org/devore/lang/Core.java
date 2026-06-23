@@ -454,8 +454,7 @@ public class Core {
                     } catch (IOException e) {
                         throw new DevoreRuntimeException("读取文件失败: " + file + ", " + e.getMessage());
                     }
-                })
-                .reduce((previous, current) -> current)
+                }).reduce((previous, current) -> current)
                 .orElse(DWord.NIL)), 1, true);
     }
 
