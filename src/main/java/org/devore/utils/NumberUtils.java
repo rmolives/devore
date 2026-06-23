@@ -18,7 +18,7 @@ public class NumberUtils {
     private static final BigDecimal PI = approximatePi();                           // Pi
     private static final BigDecimal TWO_PI = PI.multiply(TWO, DEFAULT_CONTEXT);     // Pi * 2
 
-    private static String plain(BigDecimal value) {
+    public static String plain(BigDecimal value) {
         return value.stripTrailingZeros().toPlainString();
     }
 
