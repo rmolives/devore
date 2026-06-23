@@ -22,14 +22,14 @@ public class Parse {
      * @return 语法树
      */
     public static Ast parse(List<Lexer.SourceToken> tokens) {
-        Ast[] node = new Ast[1];
+        Ast node = null;
         Deque<Ast> stack = new ArrayDeque<>();
-        tokens.forEach(sourceToken -> {
+        for (Lexer.SourceToken sourceToken : tokens) {
             DToken token = sourceToken.token;
             if (token == DWord.LB) {
                 Ast current = newNode(Ast.empty, sourceToken.index);
                 if (stack.isEmpty())
-                    node[0] = current;
+                    node = current;
                 else
                     stack.peek().add(current);
                 stack.push(current);
@@ -42,12 +42,12 @@ public class Parse {
                     throw new DevoreParseException("语法解析中栈顶为空.");
                 stack.peek().add(newNode(token, sourceToken.index));
             }
-        });
-        if (node[0] == null)
+        }
+        if (node == null)
             throw new DevoreParseException("语法解析出的AST为null.");
         if (!stack.isEmpty())
             throw new DevoreParseException("语法解析中括号未闭合.");
-        return node[0];
+        return node;
     }
 
     /**
