@@ -771,13 +771,15 @@ public class Core {
                     .orElse(DWord.NIL);
         }), 2, true);
         dEnv.addAstProcedure("lambda", ((ast, env) -> {
-            List<String> params = ast.get(0).isNotNil()
+            Ast paramsAst = ast.get(0);
+            boolean hasParams = paramsAst.isNotNil() && !isEmptyProcedure(paramsAst);
+            List<String> params = hasParams
                     ? Stream.concat(Stream.of(ast.get(0)), ast.get(0).children.stream())
                     .map(param -> {
                         DToken temp = param.symbol;
-                        if (param == ast.get(0) && param.symbol instanceof Ast)
+                        if (param == paramsAst && param.symbol instanceof Ast)
                             temp = Evaluator.eval(env, ((Ast) param.symbol).copy());
-                        if (param != ast.get(0) && param.type == Ast.Type.PROCEDURE)
+                        if (param != paramsAst && param.type == Ast.Type.PROCEDURE)
                             temp = Evaluator.eval(env, param.copy());
                         if (!(temp instanceof DSymbol))
                             throw new DevoreCastException(temp.type(), "symbol");
@@ -1644,5 +1646,12 @@ public class Core {
                 throw new DevoreRuntimeException("字符串截取过界, toIndex=" + toIndex + ", 但字符串只有" + s.length() + "个字符.");
             return DString.valueOf(s.substring(fromIndex, toIndex));
         }), 3, false);
+    }
+
+    private static boolean isEmptyProcedure(Ast ast) {
+        return ast.type == Ast.Type.PROCEDURE
+                && ast.isEmpty()
+                && ast.symbol instanceof Ast
+                && !((Ast) ast.symbol).isNotNil();
     }
 }
