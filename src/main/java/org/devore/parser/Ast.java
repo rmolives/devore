@@ -19,6 +19,7 @@ public class Ast extends DToken {
     public Type type;                                       // 语法树类型
     public int index;                                       // 源码位置
     public String source;                                   // 代码来源
+    public String code;                                     // 完整源码
 
     /**
      * 创建语法树
@@ -31,6 +32,7 @@ public class Ast extends DToken {
         this.children = new ArrayList<>();
         this.index = -1;
         this.source = null;
+        this.code = null;
     }
 
     /**
@@ -41,13 +43,15 @@ public class Ast extends DToken {
      * @param children 子树
      * @param index    源码位置
      * @param source   代码来源
+     * @param code     完整源码
      */
-    public Ast(DToken symbol, Type type, List<Ast> children, int index, String source) {
+    public Ast(DToken symbol, Type type, List<Ast> children, int index, String source, String code) {
         this.symbol = symbol;
         this.type = type;
         this.children = children;
         this.index = index;
         this.source = source;
+        this.code = code;
     }
 
     /**
@@ -60,19 +64,21 @@ public class Ast extends DToken {
                 .map(Ast::copy)
                 .collect(Collectors.toList());
         DToken symbolCopy = this.symbol instanceof Ast ? ((Ast) this.symbol).copy() : this.symbol;
-        return new Ast(symbolCopy, this.type, list, this.index, this.source);
+        return new Ast(symbolCopy, this.type, list, this.index, this.source, this.code);
     }
 
     /**
      * 设置语法树源码信息
      *
      * @param source 代码来源
+     * @param code   完整源码
      */
-    public void setSource(String source) {
+    public void setSource(String source, String code) {
         this.source = source;
-        this.children.forEach(child -> child.setSource(source));
+        this.code = code;
+        this.children.forEach(child -> child.setSource(source, code));
         if (this.symbol instanceof Ast)
-            ((Ast) this.symbol).setSource(source);
+            ((Ast) this.symbol).setSource(source, code);
     }
 
     /**
@@ -197,6 +203,7 @@ public class Ast extends DToken {
         result = 31 * result + this.children.hashCode();
         result = 31 * result + this.index;
         result = 31 * result + this.source.hashCode();
+        result = 31 * result + this.code.hashCode();
         return result;
     }
 
