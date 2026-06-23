@@ -198,6 +198,7 @@ public class Ast extends DToken {
     @Override
     public int hashCode() {
         int result = this.type().hashCode();
+        result = 31 * result + this.type.hashCode();
         result = 31 * result + this.symbol.hashCode();
         result = 31 * result + this.children.hashCode();
         result = 31 * result + this.index;
