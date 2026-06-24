@@ -12,7 +12,7 @@ public class DLock extends DToken {
         this.lock = lock;
     }
 
-    public static DLock valueOf() {
+    public static DLock newLock() {
         return new DLock(new ReentrantLock());
     }
 

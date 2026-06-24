@@ -75,7 +75,7 @@ public class ThreadModule extends Module {
     }
 
     private void initLockProcedures(Env dEnv) {
-        dEnv.addTokenProcedure("lock", (args, env) -> DLock.valueOf(), 0, false);
+        dEnv.addTokenProcedure("lock", (args, env) -> DLock.newLock(), 0, false);
         dEnv.addTokenProcedure("lock!", (args, env) -> {
             if (!(args.get(0) instanceof DLock))
                 throw new DevoreCastException(args.get(0).type(), "lock");
