@@ -865,8 +865,7 @@ public class Repl {
         return position;
     }
 
-    private static void advanceDisplayPosition(DisplayPosition position, String text, int endIndex,
-                                               int terminalColumns) {
+    private static void advanceDisplayPosition(DisplayPosition position, String text, int endIndex, int terminalColumns) {
         for (int index = 0; index < endIndex; ) {
             int codePoint = text.codePointAt(index);
             if (codePoint == '\n') {
@@ -1107,8 +1106,7 @@ public class Repl {
         private int cursorIndex;
         private int terminalColumns;
 
-        private ActiveInputRender(String prompt, String highlightContext, String line, int cursorIndex,
-                                  int terminalColumns) {
+        private ActiveInputRender(String prompt, String highlightContext, String line, int cursorIndex, int terminalColumns) {
             this.prompt = prompt;
             this.highlightContext = highlightContext;
             this.line = line;
