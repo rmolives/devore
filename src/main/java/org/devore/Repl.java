@@ -18,6 +18,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 /**
@@ -38,15 +41,20 @@ public class Repl {
             "\033[38;5;214m", "\033[38;5;177m", "\033[38;5;81m",
             "\033[38;5;119m", "\033[38;5;75m", "\033[38;5;203m"
     };
+    private static final int RESIZE_MONITOR_INTERVAL_MILLIS = 100;
     private static final List<String> HISTORY = new ArrayList<>();
+    private static final Object INPUT_RENDER_LOCK = new Object();
     private static String terminalState;
     private static int windowsConsoleMode = -1;
     private static int windowsOutputConsoleMode = -1;
     private static boolean manualEcho;
     private static boolean windowsNativeLoaded;
     private static boolean shutdownHookRegistered;
+    private static boolean resizeHandlingStarted;
     private static boolean skipLineFeed;
     private static boolean endOfInput;
+    private static ActiveInputRender activeInputRender;
+    private static ScheduledExecutorService resizeMonitorExecutor;
     private static final Reader INPUT = new InputStreamReader(System.in, StandardCharsets.UTF_8);
     private static final Deque<String> PASTED_LINES = new ArrayDeque<>();
 
@@ -293,6 +301,7 @@ public class Repl {
         windowsConsoleMode = mode;
         windowsOutputConsoleMode = outputMode;
         manualEcho = true;
+        startResizeHandling();
         registerShutdownHook();
     }
 
@@ -324,6 +333,7 @@ public class Repl {
             }
             runStty("-icanon", "-echo", "min", "1", "time", "0");
             manualEcho = true;
+            startResizeHandling();
             registerShutdownHook();
         } catch (Exception ignored) {
             terminalState = null;
@@ -336,6 +346,43 @@ public class Repl {
             return;
         Runtime.getRuntime().addShutdownHook(new Thread(Repl::restoreTerminal));
         shutdownHookRegistered = true;
+    }
+
+    private static synchronized void startResizeHandling() {
+        if (resizeHandlingStarted)
+            return;
+        resizeMonitorExecutor = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "devore-repl-resize-monitor");
+            thread.setDaemon(true);
+            return thread;
+        });
+        resizeMonitorExecutor.scheduleWithFixedDelay(Repl::monitorConsoleResize,
+                RESIZE_MONITOR_INTERVAL_MILLIS, RESIZE_MONITOR_INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
+        resizeHandlingStarted = true;
+    }
+
+    private static synchronized void stopResizeHandling() {
+        if (resizeMonitorExecutor != null) {
+            resizeMonitorExecutor.shutdownNow();
+            resizeMonitorExecutor = null;
+        }
+        resizeHandlingStarted = false;
+    }
+
+    private static void monitorConsoleResize() {
+        try {
+            redrawActiveInputAfterResize();
+        } catch (RuntimeException ignored) {
+            // resize 监视不能影响 REPL 输入。
+        }
+    }
+
+    private static void redrawActiveInputAfterResize() {
+        synchronized (INPUT_RENDER_LOCK) {
+            if (!manualEcho || activeInputRender == null)
+                return;
+            redrawActiveInputAfterResize(activeInputRender);
+        }
     }
 
     private static String runStty(String... arguments) throws IOException, InterruptedException {
@@ -359,6 +406,7 @@ public class Repl {
         if (!manualEcho)
             return;
         manualEcho = false;
+        stopResizeHandling();
         if (isWindows()) {
             if (windowsNativeLoaded && windowsConsoleMode >= 0)
                 restoreWindowsConsole(windowsConsoleMode, windowsOutputConsoleMode);
@@ -400,121 +448,153 @@ public class Repl {
         StringBuilder line = new StringBuilder(initialLine);
         int[] cursorIndex = {line.length()};
         int historyCursor = HISTORY.size();
-        int terminalColumns = terminalColumns();
-        int[] renderedRows = {displayRows(prompt, line.toString(), terminalColumns)};
-        int[] renderedCursorRow = {0};
+        ActiveInputRender render = null;
         String currentLine = null;
-        if (!initialLine.isEmpty()) {
-            if (manualEcho) {
-                System.out.print(highlightLine(highlightContext, initialLine));
-                System.out.print(ANSI_RESET);
-            } else
-                System.out.print(initialLine);
+        if (manualEcho) {
+            synchronized (INPUT_RENDER_LOCK) {
+                render = new ActiveInputRender(prompt, highlightContext, line.toString(), cursorIndex[0],
+                        terminalColumns());
+                saveInputAnchor(render);
+                activeInputRender = render;
+                if (!initialLine.isEmpty()) {
+                    System.out.print(highlightLine(highlightContext, initialLine));
+                    System.out.print(ANSI_RESET);
+                }
+                System.out.flush();
+            }
+        } else if (!initialLine.isEmpty()) {
+            System.out.print(initialLine);
             System.out.flush();
         }
-        while (true) {
-            int c = INPUT.read();
-            if (skipLineFeed) {
-                skipLineFeed = false;
-                if (c == '\n')
+        try {
+            while (true) {
+                int c = INPUT.read();
+                if (skipLineFeed) {
+                    skipLineFeed = false;
+                    if (c == '\n')
+                        continue;
+                }
+                if (c == -1 || c == 4) {
+                    endOfInput = true;
+                    if (manualEcho) {
+                        synchronized (INPUT_RENDER_LOCK) {
+                            updateActiveInput(render, line.toString(), line.length());
+                            activeInputRender = null;
+                            System.out.println();
+                        }
+                    }
+                    return line.length() == 0 ? null : line.toString();
+                }
+                if (manualEcho && c != 27 && c != 8 && c != 127 && INPUT.ready()) {
+                    String pastedCode = readPasteChunk((char) c);
+                    String formattedCode = formatPastedCode(pastedCode, highlightContext, line, cursorIndex[0]);
+                    boolean multiline = formattedCode.indexOf('\n') >= 0 || formattedCode.indexOf('\r') >= 0;
+                    String[] pastedLines = formattedCode.split("\\R", -1);
+                    if (isOnlyIndentBeforeCursor(line, cursorIndex[0])) {
+                        line.delete(0, cursorIndex[0]);
+                        cursorIndex[0] = 0;
+                    }
+                    line.insert(cursorIndex[0], pastedLines[0]);
+                    cursorIndex[0] += pastedLines[0].length();
+                    historyCursor = HISTORY.size();
+                    currentLine = null;
+                    synchronized (INPUT_RENDER_LOCK) {
+                        updateActiveInput(render, line.toString(), cursorIndex[0]);
+                    }
+                    if (multiline) {
+                        Arrays.stream(pastedLines, 1, pastedLines.length)
+                                .forEach(PASTED_LINES::addLast);
+                        synchronized (INPUT_RENDER_LOCK) {
+                            activeInputRender = null;
+                            System.out.println();
+                        }
+                        return line.toString();
+                    }
                     continue;
-            }
-            if (c == -1 || c == 4) {
-                endOfInput = true;
-                if (manualEcho) {
-                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, line.length(),
-                            renderedRows[0], renderedCursorRow, terminalColumns);
-                    System.out.println();
                 }
-                return line.length() == 0 ? null : line.toString();
-            }
-            if (manualEcho && c != 27 && c != 8 && c != 127 && INPUT.ready()) {
-                String pastedCode = readPasteChunk((char) c);
-                String formattedCode = formatPastedCode(pastedCode, highlightContext, line, cursorIndex[0]);
-                boolean multiline = formattedCode.indexOf('\n') >= 0 || formattedCode.indexOf('\r') >= 0;
-                String[] pastedLines = formattedCode.split("\\R", -1);
-                if (isOnlyIndentBeforeCursor(line, cursorIndex[0])) {
-                    line.delete(0, cursorIndex[0]);
-                    cursorIndex[0] = 0;
-                }
-                line.insert(cursorIndex[0], pastedLines[0]);
-                cursorIndex[0] += pastedLines[0].length();
-                historyCursor = HISTORY.size();
-                currentLine = null;
-                renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
-                        cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
-                if (multiline) {
-                    Arrays.stream(pastedLines, 1, pastedLines.length)
-                            .forEach(PASTED_LINES::addLast);
-                    System.out.println();
+                if (c == '\r') {
+                    skipLineFeed = true;
+                    if (manualEcho) {
+                        synchronized (INPUT_RENDER_LOCK) {
+                            updateActiveInput(render, line.toString(), line.length());
+                            activeInputRender = null;
+                            System.out.println();
+                        }
+                    }
                     return line.toString();
                 }
-                continue;
-            }
-            if (c == '\r') {
-                skipLineFeed = true;
-                if (manualEcho) {
-                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, line.length(),
-                            renderedRows[0], renderedCursorRow, terminalColumns);
-                    System.out.println();
+                if (c == '\n') {
+                    if (manualEcho) {
+                        synchronized (INPUT_RENDER_LOCK) {
+                            updateActiveInput(render, line.toString(), line.length());
+                            activeInputRender = null;
+                            System.out.println();
+                        }
+                    }
+                    return line.toString();
                 }
-                return line.toString();
-            }
-            if (c == '\n') {
-                if (manualEcho) {
-                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, line.length(),
-                            renderedRows[0], renderedCursorRow, terminalColumns);
-                    System.out.println();
+                if (manualEcho && (c == 8 || c == 127)) {
+                    if (cursorIndex[0] > 0) {
+                        line.deleteCharAt(cursorIndex[0] - 1);
+                        --cursorIndex[0];
+                        synchronized (INPUT_RENDER_LOCK) {
+                            updateActiveInput(render, line.toString(), cursorIndex[0]);
+                        }
+                    }
+                    historyCursor = HISTORY.size();
+                    currentLine = null;
+                    continue;
                 }
-                return line.toString();
-            }
-            if (manualEcho && (c == 8 || c == 127)) {
-                if (cursorIndex[0] > 0) {
-                    line.deleteCharAt(cursorIndex[0] - 1);
-                    --cursorIndex[0];
-                    renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
-                            cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
+                if (c == 27) {
+                    int key = readEscapeSequence();
+                    if (key == 'A' || key == 'B') {
+                        if (currentLine == null)
+                            currentLine = line.toString();
+                        synchronized (INPUT_RENDER_LOCK) {
+                            historyCursor = updateHistoryLine(render, line, historyCursor, currentLine, key,
+                                    cursorIndex);
+                        }
+                        if (historyCursor == HISTORY.size())
+                            currentLine = null;
+                    } else if (key == 'C') {
+                        if (cursorIndex[0] < line.length()) {
+                            ++cursorIndex[0];
+                            synchronized (INPUT_RENDER_LOCK) {
+                                updateActiveInput(render, line.toString(), cursorIndex[0]);
+                            }
+                        }
+                    } else if (key == 'D') {
+                        if (cursorIndex[0] > 0) {
+                            --cursorIndex[0];
+                            synchronized (INPUT_RENDER_LOCK) {
+                                updateActiveInput(render, line.toString(), cursorIndex[0]);
+                            }
+                        }
+                    }
+                    continue;
                 }
+                if (manualEcho && (c == ')' || c == ']') && isOnlyIndentBeforeCursor(line, cursorIndex[0])) {
+                    int deleteCount = Math.min(INDENT_SIZE, cursorIndex[0]);
+                    line.delete(cursorIndex[0] - deleteCount, cursorIndex[0]);
+                    cursorIndex[0] -= deleteCount;
+                }
+                line.insert(cursorIndex[0], (char) c);
+                ++cursorIndex[0];
                 historyCursor = HISTORY.size();
                 currentLine = null;
-                continue;
-            }
-            if (c == 27) {
-                int key = readEscapeSequence();
-                if (key == 'A' || key == 'B') {
-                    if (currentLine == null)
-                        currentLine = line.toString();
-                    historyCursor = updateHistoryLine(prompt, line, historyCursor, currentLine, key,
-                            highlightContext, cursorIndex, terminalColumns, renderedRows, renderedCursorRow);
-                    if (historyCursor == HISTORY.size())
-                        currentLine = null;
-                } else if (key == 'C') {
-                    if (cursorIndex[0] < line.length()) {
-                        ++cursorIndex[0];
-                        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
-                                cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
-                    }
-                } else if (key == 'D') {
-                    if (cursorIndex[0] > 0) {
-                        --cursorIndex[0];
-                        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
-                                cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
+                if (manualEcho) {
+                    synchronized (INPUT_RENDER_LOCK) {
+                        updateActiveInput(render, line.toString(), cursorIndex[0]);
                     }
                 }
-                continue;
             }
-            if (manualEcho && (c == ')' || c == ']') && isOnlyIndentBeforeCursor(line, cursorIndex[0])) {
-                int deleteCount = Math.min(INDENT_SIZE, cursorIndex[0]);
-                line.delete(cursorIndex[0] - deleteCount, cursorIndex[0]);
-                cursorIndex[0] -= deleteCount;
+        } finally {
+            if (manualEcho) {
+                synchronized (INPUT_RENDER_LOCK) {
+                    if (activeInputRender == render)
+                        activeInputRender = null;
+                }
             }
-            line.insert(cursorIndex[0], (char) c);
-            ++cursorIndex[0];
-            historyCursor = HISTORY.size();
-            currentLine = null;
-            if (manualEcho)
-                renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext,
-                        cursorIndex[0], renderedRows[0], renderedCursorRow, terminalColumns);
         }
     }
 
@@ -662,9 +742,8 @@ public class Repl {
         return 0;
     }
 
-    private static int updateHistoryLine(String prompt, StringBuilder line, int cursor, String currentLine, int key,
-                                         String highlightContext, int[] cursorIndex, int terminalColumns,
-                                         int[] renderedRows, int[] renderedCursorRow) {
+    private static int updateHistoryLine(ActiveInputRender render, StringBuilder line, int cursor, String currentLine,
+                                         int key, int[] cursorIndex) {
         if (HISTORY.isEmpty())
             return cursor;
         if (key == 'A' && cursor > 0)
@@ -679,41 +758,75 @@ public class Repl {
         else
             line.append(HISTORY.get(cursor));
         cursorIndex[0] = line.length();
-        renderedRows[0] = redrawLine(prompt, line.toString(), highlightContext, cursorIndex[0],
-                renderedRows[0], renderedCursorRow, terminalColumns);
+        updateActiveInput(render, line.toString(), cursorIndex[0]);
         return cursor;
     }
 
-    private static int redrawLine(String prompt, String line, String highlightContext, int cursorIndex,
-                                  int previousRows, int[] previousCursorRow, int terminalColumns) {
+    private static void updateActiveInput(ActiveInputRender render, String line, int cursorIndex) {
+        if (render == null)
+            return;
+        render.line = line;
+        render.cursorIndex = cursorIndex;
+        redrawLine(render.prompt, render.line, render.highlightContext, render.cursorIndex, render.terminalColumns);
+    }
+
+    private static void redrawActiveInputAfterResize(ActiveInputRender render) {
+        int currentColumns = terminalColumns();
+        if (currentColumns == render.terminalColumns)
+            return;
+        render.terminalColumns = currentColumns;
+        redrawLine(render.prompt, render.line, render.highlightContext, render.cursorIndex, render.terminalColumns);
+    }
+
+    private static void redrawLine(String prompt, String line, String highlightContext, int cursorIndex,
+                                   int terminalColumns) {
         if (!manualEcho)
-            return previousRows;
-        clearRenderedInput(previousRows, previousCursorRow[0]);
+            return;
+        restoreInputAnchor();
+        saveCurrentCursorAsInputAnchor();
+        System.out.print("\033[J");
         System.out.print(prompt);
         System.out.print(highlightLine(highlightContext, line));
         System.out.print(ANSI_RESET);
         System.out.print("\033[K");
         moveCursorToInputIndex(prompt, line, cursorIndex, terminalColumns);
         System.out.flush();
-        previousCursorRow[0] = displayPosition(prompt, line, cursorIndex, terminalColumns).row;
-        return displayRows(prompt, line, terminalColumns);
     }
 
-    private static void clearRenderedInput(int rows, int cursorRow) {
-        System.out.print("\r");
-        IntStream.range(0, cursorRow)
-                .forEach(i -> System.out.print("\033[1A"));
-        IntStream.range(0, rows).forEach(i -> {
-            System.out.print("\033[2K");
-            if (i < rows - 1)
-                System.out.print("\033[1B");
-        });
-        System.out.print("\r");
-        IntStream.range(1, rows)
-                .forEach(i -> System.out.print("\033[1A"));
+    private static void saveInputAnchor(ActiveInputRender render) {
+        int promptColumns = displayPosition("", render.prompt, render.prompt.length(), render.terminalColumns).column;
+        if (promptColumns > 0)
+            System.out.print("\033[" + promptColumns + "D");
+        saveCurrentCursorAsInputAnchor();
+        if (promptColumns > 0)
+            System.out.print("\033[" + promptColumns + "C");
+    }
+
+    private static void saveCurrentCursorAsInputAnchor() {
+        System.out.print("\033[s");
+    }
+
+    private static void restoreInputAnchor() {
+        System.out.print("\033[u");
     }
 
     private static int terminalColumns() {
+        if (isWindows()) {
+            int value = windowsTerminalColumns();
+            if (value > 0)
+                return value;
+        } else {
+            try {
+                String[] size = runStty("size").trim().split("\\s+");
+                if (size.length == 2) {
+                    int value = Integer.parseInt(size[1]);
+                    if (value > 0)
+                        return value;
+                }
+            } catch (Exception ignored) {
+                // 非交互输入或不支持 stty 时继续尝试环境变量。
+            }
+        }
         String columns = System.getenv("COLUMNS");
         if (columns != null) {
             try {
@@ -721,24 +834,8 @@ public class Repl {
                 if (value > 0)
                     return value;
             } catch (NumberFormatException ignored) {
-                // 继续尝试 stty。
+                // 使用保守默认值。
             }
-        }
-        if (isWindows()) {
-            int value = windowsTerminalColumns();
-            if (value > 0)
-                return value;
-            return 80;
-        }
-        try {
-            String[] size = runStty("size").trim().split("\\s+");
-            if (size.length == 2) {
-                int value = Integer.parseInt(size[1]);
-                if (value > 0)
-                    return value;
-            }
-        } catch (Exception ignored) {
-            // 非交互输入或不支持 stty 时使用保守默认值。
         }
         return 80;
     }
@@ -747,10 +844,6 @@ public class Repl {
         if (!loadWindowsNative())
             return -1;
         return windowsConsoleColumns();
-    }
-
-    private static int displayRows(String prompt, String line, int terminalColumns) {
-        return displayPosition(prompt, line, line.length(), terminalColumns).row + 1;
     }
 
     private static void moveCursorToInputIndex(String prompt, String line, int cursorIndex, int terminalColumns) {
@@ -1005,6 +1098,23 @@ public class Repl {
         private int bracketDepth;
         private boolean inString;
         private boolean escaped;
+    }
+
+    private static class ActiveInputRender {
+        private final String prompt;
+        private final String highlightContext;
+        private String line;
+        private int cursorIndex;
+        private int terminalColumns;
+
+        private ActiveInputRender(String prompt, String highlightContext, String line, int cursorIndex,
+                                  int terminalColumns) {
+            this.prompt = prompt;
+            this.highlightContext = highlightContext;
+            this.line = line;
+            this.cursorIndex = cursorIndex;
+            this.terminalColumns = terminalColumns;
+        }
     }
 
     private static class DisplayPosition {
