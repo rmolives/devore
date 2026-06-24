@@ -4,7 +4,7 @@ package org.devore.lang.token;
  * 字符串
  */
 public class DString extends DToken {
-    public final String str;    // 字符串
+    private final String str;    // 字符串
 
     protected DString(String str) {
         this.str = str;

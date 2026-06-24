@@ -1,22 +1,34 @@
 package org.devore.lang;
 
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.module.CoreModule;
+import org.devore.lang.module.Module;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 import org.devore.parser.Ast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Env {
+    // 默认导入
+    public static final List<String> defaultModules = new ArrayList<>(Arrays.asList("core"));
+
     public final Map<String, DToken> table;  // 环境表
     public final Env father;                 // 父环境
     public final IOConfig io;                // IO表
+    private final List<Env> requiredEnvs;    // require导入的环境
+    // 模块表
+    public final Map<String, Module> modules = Stream.of(
+            new AbstractMap.SimpleEntry<>("core", new CoreModule())
+    ).collect(Collectors.toMap(
+            Map.Entry::getKey,
+            Map.Entry::getValue
+    ));
 
     /**
      * 创建环境
@@ -29,8 +41,50 @@ public class Env {
         this.table = table;
         this.father = father;
         this.io = io;
-        Core.init(this);
+        this.requiredEnvs = new ArrayList<>();
+        defaultModules.forEach(this::loadModule);
     }
+
+    /**
+     * 加载环境
+     *
+     * @param name 名字
+     */
+    public void loadModule(String name) {
+        loadModule(this.modules.get(name));
+    }
+
+    /**
+     * 加载环境
+     *
+     * @param module 模块
+     */
+    public void loadModule(Module module) {
+        module.init(this);
+    }
+
+    /**
+     * 添加模块
+     *
+     * @param module 环境
+     * @return 环境
+     */
+    public Env addModule(Module module) {
+        this.modules.put(module.name, module);
+        return this;
+    }
+
+    /**
+     * 添加require导入的环境，作为符号查找的后备环境
+     *
+     * @param env 环境
+     * @return 环境
+     */
+    public Env addRequiredEnv(Env env) {
+        this.requiredEnvs.add(env);
+        return this;
+    }
+
 
     /**
      * 创建环境
@@ -217,10 +271,7 @@ public class Env {
      * @return 结果
      */
     public boolean contains(String key) {
-        Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key))
-            temp = temp.father;
-        return temp.table.containsKey(key);
+        return findVisibleEnv(key, new HashSet<>()) != null;
     }
 
     /**
@@ -230,10 +281,8 @@ public class Env {
      * @return value
      */
     public DToken get(String key) {
-        Env temp = this;
-        while (temp.father != null && !temp.table.containsKey(key))
-            temp = temp.father;
-        return temp.contains(key) ? temp.table.get(key) : DWord.NIL;
+        Env temp = findVisibleEnv(key, new HashSet<>());
+        return temp != null ? temp.table.get(key) : DWord.NIL;
     }
 
     /**
@@ -246,7 +295,7 @@ public class Env {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        return temp.contains(key) ? temp.table.remove(key) : DWord.NIL;
+        return temp.table.containsKey(key) ? temp.table.remove(key) : DWord.NIL;
     }
 
     /**
@@ -263,5 +312,31 @@ public class Env {
      */
     public Env createChild() {
         return newEnv(this, this.io);
+    }
+
+    private Env findVisibleEnv(String key, Set<Env> visited) {
+        if (!visited.add(this))
+            return null;
+        Env temp = findLexicalEnv(key);
+        if (temp != null)
+            return temp;
+        for (Env scope = this; scope != null; scope = scope.father) {
+            for (Env requiredEnv : scope.requiredEnvs) {
+                temp = requiredEnv.findVisibleEnv(key, visited);
+                if (temp != null)
+                    return temp;
+            }
+        }
+        return null;
+    }
+
+    private Env findLexicalEnv(String key) {
+        Env temp = this;
+        while (temp != null) {
+            if (temp.table.containsKey(key))
+                return temp;
+            temp = temp.father;
+        }
+        return null;
     }
 }

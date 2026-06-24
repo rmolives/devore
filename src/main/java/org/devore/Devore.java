@@ -10,7 +10,7 @@ import org.devore.parser.Parse;
 import org.devore.exception.DevoreParseException;
 import org.devore.parser.Ast;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Devore {

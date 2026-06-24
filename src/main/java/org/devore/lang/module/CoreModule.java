@@ -1,8 +1,10 @@
-package org.devore.lang;
+package org.devore.lang.module;
 
 import org.devore.Devore;
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.Env;
+import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.Ast;
 import org.devore.utils.DIntUtils;
@@ -18,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -26,13 +27,17 @@ import java.util.stream.Stream;
 /**
  * 核心
  */
-public class Core {
+public class CoreModule extends Module {
+    public CoreModule() {
+        super("core");
+    }
+
     /**
      * 初始化核心环境，按功能分类注册全部内置常量和过程
      *
      * @param dEnv 目标环境
      */
-    public static void init(Env dEnv) {
+    public void init(Env dEnv) {
         initConstants(dEnv);                // 基础常量
         initNumberProcedures(dEnv);         // 数值计算
         initIOProcedures(dEnv);             // 标准输入输出
@@ -56,7 +61,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initConstants(Env dEnv) {
+    private void initConstants(Env dEnv) {
         dEnv.put("nil", DWord.NIL);
         dEnv.put("true", DBool.TRUE);
         dEnv.put("false", DBool.FALSE);
@@ -67,7 +72,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initNumberProcedures(Env dEnv) {
+    private void initNumberProcedures(Env dEnv) {
         dEnv.addTokenProcedure("+", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
@@ -384,7 +389,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initIOProcedures(Env dEnv) {
+    private void initIOProcedures(Env dEnv) {
         dEnv.addTokenProcedure("println", ((args, env) -> {
             env.io.out.println(args.stream().map(Object::toString).collect(Collectors.joining()));
             return DWord.NIL;
@@ -414,7 +419,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initErrorProcedures(Env dEnv) {
+    private void initErrorProcedures(Env dEnv) {
         dEnv.addTokenProcedure("error-println", ((args, env) -> {
             env.io.err.println(args.stream().map(Object::toString).collect(Collectors.joining()));
             return DWord.NIL;
@@ -437,172 +442,40 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initModuleProcedures(Env dEnv) {
-        dEnv.addAstProcedure("module", ((ast, env) -> {
-            Function<Ast, List<String>> bindingParams = signature -> signature.children.stream()
-                    .map(param -> {
-                        DToken temp = param.symbol;
-                        if (param.type == Ast.Type.PROCEDURE)
-                            temp = Evaluator.eval(env, param.copy());
-                        if (!(temp instanceof DSymbol))
-                            throw new DevoreCastException(temp.type(), "symbol");
-                        return temp.toString();
-                    })
-                    .collect(Collectors.toList());
-            ast.children.forEach(node -> {
-                if (node.symbol instanceof Ast) {
-                    Ast signature = (Ast) node.symbol;
-                    DToken name = signature.symbol;
-                    if (signature.symbol instanceof Ast)
-                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
-                    if (!(name instanceof DSymbol))
-                        throw new DevoreCastException(name.type(), "symbol");
-                    if (node.children.isEmpty())
-                        throw new DevoreRuntimeException("module过程绑定必须包含过程体.");
-                    if (env.contains(name.toString()))
-                        return;
-                    List<String> params = bindingParams.apply(signature);
-                    List<Ast> nodes = node.children.stream()
-                            .map(Ast::copy)
-                            .collect(Collectors.toList());
-                    env.addTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
-                        Env newEnv = env.createChild();
-                        IntStream.range(0, params.size())
-                                .forEach(i -> newEnv.put(params.get(i), cArgs.get(i)));
-                        return nodes.stream()
-                                .map(body -> Evaluator.eval(newEnv, body.copy()))
-                                .reduce((previous, current) -> current)
-                                .orElse(DWord.NIL);
-                    }), params.size(), false);
-                    return;
-                }
-                if (node.symbol instanceof DSymbol && "procedure".equals(node.symbol.toString())) {
-                    if (node.isEmpty())
-                        throw new DevoreRuntimeException("module过程绑定必须包含签名和过程体.");
-                    Ast signature = node.get(0);
-                    DToken name = signature.symbol;
-                    if (signature.symbol instanceof Ast)
-                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
-                    if (!(name instanceof DSymbol))
-                        throw new DevoreCastException(name.type(), "symbol");
-                    List<Ast> bodyNodes = node.children.subList(1, node.size());
-                    if (bodyNodes.isEmpty())
-                        throw new DevoreRuntimeException("module过程绑定必须包含过程体.");
-                    if (env.contains(name.toString()))
-                        return;
-                    List<String> params = bindingParams.apply(signature);
-                    List<Ast> nodes = bodyNodes.stream()
-                            .map(Ast::copy)
-                            .collect(Collectors.toList());
-                    env.addTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
-                        Env newEnv = env.createChild();
-                        IntStream.range(0, params.size())
-                                .forEach(i -> newEnv.put(params.get(i), cArgs.get(i)));
-                        return nodes.stream()
-                                .map(body -> Evaluator.eval(newEnv, body.copy()))
-                                .reduce((previous, current) -> current)
-                                .orElse(DWord.NIL);
-                    }), params.size(), false);
-                    return;
-                }
-                if (node.symbol instanceof DSymbol && "macro".equals(node.symbol.toString())) {
-                    if (node.isEmpty())
-                        throw new DevoreRuntimeException("module宏绑定必须包含签名和宏体.");
-                    Ast signature = node.get(0);
-                    DToken name = signature.symbol;
-                    if (signature.symbol instanceof Ast)
-                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
-                    if (!(name instanceof DSymbol))
-                        throw new DevoreCastException(name.type(), "symbol");
-                    List<Ast> bodyNodes = node.children.subList(1, node.size());
-                    if (bodyNodes.isEmpty())
-                        throw new DevoreRuntimeException("module宏绑定必须包含宏体.");
-                    if (env.contains(name.toString()))
-                        return;
-                    env.addMacro(name.toString(), bindingParams.apply(signature),
-                            bodyNodes.stream().map(Ast::copy).collect(Collectors.toList()));
-                    return;
-                }
-                if (node.symbol instanceof DSymbol && "set!".equals(node.symbol.toString())) {
-                    if (node.size() < 2)
-                        throw new DevoreRuntimeException("module中的set!必须包含目标和值.");
-                    Ast target = node.get(0);
-                    if (!(target.symbol instanceof DSymbol))
-                        throw new DevoreCastException(target.symbol.type(), "symbol");
-                    if (target.isEmpty() && target.type != Ast.Type.PROCEDURE) {
-                        Env newEnv = env.createChild();
-                        env.set(target.symbol.toString(), node.children.subList(1, node.size()).stream()
-                                .map(value -> Evaluator.eval(newEnv, value.copy()))
-                                .reduce((previous, current) -> current)
-                                .orElse(DWord.NIL));
-                        return;
-                    }
-                    DToken name = target.symbol;
-                    if (target.symbol instanceof Ast)
-                        name = Evaluator.eval(env, ((Ast) target.symbol).copy());
-                    if (!(name instanceof DSymbol))
-                        throw new DevoreCastException(name.type(), "symbol");
-                    List<Ast> bodyNodes = node.children.subList(1, node.size());
-                    if (bodyNodes.isEmpty())
-                        throw new DevoreRuntimeException("module中的set!过程绑定必须包含过程体.");
-                    List<String> params = bindingParams.apply(target);
-                    List<Ast> nodes = bodyNodes.stream()
-                            .map(Ast::copy)
-                            .collect(Collectors.toList());
-                    env.setTokenProcedure(name.toString(), ((cArgs, cEnv) -> {
-                        Env newEnv = env.createChild();
-                        IntStream.range(0, params.size())
-                                .forEach(i -> newEnv.put(params.get(i), cArgs.get(i)));
-                        return nodes.stream()
-                                .map(body -> Evaluator.eval(newEnv, body.copy()))
-                                .reduce((previous, current) -> current)
-                                .orElse(DWord.NIL);
-                    }), params.size(), false);
-                    return;
-                }
-                if (node.symbol instanceof DSymbol && "set-macro!".equals(node.symbol.toString())) {
-                    if (node.size() < 2)
-                        throw new DevoreRuntimeException("module中的set-macro!必须包含签名和宏体.");
-                    Ast signature = node.get(0);
-                    DToken name = signature.symbol;
-                    if (signature.symbol instanceof Ast)
-                        name = Evaluator.eval(env, ((Ast) signature.symbol).copy());
-                    if (!(name instanceof DSymbol))
-                        throw new DevoreCastException(name.type(), "symbol");
-                    env.setMacro(name.toString(), bindingParams.apply(signature),
-                            node.children.subList(1, node.size()).stream().map(Ast::copy).collect(Collectors.toList()));
-                    return;
-                }
-                if (!(node.symbol instanceof DSymbol))
-                    throw new DevoreCastException(node.symbol.type(), "symbol");
-                if (node.isEmpty())
-                    throw new DevoreRuntimeException("module绑定必须包含名称和值.");
-                String name = node.symbol.toString();
-                if (env.contains(name))
-                    return;
-                Env newEnv = env.createChild();
-                env.put(name, node.children.stream()
-                        .map(value -> Evaluator.eval(newEnv, value.copy()))
-                        .reduce((previous, current) -> current)
-                        .orElse(DWord.NIL));
-            });
-            return DWord.NIL;
-        }), 1, true);
-        dEnv.addTokenProcedure("require", ((args, env) -> args.stream()
-                .map(arg -> {
-                    if (!(arg instanceof DString))
-                        throw new DevoreCastException(arg.type(), "string");
-                    String file = arg.toString();
+    private void initModuleProcedures(Env dEnv) {
+        dEnv.addAstProcedure("module", ((ast, env) ->
+                DModule.valueOf(ast.children.stream().map(child -> {
+            DToken key = child.symbol;
+            if (child.type == Ast.Type.PROCEDURE)
+                key = Evaluator.eval(env, child);
+            return key.toString();
+        }).collect(Collectors.toList()))), 1, true);
+        dEnv.addTokenProcedure("require", ((args, env) -> {
+            args.forEach(name -> {
+                if (env.modules.containsKey(name.toString()))
+                    env.loadModule(name.toString());
+                else {
+                    if (!(name instanceof DString))
+                        throw new DevoreCastException(name.type(), "string");
+                    String file = name.toString();
                     Path path = Paths.get(file);
                     if (!Files.exists(path))
-                        throw new DevoreRuntimeException("文件不存在: " + file);
+                        throw new DevoreRuntimeException("模块 " + name + " 不存在.");
                     try {
-                        return Devore.call(env, new String(Files.readAllBytes(path), StandardCharsets.UTF_8), file);
+                        Env inEnv = Env.newEnv();
+                        DToken temp = Devore.call(inEnv,
+                                new String(Files.readAllBytes(path), StandardCharsets.UTF_8), file);
+                        if (!(temp instanceof DModule))
+                            throw new DevoreCastException(name.type(), "module");
+                        env.addRequiredEnv(inEnv);
+                        ((DModule) temp).keys.forEach(key -> env.put(key, inEnv.get(key)));
                     } catch (IOException e) {
                         throw new DevoreRuntimeException("读取文件失败: " + file + ", " + e.getMessage());
                     }
-                }).reduce((previous, current) -> current)
-                .orElse(DWord.NIL)), 1, true);
+                }
+            });
+            return DWord.NIL;
+        }), 1, true);
     }
 
     /**
@@ -610,7 +483,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initDefinitionProcedures(Env dEnv) {
+    private void initDefinitionProcedures(Env dEnv) {
         dEnv.addAstProcedure("undef", ((ast, env) -> {
             ast.children.stream()
                     .map(child -> {
@@ -826,7 +699,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initComparisonProcedures(Env dEnv) {
+    private void initComparisonProcedures(Env dEnv) {
         dEnv.addTokenProcedure(">", ((args, env) ->
                 DBool.valueOf(args.get(0).compareTo(args.get(1)) > 0)), 2, false);
         dEnv.addTokenProcedure("<", ((args, env) ->
@@ -846,7 +719,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initControlProcedures(Env dEnv) {
+    private void initControlProcedures(Env dEnv) {
         dEnv.addAstProcedure("unless", (ast, env) -> {
             DToken condition = Evaluator.eval(env, ast.get(0).copy());
             if (!(condition instanceof DBool))
@@ -943,7 +816,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initLogicAndRandomProcedures(Env dEnv) {
+    private void initLogicAndRandomProcedures(Env dEnv) {
         dEnv.addTokenProcedure("and", ((args, env) -> DBool.valueOf(args.stream()
                 .map(arg -> {
                     if (!(arg instanceof DBool))
@@ -998,7 +871,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initListProcedures(Env dEnv) {
+    private void initListProcedures(Env dEnv) {
         dEnv.addTokenProcedure("list", ((args, env) ->
                 DList.valueOf(new ArrayList<>(args))), 0, true);
         dEnv.addTokenProcedure("list-contains", ((args, env) -> {
@@ -1304,7 +1177,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initConversionProcedures(Env dEnv) {
+    private void initConversionProcedures(Env dEnv) {
         dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
@@ -1347,7 +1220,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initSystemProcedures(Env dEnv) {
+    private void initSystemProcedures(Env dEnv) {
         dEnv.addTokenProcedure("exit", ((args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
@@ -1375,7 +1248,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initTableProcedures(Env dEnv) {
+    private void initTableProcedures(Env dEnv) {
         dEnv.addTokenProcedure("table", ((args, env) ->
                 DTable.valueOf(new HashMap<>())), 0, false);
         dEnv.addTokenProcedure("table-get", ((args, env) -> {
@@ -1425,7 +1298,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initAggregateProcedures(Env dEnv) {
+    private void initAggregateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("max", ((args, env) -> args.stream()
                 .max(DToken::compareTo).orElse(args.get(0))), 1, true);
         dEnv.addTokenProcedure("min", ((args, env) -> args.stream()
@@ -1437,7 +1310,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initPredicateProcedures(Env dEnv) {
+    private void initPredicateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("bool?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DBool)), 1, false);
         dEnv.addTokenProcedure("float?", ((args, env) ->
@@ -1484,7 +1357,7 @@ public class Core {
      *
      * @param dEnv 目标环境
      */
-    private static void initStringProcedures(Env dEnv) {
+    private void initStringProcedures(Env dEnv) {
         dEnv.addTokenProcedure("string-split", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
@@ -1648,7 +1521,7 @@ public class Core {
         }), 3, false);
     }
 
-    private static boolean isEmptyProcedure(Ast ast) {
+    private boolean isEmptyProcedure(Ast ast) {
         return ast.type == Ast.Type.PROCEDURE
                 && ast.isEmpty()
                 && ast.symbol instanceof Ast
