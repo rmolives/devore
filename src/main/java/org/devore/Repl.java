@@ -371,6 +371,8 @@ public class Repl {
 
     private static native void restoreWindowsConsole(int mode);
 
+    private static native int windowsConsoleColumns();
+
     /**
      * 从标准输入逐字符读取一行。交互模式下同时负责字符回显和退格
      */
@@ -714,6 +716,12 @@ public class Repl {
                 // 继续尝试 stty。
             }
         }
+        if (isWindows()) {
+            int value = windowsTerminalColumns();
+            if (value > 0)
+                return value;
+            return 80;
+        }
         try {
             String[] size = runStty("size").trim().split("\\s+");
             if (size.length == 2) {
@@ -725,6 +733,12 @@ public class Repl {
             // 非交互输入或不支持 stty 时使用保守默认值。
         }
         return 80;
+    }
+
+    private static int windowsTerminalColumns() {
+        if (!loadWindowsNative())
+            return -1;
+        return windowsConsoleColumns();
     }
 
     private static int displayRows(String prompt, String line, int terminalColumns) {

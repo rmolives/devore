@@ -44,3 +44,15 @@ JNIEXPORT void JNICALL Java_org_devore_Repl_restoreWindowsConsole(JNIEnv *env, j
         return;
     SetConsoleMode(input, (DWORD) mode);
 }
+
+JNIEXPORT jint JNICALL Java_org_devore_Repl_windowsConsoleColumns(JNIEnv *env, jclass clazz) {
+    HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    (void) env;
+    (void) clazz;
+    if (output == INVALID_HANDLE_VALUE || output == NULL)
+        return -1;
+    if (!GetConsoleScreenBufferInfo(output, &info))
+        return -1;
+    return (jint) (info.srWindow.Right - info.srWindow.Left + 1);
+}
