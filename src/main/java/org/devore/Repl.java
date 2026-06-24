@@ -7,11 +7,7 @@ import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 import org.devore.parser.Lexer;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -132,6 +128,84 @@ public class Repl {
         }
     }
 
+    public static boolean hasInteractiveInput() {
+        if (System.console() != null)
+            return true;
+        if (isWindows())
+            return false;
+        try {
+            Process process = new ProcessBuilder("sh", "-c", "test -t 0")
+                    .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                    .redirectErrorStream(true)
+                    .start();
+            drainProcessOutput(process);
+            return process.waitFor() == 0;
+        } catch (IOException | InterruptedException e) {
+            if (e instanceof InterruptedException)
+                Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    /**
+     * 从标准输入流读取代码。非交互输入不会打印提示符，但保留 REPL 的返回值显示行为。
+     *
+     * @param env 环境
+     * @throws IOException 错误
+     */
+    public static void stream(Env env) throws IOException {
+        StreamInputState state = new StreamInputState(env);
+        try {
+            new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))
+                    .lines()
+                    .forEach(line -> state.accept(line + "\n"));
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+        state.finish();
+    }
+
+    private static class StreamInputState {
+        private final Env env;
+        private StringBuilder codeBuilder = new StringBuilder();
+        private int sourceIndex;
+
+        private StreamInputState(Env env) {
+            this.env = env;
+        }
+
+        private void accept(String input) {
+            codeBuilder.append(input);
+            String code = codeBuilder.toString();
+            if (isIncomplete(code) || !isReadyForStreamExecution(code, false))
+                return;
+            execute(code);
+            codeBuilder = new StringBuilder();
+        }
+
+        private void finish() {
+            String remaining = codeBuilder.toString();
+            if (remaining.trim().isEmpty())
+                return;
+            if (isIncomplete(remaining))
+                printError(remaining, sourceIndex + 1);
+            else if (isReadyForStreamExecution(remaining, true))
+                execute(remaining);
+        }
+
+        private void execute(String code) {
+            ++sourceIndex;
+            executeStreamCode(env, code, "<stdin#" + sourceIndex + ">");
+        }
+    }
+
+    private static void drainProcessOutput(Process process) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+            reader.lines().forEach(ignored -> {
+            });
+        }
+    }
+
     private static void resetInputState() {
         skipLineFeed = false;
         endOfInput = false;
@@ -217,6 +291,19 @@ public class Repl {
         return executeCode(env, code, source);
     }
 
+    private static void executeStreamCode(Env env, String code, String source) {
+        try {
+            env.io.resetLineState();
+            DToken result = executeReplCode(env, code, source);
+            ensureOutputLineBreak(env);
+            if (result != DWord.NIL)
+                System.out.println(result.toString());
+        } catch (DevoreRuntimeException e) {
+            ensureOutputLineBreak(env);
+            System.err.println(e.getMessage());
+        }
+    }
+
     private static DToken singleBareToken(String code) {
         String trimmed = code.trim();
         if (trimmed.isEmpty() || trimmed.indexOf('(') >= 0 || trimmed.indexOf(')') >= 0
@@ -224,6 +311,16 @@ public class Repl {
             return null;
         List<Lexer.SourceToken> tokens = Lexer.lexer(trimmed, 0);
         return tokens.size() == 1 && tokens.get(0).token.toString().equals(trimmed) ? tokens.get(0).token : null;
+    }
+
+    private static boolean isReadyForStreamExecution(String code, boolean endOfInput) {
+        if (singleBareToken(code) != null)
+            return endOfInput || Character.isWhitespace(code.charAt(code.length() - 1));
+        try {
+            return !Lexer.splitCode(code).isEmpty();
+        } catch (RuntimeException e) {
+            return !isIncomplete(code);
+        }
     }
 
     private static boolean disableManualEchoForExecution() {

@@ -13,8 +13,13 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        if (args.length == 0)
-            Repl.repl(Env.newEnv());
+        if (args.length == 0) {
+            Env env = Env.newEnv();
+            if (Repl.hasInteractiveInput())
+                Repl.repl(env);
+            else
+                Repl.stream(env);
+        }
         else if ("--version".equals(args[0]) || "-v".equals(args[0]))
             System.out.println(Devore.VERSION_MESSAGE);
         else {

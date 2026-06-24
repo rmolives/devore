@@ -13,6 +13,10 @@ tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 }
 
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+}
+
 val isWindows = System.getProperty("os.name").lowercase().contains("win")
 val windowsNativeBuildDir = layout.buildDirectory.dir("native/windows")
 
