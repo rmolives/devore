@@ -57,7 +57,7 @@
     (if (<= (length xs) 1)
         xs
         (++ (qsort (filter
-            (lambda (x) (< x (head xs))) (tail xs)))
+                (lambda (x) (< x (head xs))) (tail xs)))
             (list (head xs))
             (qsort (filter
                 (lambda (x) (>= x (head xs))) (tail xs))))))
