@@ -148,7 +148,7 @@ public class Repl {
     }
 
     /**
-     * 从标准输入流读取代码。非交互输入不会打印提示符，但保留 REPL 的返回值显示行为。
+     * 从标准输入流读取代码。非交互输入不会打印提示符，但保留 REPL 的返回值显示行为
      *
      * @param env 环境
      * @throws IOException 错误
