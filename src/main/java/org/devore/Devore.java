@@ -24,6 +24,17 @@ public class Devore {
      *
      * @param env    环境
      * @param code   代码
+     * @return 返回值
+     */
+    public static DToken call(Env env, String code) {
+        return call(env, code, "<code>");
+    }
+
+    /**
+     * 执行代码
+     *
+     * @param env    环境
+     * @param code   代码
      * @param source 代码来源
      * @return 返回值
      */
