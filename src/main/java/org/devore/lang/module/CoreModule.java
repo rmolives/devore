@@ -1334,6 +1334,8 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(token.type(), "symbol");
             return DBool.valueOf(env.contains(token.toString()));
         }), 1, false);
+        dEnv.addTokenProcedure("module?", ((args, env) ->
+                DBool.valueOf(args.get(0) instanceof DModule)), 1, false);
         dEnv.addTokenProcedure("number?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DNumber)), 1, false);
         dEnv.addTokenProcedure("procedure?", ((args, env) ->

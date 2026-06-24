@@ -3,6 +3,7 @@ package org.devore;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
+import org.devore.lang.module.Module;
 import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 import org.devore.parser.Lexer;
@@ -18,6 +19,39 @@ public class Devore {
     public static final String VERSION = "0.1-alpha";
     // 版本信息
     public static final String VERSION_MESSAGE = "Devore v" + VERSION + ".\nAuthor: RMOlive (rmolives@wumoe.org)\nGitHub: https://github.com/rmolives/devore";
+
+    /**
+     * 创建默认环境
+     *
+     * @return 环境
+     */
+    public static Env newEnv() {
+        return Env.newEnv();
+    }
+
+    /**
+     * 创建环境并加载指定模块
+     *
+     * @param modules 模块名
+     * @return 环境
+     */
+    public static Env newEnv(String... modules) {
+        Env env = newEnv();
+        Arrays.stream(modules).forEach(env::loadModule);
+        return env;
+    }
+
+    /**
+     * 创建环境并加载指定模块
+     *
+     * @param modules 模块
+     * @return 环境
+     */
+    public static Env newEnv(Module... modules) {
+        Env env = newEnv();
+        Arrays.stream(modules).forEach(env::loadModule);
+        return env;
+    }
 
     /**
      * 执行代码

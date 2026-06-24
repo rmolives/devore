@@ -3,6 +3,7 @@ package org.devore.lang;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.module.CoreModule;
 import org.devore.lang.module.Module;
+import org.devore.lang.module.ThreadModule;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DToken;
@@ -24,7 +25,8 @@ public class Env {
     private final List<Env> requiredEnvs;    // require导入的环境
     // 模块表
     public final Map<String, Module> modules = Stream.of(
-            new AbstractMap.SimpleEntry<>("core", new CoreModule())
+            new AbstractMap.SimpleEntry<>("core", new CoreModule()),
+            new AbstractMap.SimpleEntry<>("thread", new ThreadModule())
     ).collect(Collectors.toMap(
             Map.Entry::getKey,
             Map.Entry::getValue
@@ -51,6 +53,8 @@ public class Env {
      * @param name 名字
      */
     public void loadModule(String name) {
+        if (!this.modules.containsKey(name))
+            throw new DevoreRuntimeException("模块 " + name + " 不存在.");
         loadModule(this.modules.get(name));
     }
 
