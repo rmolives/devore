@@ -41,6 +41,7 @@ public class Repl {
     private static final List<String> HISTORY = new ArrayList<>();
     private static String terminalState;
     private static int windowsConsoleMode = -1;
+    private static int windowsOutputConsoleMode = -1;
     private static boolean manualEcho;
     private static boolean windowsNativeLoaded;
     private static boolean shutdownHookRegistered;
@@ -283,10 +284,14 @@ public class Repl {
     private static void enableWindowsManualEcho() {
         if (!loadWindowsNative())
             return;
+        int outputMode = windowsConsoleOutputMode();
         int mode = enableWindowsConsoleManualEcho();
-        if (mode < 0)
+        if (mode < 0) {
+            windowsOutputConsoleMode = -1;
             return;
+        }
         windowsConsoleMode = mode;
+        windowsOutputConsoleMode = outputMode;
         manualEcho = true;
         registerShutdownHook();
     }
@@ -356,8 +361,9 @@ public class Repl {
         manualEcho = false;
         if (isWindows()) {
             if (windowsNativeLoaded && windowsConsoleMode >= 0)
-                restoreWindowsConsole(windowsConsoleMode);
+                restoreWindowsConsole(windowsConsoleMode, windowsOutputConsoleMode);
             windowsConsoleMode = -1;
+            windowsOutputConsoleMode = -1;
         } else if (terminalState != null) {
             try {
                 runStty(terminalState);
@@ -369,7 +375,9 @@ public class Repl {
 
     private static native int enableWindowsConsoleManualEcho();
 
-    private static native void restoreWindowsConsole(int mode);
+    private static native void restoreWindowsConsole(int inputMode, int outputMode);
+
+    private static native int windowsConsoleOutputMode();
 
     private static native int windowsConsoleColumns();
 

@@ -36,13 +36,27 @@ JNIEXPORT jint JNICALL Java_org_devore_Repl_enableWindowsConsoleManualEcho(JNIEn
     return (jint) mode;
 }
 
-JNIEXPORT void JNICALL Java_org_devore_Repl_restoreWindowsConsole(JNIEnv *env, jclass clazz, jint mode) {
+JNIEXPORT void JNICALL Java_org_devore_Repl_restoreWindowsConsole(JNIEnv *env, jclass clazz, jint input_mode, jint output_mode) {
     HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
+    HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
     (void) env;
     (void) clazz;
-    if (input == INVALID_HANDLE_VALUE || input == NULL)
-        return;
-    SetConsoleMode(input, (DWORD) mode);
+    if (input != INVALID_HANDLE_VALUE && input != NULL)
+        SetConsoleMode(input, (DWORD) input_mode);
+    if (output_mode >= 0 && output != INVALID_HANDLE_VALUE && output != NULL)
+        SetConsoleMode(output, (DWORD) output_mode);
+}
+
+JNIEXPORT jint JNICALL Java_org_devore_Repl_windowsConsoleOutputMode(JNIEnv *env, jclass clazz) {
+    HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD mode;
+    (void) env;
+    (void) clazz;
+    if (output == INVALID_HANDLE_VALUE || output == NULL)
+        return -1;
+    if (!GetConsoleMode(output, &mode))
+        return -1;
+    return (jint) mode;
 }
 
 JNIEXPORT jint JNICALL Java_org_devore_Repl_windowsConsoleColumns(JNIEnv *env, jclass clazz) {
