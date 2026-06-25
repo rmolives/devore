@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class Main {
     public static void main(String[] args) throws IOException {
         if (args.length < 1)
-            System.out.println("devore <files>");
+            System.out.println("devore <files|--version[-v]>");
         else if ("--version".equals(args[0]) || "-v".equals(args[0]))
             System.out.println(Devore.VERSION_MESSAGE);
         else {
