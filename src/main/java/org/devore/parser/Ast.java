@@ -7,6 +7,7 @@ import org.devore.utils.FormatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -192,18 +193,26 @@ public class Ast extends DToken {
 
     @Override
     public int compareTo(DToken t) {
-        return t instanceof Ast && t.hashCode() == this.hashCode() ? -1 : 0;
+        if (!(t instanceof Ast))
+            return -1;
+        Ast other = (Ast) t;
+        return this.type == other.type
+                && Objects.equals(this.symbol, other.symbol)
+                && Objects.equals(this.children, other.children)
+                && this.index == other.index
+                && Objects.equals(this.source, other.source)
+                && Objects.equals(this.code, other.code) ? 0 : -1;
     }
 
     @Override
     public int hashCode() {
         int result = this.type().hashCode();
-        result = 31 * result + this.type.hashCode();
-        result = 31 * result + this.symbol.hashCode();
-        result = 31 * result + this.children.hashCode();
+        result = 31 * result + Objects.hashCode(this.type);
+        result = 31 * result + Objects.hashCode(this.symbol);
+        result = 31 * result + Objects.hashCode(this.children);
         result = 31 * result + this.index;
-        result = 31 * result + this.source.hashCode();
-        result = 31 * result + this.code.hashCode();
+        result = 31 * result + Objects.hashCode(this.source);
+        result = 31 * result + Objects.hashCode(this.code);
         return result;
     }
 

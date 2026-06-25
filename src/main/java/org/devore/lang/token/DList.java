@@ -6,6 +6,7 @@ import org.devore.utils.FormatUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -237,8 +238,6 @@ public class DList extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.list.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.list);
     }
 }

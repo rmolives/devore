@@ -1,5 +1,7 @@
 package org.devore.lang.token;
 
+import java.util.Objects;
+
 /**
  * 符号
  */
@@ -31,8 +33,6 @@ public class DSymbol extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.symbol.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.symbol);
     }
 }

@@ -7,6 +7,7 @@ import org.devore.parser.Ast;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
@@ -186,11 +187,6 @@ public class DProcedure extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.name.hashCode();
-        result = 31 * result + this.procedure.hashCode();
-        result = 31 * result + this.argc;
-        result = 31 * result + Boolean.hashCode(this.vararg);
-        return result;
+        return Objects.hash(this.type(), this.name, this.procedure, this.argc, this.vararg);
     }
 }

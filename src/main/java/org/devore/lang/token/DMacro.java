@@ -5,6 +5,7 @@ import org.devore.parser.Ast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -179,10 +180,6 @@ public class DMacro extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.name.hashCode();
-        result = 31 * result + this.params.hashCode();
-        result = 31 * result + this.bodys.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.name, this.params, this.bodys);
     }
 }

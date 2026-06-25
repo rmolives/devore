@@ -1,5 +1,7 @@
 package org.devore.lang.token;
 
+import java.util.Objects;
+
 /**
  * 关键字
  */
@@ -43,9 +45,7 @@ public class DWord extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.tag.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.tag);
     }
 
     private enum Tags {

@@ -74,7 +74,7 @@ public class DTable extends DToken {
      * @return 结果
      */
     public DToken get(DToken key) {
-        return this.table.get(key);
+        return this.table.getOrDefault(key, DWord.NIL);
     }
 
     /**
@@ -139,8 +139,6 @@ public class DTable extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.table.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.table);
     }
 }

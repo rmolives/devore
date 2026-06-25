@@ -423,8 +423,6 @@ public abstract class DNumber extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.toBigDecimal().stripTrailingZeros().hashCode();
-        return result;
+        return this.toBigDecimal().stripTrailingZeros().hashCode();
     }
 }

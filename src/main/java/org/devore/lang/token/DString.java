@@ -1,5 +1,7 @@
 package org.devore.lang.token;
 
+import java.util.Objects;
+
 /**
  * 字符串
  */
@@ -31,8 +33,6 @@ public class DString extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.str.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.str);
     }
 }

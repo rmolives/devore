@@ -1,6 +1,7 @@
 package org.devore.lang.token;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class DModule extends DToken {
@@ -41,8 +42,6 @@ public class DModule extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.keys.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.keys);
     }
 }

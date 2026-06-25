@@ -1,5 +1,7 @@
 package org.devore.lang.token;
 
+import java.util.Objects;
+
 /**
  * 布尔值
  */
@@ -23,7 +25,7 @@ public class DBool extends DToken {
 
     @Override
     protected String str() {
-        return this.bool ? "true" : "false";
+        return Boolean.toString(this.bool);
     }
 
     @Override
@@ -33,8 +35,6 @@ public class DBool extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + Boolean.hashCode(this.bool);
-        return result;
+        return Objects.hash(this.type(), this.bool);
     }
 }

@@ -1,5 +1,6 @@
 package org.devore.lang.token;
 
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -37,8 +38,6 @@ public class DLock extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.lock.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.lock);
     }
 }

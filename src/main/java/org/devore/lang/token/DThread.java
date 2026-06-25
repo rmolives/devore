@@ -2,6 +2,7 @@ package org.devore.lang.token;
 
 import org.devore.exception.DevoreRuntimeException;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -69,9 +70,7 @@ public class DThread extends DToken {
 
     @Override
     public int hashCode() {
-        int result = this.type().hashCode();
-        result = 31 * result + this.thread.hashCode();
-        return result;
+        return Objects.hash(this.type(), this.thread);
     }
 
     public interface ThreadBody {
