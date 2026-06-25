@@ -13,8 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * 文件操作
@@ -31,10 +29,7 @@ public class FileModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
             try {
-                byte[] bytes = Files.readAllBytes(path);
-                return DList.valueOf(IntStream.range(0, bytes.length)
-                        .mapToObj(i -> DNumber.valueOf(Byte.toUnsignedInt(bytes[i])))
-                        .collect(Collectors.toList()));
+                return DByteUtils.bytesToList(Files.readAllBytes(path));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("读取二进制文件失败: " + path + ", " + e.getMessage());
             }
