@@ -21,7 +21,7 @@ public class DByteUtils {
      */
     public static byte toByte(DInt value) {
         BigInteger integer = value.toBigInteger();
-        if (outOfBinaryRange(integer))
+        if (outOfByteRange(integer))
             throw new DevoreRuntimeException("整数超出byte范围: " + integer + ".");
         return (byte) integer.intValue();
     }
@@ -38,7 +38,7 @@ public class DByteUtils {
         return baos.toByteArray();
     }
 
-    private static boolean outOfBinaryRange(BigInteger integer) {
+    private static boolean outOfByteRange(BigInteger integer) {
         return integer.compareTo(MIN) < 0 || integer.compareTo(MAX) > 0;
     }
 }
