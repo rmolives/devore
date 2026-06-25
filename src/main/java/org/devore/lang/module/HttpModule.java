@@ -4,6 +4,7 @@ import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
+import org.devore.utils.DByteUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class HttpModule extends Module {
                 Map<DToken, DToken> result = new HashMap<>();
                 result.put(DString.valueOf("status"), DNumber.valueOf(status));
                 result.put(DString.valueOf("headers"), DTable.valueOf(headers));
-                result.put(DString.valueOf("body"), DBinary.valueOf(body));
+                result.put(DString.valueOf("body"), DByteUtils.bytesToList(body));
                 return DTable.valueOf(result);
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
@@ -117,7 +118,7 @@ public class HttpModule extends Module {
                 Map<DToken, DToken> result = new HashMap<>();
                 result.put(DString.valueOf("status"), DNumber.valueOf(status));
                 result.put(DString.valueOf("headers"), DTable.valueOf(headers));
-                result.put(DString.valueOf("body"), DBinary.valueOf(body));
+                result.put(DString.valueOf("body"), DByteUtils.bytesToList(body));
                 return DTable.valueOf(result);
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
@@ -143,13 +144,13 @@ public class HttpModule extends Module {
                 int status = connection.getResponseCode();
                 InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
                 if (input == null)
-                    return DBinary.valueOf(new byte[0]);
+                    return DByteUtils.bytesToList(new byte[0]);
                 try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                     byte[] buffer = new byte[8192];
                     int n;
                     while ((n = in.read(buffer)) >= 0)
                         out.write(buffer, 0, n);
-                    return DBinary.valueOf(out.toByteArray());
+                    return DByteUtils.bytesToList(out.toByteArray());
                 }
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
@@ -186,13 +187,13 @@ public class HttpModule extends Module {
                 int status = connection.getResponseCode();
                 InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
                 if (input == null)
-                    return DBinary.valueOf(new byte[0]);
+                    return DByteUtils.bytesToList(new byte[0]);
                 try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                     byte[] buffer = new byte[8192];
                     int n;
                     while ((n = in.read(buffer)) >= 0)
                         out.write(buffer, 0, n);
-                    return DBinary.valueOf(out.toByteArray());
+                    return DByteUtils.bytesToList(out.toByteArray());
                 }
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());

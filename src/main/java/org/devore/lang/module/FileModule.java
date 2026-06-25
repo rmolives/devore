@@ -4,6 +4,7 @@ import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
+import org.devore.utils.DByteUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 文件操作
@@ -28,7 +31,10 @@ public class FileModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
             try {
-                return DBinary.valueOf(Files.readAllBytes(path));
+                byte[] bytes = Files.readAllBytes(path);
+                return DList.valueOf(IntStream.range(0, bytes.length)
+                        .mapToObj(i -> DNumber.valueOf(Byte.toUnsignedInt(bytes[i])))
+                        .collect(Collectors.toList()));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("读取二进制文件失败: " + path + ", " + e.getMessage());
             }
@@ -36,12 +42,13 @@ public class FileModule extends Module {
         dEnv.addTokenProcedure("file-write-binary", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
-            if (!(args.get(1) instanceof DBinary))
-                throw new DevoreCastException(args.get(1).type(), "binary");
+            if (!(args.get(1) instanceof DList))
+                throw new DevoreCastException(args.get(1).type(), "list");
             Path path = Paths.get(args.get(0).toString());
-            DBinary binary = (DBinary) args.get(1);
+            DList binary = (DList) args.get(1);
             try {
-                Files.write(path, binary.toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                Files.write(path, DByteUtils.toBytes(binary),
+                        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
                 return DWord.NIL;
             } catch (IOException e) {
                 throw new DevoreRuntimeException("写入二进制文件失败: " + path + ", " + e.getMessage());
@@ -50,12 +57,12 @@ public class FileModule extends Module {
         dEnv.addTokenProcedure("file-append-binary", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
-            if (!(args.get(1) instanceof DBinary))
-                throw new DevoreCastException(args.get(1).type(), "binary");
+            if (!(args.get(1) instanceof DList))
+                throw new DevoreCastException(args.get(1).type(), "list");
             Path path = Paths.get(args.get(0).toString());
-            DBinary binary = (DBinary) args.get(1);
+            DList binary = (DList) args.get(1);
             try {
-                Files.write(path, binary.toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                Files.write(path, DByteUtils.toBytes(binary), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                 return DWord.NIL;
             } catch (IOException e) {
                 throw new DevoreRuntimeException("追加二进制文件失败: " + path + ", " + e.getMessage());
