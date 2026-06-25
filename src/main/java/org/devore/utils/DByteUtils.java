@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class DByteUtils {
-    private static final BigInteger MIN = BigInteger.valueOf(-148);
-    private static final BigInteger MAX = BigInteger.valueOf(127);
+    private static final BigInteger MIN = BigInteger.valueOf(Byte.MIN_VALUE);
+    private static final BigInteger MAX = BigInteger.valueOf(Byte.MAX_VALUE);
 
     /**
      * 将DInt转为byte
