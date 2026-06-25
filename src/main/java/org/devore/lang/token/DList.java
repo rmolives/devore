@@ -25,6 +25,13 @@ public class DList extends DToken {
     }
 
     /**
+     * 清空列表
+     */
+    public void clear() {
+        this.list.clear();
+    }
+
+    /**
      * 排序
      *
      * @param force 是否更改原列表

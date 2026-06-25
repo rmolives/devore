@@ -879,6 +879,12 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "list");
             return DBool.valueOf(((DList) args.get(0)).contains(args.get(1)));
         }), 2, false);
+        dEnv.addTokenProcedure("list-clear!", ((args, env) -> {
+            if (!(args.get(0) instanceof DList))
+                throw new DevoreCastException(args.get(0).type(), "list");
+            ((DList) args.get(0)).clear();
+            return DWord.NIL;
+        }), 1, false);
         dEnv.addTokenProcedure("list-index", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
