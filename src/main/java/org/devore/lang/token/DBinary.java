@@ -78,6 +78,28 @@ public class DBinary extends DToken {
     }
 
     /**
+     * 添加字节
+     *
+     * @param index 位置
+     * @param value 字节值
+     * @param force 是否更改原数据
+     * @return 结果
+     */
+    public DBinary add(int index, int value, boolean force) {
+        checkAddIndex(index);
+        checkByte(value);
+        byte[] result = new byte[this.bytes.length + 1];
+        System.arraycopy(this.bytes, 0, result, 0, index);
+        result[index] = (byte) value;
+        System.arraycopy(this.bytes, index, result, index + 1, this.bytes.length - index);
+        if (force) {
+            this.bytes = result;
+            return this;
+        }
+        return DBinary.valueOf(result);
+    }
+
+    /**
      * 拼接二进制数据
      *
      * @param other 另一个二进制数据
@@ -185,6 +207,12 @@ public class DBinary extends DToken {
     private void checkIndex(int index, String action) {
         if (index < 0 || index >= this.bytes.length)
             throw new DevoreRuntimeException("二进制" + action + "过界, 下标=" + index
+                    + ", 但二进制只有" + this.bytes.length + "个字节.");
+    }
+
+    private void checkAddIndex(int index) {
+        if (index < 0 || index > this.bytes.length)
+            throw new DevoreRuntimeException("二进制添加过界, 下标=" + index
                     + ", 但二进制只有" + this.bytes.length + "个字节.");
     }
 

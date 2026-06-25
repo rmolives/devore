@@ -80,6 +80,18 @@ public class BinaryModule extends Module {
                 throw new DevoreRuntimeException("字节值必须在0到255之间: " + value + ".");
             return ((DBinary) args.get(0)).add(value, false);
         }, 2, false);
+        dEnv.addTokenProcedure("binary-add", (args, env) -> {
+            if (!(args.get(0) instanceof DBinary))
+                throw new DevoreCastException(args.get(0).type(), "binary");
+            if (!(args.get(1) instanceof DInt))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            if (!(args.get(2) instanceof DInt))
+                throw new DevoreCastException(args.get(2).type(), "int");
+            int value = DNumberUtils.toInt((DInt) args.get(2));
+            if (value < 0 || value > 255)
+                throw new DevoreRuntimeException("字节值必须在0到255之间: " + value + ".");
+            return ((DBinary) args.get(0)).add(DNumberUtils.toIndex((DInt) args.get(1)), value, false);
+        }, 3, false);
         dEnv.addTokenProcedure("binary-add!", (args, env) -> {
             if (!(args.get(0) instanceof DBinary))
                 throw new DevoreCastException(args.get(0).type(), "binary");
@@ -90,6 +102,18 @@ public class BinaryModule extends Module {
                 throw new DevoreRuntimeException("字节值必须在0到255之间: " + value + ".");
             return ((DBinary) args.get(0)).add(value, true);
         }, 2, false);
+        dEnv.addTokenProcedure("binary-add!", (args, env) -> {
+            if (!(args.get(0) instanceof DBinary))
+                throw new DevoreCastException(args.get(0).type(), "binary");
+            if (!(args.get(1) instanceof DInt))
+                throw new DevoreCastException(args.get(1).type(), "int");
+            if (!(args.get(2) instanceof DInt))
+                throw new DevoreCastException(args.get(2).type(), "int");
+            int value = DNumberUtils.toInt((DInt) args.get(2));
+            if (value < 0 || value > 255)
+                throw new DevoreRuntimeException("字节值必须在0到255之间: " + value + ".");
+            return ((DBinary) args.get(0)).add(DNumberUtils.toIndex((DInt) args.get(1)), value, true);
+        }, 3, false);
         dEnv.addTokenProcedure("binary-sub", (args, env) -> {
             if (!(args.get(0) instanceof DBinary))
                 throw new DevoreCastException(args.get(0).type(), "binary");
