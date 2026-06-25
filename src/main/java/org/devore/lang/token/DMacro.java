@@ -5,7 +5,6 @@ import org.devore.parser.Ast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -58,7 +57,28 @@ public class DMacro extends DToken {
      */
     public DMacro addMacro(String name, DMacro macro) {
         if (this.match(macro.params.size()) != null)
-            throw new DevoreRuntimeException("宏定义冲突: " + name);
+            throw new DevoreRuntimeException("定义冲突: " + name);
+        this.children.add(macro);
+        return this;
+    }
+
+    /**
+     * 替换相同参数数量的宏，不存在时添加为新重载
+     *
+     * @param macro 宏
+     * @return this
+     */
+    public DMacro setMacro(DMacro macro) {
+        if (this.params.size() == macro.params.size()) {
+            macro.children.addAll(this.children);
+            return macro;
+        }
+        for (int i = 0; i < this.children.size(); ++i) {
+            if (this.children.get(i).params.size() == macro.params.size()) {
+                this.children.set(i, macro);
+                return this;
+            }
+        }
         this.children.add(macro);
         return this;
     }
@@ -73,8 +93,7 @@ public class DMacro extends DToken {
         if (this.params.size() == argc)
             return this;
         return children.stream()
-                .map(dm -> dm.match(argc))
-                .filter(Objects::nonNull)
+                .filter(dm -> dm.params.size() == argc)
                 .findFirst()
                 .orElse(null);
     }
@@ -155,10 +174,7 @@ public class DMacro extends DToken {
         if (!IntStream.range(0, this.bodys.size())
                 .allMatch(i -> this.bodys.get(i).equals(other.bodys.get(i))))
             return -1;
-        if (this.children.size() != other.children.size())
-            return -1;
-        return IntStream.range(0, this.children.size())
-                .allMatch(i -> this.children.get(i).compareTo(other.children.get(i)) == 0) ? 0 : -1;
+        return 0;
     }
 
     @Override
@@ -167,7 +183,6 @@ public class DMacro extends DToken {
         result = 31 * result + this.name.hashCode();
         result = 31 * result + this.params.hashCode();
         result = 31 * result + this.bodys.hashCode();
-        result = 31 * result + this.children.hashCode();
         return result;
     }
 }

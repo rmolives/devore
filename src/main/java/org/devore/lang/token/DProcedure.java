@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.stream.IntStream;
 
 /**
  * 过程
@@ -75,7 +74,28 @@ public class DProcedure extends DToken {
      */
     public DProcedure addProcedure(String name, DProcedure procedure) {
         if (this.match(procedure.argc) != null)
-            throw new DevoreRuntimeException("过程定义冲突: " + name);
+            throw new DevoreRuntimeException("定义冲突: " + name);
+        this.children.add(procedure);
+        return this;
+    }
+
+    /**
+     * 替换相同参数数量的过程，不存在时添加为新重载
+     *
+     * @param procedure 过程
+     * @return this
+     */
+    public DProcedure setProcedure(DProcedure procedure) {
+        if (this.argc == procedure.argc) {
+            procedure.children.addAll(this.children);
+            return procedure;
+        }
+        for (int i = 0; i < this.children.size(); ++i) {
+            if (this.children.get(i).argc == procedure.argc) {
+                this.children.set(i, procedure);
+                return this;
+            }
+        }
         this.children.add(procedure);
         return this;
     }
@@ -90,15 +110,13 @@ public class DProcedure extends DToken {
         if (this.argc == argc && !vararg)
             return this;
         DProcedure exact = this.children.stream()
-                .map(df -> df.match(argc))
-                .filter(temp -> temp != null && temp.argc == argc && !temp.vararg)
+                .filter(temp -> temp.argc == argc && !temp.vararg)
                 .findFirst()
                 .orElse(null);
         if (exact != null)
             return exact;
         DProcedure bestVararg = this.children.stream()
-                .map(df -> df.match(argc))
-                .filter(temp -> temp != null && argc >= temp.argc && temp.vararg)
+                .filter(temp -> argc >= temp.argc && temp.vararg)
                 .max(Comparator.comparingInt(left -> left.argc))
                 .orElse(null);
         if (bestVararg != null)
@@ -163,22 +181,16 @@ public class DProcedure extends DToken {
             return -1;
         if (this.argc != other.argc)
             return -1;
-        if (this.vararg != other.vararg)
-            return -1;
-        if (this.children.size() != other.children.size())
-            return -1;
-        return IntStream.range(0, children.size())
-                .allMatch(i -> children.get(i).compareTo(other.children.get(i)) == 0) ? 0 : -1;
+        return this.vararg == other.vararg ? 0 : -1;
     }
 
     @Override
     public int hashCode() {
         int result = this.type().hashCode();
         result = 31 * result + this.name.hashCode();
-        result = 31 * result + System.identityHashCode(this.procedure);
+        result = 31 * result + this.procedure.hashCode();
         result = 31 * result + this.argc;
         result = 31 * result + Boolean.hashCode(this.vararg);
-        result = 31 * result + this.children.hashCode();
         return result;
     }
 }

@@ -144,7 +144,10 @@ public class Env {
      */
     public Env addMacro(String key, List<String> params, List<Ast> bodys) {
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DMacro) this.table.get(key)).addMacro(key, DMacro.newMacro(key, params, bodys)));
+            DToken token = this.table.get(key);
+            if (!(token instanceof DMacro))
+                throw new DevoreRuntimeException("定义冲突: " + key);
+            this.table.put(key, ((DMacro) token).addMacro(key, DMacro.newMacro(key, params, bodys)));
             return this;
         }
         this.table.put(key, DMacro.newMacro(key, params, bodys));
@@ -163,7 +166,11 @@ public class Env {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        temp.table.put(key, DMacro.newMacro(key, params, bodys));
+        DMacro macro = DMacro.newMacro(key, params, bodys);
+        DToken token = temp.table.get(key);
+        if (token instanceof DMacro)
+            macro = ((DMacro) token).setMacro(macro);
+        temp.table.put(key, macro);
         return this;
     }
 
@@ -178,7 +185,10 @@ public class Env {
      */
     public Env addAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(key, procedure, argc, vararg)));
+            DToken token = this.table.get(key);
+            if (!(token instanceof DProcedure))
+                throw new DevoreRuntimeException("定义冲突: " + key);
+            this.table.put(key, ((DProcedure) token).addProcedure(key, DProcedure.newProcedure(key, procedure, argc, vararg)));
             return this;
         }
         this.table.put(key, DProcedure.newProcedure(key, procedure, argc, vararg));
@@ -204,7 +214,10 @@ public class Env {
             return procedure.apply(args, env);
         };
         if (this.table.containsKey(key)) {
-            this.table.put(key, ((DProcedure) this.table.get(key)).addProcedure(key, DProcedure.newProcedure(key, df, argc, vararg)));
+            DToken token = this.table.get(key);
+            if (!(token instanceof DProcedure))
+                throw new DevoreRuntimeException("定义冲突: " + key);
+            this.table.put(key, ((DProcedure) token).addProcedure(key, DProcedure.newProcedure(key, df, argc, vararg)));
             return this;
         }
         this.table.put(key, DProcedure.newProcedure(key, df, argc, vararg));
@@ -224,7 +237,11 @@ public class Env {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        temp.table.put(key, DProcedure.newProcedure(key, procedure, argc, vararg));
+        DProcedure df = DProcedure.newProcedure(key, procedure, argc, vararg);
+        DToken token = temp.table.get(key);
+        if (token instanceof DProcedure)
+            df = ((DProcedure) token).setProcedure(df);
+        temp.table.put(key, df);
         return this;
     }
 
@@ -249,7 +266,11 @@ public class Env {
             }
             return procedure.apply(args, env);
         };
-        temp.table.put(key, DProcedure.newProcedure(key, df, argc, vararg));
+        DProcedure newProcedure = DProcedure.newProcedure(key, df, argc, vararg);
+        DToken token = temp.table.get(key);
+        if (token instanceof DProcedure)
+            newProcedure = ((DProcedure) token).setProcedure(newProcedure);
+        temp.table.put(key, newProcedure);
         return this;
     }
 
