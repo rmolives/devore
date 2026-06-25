@@ -1,13 +1,7 @@
 package org.devore.lang;
 
 import org.devore.exception.DevoreRuntimeException;
-import org.devore.lang.module.BinaryModule;
-import org.devore.lang.module.CoreModule;
-import org.devore.lang.module.FileModule;
-import org.devore.lang.module.HttpModule;
-import org.devore.lang.module.JsonModule;
-import org.devore.lang.module.Module;
-import org.devore.lang.module.ThreadModule;
+import org.devore.lang.module.*;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
 import org.devore.lang.token.DToken;
@@ -34,7 +28,8 @@ public class Env {
             new AbstractMap.SimpleEntry<>("file", new FileModule()),
             new AbstractMap.SimpleEntry<>("http", new HttpModule()),
             new AbstractMap.SimpleEntry<>("json", new JsonModule()),
-            new AbstractMap.SimpleEntry<>("thread", new ThreadModule())
+            new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
+            new AbstractMap.SimpleEntry<>("hash", new HashModule())
     ).collect(Collectors.toMap(
             Map.Entry::getKey,
             Map.Entry::getValue
