@@ -25,27 +25,12 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Delete old tag and releases
+      - name: Delete old release and tag
         run: |
-          TAG=${{ steps.gradle_version.outputs.version }}
-          RELEASES=$(curl -s \
-                        -H "Authorization: token $GITHUB_TOKEN" \
-                        -H "Accept: application/vnd.github.v3+json" \
-                        "https://api.github.com/repos/${{ github.repository }}/releases")
-                      RELEASE_IDS=$(echo "$RELEASES" | jq -r ".[] | select(.tag_name == \"$TAG\") | .id")
-                      for ID in $RELEASE_IDS; do
-                        echo "Deleting release ID: $ID"
-                        curl -s \
-                          -X DELETE \
-                          -H "Authorization: token $GITHUB_TOKEN" \
-                          -H "Accept: application/vnd.github.v3+json" \
-                          "https://api.github.com/repos/${{ github.repository }}/releases/$ID"
-                      done
-          if git ls-remote --tags origin | grep -q "refs/tags/${{ steps.gradle_version.outputs.version }}"; then
-            git push --delete origin "refs/tags/${{ steps.gradle_version.outputs.version }}"
-          fi
+          TAG="${{ steps.gradle_version.outputs.version }}"
+          gh release delete "$TAG" --yes --cleanup-tag || true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get JAR Path
         id: jar
         run: |
@@ -59,21 +44,19 @@ jobs:
       - name: Get timestamp
         id: timestamp
         run: echo "date=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S CST')" >> $GITHUB_OUTPUT
-      - name: Create Release with fixed tag
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create prerelease
+        run: |
+          TAG="${{ steps.gradle_version.outputs.version }}"
+          JAR="${{ steps.jar.outputs.jar_path }}"
+          gh release create "$TAG" "$JAR" \
+            --title "Devore Language" \
+            --notes "Version: $TAG
+          Build date: ${{ steps.timestamp.outputs.date }}
+          Commit: ${{ github.sha }}
+          SHA256: ${{ steps.calculate_sha.outputs.sha256 }}" \
+            --prerelease
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.gradle_version.outputs.version }}
-          release_name: Devore Language
-          draft: false
-          prerelease: true
-          body: |
-            Version: ${{ steps.gradle_version.outputs.version }}
-            Build date: ${{ steps.timestamp.outputs.date }}
-            Commit: ${{ github.sha }}
-            SHA256: ${{ steps.calculate_sha.outputs.sha256 }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
