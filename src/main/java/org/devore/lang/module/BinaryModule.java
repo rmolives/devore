@@ -62,7 +62,7 @@ public class BinaryModule extends Module {
                     throw new DevoreRuntimeException("十六进制字符串包含非法字符: " + args.get(0).toString() + ".");
                 result[i / 2] = (byte) ((high << 4) | low);
             }
-            return DByteUtils.bytesToList(result);
+            return DByteUtils.toList(result);
         }, 1, false);
     }
 }

@@ -26,15 +26,27 @@ public class DByteUtils {
         return (byte) integer.intValue();
     }
 
-    public static DList bytesToList(byte[] bytes) {
+    /**
+     * 将bytes转为DList
+     *
+     * @param bytes bytes
+     * @return DList
+     */
+    public static DList toList(byte[] bytes) {
         return DList.valueOf(IntStream.range(0, bytes.length)
                 .mapToObj(i -> DInt.valueOf((int) bytes[i]))
                 .collect(Collectors.toList()));
     }
 
-    public static byte[] toBytes(DList list) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(list.size());
-        list.toList().forEach(token -> baos.write(DByteUtils.toByte((DInt) token)));
+    /**
+     * 将DList转为byte
+     *
+     * @param value DList值
+     * @return bytes
+     */
+    public static byte[] toBytes(DList value) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(value.size());
+        value.toList().forEach(token -> baos.write(DByteUtils.toByte((DInt) token)));
         return baos.toByteArray();
     }
 

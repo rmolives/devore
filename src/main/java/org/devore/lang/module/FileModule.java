@@ -29,7 +29,7 @@ public class FileModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
             try {
-                return DByteUtils.bytesToList(Files.readAllBytes(path));
+                return DByteUtils.toList(Files.readAllBytes(path));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("读取二进制文件失败: " + path + ", " + e.getMessage());
             }
