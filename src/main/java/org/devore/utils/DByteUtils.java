@@ -3,9 +3,10 @@ package org.devore.utils;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.token.DInt;
 import org.devore.lang.token.DList;
+import org.devore.lang.token.DToken;
 
-import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,9 +46,11 @@ public class DByteUtils {
      * @return bytes
      */
     public static byte[] toBytes(DList value) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(value.size());
-        value.toList().forEach(token -> baos.write(DByteUtils.toByte((DInt) token)));
-        return baos.toByteArray();
+        byte[] bytes = new byte[value.size()];
+        List<DToken> list = value.toList();
+        for (int i = 0; i < list.size(); ++i)
+            bytes[i] = DByteUtils.toByte((DInt) list.get(i));
+        return bytes;
     }
 
     private static boolean outOfByteRange(BigInteger integer) {
