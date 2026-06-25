@@ -978,6 +978,8 @@ public class CoreModule extends Module {
             return list.subList(0, list.size() - 1, false);
         }), 1, false);
         dEnv.addTokenProcedure("length", ((args, env) -> {
+            if (args.get(0) instanceof DBinary)
+                return DNumber.valueOf(((DBinary) args.get(0)).size());
             if (args.get(0) instanceof DList)
                 return DNumber.valueOf(((DList) args.get(0)).size());
             if (args.get(0) instanceof DTable)
