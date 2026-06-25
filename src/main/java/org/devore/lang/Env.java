@@ -5,6 +5,7 @@ import org.devore.lang.module.BinaryModule;
 import org.devore.lang.module.CoreModule;
 import org.devore.lang.module.FileModule;
 import org.devore.lang.module.HttpModule;
+import org.devore.lang.module.JsonModule;
 import org.devore.lang.module.Module;
 import org.devore.lang.module.ThreadModule;
 import org.devore.lang.token.DMacro;
@@ -32,6 +33,7 @@ public class Env {
             new AbstractMap.SimpleEntry<>("core", new CoreModule()),
             new AbstractMap.SimpleEntry<>("file", new FileModule()),
             new AbstractMap.SimpleEntry<>("http", new HttpModule()),
+            new AbstractMap.SimpleEntry<>("json", new JsonModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule())
     ).collect(Collectors.toMap(
             Map.Entry::getKey,
