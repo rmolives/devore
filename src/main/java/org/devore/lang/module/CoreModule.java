@@ -1266,6 +1266,12 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "table");
             return ((DTable) args.get(0)).containsValue(args.get(1));
         }), 2, false);
+        dEnv.addTokenProcedure("table-clear!", ((args, env) -> {
+            if (!(args.get(0) instanceof DTable))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            ((DTable) args.get(0)).clear();
+            return DWord.NIL;
+        }), 3, false);
         dEnv.addTokenProcedure("table-put", ((args, env) -> {
             if (!(args.get(0) instanceof DTable))
                 throw new DevoreCastException(args.get(0).type(), "table");
