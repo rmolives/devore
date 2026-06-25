@@ -56,3 +56,9 @@ jobs:
             --prerelease
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check release status
+        run: |
+          TAG="${{ steps.gradle_version.outputs.version }}"
+          gh release view "$TAG" --json isDraft,isPrerelease,tagName
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
