@@ -883,7 +883,7 @@ public class CoreModule extends Module {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
             ((DList) args.get(0)).clear();
-            return DWord.NIL;
+            return args.get(0);
         }), 1, false);
         dEnv.addTokenProcedure("list-index", ((args, env) -> {
             if (!(args.get(0) instanceof DList))
@@ -1276,7 +1276,7 @@ public class CoreModule extends Module {
             if (!(args.get(0) instanceof DTable))
                 throw new DevoreCastException(args.get(0).type(), "table");
             ((DTable) args.get(0)).clear();
-            return DWord.NIL;
+            return args.get(0);
         }), 1, false);
         dEnv.addTokenProcedure("table-put", ((args, env) -> {
             if (!(args.get(0) instanceof DTable))
