@@ -54,9 +54,9 @@ public class ThreadModule extends Module {
         dEnv.addTokenProcedure("join", (args, env) -> {
             if (!(args.get(0) instanceof DThread))
                 throw new DevoreCastException(args.get(0).type(), "thread");
-            DThread thread = (DThread) args.get(0);
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
+            DThread thread = (DThread) args.get(0);
             try {
                 thread.toThread().join(DNumberUtils.toLong((DInt) args.get(1)));
             } catch (InterruptedException e) {
