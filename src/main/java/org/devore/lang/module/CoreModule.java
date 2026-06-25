@@ -1257,8 +1257,23 @@ public class CoreModule extends Module {
      * @param dEnv 目标环境
      */
     private void initTableProcedures(Env dEnv) {
-        dEnv.addTokenProcedure("table", ((args, env) ->
-                DTable.valueOf(new HashMap<>())), 0, false);
+        dEnv.addAstProcedure("table", ((ast, env) -> {
+            Map<DToken, DToken> table = IntStream.range(0, ast.size())
+                    .mapToObj(ast::get)
+                    .peek(pair -> {
+                        if (pair.type != Ast.Type.PROCEDURE || pair.symbol == DWord.NIL || pair.size() != 1)
+                            throw new DevoreRuntimeException("table参数必须为键值对: [key value]");
+                    })
+                    .collect(Collectors.toMap(
+                            pair -> {
+                                Ast key = pair.symbol instanceof Ast ? ((Ast) pair.symbol).copy() : new Ast(pair.symbol);
+                                return Evaluator.eval(env, key);
+                            },
+                            pair -> Evaluator.eval(env, pair.get(0).copy()),
+                            (left, right) -> right,
+                            HashMap::new));
+            return DTable.valueOf(table);
+        }), 0, true);
         dEnv.addTokenProcedure("table-get", ((args, env) -> {
             if (!(args.get(0) instanceof DTable))
                 throw new DevoreCastException(args.get(0).type(), "table");
