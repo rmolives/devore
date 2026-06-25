@@ -191,6 +191,19 @@ public class BinaryModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "binary");
             return DString.valueOf(new String(((DBinary) args.get(0)).toByteArray(), StandardCharsets.UTF_8));
         }, 1, false);
+        dEnv.addTokenProcedure("binary->string", (args, env) -> {
+            if (!(args.get(0) instanceof DBinary))
+                throw new DevoreCastException(args.get(0).type(), "binary");
+            if (!(args.get(1) instanceof DString))
+                throw new DevoreCastException(args.get(1).type(), "string");
+            Charset charset;
+            try {
+                charset = Charset.forName(args.get(1).toString());
+            } catch (RuntimeException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+            }
+            return DString.valueOf(new String(((DBinary) args.get(0)).toByteArray(), charset));
+        }, 2, false);
         dEnv.addTokenProcedure("binary->hex", (args, env) -> {
             if (!(args.get(0) instanceof DBinary))
                 throw new DevoreCastException(args.get(0).type(), "binary");
