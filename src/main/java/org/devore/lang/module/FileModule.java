@@ -183,6 +183,11 @@ public class FileModule extends Module {
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DBool.valueOf(Files.isDirectory(Paths.get(args.get(0).toString())));
         }, 1, false);
+        dEnv.addTokenProcedure("file-absolute-path", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            return DString.valueOf(Paths.get(args.get(0).toString()).toAbsolutePath().toString());
+        }, 1, false);
         dEnv.addTokenProcedure("file-size", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
