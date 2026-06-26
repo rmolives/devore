@@ -23,7 +23,7 @@ public class DThread extends DToken {
         return new DThread(thread, new AtomicReference<>(DWord.NIL), new AtomicReference<>());
     }
 
-    public static DThread start(String name, ThreadBody body) {
+    public static DThread create(String name, ThreadBody body) {
         AtomicReference<DToken> result = new AtomicReference<>(DWord.NIL);
         AtomicReference<Throwable> error = new AtomicReference<>();
         Thread thread = new Thread(() -> {
@@ -33,9 +33,16 @@ public class DThread extends DToken {
                 error.set(e);
             }
         }, name);
-        DThread dThread = new DThread(thread, result, error);
-        thread.start();
-        return dThread;
+        return new DThread(thread, result, error);
+    }
+
+    public DThread start() {
+        try {
+            this.thread.start();
+        } catch (IllegalThreadStateException e) {
+            throw new DevoreRuntimeException("线程已经启动.");
+        }
+        return this;
     }
 
     public Thread toThread() {

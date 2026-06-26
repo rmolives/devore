@@ -34,11 +34,16 @@ public class ThreadModule extends DModule {
             List<Ast> bodies = ast.children.stream()
                     .map(Ast::copy)
                     .collect(Collectors.toList());
-            return DThread.start("devore-thread", () -> bodies.stream()
+            return DThread.create("devore-thread", () -> bodies.stream()
                     .map(node -> Evaluator.eval(threadEnv, node.copy()))
                     .reduce((previous, current) -> current)
                     .orElse(DWord.NIL));
         }, 1, true);
+        dEnv.addTokenProcedure("thread-start", (args, env) -> {
+            if (!(args.get(0) instanceof DThread))
+                throw new DevoreCastException(args.get(0).type(), "thread");
+            return ((DThread) args.get(0)).start();
+        }, 1, false);
         dEnv.addTokenProcedure("join", (args, env) -> {
             if (!(args.get(0) instanceof DThread))
                 throw new DevoreCastException(args.get(0).type(), "thread");
