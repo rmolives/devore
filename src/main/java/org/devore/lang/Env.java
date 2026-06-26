@@ -112,7 +112,7 @@ public class Env {
         return appendFather(temp.importEnvs.get(key), this);
     }
 
-    public static Env appendFather(Env imported, Env current) {
+    private static Env appendFather(Env imported, Env current) {
         if (imported == null)
             return current;
         return new Env(imported.table, appendFather(imported.father, current),
