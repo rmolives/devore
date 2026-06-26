@@ -150,7 +150,7 @@ public class CoreModule extends Module {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (args.get(1).equals(DNumber.valueOf(0)))
-                throw new DevoreRuntimeException("模数不能为0, 被除数=" + args.get(0) + ", 模数=" + args.get(1) + ".");
+                throw new DevoreRuntimeException("模数不能为0, 被除数=" + args.get(0) + ", 模数=" + args.get(1));
             return DNumber.valueOf(((DInt) args.get(0)).toBigInteger().mod(((DInt) args.get(1)).toBigInteger()));
         }), 2, false);
         dEnv.addTokenProcedure("rem", ((args, env) -> {
@@ -159,7 +159,7 @@ public class CoreModule extends Module {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (args.get(1).equals(DNumber.valueOf(0)))
-                throw new DevoreRuntimeException("除数不能为0, 被除数=" + args.get(0) + ", 除数=" + args.get(1) + ".");
+                throw new DevoreRuntimeException("除数不能为0, 被除数=" + args.get(0) + ", 除数=" + args.get(1));
             return DNumber.valueOf(((DInt) args.get(0)).toBigInteger().remainder(((DInt) args.get(1)).toBigInteger()));
         }), 2, false);
         dEnv.addTokenProcedure("abs", ((args, env) -> {
@@ -1164,7 +1164,7 @@ public class CoreModule extends Module {
             if (step.compareTo(BigDecimal.ZERO) == 0)
                 throw new DevoreRuntimeException("步长不能为零, start=" + start.toPlainString()
                         + ", end=" + target.toPlainString()
-                        + ", step=" + step.toPlainString() + ".");
+                        + ", step=" + step.toPlainString());
             BigDecimal actualStep = start.compareTo(target) <= 0 ? step.abs() : step.abs().negate();
             BigDecimal end = target.subtract(actualStep);
             BigDecimal distance = end.subtract(start);
@@ -1541,7 +1541,7 @@ public class CoreModule extends Module {
             int toIndex = DNumberUtils.toIndex((DInt) args.get(2));
             if (fromIndex > toIndex)
                 throw new DevoreRuntimeException("字符串截取起始下标大于目标下标, fromIndex=" + fromIndex
-                        + ", toIndex=" + toIndex + ", length=" + s.length() + ".");
+                        + ", toIndex=" + toIndex + ", length=" + s.length());
             if (fromIndex >= s.length() || fromIndex < 0)
                 throw new DevoreRuntimeException("字符串截取过界, fromIndex=" + fromIndex + ", 但字符串只有" + s.length() + "个字符.");
             if (toIndex >= s.length())

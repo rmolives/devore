@@ -23,7 +23,7 @@ public class DNumberUtils {
     public static int toInt(DInt value) {
         BigInteger integer = value.toBigInteger();
         if (outOfIntRange(integer))
-            throw new DevoreRuntimeException("整数超出int范围: " + integer + ".");
+            throw new DevoreRuntimeException("整数超出int范围: " + integer);
         return integer.intValue();
     }
 
@@ -36,7 +36,7 @@ public class DNumberUtils {
     public static long toLong(DInt value) {
         BigInteger integer = value.toBigInteger();
         if (outOfLongRange(integer))
-            throw new DevoreRuntimeException("整数超出long范围: " + integer + ".");
+            throw new DevoreRuntimeException("整数超出long范围: " + integer);
         return integer.longValue();
     }
 
@@ -49,7 +49,7 @@ public class DNumberUtils {
     public static int toIndex(DInt value) {
         BigInteger integer = value.toBigInteger();
         if (outOfIntRange(integer))
-            throw new DevoreRuntimeException("下标超出int范围: " + integer + ".");
+            throw new DevoreRuntimeException("下标超出int范围: " + integer);
         return integer.intValue();
     }
 

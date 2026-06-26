@@ -83,7 +83,7 @@ public class FileModule extends Module {
             try {
                 charset = Charset.forName(args.get(1).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
             try {
                 return DString.valueOf(new String(Files.readAllBytes(path), charset));
@@ -119,7 +119,7 @@ public class FileModule extends Module {
             try {
                 charset = Charset.forName(args.get(2).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(2) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(2));
             }
             try {
                 Files.write(path, content.getBytes(charset),
@@ -157,7 +157,7 @@ public class FileModule extends Module {
             try {
                 charset = Charset.forName(args.get(2).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(2) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(2));
             }
             try {
                 Files.write(path, content.getBytes(charset),

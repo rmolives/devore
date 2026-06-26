@@ -23,7 +23,7 @@ public class DByteUtils {
     public static byte toByte(DInt value) {
         BigInteger integer = value.toBigInteger();
         if (outOfByteRange(integer))
-            throw new DevoreRuntimeException("整数超出byte范围: " + integer + ".");
+            throw new DevoreRuntimeException("整数超出byte范围: " + integer);
         return (byte) integer.intValue();
     }
 

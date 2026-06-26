@@ -68,7 +68,7 @@ public class JsonModule extends Module {
             parents.remove(token);
             return "{" + String.join(",", items) + "}";
         }
-        throw new DevoreRuntimeException("JSON不支持类型: " + token.type() + ".");
+        throw new DevoreRuntimeException("JSON不支持类型: " + token.type());
     }
 
     private static boolean isJson(DToken token, Set<DToken> parents) {
@@ -353,7 +353,7 @@ public class JsonModule extends Module {
         }
 
         private void error(String message) {
-            throw new DevoreRuntimeException(message + ", index=" + this.index + ".");
+            throw new DevoreRuntimeException(message + ", index=" + this.index);
         }
     }
 }

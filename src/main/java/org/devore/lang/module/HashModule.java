@@ -59,7 +59,7 @@ public class HashModule extends Module {
             try {
                 charset = Charset.forName(args.get(1).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
             return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "MD5"));
         }), 2, false);
@@ -72,7 +72,7 @@ public class HashModule extends Module {
             try {
                 charset = Charset.forName(args.get(1).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
             return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "SHA-1"));
         }), 2, false);
@@ -85,7 +85,7 @@ public class HashModule extends Module {
             try {
                 charset = Charset.forName(args.get(1).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
             return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "SHA-256"));
         }), 2, false);
@@ -98,7 +98,7 @@ public class HashModule extends Module {
             try {
                 charset = Charset.forName(args.get(1).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
             return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "SHA-512"));
         }), 2, false);

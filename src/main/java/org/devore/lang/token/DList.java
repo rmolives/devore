@@ -197,7 +197,7 @@ public class DList extends DToken {
     public DList subList(int fromIndex, int toIndex, boolean force) {
         if (fromIndex > toIndex)
             throw new DevoreRuntimeException("列表截取起始下标大于目标下标, fromIndex=" + fromIndex
-                    + ", toIndex=" + toIndex + ", length=" + this.list.size() + ".");
+                    + ", toIndex=" + toIndex + ", length=" + this.list.size());
         if (fromIndex >= this.list.size() || fromIndex < 0)
             throw new DevoreRuntimeException("列表截取过界, fromIndex=" + fromIndex + ", 但列表只有" + this.list.size() + "个元素.");
         if (toIndex > this.list.size())

@@ -65,7 +65,7 @@ public abstract class DNumber extends DToken {
      */
     public DNumber div(DNumber a) {
         if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("除数不能为0, 被除数=" + this + ", 除数=" + a + ".");
+            throw new DevoreRuntimeException("除数不能为0, 被除数=" + this + ", 除数=" + a);
         return DNumber.valueOf(NumberUtils.divide(this.toBigDecimal(), a.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
     }
 

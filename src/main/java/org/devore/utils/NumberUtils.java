@@ -136,7 +136,7 @@ public class NumberUtils {
      */
     public static BigDecimal csch(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("csch(x)要求x不为0, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("csch(x)要求x不为0, 实际x=" + plain(x));
         return BigDecimal.ONE.divide(sinh(x, mc), mc);
     }
 
@@ -149,7 +149,7 @@ public class NumberUtils {
      */
     public static BigDecimal coth(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("coth(x)要求x不为0, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("coth(x)要求x不为0, 实际x=" + plain(x));
         return cosh(x, mc).divide(sinh(x, mc), mc);
     }
 
@@ -162,7 +162,7 @@ public class NumberUtils {
      */
     public static BigDecimal arcsech(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0 || x.compareTo(BigDecimal.ONE) > 0)
-            throw new DevoreRuntimeException("arcsech(x)定义域为(0, 1], x超出范围, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("arcsech(x)定义域为(0, 1], x超出范围, 实际x=" + plain(x));
         return arccosh(BigDecimal.ONE.divide(x, mc), mc);
     }
 
@@ -175,7 +175,7 @@ public class NumberUtils {
      */
     public static BigDecimal arccsch(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("arccsch(x)要求x不为0, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("arccsch(x)要求x不为0, 实际x=" + plain(x));
         return arcsinh(BigDecimal.ONE.divide(x, mc), mc);
     }
 
@@ -189,7 +189,7 @@ public class NumberUtils {
     public static BigDecimal arccoth(BigDecimal x, MathContext mc) {
         if (x.abs().compareTo(BigDecimal.ONE) <= 0)
             throw new DevoreRuntimeException("arccoth(x)定义域为(-∞, -1)∪(1, +∞), x超出范围, 实际x="
-                    + plain(x) + ".");
+                    + plain(x));
         return arctanh(BigDecimal.ONE.divide(x, mc), mc);
     }
 
@@ -203,7 +203,7 @@ public class NumberUtils {
     public static BigDecimal sec(BigDecimal x, MathContext mc) {
         BigDecimal c = cos(x, mc);
         if (c.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("sec(x)在cos(x)=0时未定义, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("sec(x)在cos(x)=0时未定义, 实际x=" + plain(x));
         return BigDecimal.ONE.divide(c, mc);
     }
 
@@ -217,7 +217,7 @@ public class NumberUtils {
     public static BigDecimal csc(BigDecimal x, MathContext mc) {
         BigDecimal s = sin(x, mc);
         if (s.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("csc(x)在sin(x)=0时未定义, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("csc(x)在sin(x)=0时未定义, 实际x=" + plain(x));
         return BigDecimal.ONE.divide(s, mc);
     }
 
@@ -231,7 +231,7 @@ public class NumberUtils {
     public static BigDecimal cot(BigDecimal x, MathContext mc) {
         BigDecimal s = sin(x, mc);
         if (s.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("cot(x)在sin(x)=0时未定义, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("cot(x)在sin(x)=0时未定义, 实际x=" + plain(x));
         return cos(x, mc).divide(s, mc);
     }
 
@@ -245,7 +245,7 @@ public class NumberUtils {
     public static BigDecimal arcsec(BigDecimal x, MathContext mc) {
         if (x.abs().compareTo(BigDecimal.ONE) < 0)
             throw new DevoreRuntimeException("arcsec(x)定义域为(-∞, -1]∪[1, +∞), x超出范围, 实际x="
-                    + plain(x) + ".");
+                    + plain(x));
         return arccos(BigDecimal.ONE.divide(x, mc), mc);
     }
 
@@ -259,7 +259,7 @@ public class NumberUtils {
     public static BigDecimal arccsc(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) == 0 || x.abs().compareTo(BigDecimal.ONE) < 0)
             throw new DevoreRuntimeException("arccsc(x)定义域为(-∞, -1]∪[1, +∞), x超出范围, 实际x="
-                    + plain(x) + ".");
+                    + plain(x));
         return arcsin(BigDecimal.ONE.divide(x, mc), mc);
     }
 
@@ -343,7 +343,7 @@ public class NumberUtils {
     public static BigDecimal arccosh(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) < 0)
             throw new DevoreRuntimeException("arcosh(x)的定义域为[1, +∞), x超出范围, 实际x="
-                    + plain(x) + ".");
+                    + plain(x));
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ZERO;
         BigDecimal xm1 = x.subtract(BigDecimal.ONE, mc);
@@ -362,7 +362,7 @@ public class NumberUtils {
     public static BigDecimal arctanh(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) >= 0 || x.compareTo(BigDecimal.ONE.negate()) <= 0)
             throw new DevoreRuntimeException("artanh(x)的定义域为(-1, 1), x超出范围, 实际x="
-                    + plain(x) + ".");
+                    + plain(x));
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         BigDecimal onePlus = BigDecimal.ONE.add(x, mc);
@@ -381,7 +381,7 @@ public class NumberUtils {
     public static BigDecimal arccos(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
             throw new DevoreRuntimeException("arccos(x)的定义域为[-1, 1], x超出范围, 实际x="
-                    + plain(x) + ".");
+                    + plain(x));
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ONE.negate()) == 0)
@@ -408,7 +408,7 @@ public class NumberUtils {
     public static BigDecimal arcsin(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
             throw new DevoreRuntimeException("arcsin(x)的定义域为[-1, 1], x超出范围, 实际x="
-                    + plain(x) + ".");
+                    + plain(x));
         if (x.compareTo(BigDecimal.ONE) == 0)
             return PI.divide(BigDecimal.valueOf(2), mc);
         if (x.compareTo(BigDecimal.ONE.negate()) == 0)
@@ -601,7 +601,7 @@ public class NumberUtils {
     public static BigDecimal tan(BigDecimal x, MathContext mc) {
         BigDecimal cos = cos(x, mc);
         if (cos.compareTo(BigDecimal.ZERO) == 0)
-            throw new DevoreRuntimeException("tan(x)在cos(x)=0时未定义, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("tan(x)在cos(x)=0时未定义, 实际x=" + plain(x));
         return sin(x, mc).divide(cos, mc);
     }
 
@@ -614,7 +614,7 @@ public class NumberUtils {
      */
     public static BigDecimal sqrt(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
-            throw new DevoreRuntimeException("sqrt(x)要求x不为负数, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("sqrt(x)要求x不为负数, 实际x=" + plain(x));
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ONE) == 0)
@@ -675,7 +675,7 @@ public class NumberUtils {
             if (y.compareTo(BigDecimal.ZERO) > 0)
                 return BigDecimal.ZERO;
             throw new DevoreRuntimeException("x^y要求但x为0时, y不能为负数, 实际x="
-                    + plain(x) + ", y=" + plain(y) + ".");
+                    + plain(x) + ", y=" + plain(y));
         }
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ONE;
@@ -685,7 +685,7 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ZERO) < 0
                 && !exponent.denominator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
             throw new DevoreRuntimeException("x^y要求但y为非整数且分母为偶数时, x不能为负数, 实际x="
-                    + plain(x) + ", y=" + plain(y) + ", 近似指数分母=" + exponent.denominator + ".");
+                    + plain(x) + ", y=" + plain(y) + ", 近似指数分母=" + exponent.denominator);
         BigDecimal exact = powRationalExact(x.abs(), exponent, y.signum() < 0, mc);
         if (exact != null) {
             if (x.compareTo(BigDecimal.ZERO) < 0 && exponent.numerator.testBit(0))
@@ -844,7 +844,7 @@ public class NumberUtils {
      */
     private static BigDecimal exactNthRoot(BigDecimal value, int n) {
         if (n <= 0)
-            throw new DevoreRuntimeException("n次根要求n为正数, 实际n=" + n + ", value=" + plain(value) + ".");
+            throw new DevoreRuntimeException("n次根要求n为正数, 实际n=" + n + ", value=" + plain(value));
         if (n > 10000)
             return null;
         if (value.compareTo(BigDecimal.ZERO) == 0)
@@ -907,7 +907,7 @@ public class NumberUtils {
      */
     public static BigDecimal ln(BigDecimal x, MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) <= 0)
-            throw new DevoreRuntimeException("ln(x)要求x为正数, 实际x=" + plain(x) + ".");
+            throw new DevoreRuntimeException("ln(x)要求x为正数, 实际x=" + plain(x));
         BigDecimal term = x.subtract(BigDecimal.ONE).divide(x.add(BigDecimal.ONE), mc);
         BigDecimal termSquared = term.multiply(term, mc);
         BigDecimal result = term;
@@ -933,11 +933,11 @@ public class NumberUtils {
      */
     public static BigDecimal log(BigDecimal a, BigDecimal b, MathContext mc) {
         if (a.compareTo(BigDecimal.ZERO) <= 0)
-            throw new DevoreRuntimeException("log_b(a)要求a为正数, 实际a=" + plain(a) + ", b=" + plain(b) + ".");
+            throw new DevoreRuntimeException("log_b(a)要求a为正数, 实际a=" + plain(a) + ", b=" + plain(b));
         if (b.compareTo(BigDecimal.ZERO) <= 0)
-            throw new DevoreRuntimeException("log_b(a)要求b为正数, 实际a=" + plain(a) + ", b=" + plain(b) + ".");
+            throw new DevoreRuntimeException("log_b(a)要求b为正数, 实际a=" + plain(a) + ", b=" + plain(b));
         if (b.compareTo(BigDecimal.ONE) == 0)
-            throw new DevoreRuntimeException("log_b(a)要求b不能为1, 实际a=" + plain(a) + ", b=" + plain(b) + ".");
+            throw new DevoreRuntimeException("log_b(a)要求b不能为1, 实际a=" + plain(a) + ", b=" + plain(b));
         BigDecimal exact = exactIntegerLog(a, b);
         if (exact != null)
             return exact;

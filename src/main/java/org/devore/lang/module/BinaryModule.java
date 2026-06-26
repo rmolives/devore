@@ -36,7 +36,7 @@ public class BinaryModule extends Module {
             try {
                 charset = Charset.forName(args.get(1).toString());
             } catch (RuntimeException e) {
-                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
             return DByteUtils.toList(args.get(0).toString().getBytes(charset));
         }, 2, false);
@@ -77,7 +77,7 @@ public class BinaryModule extends Module {
                 int high = Character.digit(value.charAt(i), 16);
                 int low = Character.digit(value.charAt(i + 1), 16);
                 if (high < 0 || low < 0)
-                    throw new DevoreRuntimeException("十六进制字符串包含非法字符: " + args.get(0).toString() + ".");
+                    throw new DevoreRuntimeException("十六进制字符串包含非法字符: " + args.get(0).toString());
                 result[i / 2] = (byte) ((high << 4) | low);
             }
             return DByteUtils.toList(result);

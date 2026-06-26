@@ -35,10 +35,10 @@ public class HttpModule extends Module {
             try {
                 uri = new URI(args.get(0).toString());
             } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
             }
             if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
             try {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestMethod("GET");
@@ -60,7 +60,8 @@ public class HttpModule extends Module {
                 Map<DToken, DToken> headers = new HashMap<>();
                 for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
                     if (entry.getKey() != null)
-                        headers.put(DString.valueOf(entry.getKey()), DString.valueOf(String.join(",", entry.getValue())));
+                        headers.put(DString.valueOf(entry.getKey()),
+                                DString.valueOf(String.join(",", entry.getValue())));
                 }
                 Map<DToken, DToken> result = new HashMap<>();
                 result.put(DString.valueOf("status"), DNumber.valueOf(status));
@@ -80,10 +81,10 @@ public class HttpModule extends Module {
             try {
                 uri = new URI(args.get(0).toString());
             } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
             }
             if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
             try {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestMethod("GET");
@@ -114,7 +115,8 @@ public class HttpModule extends Module {
                 Map<DToken, DToken> headers = new HashMap<>();
                 for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
                     if (entry.getKey() != null)
-                        headers.put(DString.valueOf(entry.getKey()), DString.valueOf(String.join(",", entry.getValue())));
+                        headers.put(DString.valueOf(entry.getKey()),
+                                DString.valueOf(String.join(",", entry.getValue())));
                 }
                 Map<DToken, DToken> result = new HashMap<>();
                 result.put(DString.valueOf("status"), DNumber.valueOf(status));
@@ -132,10 +134,10 @@ public class HttpModule extends Module {
             try {
                 uri = new URI(args.get(0).toString());
             } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
             }
             if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
             try {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestMethod("GET");
@@ -166,10 +168,10 @@ public class HttpModule extends Module {
             try {
                 uri = new URI(args.get(0).toString());
             } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
             }
             if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
             try {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestMethod("GET");
@@ -207,10 +209,10 @@ public class HttpModule extends Module {
             try {
                 uri = new URI(args.get(0).toString());
             } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
             }
             if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
             try {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestMethod("GET");
@@ -241,10 +243,10 @@ public class HttpModule extends Module {
             try {
                 uri = new URI(args.get(0).toString());
             } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
             }
             if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
             try {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestMethod("GET");
@@ -266,7 +268,7 @@ public class HttpModule extends Module {
                     try {
                         charset = Charset.forName(args.get(1).toString());
                     } catch (RuntimeException e) {
-                        throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+                        throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
                     }
                 }
                 int status = connection.getResponseCode();
@@ -295,10 +297,10 @@ public class HttpModule extends Module {
             try {
                 uri = new URI(args.get(0).toString());
             } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
             }
             if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0) + ".");
+                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
             try {
                 HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
                 connection.setRequestMethod("GET");
@@ -318,7 +320,7 @@ public class HttpModule extends Module {
                 try {
                     charset = Charset.forName(args.get(2).toString());
                 } catch (RuntimeException e) {
-                    throw new DevoreRuntimeException("字符集不存在: " + args.get(2) + ".");
+                    throw new DevoreRuntimeException("字符集不存在: " + args.get(2));
                 }
                 int status = connection.getResponseCode();
                 InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
