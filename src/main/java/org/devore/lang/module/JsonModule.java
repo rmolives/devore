@@ -151,14 +151,14 @@ public class JsonModule extends Module {
             DToken token = parseValue();
             skipWhitespace();
             if (!end())
-                error("JSON结尾后存在多余内容");
+                error("JSON结尾后存在多余内容.");
             return token;
         }
 
         private DToken parseValue() {
             skipWhitespace();
             if (end())
-                error("JSON意外结束");
+                error("JSON意外结束.");
             char c = peek();
             if (c == '"')
                 return DString.valueOf(parseString());
@@ -187,7 +187,7 @@ public class JsonModule extends Module {
             while (true) {
                 skipWhitespace();
                 if (end() || peek() != '"')
-                    error("JSON对象key必须是字符串");
+                    error("JSON对象key必须是字符串.");
                 DString key = DString.valueOf(parseString());
                 skipWhitespace();
                 expect(':');
@@ -219,22 +219,22 @@ public class JsonModule extends Module {
             consume('-');
             if (consume('0')) {
                 if (!end() && isDigit(peek()))
-                    error("JSON数字不能包含前导0");
+                    error("JSON数字不能包含前导0.");
             } else {
-                readDigits("JSON数字缺少整数部分");
+                readDigits("JSON数字缺少整数部分.");
             }
             if (consume('.'))
-                readDigits("JSON数字缺少小数部分");
+                readDigits("JSON数字缺少小数部分.");
             if (!end() && (peek() == 'e' || peek() == 'E')) {
                 ++this.index;
                 if (!end() && (peek() == '+' || peek() == '-'))
                     ++this.index;
-                readDigits("JSON数字缺少指数部分");
+                readDigits("JSON数字缺少指数部分.");
             }
             try {
                 return DNumber.valueOf(new BigDecimal(this.json.substring(start, this.index)));
             } catch (NumberFormatException e) {
-                error("JSON数字格式错误");
+                error("JSON数字格式错误.");
                 return DNumber.valueOf(0);
             }
         }
@@ -247,13 +247,13 @@ public class JsonModule extends Module {
                 if (c == '"')
                     return builder.toString();
                 if (c < 0x20)
-                    error("JSON字符串不能包含未转义控制字符");
+                    error("JSON字符串不能包含未转义控制字符.");
                 if (c != '\\') {
                     builder.append(c);
                     continue;
                 }
                 if (end())
-                    error("JSON字符串转义未完成");
+                    error("JSON字符串转义未完成.");
                 char escaped = next();
                 switch (escaped) {
                     case '"':
@@ -280,21 +280,21 @@ public class JsonModule extends Module {
                         builder.append(readUnicode());
                         break;
                     default:
-                        error("JSON字符串转义错误");
+                        error("JSON字符串转义错误.");
                 }
             }
-            error("JSON字符串未闭合");
+            error("JSON字符串未闭合.");
             return "";
         }
 
         private char readUnicode() {
             if (this.index + 4 > this.json.length())
-                error("JSON unicode转义未完成");
+                error("JSON unicode转义未完成.");
             int value = 0;
             for (int i = 0; i < 4; ++i) {
                 int digit = Character.digit(this.json.charAt(this.index++), 16);
                 if (digit < 0)
-                    error("JSON unicode转义包含非法字符");
+                    error("JSON unicode转义包含非法字符.");
                 value = value * 16 + digit;
             }
             return (char) value;
