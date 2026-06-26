@@ -22,6 +22,24 @@ public class BinaryModule extends Module {
 
     @Override
     public void init(Env dEnv) {
+        dEnv.addTokenProcedure("string->binary", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            return DByteUtils.toList(args.get(0).toString().getBytes(StandardCharsets.UTF_8));
+        }, 1, false);
+        dEnv.addTokenProcedure("string->binary", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            if (!(args.get(1) instanceof DString))
+                throw new DevoreCastException(args.get(1).type(), "string");
+            Charset charset;
+            try {
+                charset = Charset.forName(args.get(1).toString());
+            } catch (RuntimeException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1) + ".");
+            }
+            return DByteUtils.toList(args.get(0).toString().getBytes(charset));
+        }, 2, false);
         dEnv.addTokenProcedure("binary->string", (args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
