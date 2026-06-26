@@ -91,6 +91,8 @@ public class Env {
      * @return 环境
      */
     public Env putImportEnv(String key, Env env) {
+        if (this.importEnvs.containsKey(key))
+            throw new DevoreRuntimeException("定义冲突: " + key);
         this.importEnvs.put(key, env);
         return this;
     }
