@@ -439,7 +439,7 @@ public class CoreModule extends DModule {
 
     /**
      * 注册模块加载过程，用于导入并执行外部Devore文件
-     *
+     *a
      * @param dEnv 目标环境
      */
     private void initModuleProcedures(Env dEnv) {
@@ -448,6 +448,8 @@ public class CoreModule extends DModule {
             DToken key = child.symbol;
             if (child.type == Ast.Type.PROCEDURE)
                 key = Evaluator.eval(env, child);
+            if (!(key instanceof DSymbol))
+                throw new DevoreCastException(key.type(), "symbol");
             return key.toString();
         }).collect(Collectors.toList()))), 1, true);
         dEnv.addTokenProcedure("import", ((args, env) -> {
