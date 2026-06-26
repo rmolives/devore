@@ -56,20 +56,24 @@ public class Env {
      * 加载环境
      *
      * @param name 名字
+     * @return 环境
      */
-    public void loadModule(String name) {
+    public Env loadModule(String name) {
         if (!this.modules.containsKey(name))
             throw new DevoreRuntimeException("模块 " + name + " 不存在.");
         loadModule(this.modules.get(name));
+        return this;
     }
 
     /**
      * 加载环境
      *
      * @param module 模块
+     * @return 环境
      */
-    public void loadModule(DModule module) {
+    public Env loadModule(DModule module) {
         module.init(this);
+        return this;
     }
 
     /**
