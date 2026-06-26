@@ -70,6 +70,12 @@ public class ThreadModule extends DModule {
                 throw new DevoreCastException(args.get(0).type(), "thread");
             return DBool.valueOf(((DThread) args.get(0)).toThread().isAlive());
         }, 1, false);
+        dEnv.addTokenProcedure("thread-interrupt!", (args, env) -> {
+            if (!(args.get(0) instanceof DThread))
+                throw new DevoreCastException(args.get(0).type(), "thread");
+            ((DThread) args.get(0)).toThread().interrupt();
+            return DWord.NIL;
+        }, 1, false);
         dEnv.addTokenProcedure("current-thread", (args, env) ->
                 DThread.valueOf(Thread.currentThread()), 0, false);
     }

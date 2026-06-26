@@ -1239,7 +1239,8 @@ public class CoreModule extends DModule {
             try {
                 Thread.sleep(DNumberUtils.toLong((DInt) args.get(0)));
             } catch (InterruptedException e) {
-                throw new DevoreRuntimeException(e.getLocalizedMessage());
+                Thread.currentThread().interrupt();
+                throw new DevoreRuntimeException("线程休眠被中断.");
             }
             return DWord.NIL;
         }), 1, false);
