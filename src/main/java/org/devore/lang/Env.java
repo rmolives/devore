@@ -17,10 +17,11 @@ public class Env {
     // 默认导入
     public static final List<String> defaultModules = new ArrayList<>(Arrays.asList("core"));
 
-    public final Map<String, DToken> table;  // 环境表
-    public final Env father;                 // 父环境
-    public final IOConfig io;                // IO表
-    private final List<Env> requiredEnvs;    // require导入的环境
+    public final Map<String, DToken> table;         // 环境表
+    public Env father;                              // 父环境
+    public final IOConfig io;                       // IO表
+    public final Map<String, Env> importEnvs;       // 导入的环境
+
     // 模块表
     public final Map<String, DModule> modules = Stream.of(
             new AbstractMap.SimpleEntry<>("binary", new BinaryModule()),
@@ -42,12 +43,13 @@ public class Env {
      * @param father 父环境
      * @param io     IO表
      */
-    public Env(Map<String, DToken> table, Env father, IOConfig io) {
+    public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvs, IOConfig io, boolean load) {
         this.table = table;
         this.father = father;
         this.io = io;
-        this.requiredEnvs = new ArrayList<>();
-        defaultModules.forEach(this::loadModule);
+        this.importEnvs = importEnvs;
+        if (load)
+            defaultModules.forEach(this::loadModule);
     }
 
     /**
@@ -82,16 +84,38 @@ public class Env {
     }
 
     /**
-     * 添加require导入的环境，作为符号查找的后备环境
+     * 添加import导入的环境
      *
+     * @param key key
      * @param env 环境
      * @return 环境
      */
-    public Env addRequiredEnv(Env env) {
-        this.requiredEnvs.add(env);
+    public Env putImportEnv(String key, Env env) {
+        this.importEnvs.put(key, env);
         return this;
     }
 
+    /**
+     * 添加import导入的环境
+     *
+     * @param key key
+     * @return 环境
+     */
+    public Env getImportEnv(String key) {
+        Env temp = this;
+        while (temp != null && !temp.importEnvs.containsKey(key))
+            temp = temp.father;
+        if (temp == null)
+            throw new DevoreRuntimeException("未定义: " + key);
+        return appendFather(temp.importEnvs.get(key), this);
+    }
+
+    public static Env appendFather(Env imported, Env current) {
+        if (imported == null)
+            return current;
+        return new Env(imported.table, appendFather(imported.father, current),
+                imported.importEnvs, imported.io, false);
+    }
 
     /**
      * 创建环境
@@ -99,7 +123,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv() {
-        return new Env(new HashMap<>(), null, new IOConfig());
+        return new Env(new HashMap<>(), null, new HashMap<>(), new IOConfig(), true);
     }
 
     /**
@@ -110,7 +134,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv(Env father, IOConfig io) {
-        return new Env(new HashMap<>(), father, io);
+        return new Env(new HashMap<>(), father, new HashMap<>(), io, true);
     }
 
     /**
@@ -120,7 +144,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv(IOConfig io) {
-        return new Env(new HashMap<>(), null, io);
+        return new Env(new HashMap<>(), null, new HashMap<>(), io, true);
     }
 
     /**
@@ -299,7 +323,23 @@ public class Env {
      * @return 结果
      */
     public boolean contains(String key) {
-        return findVisibleEnv(key, new HashSet<>()) != null;
+        Env temp = this;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
+        return temp.table.containsKey(key);
+    }
+
+    /**
+     * 查看环境是否包含特定import key
+     *
+     * @param key key
+     * @return 结果
+     */
+    public boolean containsImport(String key) {
+        Env temp = this;
+        while (temp.father != null && !temp.importEnvs.containsKey(key))
+            temp = temp.father;
+        return temp.importEnvs.containsKey(key);
     }
 
     /**
@@ -309,8 +349,12 @@ public class Env {
      * @return value
      */
     public DToken get(String key) {
-        Env temp = findVisibleEnv(key, new HashSet<>());
-        return temp != null ? temp.table.get(key) : DWord.NIL;
+        Env temp = this;
+        while (temp.father != null && !temp.table.containsKey(key))
+            temp = temp.father;
+        if (!temp.table.containsKey(key))
+            throw new DevoreRuntimeException("未定义: " + key);
+        return temp.table.get(key);
     }
 
     /**
@@ -340,31 +384,5 @@ public class Env {
      */
     public Env createChild() {
         return newEnv(this, this.io);
-    }
-
-    private Env findVisibleEnv(String key, Set<Env> visited) {
-        if (!visited.add(this))
-            return null;
-        Env temp = findLexicalEnv(key);
-        if (temp != null)
-            return temp;
-        for (Env scope = this; scope != null; scope = scope.father) {
-            for (Env requiredEnv : scope.requiredEnvs) {
-                temp = requiredEnv.findVisibleEnv(key, visited);
-                if (temp != null)
-                    return temp;
-            }
-        }
-        return null;
-    }
-
-    private Env findLexicalEnv(String key) {
-        Env temp = this;
-        while (temp != null) {
-            if (temp.table.containsKey(key))
-                return temp;
-            temp = temp.father;
-        }
-        return null;
     }
 }

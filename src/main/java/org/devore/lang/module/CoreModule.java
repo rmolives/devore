@@ -465,10 +465,8 @@ public class CoreModule extends DModule {
                         Env inEnv = Env.newEnv();
                         DToken temp = Devore.call(inEnv,
                                 new String(Files.readAllBytes(path), StandardCharsets.UTF_8), file);
-                        if (!(temp instanceof DExport))
-                            throw new DevoreCastException(name.type(), "export");
-                        env.addRequiredEnv(inEnv);
-                        ((DExport) temp).keys.forEach(key -> env.put(key, inEnv.get(key)));
+                        if (temp instanceof DExport)
+                            ((DExport) temp).keys.forEach(key -> env.putImportEnv(key, inEnv));
                     } catch (IOException e) {
                         throw new DevoreRuntimeException("读取文件失败: " + file + ", " + e.getMessage());
                     }

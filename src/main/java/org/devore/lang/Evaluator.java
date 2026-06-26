@@ -23,13 +23,17 @@ public class Evaluator {
         try {
             if (node.symbol instanceof Ast)
                 node.symbol = eval(env, ((Ast) node.symbol).copy());
-            node.symbol = resolveSymbol(env, node.symbol);
+            Env symbolEnv = env;
+            boolean importedSymbol = env.containsImport(node.symbol.toString());
+            if (importedSymbol)
+                symbolEnv = env.getImportEnv(node.symbol.toString());
+            node.symbol = resolveSymbol(symbolEnv, node.symbol);
             if (node.symbol instanceof DMacro) {
                 DMacro macro = (DMacro) node.symbol;
                 List<Ast> bodies = macro.expand(node.children);
                 DToken result = DWord.NIL;
                 for (Ast temp : bodies)
-                    result = eval(env, temp);
+                    result = eval(symbolEnv, temp);
                 return result;
             }
             if (node.isEmpty() && node.type != Ast.Type.PROCEDURE)
@@ -42,10 +46,10 @@ public class Evaluator {
             }
             if (node.symbol instanceof DProcedure) {
                 DProcedure procedure = (DProcedure) node.symbol;
-                node.symbol = procedure.call(node, env);
+                node.symbol = procedure.call(node, importedSymbol ? env : symbolEnv);
                 node.clear();
             }
-            return resolveSymbol(env, node.symbol);
+            return resolveSymbol(symbolEnv, node.symbol);
         } catch (StackOverflowError e) {
             throw new DevoreRuntimeException("栈溢出，可能存在无限递归或递归宏展开.",
                     expression, index, node.source, node.code);
@@ -64,8 +68,9 @@ public class Evaluator {
      * @return 解析结果
      */
     private static DToken resolveSymbol(Env env, DToken token) {
-        while (token instanceof DSymbol && env.contains(token.toString()))
-            token = env.get(token.toString());
-        return token;
+        DToken temp = token;
+        while (temp instanceof DSymbol && env.contains(temp.toString()))
+            temp = env.get(temp.toString());
+        return temp;
     }
 }
