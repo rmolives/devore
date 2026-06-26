@@ -450,7 +450,7 @@ public class CoreModule extends DModule {
                 key = Evaluator.eval(env, child);
             return key.toString();
         }).collect(Collectors.toList()))), 1, true);
-        dEnv.addTokenProcedure("require", ((args, env) -> {
+        dEnv.addTokenProcedure("import", ((args, env) -> {
             args.forEach(name -> {
                 if (env.modules.containsKey(name.toString()))
                     env.loadModule(name.toString());
