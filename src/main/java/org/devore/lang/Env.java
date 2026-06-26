@@ -17,10 +17,10 @@ public class Env {
     // 默认导入
     public static final List<String> defaultModules = new ArrayList<>(Arrays.asList("core"));
 
-    public final Map<String, DToken> table;         // 环境表
-    public Env father;                              // 父环境
-    public final IOConfig io;                       // IO表
-    public final Map<String, Env> importEnvs;       // 导入的环境
+    public final Map<String, DToken> table;             // 环境表
+    public Env father;                                  // 父环境
+    public final IOConfig io;                           // IO表
+    public final Map<String, Env> importEnvTable;       // 导入的环境
 
     // 模块表
     public final Map<String, DModule> modules = Stream.of(
@@ -43,11 +43,11 @@ public class Env {
      * @param father 父环境
      * @param io     IO表
      */
-    public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvs, IOConfig io, boolean load) {
+    public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvTable, IOConfig io, boolean load) {
         this.table = table;
         this.father = father;
         this.io = io;
-        this.importEnvs = importEnvs;
+        this.importEnvTable = importEnvTable;
         if (load)
             defaultModules.forEach(this::loadModule);
     }
@@ -91,9 +91,9 @@ public class Env {
      * @return 环境
      */
     public Env putImportEnv(String key, Env env) {
-        if (this.importEnvs.containsKey(key))
+        if (this.importEnvTable.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
-        this.importEnvs.put(key, env);
+        this.importEnvTable.put(key, env);
         return this;
     }
 
@@ -105,18 +105,18 @@ public class Env {
      */
     public Env getImportEnv(String key) {
         Env temp = this;
-        while (temp != null && !temp.importEnvs.containsKey(key))
+        while (temp != null && !temp.importEnvTable.containsKey(key))
             temp = temp.father;
         if (temp == null)
             throw new DevoreRuntimeException("未定义: " + key);
-        return appendFather(temp.importEnvs.get(key), this);
+        return appendFather(temp.importEnvTable.get(key), this);
     }
 
     private static Env appendFather(Env imported, Env current) {
         if (imported == null)
             return current;
         return new Env(imported.table, appendFather(imported.father, current),
-                imported.importEnvs, imported.io, false);
+                imported.importEnvTable, imported.io, false);
     }
 
     /**
@@ -339,9 +339,9 @@ public class Env {
      */
     public boolean containsImport(String key) {
         Env temp = this;
-        while (temp.father != null && !temp.importEnvs.containsKey(key))
+        while (temp.father != null && !temp.importEnvTable.containsKey(key))
             temp = temp.father;
-        return temp.importEnvs.containsKey(key);
+        return temp.importEnvTable.containsKey(key);
     }
 
     /**
