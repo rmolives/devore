@@ -40,10 +40,13 @@ public class ThreadModule extends DModule {
                     .orElse(DWord.NIL));
         }, 1, true);
         dEnv.addTokenProcedure("thread-start", (args, env) -> {
-            if (!(args.get(0) instanceof DThread))
-                throw new DevoreCastException(args.get(0).type(), "thread");
-            return ((DThread) args.get(0)).start();
-        }, 1, false);
+            for (DToken arg : args) {
+                if (!(arg instanceof DThread))
+                    throw new DevoreCastException(arg.type(), "thread");
+                ((DThread) arg).start();
+            }
+            return DWord.NIL;
+        }, 1, true);
         dEnv.addTokenProcedure("join", (args, env) -> {
             if (!(args.get(0) instanceof DThread))
                 throw new DevoreCastException(args.get(0).type(), "thread");

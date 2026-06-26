@@ -36,13 +36,12 @@ public class DThread extends DToken {
         return new DThread(thread, result, error);
     }
 
-    public DThread start() {
+    public void start() {
         try {
             this.thread.start();
         } catch (IllegalThreadStateException e) {
             throw new DevoreRuntimeException("线程已经启动.");
         }
-        return this;
     }
 
     public Thread toThread() {
