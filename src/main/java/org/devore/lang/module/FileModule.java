@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 文件操作
@@ -187,6 +189,23 @@ public class FileModule extends DModule {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DString.valueOf(Paths.get(args.get(0).toString()).toAbsolutePath().toString());
+        }, 1, false);
+        dEnv.addTokenProcedure("file-list", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            Path path = Paths.get(args.get(0).toString());
+            if (!Files.exists(path))
+                throw new DevoreRuntimeException("目录不存在: " + path);
+            if (!Files.isDirectory(path))
+                throw new DevoreRuntimeException("不是目录: " + path);
+            try (Stream<Path> stream = Files.list(path)) {
+                return DList.valueOf(
+                        stream.map(p -> DString.valueOf(p.getFileName().toString()))
+                                .collect(Collectors.toList())
+                );
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("读取文件列表失败: " + path + ", " + e.getMessage());
+            }
         }, 1, false);
         dEnv.addTokenProcedure("file-size", (args, env) -> {
             if (!(args.get(0) instanceof DString))
