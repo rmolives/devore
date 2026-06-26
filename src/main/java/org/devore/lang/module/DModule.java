@@ -2,10 +2,10 @@ package org.devore.lang.module;
 
 import org.devore.lang.Env;
 
-public abstract class Module {
+public abstract class DModule {
     public final String name;
 
-    public Module(String name) {
+    public DModule(String name) {
         this.name = name;
     }
 

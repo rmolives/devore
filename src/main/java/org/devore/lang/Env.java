@@ -22,7 +22,7 @@ public class Env {
     public final IOConfig io;                // IO表
     private final List<Env> requiredEnvs;    // require导入的环境
     // 模块表
-    public final Map<String, Module> modules = Stream.of(
+    public final Map<String, DModule> modules = Stream.of(
             new AbstractMap.SimpleEntry<>("binary", new BinaryModule()),
             new AbstractMap.SimpleEntry<>("core", new CoreModule()),
             new AbstractMap.SimpleEntry<>("file", new FileModule()),
@@ -66,7 +66,7 @@ public class Env {
      *
      * @param module 模块
      */
-    public void loadModule(Module module) {
+    public void loadModule(DModule module) {
         module.init(this);
     }
 
@@ -76,7 +76,7 @@ public class Env {
      * @param module 环境
      * @return 环境
      */
-    public Env addModule(Module module) {
+    public Env addModule(DModule module) {
         this.modules.put(module.name, module);
         return this;
     }

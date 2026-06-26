@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 /**
  * 二进制数据
  */
-public class BinaryModule extends Module {
+public class BinaryModule extends DModule {
     public BinaryModule() {
         super("binary");
     }

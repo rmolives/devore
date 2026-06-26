@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 /**
  * 核心
  */
-public class CoreModule extends Module {
+public class CoreModule extends DModule {
     public CoreModule() {
         super("core");
     }
@@ -443,8 +443,8 @@ public class CoreModule extends Module {
      * @param dEnv 目标环境
      */
     private void initModuleProcedures(Env dEnv) {
-        dEnv.addAstProcedure("module", ((ast, env) ->
-                DModule.valueOf(ast.children.stream().map(child -> {
+        dEnv.addAstProcedure("export", ((ast, env) ->
+                DExport.valueOf(ast.children.stream().map(child -> {
             DToken key = child.symbol;
             if (child.type == Ast.Type.PROCEDURE)
                 key = Evaluator.eval(env, child);
@@ -465,10 +465,10 @@ public class CoreModule extends Module {
                         Env inEnv = Env.newEnv();
                         DToken temp = Devore.call(inEnv,
                                 new String(Files.readAllBytes(path), StandardCharsets.UTF_8), file);
-                        if (!(temp instanceof DModule))
-                            throw new DevoreCastException(name.type(), "module");
+                        if (!(temp instanceof DExport))
+                            throw new DevoreCastException(name.type(), "export");
                         env.addRequiredEnv(inEnv);
-                        ((DModule) temp).keys.forEach(key -> env.put(key, inEnv.get(key)));
+                        ((DExport) temp).keys.forEach(key -> env.put(key, inEnv.get(key)));
                     } catch (IOException e) {
                         throw new DevoreRuntimeException("读取文件失败: " + file + ", " + e.getMessage());
                     }
@@ -1361,8 +1361,8 @@ public class CoreModule extends Module {
                 throw new DevoreCastException(token.type(), "symbol");
             return DBool.valueOf(env.contains(token.toString()));
         }), 1, false);
-        dEnv.addTokenProcedure("module?", ((args, env) ->
-                DBool.valueOf(args.get(0) instanceof DModule)), 1, false);
+        dEnv.addTokenProcedure("export?", ((args, env) ->
+                DBool.valueOf(args.get(0) instanceof DExport)), 1, false);
         dEnv.addTokenProcedure("number?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DNumber)), 1, false);
         dEnv.addTokenProcedure("procedure?", ((args, env) ->

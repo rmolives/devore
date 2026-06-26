@@ -17,7 +17,7 @@ import java.nio.file.StandardOpenOption;
 /**
  * 文件操作
  */
-public class FileModule extends Module {
+public class FileModule extends DModule {
     public FileModule() {
         super("file");
     }

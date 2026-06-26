@@ -3,7 +3,7 @@ package org.devore;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
-import org.devore.lang.module.Module;
+import org.devore.lang.module.DModule;
 import org.devore.lang.token.DToken;
 import org.devore.lang.token.DWord;
 import org.devore.parser.Lexer;
@@ -47,7 +47,7 @@ public class Devore {
      * @param modules 模块
      * @return 环境
      */
-    public static Env newEnv(Module... modules) {
+    public static Env newEnv(DModule... modules) {
         Env env = newEnv();
         Arrays.stream(modules).forEach(env::loadModule);
         return env;

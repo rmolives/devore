@@ -4,25 +4,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-public class DModule extends DToken {
+public class DExport extends DToken {
     public final List<String> keys;
 
-    public DModule(List<String> keys) {
+    public DExport(List<String> keys) {
         this.keys = keys;
     }
 
-    public static DModule valueOf(List<String> keys) {
-        return new DModule(keys);
+    public static DExport valueOf(List<String> keys) {
+        return new DExport(keys);
     }
 
     @Override
     public String type() {
-        return "module";
+        return "export";
     }
 
     @Override
     protected String str() {
-        return "<module>";
+        return "<export>";
     }
 
     public int size() {
@@ -31,9 +31,9 @@ public class DModule extends DToken {
 
     @Override
     public int compareTo(DToken t) {
-        if (!(t instanceof DModule))
+        if (!(t instanceof DExport))
             return -1;
-        DModule other = (DModule) t;
+        DExport other = (DExport) t;
         if (other.size() != this.size())
             return -1;
         return IntStream.range(0, this.size())

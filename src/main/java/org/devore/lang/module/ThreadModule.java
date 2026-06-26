@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 /**
  * 线程和锁
  */
-public class ThreadModule extends Module {
+public class ThreadModule extends DModule {
     public ThreadModule() {
         super("thread");
     }

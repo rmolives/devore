@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * HTTP请求
  */
-public class HttpModule extends Module {
+public class HttpModule extends DModule {
     public HttpModule() {
         super("http");
     }

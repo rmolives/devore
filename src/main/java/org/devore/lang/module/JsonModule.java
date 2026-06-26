@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * JSON处理
  */
-public class JsonModule extends Module {
+public class JsonModule extends DModule {
     public JsonModule() {
         super("json");
     }
