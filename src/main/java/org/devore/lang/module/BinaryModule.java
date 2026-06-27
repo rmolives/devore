@@ -5,9 +5,11 @@ import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
+import org.devore.utils.DNumberUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,6 +24,16 @@ public class BinaryModule extends DModule {
 
     @Override
     public void init(Env dEnv) {
+        dEnv.addTokenProcedure("random-binary", (args, env) -> {
+            if (!(args.get(0) instanceof DInt))
+                throw new DevoreCastException(args.get(0).type(), "int");
+            int size = DNumberUtils.toInt((DInt) args.get(0));
+            if (size < 0)
+                throw new DevoreRuntimeException("随机字节长度不能为负数: " + size);
+            byte[] bytes = new byte[size];
+            new SecureRandom().nextBytes(bytes);
+            return DByteUtils.toList(bytes);
+        }, 1, false);
         dEnv.addTokenProcedure("string->binary", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");

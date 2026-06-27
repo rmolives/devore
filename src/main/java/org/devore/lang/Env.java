@@ -24,10 +24,13 @@ public class Env {
     // 模块表
     public final Map<String, DModule> modules = Stream.of(
             new AbstractMap.SimpleEntry<>("binary", new BinaryModule()),
+            new AbstractMap.SimpleEntry<>("base64", new Base64Module()),
             new AbstractMap.SimpleEntry<>("core", new CoreModule()),
             new AbstractMap.SimpleEntry<>("file", new FileModule()),
+            new AbstractMap.SimpleEntry<>("crypto", new CryptoModule()),
             new AbstractMap.SimpleEntry<>("http", new HttpModule()),
             new AbstractMap.SimpleEntry<>("json", new JsonModule()),
+            new AbstractMap.SimpleEntry<>("sign", new SignModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
             new AbstractMap.SimpleEntry<>("hash", new HashModule())
     ).collect(Collectors.toMap(
