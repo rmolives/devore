@@ -24,7 +24,7 @@
 
 ### 基础
 
-* [普通过程](Base.md)
+* [普通过程](Ordinary.md)
 * [类型](Type.md)
 * [模块](Module.md)
 
