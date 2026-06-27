@@ -90,7 +90,7 @@ public class Env {
      * @param env 环境
      */
     public void putImportEnv(String key, Env env) {
-        if (this.importEnvTable.containsKey(key))
+        if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
         this.importEnvTable.put(key, env);
     }
@@ -191,7 +191,7 @@ public class Env {
      * @param value value
      */
     public void put(String key, DToken value) {
-        if (this.table.containsKey(key))
+        if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
         this.table.put(key, value);
     }
