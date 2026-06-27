@@ -7,7 +7,7 @@
 * 作用：把原始字节编码成Base64字符串
 * 参数数量：1
 * 参数作用：原始字节
-* 参数类型：[string|list]
+* 参数类型：\[string|list\]
 * 返回值：Base64
 * 返回类型：string
 * 示例：(base64-encode "abc")

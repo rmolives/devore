@@ -6,8 +6,8 @@
 
 * 作用：MD5
 * 参数数量：1
-* 参数作用：[string|binary]
-* 参数类型：[string|list]
+* 参数作用：\[string|binary\]
+* 参数类型：\[string|list\]
 * 返回值：MD5
 * 返回类型：string
 * 示例：(md5 "abc")
@@ -26,8 +26,8 @@
 
 * 作用：SHA-1
 * 参数数量：1
-* 参数作用：[string|binary]
-* 参数类型：[string|list]
+* 参数作用：\[string|binary\]
+* 参数类型：\[string|list\]
 * 返回值：SHA-1
 * 返回类型：string
 * 示例：(sha1 "abc")
@@ -46,8 +46,8 @@
 
 * 作用：SHA-256
 * 参数数量：1
-* 参数作用：[string|binary]
-* 参数类型：[string|list]
+* 参数作用：\[string|binary\]
+* 参数类型：\[string|list\]
 * 返回值：SHA-256
 * 返回类型：string
 * 示例：(sha256 "abc")
@@ -66,8 +66,8 @@
 
 * 作用：SHA-512
 * 参数数量：1
-* 参数作用：[string|binary]
-* 参数类型：[string|list]
+* 参数作用：\[string|binary\]
+* 参数类型：\[string|list\]
 * 返回值：SHA-512
 * 返回类型：string
 * 示例：(sha512 "abc")

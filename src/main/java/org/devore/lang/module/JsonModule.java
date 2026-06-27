@@ -27,14 +27,21 @@ public class JsonModule extends DModule {
         dEnv.addTokenProcedure("json-read", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
-            return new Parser(args.get(0).toString()).parse();
+            return readJson(args.get(0).toString());
         }, 1, false);
         dEnv.addTokenProcedure("json-write", (args, env) ->
-                DString.valueOf(writeJson(args.get(0),
-                        Collections.newSetFromMap(new IdentityHashMap<>()))), 1, false);
+                DString.valueOf(writeJson(args.get(0))), 1, false);
         dEnv.addTokenProcedure("json?", (args, env) ->
                 DBool.valueOf(isJson(args.get(0),
                         Collections.newSetFromMap(new IdentityHashMap<>()))), 1, false);
+    }
+
+    private static DToken readJson(String json) {
+        return new Parser(json).parse();
+    }
+
+    private static String writeJson(DToken token) {
+        return writeJson(token, Collections.newSetFromMap(new IdentityHashMap<>()));
     }
 
     private static String writeJson(DToken token, Set<DToken> parents) {

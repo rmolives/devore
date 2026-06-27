@@ -26,11 +26,11 @@
 
 * 作用：捕捉运行错误
 * 参数数量：无穷（>= 2）
-* 参数作用：body<\*>、[catch key handler<\*>]
-* 参数类型：token<\*>、[catch symbol token<\*>]
+* 参数作用：body<\*>、\[catch key handler<\*>\]
+* 参数类型：token<\*>、\[catch symbol token<\*>\]
 * 返回值：正常时返回 body 最后一个表达式；报错时返回 handler 最后一个表达式
 * 返回类型：token
-* 示例：(try (/ 1 0) [catch err 0])
+* 示例：(try (/ 1 0) \[catch err 0\])
 
 ### def
 
@@ -392,8 +392,8 @@
 
 * 作用：多条件判断
 * 参数数量：无穷（>= 1）
-* 参数作用：([条件|else] value<\*>)<\*>
-* 参数类型：([bool|symbol]<\*> token<\*>)<\*>
+* 参数作用：(\[条件|else\] value<\*>)<\*>
+* 参数类型：(\[bool|symbol\]<\*> token<\*>)<\*>
 * 返回值：token
 * 返回类型：token
 * 示例：(cond ((>= 1 2) 1) (>= 2 3) 2) (else 4)))
