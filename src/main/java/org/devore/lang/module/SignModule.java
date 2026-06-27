@@ -10,7 +10,7 @@ import org.devore.lang.token.DString;
 import org.devore.lang.token.DToken;
 import org.devore.utils.CryptoUtils;
 import org.devore.utils.DByteUtils;
-import org.devore.utils.DNumberUtils;
+import org.devore.utils.DIntUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -34,7 +34,7 @@ public class SignModule extends DModule {
             dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
                 if (!(args.get(0) instanceof DInt))
                     throw new DevoreCastException(args.get(0).type(), "int");
-                return CryptoUtils.rsaKeyPair(DNumberUtils.toInt((DInt) args.get(0)));
+                return CryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
             }, 1, false);
         dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> ecKeyPair(DEFAULT_EC_CURVE), 0, false);
         dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> {

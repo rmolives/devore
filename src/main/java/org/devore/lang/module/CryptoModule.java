@@ -9,7 +9,7 @@ import org.devore.lang.token.DString;
 import org.devore.lang.token.DToken;
 import org.devore.utils.CryptoUtils;
 import org.devore.utils.DByteUtils;
-import org.devore.utils.DNumberUtils;
+import org.devore.utils.DIntUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -35,7 +35,7 @@ public class CryptoModule extends DModule {
         dEnv.addTokenProcedure("aes-key", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            int bits = DNumberUtils.toInt((DInt) args.get(0));
+            int bits = DIntUtils.toInt((DInt) args.get(0));
             if (bits != 128 && bits != 192 && bits != 256)
                 throw new DevoreRuntimeException("AES密钥长度必须是128、192或256位.");
             try {
@@ -65,7 +65,7 @@ public class CryptoModule extends DModule {
             dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
                 if (!(args.get(0) instanceof DInt))
                     throw new DevoreCastException(args.get(0).type(), "int");
-                return CryptoUtils.rsaKeyPair(DNumberUtils.toInt((DInt) args.get(0)));
+                return CryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
             }, 1, false);
         dEnv.addTokenProcedure("rsa-encrypt", (args, env) ->
                 rsa(args.get(0), args.get(1), DEFAULT_RSA_TRANSFORMATION, Cipher.ENCRYPT_MODE), 2, false);

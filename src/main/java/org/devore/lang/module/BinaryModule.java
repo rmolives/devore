@@ -5,7 +5,7 @@ import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
-import org.devore.utils.DNumberUtils;
+import org.devore.utils.DIntUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +27,7 @@ public class BinaryModule extends DModule {
         dEnv.addTokenProcedure("random-binary", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            int size = DNumberUtils.toInt((DInt) args.get(0));
+            int size = DIntUtils.toInt((DInt) args.get(0));
             if (size < 0)
                 throw new DevoreRuntimeException("随机字节长度不能为负数: " + size);
             byte[] bytes = new byte[size];

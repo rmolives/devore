@@ -8,7 +8,7 @@ import java.math.BigInteger;
 /**
  * DInt工具
  */
-public class DNumberUtils {
+public class DIntUtils {
     private static final BigInteger MIN_INT = BigInteger.valueOf(Integer.MIN_VALUE);
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static final BigInteger MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);

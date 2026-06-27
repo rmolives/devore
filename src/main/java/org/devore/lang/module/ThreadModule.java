@@ -6,7 +6,7 @@ import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.Ast;
-import org.devore.utils.DNumberUtils;
+import org.devore.utils.DIntUtils;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +66,7 @@ public class ThreadModule extends DModule {
                 throw new DevoreCastException(args.get(1).type(), "int");
             DThread thread = (DThread) args.get(0);
             try {
-                thread.toThread().join(DNumberUtils.toLong((DInt) args.get(1)));
+                thread.toThread().join(DIntUtils.toLong((DInt) args.get(1)));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new DevoreRuntimeException("线程等待被中断.");
