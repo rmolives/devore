@@ -6,6 +6,7 @@ import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
 import org.devore.utils.DIntUtils;
+import org.devore.utils.DNetworkUtils;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -14,10 +15,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -39,10 +43,52 @@ public class HttpModule extends DModule {
     public void init(Env dEnv) {
         dEnv.addTokenProcedure("http-server?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DHttpServer), 1, false);
+        dEnv.addTokenProcedure("http-url-encode", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            try {
+                return DString.valueOf(URLEncoder.encode(args.get(0).toString(), StandardCharsets.UTF_8.name()));
+            } catch (UnsupportedEncodingException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + StandardCharsets.UTF_8.name());
+            }
+        }, 1, false);
+        dEnv.addTokenProcedure("http-url-encode", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            String charset = toCharset(args.get(1)).name();
+            try {
+                return DString.valueOf(URLEncoder.encode(args.get(0).toString(), charset));
+            } catch (UnsupportedEncodingException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + charset);
+            }
+        }, 2, false);
+        dEnv.addTokenProcedure("http-url-decode", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            try {
+                return DString.valueOf(URLDecoder.decode(args.get(0).toString(), StandardCharsets.UTF_8.name()));
+            } catch (UnsupportedEncodingException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + StandardCharsets.UTF_8.name());
+            } catch (IllegalArgumentException e) {
+                throw new DevoreRuntimeException("URL解码失败: " + args.get(0));
+            }
+        }, 1, false);
+        dEnv.addTokenProcedure("http-url-decode", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            String charset = toCharset(args.get(1)).name();
+            try {
+                return DString.valueOf(URLDecoder.decode(args.get(0).toString(), charset));
+            } catch (UnsupportedEncodingException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + charset);
+            } catch (IllegalArgumentException e) {
+                throw new DevoreRuntimeException("URL解码失败: " + args.get(0));
+            }
+        }, 2, false);
         dEnv.addTokenProcedure("http-listen", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            int port = toPort((DInt) args.get(0));
+            int port = DNetworkUtils.toPort((DInt) args.get(0));
             try {
                 return openServer(new InetSocketAddress(port));
             } catch (IOException e) {
@@ -55,7 +101,7 @@ public class HttpModule extends DModule {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             String host = args.get(0).toString();
-            int port = toPort((DInt) args.get(1));
+            int port = DNetworkUtils.toPort((DInt) args.get(1));
             try {
                 return openServer(new InetSocketAddress(host, port));
             } catch (IOException e) {
@@ -106,314 +152,245 @@ public class HttpModule extends DModule {
             return DWord.NIL;
         }, 2, false);
         dEnv.addTokenProcedure("http-get", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            URI uri;
+            URI uri = toHttpUri(args.get(0));
             try {
-                uri = new URI(args.get(0).toString());
-            } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
-            }
-            if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
-            try {
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(30000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
-                int status = connection.getResponseCode();
-                InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-                byte[] body = new byte[0];
-                if (input != null) {
-                    try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                        byte[] buffer = new byte[8192];
-                        int n;
-                        while ((n = in.read(buffer)) >= 0)
-                            out.write(buffer, 0, n);
-                        body = out.toByteArray();
-                    }
-                }
-                Map<DToken, DToken> headers = new HashMap<>();
-                for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
-                    if (entry.getKey() != null)
-                        headers.put(DString.valueOf(entry.getKey()),
-                                DString.valueOf(String.join(",", entry.getValue())));
-                }
-                Map<DToken, DToken> result = new HashMap<>();
-                result.put(DString.valueOf("status"), DNumber.valueOf(status));
-                result.put(DString.valueOf("headers"), DTable.valueOf(headers));
-                result.put(DString.valueOf("body"), DByteUtils.toList(body));
-                return DTable.valueOf(result);
+                return toResponseTable(request(uri, "GET", null, null));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
             }
         }, 1, false);
         dEnv.addTokenProcedure("http-get", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
+            URI uri = toHttpUri(args.get(0));
             if (!(args.get(1) instanceof DTable))
                 throw new DevoreCastException(args.get(1).type(), "table");
-            URI uri;
             try {
-                uri = new URI(args.get(0).toString());
-            } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
-            }
-            if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
-            try {
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(30000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
-                DTable requestHeaders = (DTable) args.get(1);
-                for (DToken key : requestHeaders.keys()) {
-                    if (!(key instanceof DString))
-                        throw new DevoreCastException(key.type(), "string");
-                    DToken value = requestHeaders.get(key);
-                    if (!(value instanceof DString))
-                        throw new DevoreCastException(value.type(), "string");
-                    connection.setRequestProperty(key.toString(), value.toString());
-                }
-                int status = connection.getResponseCode();
-                InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-                byte[] body = new byte[0];
-                if (input != null) {
-                    try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                        byte[] buffer = new byte[8192];
-                        int n;
-                        while ((n = in.read(buffer)) >= 0)
-                            out.write(buffer, 0, n);
-                        body = out.toByteArray();
-                    }
-                }
-                Map<DToken, DToken> headers = new HashMap<>();
-                for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet()) {
-                    if (entry.getKey() != null)
-                        headers.put(DString.valueOf(entry.getKey()),
-                                DString.valueOf(String.join(",", entry.getValue())));
-                }
-                Map<DToken, DToken> result = new HashMap<>();
-                result.put(DString.valueOf("status"), DNumber.valueOf(status));
-                result.put(DString.valueOf("headers"), DTable.valueOf(headers));
-                result.put(DString.valueOf("body"), DByteUtils.toList(body));
-                return DTable.valueOf(result);
+                return toResponseTable(request(uri, "GET", (DTable) args.get(1), null));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
             }
         }, 2, false);
         dEnv.addTokenProcedure("http-get-binary", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            URI uri;
+            URI uri = toHttpUri(args.get(0));
             try {
-                uri = new URI(args.get(0).toString());
-            } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
-            }
-            if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
-            try {
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(30000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
-                int status = connection.getResponseCode();
-                InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-                if (input == null)
-                    return DByteUtils.toList(new byte[0]);
-                try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                    byte[] buffer = new byte[8192];
-                    int n;
-                    while ((n = in.read(buffer)) >= 0)
-                        out.write(buffer, 0, n);
-                    return DByteUtils.toList(out.toByteArray());
-                }
+                return DByteUtils.toList(request(uri, "GET", null, null).body);
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
             }
         }, 1, false);
         dEnv.addTokenProcedure("http-get-binary", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
+            URI uri = toHttpUri(args.get(0));
             if (!(args.get(1) instanceof DTable))
                 throw new DevoreCastException(args.get(1).type(), "table");
-            URI uri;
             try {
-                uri = new URI(args.get(0).toString());
-            } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
-            }
-            if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
-            try {
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(30000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
-                DTable requestHeaders = (DTable) args.get(1);
-                for (DToken key : requestHeaders.keys()) {
-                    if (!(key instanceof DString))
-                        throw new DevoreCastException(key.type(), "string");
-                    DToken value = requestHeaders.get(key);
-                    if (!(value instanceof DString))
-                        throw new DevoreCastException(value.type(), "string");
-                    connection.setRequestProperty(key.toString(), value.toString());
-                }
-                int status = connection.getResponseCode();
-                InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-                if (input == null)
-                    return DByteUtils.toList(new byte[0]);
-                try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                    byte[] buffer = new byte[8192];
-                    int n;
-                    while ((n = in.read(buffer)) >= 0)
-                        out.write(buffer, 0, n);
-                    return DByteUtils.toList(out.toByteArray());
-                }
+                return DByteUtils.toList(request(uri, "GET", (DTable) args.get(1), null).body);
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
             }
         }, 2, false);
         dEnv.addTokenProcedure("http-get-string", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            URI uri;
+            URI uri = toHttpUri(args.get(0));
             try {
-                uri = new URI(args.get(0).toString());
-            } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
-            }
-            if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
-            try {
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(30000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
-                int status = connection.getResponseCode();
-                InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-                if (input == null)
-                    return DString.valueOf("");
-                try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                    byte[] buffer = new byte[8192];
-                    int n;
-                    while ((n = in.read(buffer)) >= 0)
-                        out.write(buffer, 0, n);
-                    return DString.valueOf(new String(out.toByteArray(), StandardCharsets.UTF_8));
-                }
+                return DString.valueOf(new String(request(uri, "GET", null, null).body, StandardCharsets.UTF_8));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
             }
         }, 1, false);
         dEnv.addTokenProcedure("http-get-string", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
+            URI uri = toHttpUri(args.get(0));
             if (!(args.get(1) instanceof DTable) && !(args.get(1) instanceof DString))
                 throw new DevoreCastException(args.get(1).type(), "table|string");
-            URI uri;
             try {
-                uri = new URI(args.get(0).toString());
-            } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
-            }
-            if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
-            try {
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(30000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
                 Charset charset = StandardCharsets.UTF_8;
+                DTable headers = null;
                 if (args.get(1) instanceof DTable) {
-                    DTable requestHeaders = (DTable) args.get(1);
-                    for (DToken key : requestHeaders.keys()) {
-                        if (!(key instanceof DString))
-                            throw new DevoreCastException(key.type(), "string");
-                        DToken value = requestHeaders.get(key);
-                        if (!(value instanceof DString))
-                            throw new DevoreCastException(value.type(), "string");
-                        connection.setRequestProperty(key.toString(), value.toString());
-                    }
+                    headers = (DTable) args.get(1);
                 } else {
-                    try {
-                        charset = Charset.forName(args.get(1).toString());
-                    } catch (RuntimeException e) {
-                        throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
-                    }
+                    charset = toCharset(args.get(1));
                 }
-                int status = connection.getResponseCode();
-                InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-                if (input == null)
-                    return DString.valueOf("");
-                try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                    byte[] buffer = new byte[8192];
-                    int n;
-                    while ((n = in.read(buffer)) >= 0)
-                        out.write(buffer, 0, n);
-                    return DString.valueOf(new String(out.toByteArray(), charset));
-                }
+                return DString.valueOf(new String(request(uri, "GET", headers, null).body, charset));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
             }
         }, 2, false);
         dEnv.addTokenProcedure("http-get-string", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
+            URI uri = toHttpUri(args.get(0));
             if (!(args.get(1) instanceof DTable))
                 throw new DevoreCastException(args.get(1).type(), "table");
-            if (!(args.get(2) instanceof DTable))
+            if (!(args.get(2) instanceof DString))
                 throw new DevoreCastException(args.get(2).type(), "string");
-            URI uri;
             try {
-                uri = new URI(args.get(0).toString());
-            } catch (URISyntaxException e) {
-                throw new DevoreRuntimeException("URL格式错误: " + args.get(0));
-            }
-            if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
-                throw new DevoreRuntimeException("URL协议必须是http或https: " + args.get(0));
-            try {
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-                connection.setRequestMethod("GET");
-                connection.setConnectTimeout(30000);
-                connection.setReadTimeout(30000);
-                connection.setInstanceFollowRedirects(true);
-                DTable requestHeaders = (DTable) args.get(1);
-                for (DToken key : requestHeaders.keys()) {
-                    if (!(key instanceof DString))
-                        throw new DevoreCastException(key.type(), "string");
-                    DToken value = requestHeaders.get(key);
-                    if (!(value instanceof DString))
-                        throw new DevoreCastException(value.type(), "string");
-                    connection.setRequestProperty(key.toString(), value.toString());
-                }
-                Charset charset;
-                try {
-                    charset = Charset.forName(args.get(2).toString());
-                } catch (RuntimeException e) {
-                    throw new DevoreRuntimeException("字符集不存在: " + args.get(2));
-                }
-                int status = connection.getResponseCode();
-                InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
-                if (input == null)
-                    return DString.valueOf("");
-                try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                    byte[] buffer = new byte[8192];
-                    int n;
-                    while ((n = in.read(buffer)) >= 0)
-                        out.write(buffer, 0, n);
-                    return DString.valueOf(new String(out.toByteArray(), charset));
-                }
+                return DString.valueOf(new String(request(uri, "GET", (DTable) args.get(1), null).body,
+                        toCharset(args.get(2))));
             } catch (IOException e) {
                 throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
             }
         }, 3, false);
+        dEnv.addTokenProcedure("http-post", (args, env) -> {
+            URI uri = toHttpUri(args.get(0));
+            try {
+                return toResponseTable(request(uri, "POST", null, toRequestBody(args.get(1))));
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
+            }
+        }, 2, false);
+        dEnv.addTokenProcedure("http-post", (args, env) -> {
+            URI uri = toHttpUri(args.get(0));
+            if (!(args.get(1) instanceof DTable))
+                throw new DevoreCastException(args.get(1).type(), "table");
+            try {
+                return toResponseTable(request(uri, "POST", (DTable) args.get(1), toRequestBody(args.get(2))));
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
+            }
+        }, 3, false);
+        dEnv.addTokenProcedure("http-post-binary", (args, env) -> {
+            URI uri = toHttpUri(args.get(0));
+            try {
+                return DByteUtils.toList(request(uri, "POST", null, toRequestBody(args.get(1))).body);
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
+            }
+        }, 2, false);
+        dEnv.addTokenProcedure("http-post-binary", (args, env) -> {
+            URI uri = toHttpUri(args.get(0));
+            if (!(args.get(1) instanceof DTable))
+                throw new DevoreCastException(args.get(1).type(), "table");
+            try {
+                return DByteUtils.toList(request(uri, "POST", (DTable) args.get(1), toRequestBody(args.get(2))).body);
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
+            }
+        }, 3, false);
+        dEnv.addTokenProcedure("http-post-string", (args, env) -> {
+            URI uri = toHttpUri(args.get(0));
+            try {
+                return DString.valueOf(new String(request(uri, "POST", null, toRequestBody(args.get(1))).body,
+                        StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
+            }
+        }, 2, false);
+        dEnv.addTokenProcedure("http-post-string", (args, env) -> {
+            URI uri = toHttpUri(args.get(0));
+            try {
+                if (args.get(1) instanceof DTable) {
+                    return DString.valueOf(new String(request(uri, "POST", (DTable) args.get(1),
+                            toRequestBody(args.get(2))).body, StandardCharsets.UTF_8));
+                }
+                if (!(args.get(2) instanceof DString))
+                    throw new DevoreCastException(args.get(2).type(), "string");
+                return DString.valueOf(new String(request(uri, "POST", null, toRequestBody(args.get(1))).body,
+                        toCharset(args.get(2))));
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
+            }
+        }, 3, false);
+        dEnv.addTokenProcedure("http-post-string", (args, env) -> {
+            URI uri = toHttpUri(args.get(0));
+            if (!(args.get(1) instanceof DTable))
+                throw new DevoreCastException(args.get(1).type(), "table");
+            try {
+                return DString.valueOf(new String(request(uri, "POST", (DTable) args.get(1),
+                        toRequestBody(args.get(2))).body, toCharset(args.get(3))));
+            } catch (IOException e) {
+                throw new DevoreRuntimeException("HTTP请求失败: " + uri + ", " + e.getMessage());
+            }
+        }, 4, false);
+    }
+
+    private static URI toHttpUri(DToken token) {
+        if (!(token instanceof DString))
+            throw new DevoreCastException(token.type(), "string");
+        URI uri;
+        try {
+            uri = new URI(token.toString());
+        } catch (URISyntaxException e) {
+            throw new DevoreRuntimeException("URL格式错误: " + token);
+        }
+        if (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))
+            throw new DevoreRuntimeException("URL协议必须是http或https: " + token);
+        return uri;
+    }
+
+    private static Response request(URI uri, String method, DTable headers, byte[] requestBody) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        connection.setRequestMethod(method);
+        connection.setConnectTimeout(30000);
+        connection.setReadTimeout(30000);
+        connection.setInstanceFollowRedirects(true);
+        if (headers != null)
+            setRequestHeaders(connection, headers);
+        if (requestBody != null) {
+            connection.setDoOutput(true);
+            connection.setFixedLengthStreamingMode(requestBody.length);
+            try (OutputStream output = connection.getOutputStream()) {
+                output.write(requestBody);
+            }
+        }
+        int status = connection.getResponseCode();
+        InputStream input = status >= 400 ? connection.getErrorStream() : connection.getInputStream();
+        byte[] body = input == null ? new byte[0] : readAll(input);
+        return new Response(status, headersToTable(connection.getHeaderFields()), body);
+    }
+
+    private static void setRequestHeaders(HttpURLConnection connection, DTable headers) {
+        for (DToken key : headers.keys()) {
+            if (!(key instanceof DString))
+                throw new DevoreCastException(key.type(), "string");
+            DToken value = headers.get(key);
+            if (!(value instanceof DString))
+                throw new DevoreCastException(value.type(), "string");
+            connection.setRequestProperty(key.toString(), value.toString());
+        }
+    }
+
+    private static byte[] toRequestBody(DToken body) {
+        if (body == DWord.NIL)
+            return new byte[0];
+        if (body instanceof DList)
+            return DByteUtils.toBytes((DList) body);
+        if (body instanceof DString)
+            return body.toString().getBytes(StandardCharsets.UTF_8);
+        throw new DevoreCastException(body.type(), "string|list");
+    }
+
+    private static Charset toCharset(DToken token) {
+        if (!(token instanceof DString))
+            throw new DevoreCastException(token.type(), "string");
+        try {
+            return Charset.forName(token.toString());
+        } catch (RuntimeException e) {
+            throw new DevoreRuntimeException("字符集不存在: " + token);
+        }
+    }
+
+    private static Map<DToken, DToken> headersToTable(Map<String, List<String>> fields) {
+        Map<DToken, DToken> headers = new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : fields.entrySet()) {
+            if (entry.getKey() != null)
+                headers.put(DString.valueOf(entry.getKey()), DString.valueOf(String.join(",", entry.getValue())));
+        }
+        return headers;
+    }
+
+    private static DTable toResponseTable(Response response) {
+        Map<DToken, DToken> result = new HashMap<>();
+        result.put(DString.valueOf("status"), DNumber.valueOf(response.status));
+        result.put(DString.valueOf("headers"), DTable.valueOf(response.headers));
+        result.put(DString.valueOf("body"), DByteUtils.toList(response.body));
+        return DTable.valueOf(result);
+    }
+
+    private static class Response {
+        private final int status;
+        private final Map<DToken, DToken> headers;
+        private final byte[] body;
+
+        private Response(int status, Map<DToken, DToken> headers, byte[] body) {
+            this.status = status;
+            this.headers = headers;
+            this.body = body;
+        }
     }
 
     private static DHttpServer openServer(InetSocketAddress address) throws IOException {
@@ -443,13 +420,34 @@ public class HttpModule extends DModule {
         Map<DToken, DToken> request = new HashMap<>();
         request.put(DString.valueOf("method"), DString.valueOf(exchange.getRequestMethod()));
         request.put(DString.valueOf("path"), DString.valueOf(exchange.getRequestURI().getPath()));
-        request.put(DString.valueOf("query"), DString.valueOf(
-                exchange.getRequestURI().getRawQuery() == null ? "" : exchange.getRequestURI().getRawQuery()));
+        request.put(DString.valueOf("query"), queryToTable(exchange.getRequestURI().getRawQuery()));
         request.put(DString.valueOf("headers"), toTable(exchange.getRequestHeaders()));
         request.put(DString.valueOf("body"), DByteUtils.toList(readAll(exchange.getRequestBody())));
         request.put(DString.valueOf("remote-host"), DString.valueOf(exchange.getRemoteAddress().getHostString()));
         request.put(DString.valueOf("remote-port"), DNumber.valueOf(exchange.getRemoteAddress().getPort()));
         return DTable.valueOf(request);
+    }
+
+    private static DTable queryToTable(String rawQuery) {
+        Map<DToken, DToken> query = new HashMap<>();
+        if (rawQuery == null || rawQuery.isEmpty())
+            return DTable.valueOf(query);
+        for (String pair : rawQuery.split("&", -1)) {
+            if (pair.isEmpty())
+                continue;
+            int index = pair.indexOf('=');
+            String key = index < 0 ? pair : pair.substring(0, index);
+            String value = index < 0 ? "" : pair.substring(index + 1);
+            try {
+                query.put(DString.valueOf(URLDecoder.decode(key, StandardCharsets.UTF_8.name())),
+                        DString.valueOf(URLDecoder.decode(value, StandardCharsets.UTF_8.name())));
+            } catch (UnsupportedEncodingException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + StandardCharsets.UTF_8.name());
+            } catch (IllegalArgumentException e) {
+                throw new DevoreRuntimeException("HTTP query格式错误: " + rawQuery);
+            }
+        }
+        return DTable.valueOf(query);
     }
 
     private static DTable toTable(Headers headers) {
@@ -517,13 +515,6 @@ public class HttpModule extends DModule {
                 out.write(buffer, 0, n);
             return out.toByteArray();
         }
-    }
-
-    private static int toPort(DInt value) {
-        int port = DIntUtils.toInt(value);
-        if (port < 0 || port > 65535)
-            throw new DevoreRuntimeException("端口范围必须是0-65535: " + port);
-        return port;
     }
 
     private static String message(Throwable e) {

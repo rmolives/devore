@@ -5,7 +5,7 @@ import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
-import org.devore.utils.DIntUtils;
+import org.devore.utils.DNetworkUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ public class TCPModule extends DModule {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             String host = args.get(0).toString();
-            int port = toPort((DInt) args.get(1));
+            int port = DNetworkUtils.toPort((DInt) args.get(1));
             try {
                 return DTCPSocket.valueOf(new Socket(host, port));
             } catch (IOException e) {
@@ -50,8 +50,8 @@ public class TCPModule extends DModule {
             if (!(args.get(2) instanceof DInt))
                 throw new DevoreCastException(args.get(2).type(), "int");
             String host = args.get(0).toString();
-            int port = toPort((DInt) args.get(1));
-            int timeout = toTimeout((DInt) args.get(2));
+            int port = DNetworkUtils.toPort((DInt) args.get(1));
+            int timeout = DNetworkUtils.toTimeout((DInt) args.get(2));
             try {
                 Socket socket = new Socket();
                 socket.connect(new InetSocketAddress(host, port), timeout);
@@ -63,7 +63,7 @@ public class TCPModule extends DModule {
         dEnv.addTokenProcedure("tcp-listen", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            int port = toPort((DInt) args.get(0));
+            int port = DNetworkUtils.toPort((DInt) args.get(0));
             try {
                 return DTCPServer.valueOf(new ServerSocket(port));
             } catch (IOException e) {
@@ -76,7 +76,7 @@ public class TCPModule extends DModule {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             String host = args.get(0).toString();
-            int port = toPort((DInt) args.get(1));
+            int port = DNetworkUtils.toPort((DInt) args.get(1));
             try {
                 ServerSocket serverSocket = new ServerSocket();
                 serverSocket.bind(new InetSocketAddress(host, port));
@@ -101,7 +101,7 @@ public class TCPModule extends DModule {
                 throw new DevoreCastException(args.get(0).type(), "tcp-socket");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            int size = toPositiveSize((DInt) args.get(1));
+            int size = DNetworkUtils.toPositiveSize((DInt) args.get(1));
             byte[] buffer = new byte[size];
             try {
                 InputStream input = ((DTCPSocket) args.get(0)).toSocket().getInputStream();
@@ -136,7 +136,7 @@ public class TCPModule extends DModule {
                 throw new DevoreCastException(args.get(0).type(), "tcp-socket");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            int timeout = toTimeout((DInt) args.get(1));
+            int timeout = DNetworkUtils.toTimeout((DInt) args.get(1));
             try {
                 ((DTCPSocket) args.get(0)).toSocket().setSoTimeout(timeout);
                 return DWord.NIL;
@@ -150,7 +150,7 @@ public class TCPModule extends DModule {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             try {
-                ((DTCPServer) args.get(0)).toServerSocket().setSoTimeout(toTimeout((DInt) args.get(1)));
+                ((DTCPServer) args.get(0)).toServerSocket().setSoTimeout(DNetworkUtils.toTimeout((DInt) args.get(1)));
                 return DWord.NIL;
             } catch (IOException e) {
                 throw new DevoreRuntimeException("设置TCP服务端超时失败: " + e.getMessage());
@@ -169,24 +169,4 @@ public class TCPModule extends DModule {
         }, 1, false);
     }
 
-    private static int toPort(DInt value) {
-        int port = DIntUtils.toInt(value);
-        if (port < 0 || port > 65535)
-            throw new DevoreRuntimeException("端口范围必须是0-65535: " + port);
-        return port;
-    }
-
-    private static int toTimeout(DInt value) {
-        int timeout = DIntUtils.toInt(value);
-        if (timeout < 0)
-            throw new DevoreRuntimeException("超时时间不能为负数: " + timeout);
-        return timeout;
-    }
-
-    private static int toPositiveSize(DInt value) {
-        int size = DIntUtils.toInt(value);
-        if (size <= 0)
-            throw new DevoreRuntimeException("读取长度必须大于0: " + size);
-        return size;
-    }
 }

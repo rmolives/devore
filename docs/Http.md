@@ -18,6 +18,48 @@
 * 返回类型：bool
 * 示例：(http-server? server)
 
+## URL编码
+
+### http-url-encode
+
+* 作用：使用UTF-8进行URL编码
+* 参数数量：1
+* 参数作用：内容
+* 参数类型：string
+* 返回值：编码后的内容
+* 返回类型：string
+* 示例：(http-url-encode "a b")
+
+### http-url-encode
+
+* 作用：使用指定字符集进行URL编码
+* 参数数量：2
+* 参数作用：内容、编码格式
+* 参数类型：string、string
+* 返回值：编码后的内容
+* 返回类型：string
+* 示例：(http-url-encode "a b" "UTF-8")
+
+### http-url-decode
+
+* 作用：使用UTF-8进行URL解码
+* 参数数量：1
+* 参数作用：内容
+* 参数类型：string
+* 返回值：解码后的内容
+* 返回类型：string
+* 示例：(http-url-decode "a+b")
+
+### http-url-decode
+
+* 作用：使用指定字符集进行URL解码
+* 参数数量：2
+* 参数作用：内容、编码格式
+* 参数类型：string、string
+* 返回值：解码后的内容
+* 返回类型：string
+* 示例：(http-url-decode "a+b" "UTF-8")
+
 ## HTTP服务端
 
 ### http-listen
@@ -54,6 +96,7 @@
 
 * 参数值：{"method"=\<method\>, "path"=\<path\>, "query"=\<query\>, "headers"=\<headers\>, "body"=\<body\>, "remote-host"=\<remote-host\>, "remote-port"=\<remote-port\>}
 * 参数类型：table
+* query：查询参数表，key和value均为URL解码后的string；无查询参数时为空表
 
 处理过程可以直接返回string或binary，也可以返回response表：
 
@@ -106,12 +149,32 @@
 ## http-get
 
 * 作用：访问http/https，并返回详细信息，使用headers
-* 参数数量：1
+* 参数数量：2
 * 参数作用：url、headers
 * 参数类型：string、table
 * 返回值：{"status"=\<status\>, "headers"=\<headers\>, "body"=\<body\>}
 * 返回类型：table
-* 示例：(http-get "http://127.0.0.1/" (table ["a" 3]))
+* 示例：(http-get "http://127.0.0.1/" (table ["a" "3"]))
+
+## http-post
+
+* 作用：POST访问http/https，并返回详细信息
+* 参数数量：2
+* 参数作用：url、body
+* 参数类型：string、string|list
+* 返回值：{"status"=\<status\>, "headers"=\<headers\>, "body"=\<body\>}
+* 返回类型：table
+* 示例：(http-post "http://127.0.0.1/" "hello")
+
+## http-post
+
+* 作用：POST访问http/https，并返回详细信息，使用headers
+* 参数数量：3
+* 参数作用：url、headers、body
+* 参数类型：string、table、string|list
+* 返回值：{"status"=\<status\>, "headers"=\<headers\>, "body"=\<body\>}
+* 返回类型：table
+* 示例：(http-post "http://127.0.0.1/" (table ["Content-Type" "text/plain"]) "hello")
 
 ## http-get-string
 
@@ -136,12 +199,42 @@
 ## http-get-string
 
 * 作用：访问http/https，并返回string，使用headers，并采用特定编码格式
-* 参数数量：2
+* 参数数量：3
 * 参数作用：url、headers、编码格式
 * 参数类型：string、table、string
 * 返回值：string
 * 返回类型：string
-* 示例：(http-get-string "http://127.0.0.1/" (table ["a" 3]) "UTF-8")
+* 示例：(http-get-string "http://127.0.0.1/" (table ["a" "3"]) "UTF-8")
+
+## http-post-string
+
+* 作用：POST访问http/https，并返回string
+* 参数数量：2
+* 参数作用：url、body
+* 参数类型：string、string|list
+* 返回值：string
+* 返回类型：string
+* 示例：(http-post-string "http://127.0.0.1/" "hello")
+
+## http-post-string
+
+* 作用：POST访问http/https，并返回string，并采用特定编码格式|使用headers
+* 参数数量：3
+* 参数作用：url、body、编码格式|url、headers、body
+* 参数类型：string、string|list、string 或 string、table、string|list
+* 返回值：string
+* 返回类型：string
+* 示例：(http-post-string "http://127.0.0.1/" "hello" "UTF-8")
+
+## http-post-string
+
+* 作用：POST访问http/https，并返回string，使用headers，并采用特定编码格式
+* 参数数量：4
+* 参数作用：url、headers、body、编码格式
+* 参数类型：string、table、string|list、string
+* 返回值：string
+* 返回类型：string
+* 示例：(http-post-string "http://127.0.0.1/" (table ["Content-Type" "text/plain"]) "hello" "UTF-8")
 
 ## http-get-binary
 
@@ -156,9 +249,29 @@
 ## http-get-binary
 
 * 作用：访问http/https，并返回binary，使用headers
-* 参数数量：1
+* 参数数量：2
 * 参数作用：url、headers
 * 参数类型：string、table
 * 返回值：binary
 * 返回类型：list
-* 示例：(http-get-binary "http://127.0.0.1/" (table ["a" 3]))
+* 示例：(http-get-binary "http://127.0.0.1/" (table ["a" "3"]))
+
+## http-post-binary
+
+* 作用：POST访问http/https，并返回binary
+* 参数数量：2
+* 参数作用：url、body
+* 参数类型：string、string|list
+* 返回值：binary
+* 返回类型：list
+* 示例：(http-post-binary "http://127.0.0.1/" "hello")
+
+## http-post-binary
+
+* 作用：POST访问http/https，并返回binary，使用headers
+* 参数数量：3
+* 参数作用：url、headers、body
+* 参数类型：string、table、string|list
+* 返回值：binary
+* 返回类型：list
+* 示例：(http-post-binary "http://127.0.0.1/" (table ["Content-Type" "text/plain"]) "hello")

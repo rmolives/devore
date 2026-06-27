@@ -5,7 +5,7 @@ import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
-import org.devore.utils.DIntUtils;
+import org.devore.utils.DNetworkUtils;
 
 import java.io.IOException;
 import java.net.*;
@@ -34,7 +34,7 @@ public class UDPModule extends DModule {
         dEnv.addTokenProcedure("udp-bind", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            int port = toPort((DInt) args.get(0));
+            int port = DNetworkUtils.toPort((DInt) args.get(0));
             try {
                 return DUDPSocket.valueOf(new DatagramSocket(port));
             } catch (SocketException e) {
@@ -47,7 +47,7 @@ public class UDPModule extends DModule {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             String host = args.get(0).toString();
-            int port = toPort((DInt) args.get(1));
+            int port = DNetworkUtils.toPort((DInt) args.get(1));
             try {
                 return DUDPSocket.valueOf(new DatagramSocket(new InetSocketAddress(host, port)));
             } catch (SocketException e) {
@@ -64,7 +64,7 @@ public class UDPModule extends DModule {
             if (!(args.get(3) instanceof DList))
                 throw new DevoreCastException(args.get(3).type(), "list");
             String host = args.get(1).toString();
-            int port = toPort((DInt) args.get(2));
+            int port = DNetworkUtils.toPort((DInt) args.get(2));
             byte[] data = DByteUtils.toBytes((DList) args.get(3));
             try {
                 DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName(host), port);
@@ -79,7 +79,7 @@ public class UDPModule extends DModule {
                 throw new DevoreCastException(args.get(0).type(), "udp-socket");
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
-            int size = toPositiveSize((DInt) args.get(1));
+            int size = DNetworkUtils.toPositiveSize((DInt) args.get(1));
             byte[] buffer = new byte[size];
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try {
@@ -103,7 +103,7 @@ public class UDPModule extends DModule {
             if (!(args.get(1) instanceof DInt))
                 throw new DevoreCastException(args.get(1).type(), "int");
             try {
-                ((DUDPSocket) args.get(0)).toSocket().setSoTimeout(toTimeout((DInt) args.get(1)));
+                ((DUDPSocket) args.get(0)).toSocket().setSoTimeout(DNetworkUtils.toTimeout((DInt) args.get(1)));
                 return DWord.NIL;
             } catch (SocketException e) {
                 throw new DevoreRuntimeException("设置UDP超时失败: " + e.getMessage());
@@ -117,24 +117,4 @@ public class UDPModule extends DModule {
         }, 1, false);
     }
 
-    private static int toPort(DInt value) {
-        int port = DIntUtils.toInt(value);
-        if (port < 0 || port > 65535)
-            throw new DevoreRuntimeException("端口范围必须是0-65535: " + port);
-        return port;
-    }
-
-    private static int toTimeout(DInt value) {
-        int timeout = DIntUtils.toInt(value);
-        if (timeout < 0)
-            throw new DevoreRuntimeException("超时时间不能为负数: " + timeout);
-        return timeout;
-    }
-
-    private static int toPositiveSize(DInt value) {
-        int size = DIntUtils.toInt(value);
-        if (size <= 0)
-            throw new DevoreRuntimeException("接收长度必须大于0: " + size);
-        return size;
-    }
 }
