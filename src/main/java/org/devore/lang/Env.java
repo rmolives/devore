@@ -438,8 +438,13 @@ public class Env {
      * @return 所有key
      */
     public Set<String> keySet() {
-        Set<String> keys = new LinkedHashSet<>(this.table.keySet());
-        keys.addAll(this.importEnvTable.keySet());
+        Set<String> keys = new LinkedHashSet<>();
+        Env temp = this;
+        while (temp != null) {
+            keys.addAll(temp.table.keySet());
+            keys.addAll(temp.importEnvTable.keySet());
+            temp = temp.father;
+        }
         return keys;
     }
 
