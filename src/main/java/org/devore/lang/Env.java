@@ -32,6 +32,7 @@ public class Env {
             new AbstractMap.SimpleEntry<>("crypto", new CryptoModule()),
             new AbstractMap.SimpleEntry<>("http", new HttpModule()),
             new AbstractMap.SimpleEntry<>("json", new JsonModule()),
+            new AbstractMap.SimpleEntry<>("os", new OSModule()),
             new AbstractMap.SimpleEntry<>("sign", new SignModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
             new AbstractMap.SimpleEntry<>("hash", new HashModule())
