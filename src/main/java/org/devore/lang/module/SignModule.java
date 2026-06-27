@@ -111,7 +111,6 @@ public class SignModule extends DModule {
                 dataBytes = data.toString().getBytes(StandardCharsets.UTF_8);
             else
                 throw new DevoreCastException(data.type(), "list|string");
-
             byte[] signedBytes;
             if (signed instanceof DList)
                 signedBytes = DByteUtils.toBytes((DList) signed);
@@ -119,7 +118,6 @@ public class SignModule extends DModule {
                 signedBytes = signed.toString().getBytes(StandardCharsets.UTF_8);
             else
                 throw new DevoreCastException(signed.type(), "list|string");
-
             signature.update(dataBytes);
             return DBool.valueOf(signature.verify(signedBytes));
         } catch (GeneralSecurityException | IllegalArgumentException e) {

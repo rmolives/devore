@@ -51,7 +51,7 @@ public class CryptoUtils {
     }
 
     /**
-     * 将Java密钥对转换为Devore表
+     * 将Java密钥对转换为DTable
      *
      * @param keyPair Java密钥对
      * @return 包含public和private字段的表
