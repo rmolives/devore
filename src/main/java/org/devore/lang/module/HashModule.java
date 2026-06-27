@@ -20,7 +20,7 @@ public class HashModule extends DModule {
     public void init(Env dEnv) {
         dEnv.addTokenProcedure("md5", ((args, env) -> {
             if (args.get(0) instanceof DString)
-                return DString.valueOf(HashUtils.hash(args.toString()
+                return DString.valueOf(HashUtils.hash(args.get(0).toString()
                         .getBytes(StandardCharsets.UTF_8), "MD5"));
             else if (args.get(0) instanceof DList)
                 return DString.valueOf(HashUtils.hash(DByteUtils.toBytes((DList) args.get(0)), "MD5"));
@@ -28,7 +28,7 @@ public class HashModule extends DModule {
         }), 1, false);
         dEnv.addTokenProcedure("sha1", ((args, env) -> {
             if (args.get(0) instanceof DString)
-                return DString.valueOf(HashUtils.hash(args.toString()
+                return DString.valueOf(HashUtils.hash(args.get(0).toString()
                         .getBytes(StandardCharsets.UTF_8), "SHA-1"));
             else if (args.get(0) instanceof DList)
                 return DString.valueOf(HashUtils.hash(DByteUtils.toBytes((DList) args.get(0)), "SHA-1"));
@@ -36,7 +36,7 @@ public class HashModule extends DModule {
         }), 1, false);
         dEnv.addTokenProcedure("sha256", ((args, env) -> {
             if (args.get(0) instanceof DString)
-                return DString.valueOf(HashUtils.hash(args.toString()
+                return DString.valueOf(HashUtils.hash(args.get(0).toString()
                         .getBytes(StandardCharsets.UTF_8), "SHA-256"));
             else if (args.get(0) instanceof DList)
                 return DString.valueOf(HashUtils.hash(DByteUtils.toBytes((DList) args.get(0)), "SHA-256"));
@@ -44,7 +44,7 @@ public class HashModule extends DModule {
         }), 1, false);
         dEnv.addTokenProcedure("sha512", ((args, env) -> {
             if (args.get(0) instanceof DString)
-                return DString.valueOf(HashUtils.hash(args.toString()
+                return DString.valueOf(HashUtils.hash(args.get(0).toString()
                         .getBytes(StandardCharsets.UTF_8), "SHA-512"));
             else if (args.get(0) instanceof DList)
                 return DString.valueOf(HashUtils.hash(DByteUtils.toBytes((DList) args.get(0)), "SHA-512"));
@@ -61,7 +61,7 @@ public class HashModule extends DModule {
             } catch (RuntimeException e) {
                 throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
-            return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "MD5"));
+            return DString.valueOf(HashUtils.hash(args.get(0).toString().getBytes(charset), "MD5"));
         }), 2, false);
         dEnv.addTokenProcedure("sha1", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
@@ -74,7 +74,7 @@ public class HashModule extends DModule {
             } catch (RuntimeException e) {
                 throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
-            return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "SHA-1"));
+            return DString.valueOf(HashUtils.hash(args.get(0).toString().getBytes(charset), "SHA-1"));
         }), 2, false);
         dEnv.addTokenProcedure("sha256", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
@@ -87,7 +87,7 @@ public class HashModule extends DModule {
             } catch (RuntimeException e) {
                 throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
-            return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "SHA-256"));
+            return DString.valueOf(HashUtils.hash(args.get(0).toString().getBytes(charset), "SHA-256"));
         }), 2, false);
         dEnv.addTokenProcedure("sha512", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
@@ -100,7 +100,7 @@ public class HashModule extends DModule {
             } catch (RuntimeException e) {
                 throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
             }
-            return DString.valueOf(HashUtils.hash(args.toString().getBytes(charset), "SHA-512"));
+            return DString.valueOf(HashUtils.hash(args.get(0).toString().getBytes(charset), "SHA-512"));
         }), 2, false);
     }
 }
