@@ -81,6 +81,18 @@ public class DProcedure extends DToken {
     }
 
     /**
+     * 复制过程及其所有重载
+     *
+     * @return 复制后的过程
+     */
+    public DProcedure copy() {
+        List<DProcedure> copiedChildren = new ArrayList<>();
+        for (DProcedure child : this.children)
+            copiedChildren.add(child.copy());
+        return new DProcedure(this.name, this.procedure, copiedChildren, this.argc, this.vararg);
+    }
+
+    /**
      * 替换相同参数数量的过程，不存在时添加为新重载
      *
      * @param procedure 过程

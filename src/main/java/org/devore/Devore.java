@@ -77,7 +77,7 @@ public class Devore {
         try {
             codes = Lexer.splitCode(code);
         } catch (DevoreParseException e) {
-            throw new DevoreRuntimeException(formatError(code, source, e.index(), "", e));
+            throw new DevoreRuntimeException(message(e), null, e.index(), source, code);
         }
         return codes.stream()
                 .map(exp -> evalExpression(env, code, source, exp))
@@ -88,18 +88,19 @@ public class Devore {
     /**
      * 格式化错误信息
      *
-     * @param code   代码
-     * @param source 代码来源
-     * @param exp    表达式
      * @param e      异常
      * @return 错误信息
      */
-    private static String formatError(String code, String source, Lexer.SourceExpression exp, Throwable e) {
-        return formatError(code, source, exp.startIndex, exp.expression, e);
+    public static String formatError(DevoreRuntimeException e) {
+        String code = e.code() == null ? "" : e.code();
+        String source = e.source() == null ? "<code>" : e.source();
+        int index = Math.max(e.index(), 0);
+        String expression = e.expression() == null ? "" : e.expression();
+        return formatError(code, source, index, expression, e);
     }
 
     private static String formatError(String code, String source, int index, String expression, Throwable e) {
-        String message = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+        String message = message(e);
         if (e instanceof DevoreRuntimeException) {
             DevoreRuntimeException runtimeException = (DevoreRuntimeException) e;
             if (runtimeException.index() >= 0)
@@ -157,11 +158,19 @@ public class Devore {
             ast.setSource(source, code);
             return Evaluator.eval(env, ast);
         } catch (StackOverflowError e) {
-            throw new DevoreRuntimeException(formatError(code, source, exp,
-                    new StackOverflowError("栈溢出，可能存在无限递归或递归宏展开.")));
+            throw new DevoreRuntimeException("栈溢出，可能存在无限递归或递归宏展开.",
+                    exp.expression, exp.startIndex, source, code);
+        } catch (DevoreParseException e) {
+            throw new DevoreRuntimeException(message(e), null, e.index(), source, code);
+        } catch (DevoreRuntimeException e) {
+            throw e;
         } catch (RuntimeException e) {
-            throw new DevoreRuntimeException(formatError(code, source, exp, e));
+            throw new DevoreRuntimeException(message(e), exp.expression, exp.startIndex, source, code);
         }
+    }
+
+    private static String message(Throwable e) {
+        return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
     }
 
     private static class Position {

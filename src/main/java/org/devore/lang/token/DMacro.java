@@ -64,6 +64,18 @@ public class DMacro extends DToken {
     }
 
     /**
+     * 复制宏及其所有重载
+     *
+     * @return 复制后的宏
+     */
+    public DMacro copy() {
+        List<DMacro> copiedChildren = new ArrayList<>();
+        for (DMacro child : this.children)
+            copiedChildren.add(child.copy());
+        return new DMacro(this.name, this.params, this.bodys, copiedChildren);
+    }
+
+    /**
      * 替换相同参数数量的宏，不存在时添加为新重载
      *
      * @param macro 宏

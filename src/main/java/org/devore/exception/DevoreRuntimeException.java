@@ -41,7 +41,7 @@ public class DevoreRuntimeException extends RuntimeException {
     }
 
     public void setExpressionIfAbsent(String expression, int index, String source, String code) {
-        if (this.expression == null) {
+        if (this.expression == null && this.index < 0 && this.source == null && this.code == null) {
             this.expression = expression;
             this.index = index;
             this.source = source;

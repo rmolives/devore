@@ -29,7 +29,7 @@ public class Main {
                     try {
                         Devore.call(env, new String(Files.readAllBytes(path), StandardCharsets.UTF_8), arg);
                     } catch (DevoreRuntimeException e) {
-                        System.err.println(e.getMessage());
+                        System.err.println(Devore.formatError(e));
                         System.exit(1);
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
