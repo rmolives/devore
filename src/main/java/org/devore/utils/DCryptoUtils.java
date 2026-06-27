@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * 加密和签名模块共享的工具函数
  */
-public class CryptoUtils {
+public class DCryptoUtils {
     /**
      * 从Base64编码的X.509公钥字符串解析公钥
      *

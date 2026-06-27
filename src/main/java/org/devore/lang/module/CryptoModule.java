@@ -7,7 +7,7 @@ import org.devore.lang.token.DInt;
 import org.devore.lang.token.DList;
 import org.devore.lang.token.DString;
 import org.devore.lang.token.DToken;
-import org.devore.utils.CryptoUtils;
+import org.devore.utils.DCryptoUtils;
 import org.devore.utils.DByteUtils;
 import org.devore.utils.DIntUtils;
 
@@ -65,7 +65,7 @@ public class CryptoModule extends DModule {
             dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
                 if (!(args.get(0) instanceof DInt))
                     throw new DevoreCastException(args.get(0).type(), "int");
-                return CryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
+                return DCryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
             }, 1, false);
         dEnv.addTokenProcedure("rsa-encrypt", (args, env) ->
                 rsa(args.get(0), args.get(1), DEFAULT_RSA_TRANSFORMATION, Cipher.ENCRYPT_MODE), 2, false);
@@ -120,9 +120,9 @@ public class CryptoModule extends DModule {
         try {
             Cipher cipher = Cipher.getInstance(transformation);
             if (mode == Cipher.ENCRYPT_MODE)
-                cipher.init(mode, CryptoUtils.publicKey("RSA", key));
+                cipher.init(mode, DCryptoUtils.publicKey("RSA", key));
             else
-                cipher.init(mode, CryptoUtils.privateKey("RSA", key));
+                cipher.init(mode, DCryptoUtils.privateKey("RSA", key));
             byte[] dataBytes;
             if (data instanceof DList)
                 dataBytes = DByteUtils.toBytes((DList) data);

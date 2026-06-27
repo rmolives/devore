@@ -8,7 +8,7 @@ import org.devore.lang.token.DInt;
 import org.devore.lang.token.DList;
 import org.devore.lang.token.DString;
 import org.devore.lang.token.DToken;
-import org.devore.utils.CryptoUtils;
+import org.devore.utils.DCryptoUtils;
 import org.devore.utils.DByteUtils;
 import org.devore.utils.DIntUtils;
 
@@ -34,7 +34,7 @@ public class SignModule extends DModule {
             dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
                 if (!(args.get(0) instanceof DInt))
                     throw new DevoreCastException(args.get(0).type(), "int");
-                return CryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
+                return DCryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
             }, 1, false);
         dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> ecKeyPair(DEFAULT_EC_CURVE), 0, false);
         dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> {
@@ -76,7 +76,7 @@ public class SignModule extends DModule {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
             generator.initialize(new ECGenParameterSpec(curve));
-            return CryptoUtils.keyPairTable(generator.generateKeyPair());
+            return DCryptoUtils.keyPairTable(generator.generateKeyPair());
         } catch (GeneralSecurityException e) {
             throw new DevoreRuntimeException("ECDSA密钥生成失败: " + e.getMessage());
         }
@@ -85,7 +85,7 @@ public class SignModule extends DModule {
     private DList sign(DToken data, DToken privateKey, String keyAlgorithm, String signatureAlgorithm) {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);
-            signature.initSign(CryptoUtils.privateKey(keyAlgorithm, privateKey));
+            signature.initSign(DCryptoUtils.privateKey(keyAlgorithm, privateKey));
             byte[] dataBytes;
             if (data instanceof DList)
                 dataBytes = DByteUtils.toBytes((DList) data);
@@ -103,7 +103,7 @@ public class SignModule extends DModule {
     private DBool verify(DToken data, DToken signed, DToken publicKey, String keyAlgorithm, String signatureAlgorithm) {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);
-            signature.initVerify(CryptoUtils.publicKey(keyAlgorithm, publicKey));
+            signature.initVerify(DCryptoUtils.publicKey(keyAlgorithm, publicKey));
             byte[] dataBytes;
             if (data instanceof DList)
                 dataBytes = DByteUtils.toBytes((DList) data);
