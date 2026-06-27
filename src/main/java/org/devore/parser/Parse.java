@@ -23,11 +23,10 @@ public class Parse {
      */
     public static Ast parse(List<Lexer.SourceToken> tokens) {
         if (tokens == null)
-            throw new DevoreParseException("语法解析中传入tokens为null.");
-        List<Lexer.SourceToken> tokenSnapshot = new ArrayList<>(tokens);
+            throw new DevoreParseException("语法解析中传入为null.");
         Ast node = null;
         Deque<Ast> stack = new ArrayDeque<>();
-        for (Lexer.SourceToken sourceToken : tokenSnapshot) {
+        for (Lexer.SourceToken sourceToken : tokens) {
             DToken token = sourceToken.token;
             if (token == DWord.LB) {
                 Ast current = newNode(Ast.empty, sourceToken.index);
