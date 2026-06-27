@@ -1,6 +1,9 @@
+# 操作系统
+
 需要导入模块：os
 
-# os-name
+## os-name
+
 * 作用：获取操作系统名称
 * 参数数量：0
 * 参数作用：
@@ -9,7 +12,8 @@
 * 返回类型：string
 * 示例：(os-name)
 
-# os-arch
+## os-arch
+
 * 作用：获取操作系统架构
 * 参数数量：0
 * 参数作用：
@@ -18,7 +22,8 @@
 * 返回类型：string
 * 示例：(os-arch)
 
-# os-version
+## os-version
+
 * 作用：获取操作系统版本
 * 参数数量：0
 * 参数作用：
@@ -27,7 +32,8 @@
 * 返回类型：string
 * 示例：(os-version)
 
-# os-user-name
+## os-user-name
+
 * 作用：获取当前用户名称
 * 参数数量：0
 * 参数作用：
@@ -36,7 +42,8 @@
 * 返回类型：string
 * 示例：(os-user-name)
 
-# os-user-home
+## os-user-home
+
 * 作用：获取当前用户主目录
 * 参数数量：0
 * 参数作用：
@@ -45,7 +52,8 @@
 * 返回类型：string
 * 示例：(os-user-home)
 
-# os-current-dir
+## os-current-dir
+
 * 作用：获取当前工作目录
 * 参数数量：0
 * 参数作用：
@@ -54,7 +62,8 @@
 * 返回类型：string
 * 示例：(os-current-dir)
 
-# os-line-separator
+## os-line-separator
+
 * 作用：获取当前系统的换行符
 * 参数数量：0
 * 参数作用：无
@@ -63,7 +72,8 @@
 * 返回类型：string
 * 示例：(os-line-separator)
 
-# os-available-processors
+## os-available-processors
+
 * 作用：获取JVM可用的处理器数量
 * 参数数量：0
 * 参数作用：
@@ -72,7 +82,8 @@
 * 返回类型：int
 * 示例：(os-available-processors)
 
-# os-free-memory
+## os-free-memory
+
 * 作用：获取JVM当前空闲内存字节数
 * 参数数量：0
 * 参数作用：
@@ -81,7 +92,8 @@
 * 返回类型：int
 * 示例：(os-free-memory)
 
-# os-total-memory
+## os-total-memory
+
 * 作用：获取JVM当前总内存字节数
 * 参数数量：0
 * 参数作用：
@@ -90,7 +102,8 @@
 * 返回类型：int
 * 示例：(os-total-memory)
 
-# os-max-memory
+## os-max-memory
+
 * 作用：获取JVM最大可用内存字节数
 * 参数数量：0
 * 参数作用：
@@ -99,7 +112,8 @@
 * 返回类型：int
 * 示例：(os-max-memory)
 
-# os-process-id
+## os-process-id
+
 * 作用：获取当前JVM进程ID
 * 参数数量：0
 * 参数作用：
@@ -108,7 +122,8 @@
 * 返回类型：int
 * 示例：(os-process-id)
 
-# os-env
+## os-env
+
 * 作用：获取指定名称的环境变量
 * 参数数量：1
 * 参数作用：环境变量名称
@@ -117,7 +132,8 @@
 * 返回类型：string|word
 * 示例：(os-env "PATH")
 
-# os-envs
+## os-envs
+
 * 作用：获取全部环境变量
 * 参数数量：0
 * 参数作用：无
@@ -126,7 +142,8 @@
 * 返回类型：table
 * 示例：(os-envs)
 
-# os-property
+## os-property
+
 * 作用：获取指定名称的Java系统属性
 * 参数数量：1
 * 参数作用：Java系统属性名称
@@ -135,7 +152,8 @@
 * 返回类型：string|word
 * 示例：(os-property "java.version")
 
-# os-properties
+## os-properties
+
 * 作用：获取全部Java系统属性
 * 参数数量：0
 * 参数作用：无
@@ -144,7 +162,8 @@
 * 返回类型：table
 * 示例：(os-properties)
 
-# os-exec
+## os-exec
+
 * 作用：执行操作系统命令
 * 参数数量：1
 * 参数作用：命令
@@ -153,7 +172,8 @@
 * 返回类型：table
 * 示例：(os-exec "echo abc")
 
-# os-exec
+## os-exec
+
 * 作用：在指定工作目录执行操作系统命令
 * 参数数量：2
 * 参数作用：命令、工作目录

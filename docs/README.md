@@ -1,64 +1,48 @@
-需要导入模块：http
+# Home
 
-# http-get
-* 作用：访问http/https，并返回详细信息
-* 参数数量：1
-* 参数作用：url
-* 参数类型：string
-* 返回值：{"status"=\<status\>, "headers"=\<headers\>, "body"=\<body\>}
-* 返回类型：table
-* 示例：(http-get "http://127.0.0.1/")
+欢迎使用**Devore Language**，是一门**Java**实现的**Lisp方言**，本wiki将讲解**Devore Language**的内置过程的用法等。
 
-# http-get
-* 作用：访问http/https，并返回详细信息，使用headers
-* 参数数量：1
-* 参数作用：url、headers
-* 参数类型：string、table
-* 返回值：{"status"=\<status\>, "headers"=\<headers\>, "body"=\<body\>}
-* 返回类型：table
-* 示例：(http-get "http://127.0.0.1/" (table ["a" 3]))
+**Devore Language**采用**S-表达式**，其中\[\]和\(\)可以互换，但需要互相匹配。
 
-# http-get-string
-* 作用：访问http/https，并返回string
-* 参数数量：1
-* 参数作用：url
-* 参数类型：string
-* 返回值：string
-* 返回类型：string
-* 示例：(http-get-string "http://127.0.0.1/")
+语法：(operator operand1 operand2 ...)
 
-# http-get-string
-* 作用：访问http/https，并返回string，并采用特定编码格式|使用headers
-* 参数数量：2
-* 参数作用：url、[编码格式|headers]
-* 参数类型：string、[string|table]
-* 返回值：string
-* 返回类型：string
-* 示例：(http-get-string "http://127.0.0.1/" "UTF-8")
+例如：
 
-# http-get-string
-* 作用：访问http/https，并返回string，使用headers，并采用特定编码格式
-* 参数数量：2
-* 参数作用：url、headers、编码格式
-* 参数类型：string、table、string
-* 返回值：string
-* 返回类型：string
-* 示例：(http-get-string "http://127.0.0.1/" (table ["a" 3]) "UTF-8")
+* (+ 3 (- 4 5))是+(3, -(4, 5))也就是3 + (4 - 5)
+* (a (b c))是a(b(c))
 
-# http-get-binary
-* 作用：访问http/https，并返回binary
-* 参数数量：1
-* 参数作用：url
-* 参数类型：string
-* 返回值：binary
-* 返回类型：list
-* 示例：(http-get-binary "http://127.0.0.1/")
+## 字面量
 
-# http-get-binary
-* 作用：访问http/https，并返回binary，使用headers
-* 参数数量：1
-* 参数作用：url、headers
-* 参数类型：string、table
-* 返回值：binary
-* 返回类型：list
-* 示例：(http-get-binary "http://127.0.0.1/" (table ["a" 3]))
+* 真：true
+* 假：false
+* null：nil
+
+## 注释
+使用`;xxx`进行注释。
+
+## 文档
+
+### 基础
+
+* [普通过程](Base.md)
+* [类型](Type.md)
+* [模块](Module.md)
+
+### 数据处理
+
+* [字符串](String.md)
+* [列表](List.md)
+* [表](Table.md)
+* [数学](Math.md)
+* [二进制](Binary.md)
+* [Base64](Base64.md)
+* [哈希](Hash.md)
+* [签名](Sign.md)
+* [加密](Crypto.md)
+
+### 系统与工具
+
+* [文件](File.md)
+* [HTTP](Http.md)
+* [操作系统](OS.md)
+* [线程](Thread.md)

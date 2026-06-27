@@ -1,4 +1,7 @@
-# \+\+
+# 字符串
+
+## \+\+
+
 * 作用：拼接字符串
 * 参数数量：无穷（>= 2）
 * 参数作用：字符串
@@ -7,7 +10,8 @@
 * 返回类型：string
 * 示例：(\+\+ "abc" "bcd")
 
-# length
+## length
+
 * 作用：获取字符串长度
 * 参数数量：1
 * 参数作用：字符串
@@ -16,7 +20,8 @@
 * 返回类型：int
 * 示例：(length "abc")
 
-# ->string
+## ->string
+
 * 作用：将输入转为字符串
 * 参数数量：1
 * 参数作用：内容
@@ -25,7 +30,8 @@
 * 返回类型：string
 * 示例：(->string 123)
 
-# string->number
+## string->number
+
 * 作用：将字符串转换为number
 * 参数数量：1
 * 参数作用：内容
@@ -34,7 +40,8 @@
 * 返回类型：number
 * 示例：(string->number "123.2")
 
-# string->bool
+## string->bool
+
 * 作用：将字符串转换为bool
 * 参数数量：1
 * 参数作用：内容
@@ -43,7 +50,8 @@
 * 返回类型：bool
 * 示例：(string->bool "false")
 
-# string->symbol
+## string->symbol
+
 * 作用：将字符串转换为symbol
 * 参数数量：1
 * 参数作用：内容
@@ -52,7 +60,8 @@
 * 返回类型：symbol
 * 示例：(string->symbol "a")
 
-# string->list
+## string->list
+
 * 作用：将字符串转换为list
 * 参数数量：1
 * 参数作用：内容
@@ -61,7 +70,8 @@
 * 返回类型：list
 * 示例：(string->list "abc")
 
-# string-index
+## string-index
+
 * 作用：获取字符最早出现位置
 * 参数数量：2
 * 参数作用：字符串、定位字符串
@@ -70,7 +80,8 @@
 * 返回类型：int
 * 示例：(string-index "dabac" "a")
 
-# string-index-last
+## string-index-last
+
 * 作用：获取字符最后出现位置
 * 参数数量：2
 * 参数作用：字符串、定位字符串
@@ -79,7 +90,8 @@
 * 返回类型：int
 * 示例：(string-index-last "dabac" "a")
 
-# string-contains
+## string-contains
+
 * 作用：字符串是否包含特定字符串
 * 参数数量：2
 * 参数作用：字符串、特定字符串
@@ -88,7 +100,8 @@
 * 返回类型：bool
 * 示例：(string-contains "dabac" "a")
 
-# string-match
+## string-match
+
 * 作用：字符串是否符合正则
 * 参数数量：2
 * 参数作用：字符串、正则
@@ -97,7 +110,8 @@
 * 返回类型：bool
 * 示例：(string-match "dabac" "a")
 
-# string-starts-with
+## string-starts-with
+
 * 作用：字符串是否起始特定字符串
 * 参数数量：2
 * 参数作用：字符串、特定字符串
@@ -106,7 +120,8 @@
 * 返回类型：bool
 * 示例：(string-starts-with "dabac" "a")
 
-# string-ends-with
+## string-ends-with
+
 * 作用：字符串是否结束特定字符串
 * 参数数量：2
 * 参数作用：字符串、特定字符串
@@ -115,7 +130,8 @@
 * 返回类型：bool
 * 示例：(string-ends-with "dabac" "a")
 
-# string-get
+## string-get
+
 * 作用：获取字符串特定下标的字符
 * 参数数量：2
 * 参数作用：字符串、下标
@@ -124,7 +140,8 @@
 * 返回类型：string
 * 示例：(string-get "dabac" 2)
 
-# string-sub
+## string-sub
+
 * 作用：截取字符串特定起始下标之后的字符
 * 参数数量：2
 * 参数作用：字符串、起始下标
@@ -133,7 +150,8 @@
 * 返回类型：string
 * 示例：(string-sub "dabac" 2)
 
-# string-sub
+## string-sub
+
 * 作用：截取字符串特定起始下标到结束下标之间的字符
 * 参数数量：3
 * 参数作用：字符串、起始下标、结束下标
@@ -142,7 +160,8 @@
 * 返回类型：string
 * 示例：(string-sub "dabac" 2 4)
 
-# string-empty?
+## string-empty?
+
 * 作用：字符串是否为空
 * 参数数量：1
 * 参数作用：字符串
@@ -151,7 +170,8 @@
 * 返回类型：bool
 * 示例：(string-empty? "dabac")
 
-# string-replace
+## string-replace
+
 * 作用：替换字符串
 * 参数数量：2
 * 参数作用：原字符串、替换前、替换后
@@ -160,7 +180,8 @@
 * 返回类型：string
 * 示例：(string-replace "dabac" "a" "c")
 
-# string-replace-regex
+## string-replace-regex
+
 * 作用：替换字符串（正则）
 * 参数数量：2
 * 参数作用：原字符串、替换前、替换后
@@ -169,7 +190,8 @@
 * 返回类型：string
 * 示例：(string-replace-regex "dabac" "a" "c")
 
-# string-split-regex
+## string-split-regex
+
 * 作用：分割字符串（正则）
 * 参数数量：2
 * 参数作用：原字符串、分割字符串
@@ -178,7 +200,8 @@
 * 返回类型：list
 * 示例：(string-split-regex "dabac" "a")
 
-# string-split
+## string-split
+
 * 作用：分割字符串（正则）
 * 参数数量：2
 * 参数作用：原字符串、分割字符串
@@ -187,7 +210,8 @@
 * 返回类型：list
 * 示例：(string-split "dabac" "a")
 
-# string-trim
+## string-trim
+
 * 作用：删除两侧空白
 * 参数数量：1
 * 参数作用：原字符串
@@ -196,7 +220,8 @@
 * 返回类型：string
 * 示例：(string-trim "dabac ")
 
-# string-trim-left
+## string-trim-left
+
 * 作用：删除左侧空白
 * 参数数量：1
 * 参数作用：原字符串
@@ -205,7 +230,8 @@
 * 返回类型：string
 * 示例：(string-trim-left "dabac ")
 
-# string-trim-right
+## string-trim-right
+
 * 作用：删除右侧空白
 * 参数数量：1
 * 参数作用：原字符串
@@ -214,7 +240,8 @@
 * 返回类型：string
 * 示例：(string-trim-right "dabac ")
 
-# string-upper
+## string-upper
+
 * 作用：字符串转大写
 * 参数数量：1
 * 参数作用：原字符串
@@ -223,7 +250,8 @@
 * 返回类型：string
 * 示例：(string-upper "dabac ")
 
-# string-lower
+## string-lower
+
 * 作用：字符串转小写
 * 参数数量：1
 * 参数作用：原字符串
@@ -232,7 +260,8 @@
 * 返回类型：string
 * 示例：(string-lower "AAA ")
 
-# char->unicode
+## char->unicode
+
 * 作用：将字符转换为unicode
 * 参数数量：1
 * 参数作用：内容
@@ -241,7 +270,8 @@
 * 返回类型：int
 * 示例：(char->unicode "a")
 
-# unicode->char
+## unicode->char
+
 * 作用：将unicode转换为字符
 * 参数数量：1
 * 参数作用：unicode

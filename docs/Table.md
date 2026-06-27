@@ -1,4 +1,7 @@
-# table
+# 表
+
+## table
+
 * 作用：创建表
 * 参数数量：0
 * 参数作用：
@@ -7,7 +10,8 @@
 * 返回类型：table
 * 示例：(table)
 
-# table-put
+## table-put
+
 * 作用：往表里添加元素（不改变原表，生成新表）
 * 参数数量：3
 * 参数作用：表、key、value
@@ -16,7 +20,8 @@
 * 返回类型：table
 * 示例：(table-put (table) "a" 3)
 
-# table-remove
+## table-remove
+
 * 作用：往表里删除元素（不改变原表，生成新表）
 * 参数数量：2
 * 参数作用：表、key
@@ -25,7 +30,8 @@
 * 返回类型：table
 * 示例：(table-remove (table) "a")
 
-# table-put!
+## table-put!
+
 * 作用：往表里添加元素（改变原表，不生成新表）
 * 参数数量：3
 * 参数作用：表、key、value
@@ -34,7 +40,8 @@
 * 返回类型：table
 * 示例：(table-put! (table) "a" 3)
 
-# table-remove!
+## table-remove!
+
 * 作用：往表里删除元素（改变原表，不生成新表）
 * 参数数量：2
 * 参数作用：表、key
@@ -43,7 +50,8 @@
 * 返回类型：table
 * 示例：(table-remove! (table) "a")
 
-# table-clear!
+## table-clear!
+
 * 作用：清空表
 * 参数数量：1
 * 参数作用：表
@@ -52,7 +60,8 @@
 * 返回类型：table
 * 示例：(table-clear! a)
 
-# length
+## length
+
 * 作用：获取表长度
 * 参数数量：1
 * 参数作用：表
@@ -61,7 +70,8 @@
 * 返回类型：int
 * 示例：(length t)
 
-# table-contains-key
+## table-contains-key
+
 * 作用：判断表是否包含特定key
 * 参数数量：2
 * 参数作用：表、元素
@@ -70,7 +80,8 @@
 * 返回类型：bool
 * 示例：(table-contains-key t "a")
 
-# table-contains-value
+## table-contains-value
+
 * 作用：判断表是否包含特定value
 * 参数数量：2
 * 参数作用：表、元素
@@ -79,7 +90,8 @@
 * 返回类型：bool
 * 示例：(table-contains-value t "a")
 
-# table-keys
+## table-keys
+
 * 作用：获取表的所有key
 * 参数数量：1
 * 参数作用：表
