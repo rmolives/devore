@@ -52,16 +52,13 @@
 
 处理过程接收request表：
 
-* method：请求方法
-* path：请求路径
-* query：查询字符串
-* headers：请求头表
-* body：请求体binary
-* remote-host：客户端主机
-* remote-port：客户端端口
+* 参数值：{"method"=\<method\>, "path"=\<path\>, "query"=\<query\>, "headers"=\<headers\>, "body"=\<body\>, "remote-host"=\<remote-host\>, "remote-port"=\<remote-port\>}
+* 参数类型：table
 
 处理过程可以直接返回string或binary，也可以返回response表：
 
+* 返回值：{"status"=\<status\>, "headers"=\<headers\>, "body"=\<body\>}
+* 返回类型：table
 * status：状态码，默认200
 * headers：响应头表
 * body：响应体，支持string或binary
