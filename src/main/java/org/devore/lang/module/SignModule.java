@@ -78,7 +78,7 @@ public class SignModule extends DModule {
             generator.initialize(new ECGenParameterSpec(curve));
             return CryptoUtils.keyPairTable(generator.generateKeyPair());
         } catch (GeneralSecurityException e) {
-            throw CryptoUtils.cryptoError("ECDSA密钥生成", e);
+            throw new DevoreRuntimeException("ECDSA密钥生成失败: " + e.getMessage());
         }
     }
 
@@ -96,7 +96,7 @@ public class SignModule extends DModule {
             signature.update(dataBytes);
             return DByteUtils.toList(signature.sign());
         } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw CryptoUtils.cryptoError("签名", e);
+            throw new DevoreRuntimeException("签名失败: " + e.getMessage());
         }
     }
 

@@ -44,7 +44,7 @@ public class CryptoModule extends DModule {
                 SecretKey key = generator.generateKey();
                 return DByteUtils.toList(key.getEncoded());
             } catch (GeneralSecurityException e) {
-                throw CryptoUtils.cryptoError("AES密钥生成", e);
+                throw new DevoreRuntimeException("AES密钥生成失败: " + e.getMessage());
             }
         }, 1, false);
         dEnv.addTokenProcedure("aes-encrypt", (args, env) ->
@@ -111,7 +111,8 @@ public class CryptoModule extends DModule {
             cipher.init(mode, keySpec, new IvParameterSpec(ivBytes));
             return DByteUtils.toList(cipher.doFinal(dataBytes));
         } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw CryptoUtils.cryptoError(mode == Cipher.ENCRYPT_MODE ? "AES加密" : "AES解密", e);
+            String action = mode == Cipher.ENCRYPT_MODE ? "AES加密" : "AES解密";
+            throw new DevoreRuntimeException(action + "失败: " + e.getMessage());
         }
     }
 
@@ -131,7 +132,8 @@ public class CryptoModule extends DModule {
                 throw new DevoreCastException(data.type(), "list|string");
             return DByteUtils.toList(cipher.doFinal(dataBytes));
         } catch (GeneralSecurityException | IllegalArgumentException e) {
-            throw CryptoUtils.cryptoError(mode == Cipher.ENCRYPT_MODE ? "RSA加密" : "RSA解密", e);
+            String action = mode == Cipher.ENCRYPT_MODE ? "RSA加密" : "RSA解密";
+            throw new DevoreRuntimeException(action + "失败: " + e.getMessage());
         }
     }
 }

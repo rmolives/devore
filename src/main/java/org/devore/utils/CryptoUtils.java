@@ -77,18 +77,7 @@ public class CryptoUtils {
             generator.initialize(bits);
             return keyPairTable(generator.generateKeyPair());
         } catch (GeneralSecurityException e) {
-            throw cryptoError("RSA密钥生成", e);
+            throw new DevoreRuntimeException("RSA密钥生成失败: " + e.getMessage());
         }
-    }
-
-    /**
-     * 将底层加密异常包装为Devore运行时异常
-     *
-     * @param action 操作名称
-     * @param e      原始异常
-     * @return Devore运行时异常
-     */
-    public static DevoreRuntimeException cryptoError(String action, Exception e) {
-        return new DevoreRuntimeException(action + "失败: " + e.getMessage());
     }
 }
