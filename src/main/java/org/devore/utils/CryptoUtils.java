@@ -58,8 +58,10 @@ public class CryptoUtils {
      */
     public static DTable keyPairTable(KeyPair keyPair) {
         Map<DToken, DToken> table = new HashMap<>();
-        table.put(DString.valueOf("public"), DString.valueOf(Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded())));
-        table.put(DString.valueOf("private"), DString.valueOf(Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded())));
+        table.put(DString.valueOf("public"),
+                DString.valueOf(Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded())));
+        table.put(DString.valueOf("private"),
+                DString.valueOf(Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded())));
         return DTable.valueOf(table);
     }
 
