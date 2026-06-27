@@ -22,9 +22,12 @@ public class Parse {
      * @return 语法树
      */
     public static Ast parse(List<Lexer.SourceToken> tokens) {
+        if (tokens == null)
+            throw new DevoreParseException("语法解析中传入tokens为null.");
+        List<Lexer.SourceToken> tokenSnapshot = new ArrayList<>(tokens);
         Ast node = null;
         Deque<Ast> stack = new ArrayDeque<>();
-        for (Lexer.SourceToken sourceToken : tokens) {
+        for (Lexer.SourceToken sourceToken : tokenSnapshot) {
             DToken token = sourceToken.token;
             if (token == DWord.LB) {
                 Ast current = newNode(Ast.empty, sourceToken.index);
@@ -44,7 +47,7 @@ public class Parse {
             }
         }
         if (node == null)
-            throw new DevoreParseException("语法解析出的AST为null.");
+            return Ast.empty;
         if (!stack.isEmpty())
             throw new DevoreParseException("语法解析中括号未闭合.");
         return node;

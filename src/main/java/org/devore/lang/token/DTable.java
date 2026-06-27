@@ -2,7 +2,9 @@ package org.devore.lang.token;
 
 import org.devore.utils.FormatUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -19,14 +21,16 @@ public class DTable extends DToken {
     }
 
     public static DTable valueOf(Map<DToken, DToken> table) {
-        return new DTable(table);
+        return new DTable(Collections.synchronizedMap(new HashMap<>(table)));
     }
 
     /**
      * 清空表
      */
     public void clear() {
-        this.table.clear();
+        synchronized (this.table) {
+            this.table.clear();
+        }
     }
 
     /**
@@ -39,10 +43,12 @@ public class DTable extends DToken {
      */
     public DTable put(DToken key, DToken value, boolean force) {
         if (force) {
-            this.table.put(key, value);
+            synchronized (this.table) {
+                this.table.put(key, value);
+            }
             return this;
         }
-        Map<DToken, DToken> newTable = new HashMap<>(this.table);
+        Map<DToken, DToken> newTable = snapshot();
         newTable.put(key, value);
         return DTable.valueOf(newTable);
     }
@@ -54,7 +60,9 @@ public class DTable extends DToken {
      * @return 结果
      */
     public DBool containsKey(DToken key) {
-        return DBool.valueOf(this.table.containsKey(key));
+        synchronized (this.table) {
+            return DBool.valueOf(this.table.containsKey(key));
+        }
     }
 
     /**
@@ -64,7 +72,9 @@ public class DTable extends DToken {
      * @return 结果
      */
     public DBool containsValue(DToken value) {
-        return DBool.valueOf(this.table.containsValue(value));
+        synchronized (this.table) {
+            return DBool.valueOf(this.table.containsValue(value));
+        }
     }
 
     /**
@@ -74,7 +84,9 @@ public class DTable extends DToken {
      * @return 结果
      */
     public DToken get(DToken key) {
-        return this.table.getOrDefault(key, DWord.NIL);
+        synchronized (this.table) {
+            return this.table.getOrDefault(key, DWord.NIL);
+        }
     }
 
     /**
@@ -86,10 +98,12 @@ public class DTable extends DToken {
      */
     public DTable remove(DToken key, boolean force) {
         if (force) {
-            this.table.remove(key);
+            synchronized (this.table) {
+                this.table.remove(key);
+            }
             return this;
         }
-        Map<DToken, DToken> newTable = new HashMap<>(this.table);
+        Map<DToken, DToken> newTable = snapshot();
         newTable.remove(key);
         return DTable.valueOf(newTable);
     }
@@ -100,7 +114,9 @@ public class DTable extends DToken {
      * @return 结果
      */
     public Set<DToken> keys() {
-        return this.table.keySet();
+        synchronized (this.table) {
+            return new HashSet<>(this.table.keySet());
+        }
     }
 
     /**
@@ -109,7 +125,15 @@ public class DTable extends DToken {
      * @return 数量
      */
     public int size() {
-        return this.table.size();
+        synchronized (this.table) {
+            return this.table.size();
+        }
+    }
+
+    private Map<DToken, DToken> snapshot() {
+        synchronized (this.table) {
+            return new HashMap<>(this.table);
+        }
     }
 
     @Override
@@ -119,7 +143,7 @@ public class DTable extends DToken {
 
     @Override
     protected String str() {
-        return this.table.entrySet().stream()
+        return snapshot().entrySet().stream()
                 .map(entry -> FormatUtils.formatToken(entry.getKey())
                         + "=" + FormatUtils.formatToken(entry.getValue()))
                 .collect(Collectors.joining(", ", "{", "}"));
@@ -130,15 +154,17 @@ public class DTable extends DToken {
         if (!(t instanceof DTable))
             return -1;
         DTable other = (DTable) t;
-        if (this.table.size() != other.table.size())
+        Map<DToken, DToken> thisSnapshot = snapshot();
+        Map<DToken, DToken> otherSnapshot = other.snapshot();
+        if (thisSnapshot.size() != otherSnapshot.size())
             return -1;
-        return this.table.entrySet().stream()
-                .allMatch(entry -> other.table.containsKey(entry.getKey())
-                        && Objects.equals(entry.getValue(), other.table.get(entry.getKey()))) ? 0 : -1;
+        return thisSnapshot.entrySet().stream()
+                .allMatch(entry -> otherSnapshot.containsKey(entry.getKey())
+                        && Objects.equals(entry.getValue(), otherSnapshot.get(entry.getKey()))) ? 0 : -1;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.type(), this.table);
+        return Objects.hash(this.type(), snapshot());
     }
 }

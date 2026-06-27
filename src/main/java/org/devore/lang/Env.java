@@ -8,13 +8,15 @@ import org.devore.lang.token.DToken;
 import org.devore.parser.Ast;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Env {
     // 默认导入
-    public static final List<String> defaultModules = new ArrayList<>(Arrays.asList("core"));
+    public static final List<String> defaultModules = Collections.unmodifiableList(Arrays.asList("core"));
 
     public final Map<String, DToken> table;             // 环境表
     public Env father;                                  // 父环境
@@ -35,7 +37,9 @@ public class Env {
             new AbstractMap.SimpleEntry<>("hash", new HashModule())
     ).collect(Collectors.toMap(
             Map.Entry::getKey,
-            Map.Entry::getValue
+            Map.Entry::getValue,
+            (left, right) -> right,
+            ConcurrentHashMap::new
     ));
 
     /**
@@ -46,12 +50,18 @@ public class Env {
      * @param io     IO表
      */
     public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvTable, IOConfig io, boolean load) {
-        this.table = table;
+        this.table = concurrentMap(table);
         this.father = father;
         this.io = io;
-        this.importEnvTable = importEnvTable;
+        this.importEnvTable = concurrentMap(importEnvTable);
         if (load)
             defaultModules.forEach(this::loadModule);
+    }
+
+    private static <K, V> Map<K, V> concurrentMap(Map<K, V> map) {
+        if (map instanceof ConcurrentMap)
+            return map;
+        return new ConcurrentHashMap<>(map);
     }
 
     /**
@@ -79,7 +89,7 @@ public class Env {
      *
      * @param module 环境
      */
-    public void addModule(DModule module) {
+    public synchronized void addModule(DModule module) {
         this.modules.put(module.name, module);
     }
 
@@ -89,7 +99,7 @@ public class Env {
      * @param key key
      * @param env 环境
      */
-    public void putImportEnv(String key, Env env) {
+    public synchronized void putImportEnv(String key, Env env) {
         if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
         this.importEnvTable.put(key, env);
@@ -190,7 +200,7 @@ public class Env {
      * @param key   key
      * @param value value
      */
-    public void put(String key, DToken value) {
+    public synchronized void put(String key, DToken value) {
         if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
         this.table.put(key, value);
@@ -203,7 +213,7 @@ public class Env {
      * @param params params
      * @param bodys  bodys
      */
-    public void addMacro(String key, List<String> params, List<Ast> bodys) {
+    public synchronized void addMacro(String key, List<String> params, List<Ast> bodys) {
         DMacro newMacro = DMacro.newMacro(key, params, bodys);
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
@@ -227,7 +237,7 @@ public class Env {
      * @param params params
      * @param bodys  bodys
      */
-    public void setMacro(String key, List<String> params, List<Ast> bodys) {
+    public synchronized void setMacro(String key, List<String> params, List<Ast> bodys) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
@@ -246,7 +256,7 @@ public class Env {
      * @param argc      参数数量
      * @param vararg    是否为可变参数
      */
-    public void addAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
+    public synchronized void addAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         DProcedure newProcedure = DProcedure.newProcedure(key, procedure, argc, vararg);
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
@@ -271,7 +281,7 @@ public class Env {
      * @param argc      参数数量
      * @param vararg    是否为可变参数
      */
-    public void addTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
+    public synchronized void addTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
         BiFunction<Ast, Env, DToken> df = (ast, env) -> {
             List<DToken> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
@@ -304,7 +314,7 @@ public class Env {
      * @param argc      参数数量
      * @param vararg    是否为可变参数
      */
-    public void setAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
+    public synchronized void setAstProcedure(String key, BiFunction<Ast, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
@@ -323,7 +333,7 @@ public class Env {
      * @param argc      参数数量
      * @param vararg    是否为可变参数
      */
-    public void setTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
+    public synchronized void setTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
@@ -417,7 +427,7 @@ public class Env {
     /**
      * 清空环境
      */
-    public void clear() {
+    public synchronized void clear() {
         this.table.clear();
         this.importEnvTable.clear();
     }

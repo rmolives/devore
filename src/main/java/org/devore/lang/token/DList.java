@@ -21,14 +21,16 @@ public class DList extends DToken {
     }
 
     public static DList valueOf(List<DToken> list) {
-        return new DList(list);
+        return new DList(Collections.synchronizedList(new ArrayList<>(list)));
     }
 
     /**
      * 清空列表
      */
     public void clear() {
-        this.list.clear();
+        synchronized (this.list) {
+            this.list.clear();
+        }
     }
 
     /**
@@ -39,10 +41,12 @@ public class DList extends DToken {
      */
     public DList sort(boolean force) {
         if (force) {
-            this.list.sort(DToken::compareTo);
+            synchronized (this.list) {
+                this.list.sort(DToken::compareTo);
+            }
             return this;
         }
-        List<DToken> newList = new ArrayList<>(this.list);
+        List<DToken> newList = snapshot();
         newList.sort(DToken::compareTo);
         return DList.valueOf(newList);
     }
@@ -55,10 +59,12 @@ public class DList extends DToken {
      */
     public DList reverse(boolean force) {
         if (force) {
-            Collections.reverse(this.list);
+            synchronized (this.list) {
+                Collections.reverse(this.list);
+            }
             return this;
         }
-        List<DToken> newList = new ArrayList<>(this.list);
+        List<DToken> newList = snapshot();
         Collections.reverse(newList);
         return DList.valueOf(newList);
     }
@@ -72,10 +78,12 @@ public class DList extends DToken {
      */
     public DList add(DToken t, boolean force) {
         if (force) {
-            this.list.add(t);
+            synchronized (this.list) {
+                this.list.add(t);
+            }
             return this;
         }
-        List<DToken> newList = new ArrayList<>(this.list);
+        List<DToken> newList = snapshot();
         newList.add(t);
         return DList.valueOf(newList);
     }
@@ -90,10 +98,12 @@ public class DList extends DToken {
      */
     public DList add(int index, DToken t, boolean force) {
         if (force) {
-            this.list.add(index, t);
+            synchronized (this.list) {
+                this.list.add(index, t);
+            }
             return this;
         }
-        List<DToken> newList = new ArrayList<>(this.list);
+        List<DToken> newList = snapshot();
         newList.add(index, t);
         return DList.valueOf(newList);
     }
@@ -105,9 +115,11 @@ public class DList extends DToken {
      * @return 元素
      */
     public DToken get(int index) {
-        if (index >= this.list.size())
-            throw new DevoreRuntimeException("列表访问过界, 下标=" + index + ", 但列表只有" + this.list.size() + "个元素.");
-        return this.list.get(index);
+        synchronized (this.list) {
+            if (index >= this.list.size())
+                throw new DevoreRuntimeException("列表访问过界, 下标=" + index + ", 但列表只有" + this.list.size() + "个元素.");
+            return this.list.get(index);
+        }
     }
 
     /**
@@ -120,10 +132,12 @@ public class DList extends DToken {
      */
     public DToken set(int index, DToken t, boolean force) {
         if (force) {
-            this.list.set(index, t);
+            synchronized (this.list) {
+                this.list.set(index, t);
+            }
             return this;
         }
-        List<DToken> newList = new ArrayList<>(this.list);
+        List<DToken> newList = snapshot();
         newList.set(index, t);
         return DList.valueOf(newList);
     }
@@ -136,13 +150,15 @@ public class DList extends DToken {
      * @return 结果
      */
     public DList remove(int index, boolean force) {
-        if (index >= this.list.size())
-            throw new DevoreRuntimeException("列表删除过界, 下标=" + index + ", 但列表只有" + this.list.size() + "个元素.");
-        if (force) {
-            this.list.remove(index);
-            return this;
+        synchronized (this.list) {
+            if (index >= this.list.size())
+                throw new DevoreRuntimeException("列表删除过界, 下标=" + index + ", 但列表只有" + this.list.size() + "个元素.");
+            if (force) {
+                this.list.remove(index);
+                return this;
+            }
         }
-        List<DToken> newList = new ArrayList<>(this.list);
+        List<DToken> newList = snapshot();
         newList.remove(index);
         return DList.valueOf(newList);
     }
@@ -154,7 +170,9 @@ public class DList extends DToken {
      * @return 位置
      */
     public int indexOf(DToken t) {
-        return this.list.indexOf(t);
+        synchronized (this.list) {
+            return this.list.indexOf(t);
+        }
     }
 
     /**
@@ -164,7 +182,9 @@ public class DList extends DToken {
      * @return 位置
      */
     public int lastIndexOf(DToken t) {
-        return this.list.lastIndexOf(t);
+        synchronized (this.list) {
+            return this.list.lastIndexOf(t);
+        }
     }
 
     /**
@@ -174,7 +194,9 @@ public class DList extends DToken {
      * @return 结果
      */
     public boolean contains(DToken t) {
-        return this.list.contains(t);
+        synchronized (this.list) {
+            return this.list.contains(t);
+        }
     }
 
     /**
@@ -183,7 +205,9 @@ public class DList extends DToken {
      * @return 数量
      */
     public int size() {
-        return this.list.size();
+        synchronized (this.list) {
+            return this.list.size();
+        }
     }
 
     /**
@@ -195,20 +219,22 @@ public class DList extends DToken {
      * @return 截取后的列表
      */
     public DList subList(int fromIndex, int toIndex, boolean force) {
-        if (fromIndex > toIndex)
-            throw new DevoreRuntimeException("列表截取起始下标大于目标下标, fromIndex=" + fromIndex
-                    + ", toIndex=" + toIndex + ", length=" + this.list.size());
-        if (fromIndex >= this.list.size() || fromIndex < 0)
-            throw new DevoreRuntimeException("列表截取过界, fromIndex=" + fromIndex + ", 但列表只有" + this.list.size() + "个元素.");
-        if (toIndex > this.list.size())
-            throw new DevoreRuntimeException("列表截取过界, toIndex=" + toIndex + ", 但列表只有" + this.list.size() + "个元素.");
-        if (force) {
-            List<DToken> view = new ArrayList<>(this.list.subList(fromIndex, toIndex));
-            this.list.clear();
-            this.list.addAll(view);
-            return this;
+        synchronized (this.list) {
+            if (fromIndex > toIndex)
+                throw new DevoreRuntimeException("列表截取起始下标大于目标下标, fromIndex=" + fromIndex
+                        + ", toIndex=" + toIndex + ", length=" + this.list.size());
+            if (fromIndex >= this.list.size() || fromIndex < 0)
+                throw new DevoreRuntimeException("列表截取过界, fromIndex=" + fromIndex + ", 但列表只有" + this.list.size() + "个元素.");
+            if (toIndex > this.list.size())
+                throw new DevoreRuntimeException("列表截取过界, toIndex=" + toIndex + ", 但列表只有" + this.list.size() + "个元素.");
+            if (force) {
+                List<DToken> view = new ArrayList<>(this.list.subList(fromIndex, toIndex));
+                this.list.clear();
+                this.list.addAll(view);
+                return this;
+            }
+            return DList.valueOf(new ArrayList<>(this.list.subList(fromIndex, toIndex)));
         }
-        return DList.valueOf(new ArrayList<>(this.list.subList(fromIndex, toIndex)));
     }
 
     /**
@@ -217,7 +243,13 @@ public class DList extends DToken {
      * @return 结果
      */
     public List<DToken> toList() {
-        return this.list;
+        return snapshot();
+    }
+
+    private List<DToken> snapshot() {
+        synchronized (this.list) {
+            return new ArrayList<>(this.list);
+        }
     }
 
     @Override
@@ -227,7 +259,7 @@ public class DList extends DToken {
 
     @Override
     protected String str() {
-        return this.list.stream()
+        return snapshot().stream()
                 .map(FormatUtils::formatToken)
                 .collect(Collectors.joining(", ", "[", "]"));
     }
@@ -237,14 +269,16 @@ public class DList extends DToken {
         if (!(t instanceof DList))
             return -1;
         DList other = (DList) t;
-        if (other.size() != this.size())
+        List<DToken> thisSnapshot = snapshot();
+        List<DToken> otherSnapshot = other.snapshot();
+        if (otherSnapshot.size() != thisSnapshot.size())
             return -1;
-        return IntStream.range(0, this.size())
-                .allMatch(i -> other.get(i).equals(this.get(i))) ? 0 : -1;
+        return IntStream.range(0, thisSnapshot.size())
+                .allMatch(i -> otherSnapshot.get(i).equals(thisSnapshot.get(i))) ? 0 : -1;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.type(), this.list);
+        return Objects.hash(this.type(), snapshot());
     }
 }
