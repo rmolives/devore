@@ -454,11 +454,11 @@ public class CoreModule extends DModule {
         }).collect(Collectors.toList()))), 1, true);
         dEnv.addTokenProcedure("import", ((args, env) -> {
             args.forEach(name -> {
+                if (!(name instanceof DString))
+                    throw new DevoreCastException(name.type(), "string");
                 if (env.modules.containsKey(name.toString()))
                     env.loadModule(name.toString());
                 else {
-                    if (!(name instanceof DString))
-                        throw new DevoreCastException(name.type(), "string");
                     String file = name.toString();
                     Path path = Paths.get(file);
                     if (!Files.exists(path))
