@@ -47,7 +47,7 @@
 * 参数作用：HTTP服务端、路由路径、处理过程
 * 参数类型：http-server、string、procedure
 * 返回值：nil
-* 返回类型：nil
+* 返回类型：word
 * 示例：(http-handler server "/" (lambda [request] "hello"))
 
 处理过程接收request表：
@@ -70,7 +70,7 @@
 * 参数作用：HTTP服务端
 * 参数类型：http-server
 * 返回值：nil
-* 返回类型：nil
+* 返回类型：word
 * 示例：(http-start server)
 
 ### http-stop
@@ -80,7 +80,7 @@
 * 参数作用：HTTP服务端
 * 参数类型：http-server
 * 返回值：nil
-* 返回类型：nil
+* 返回类型：word
 * 示例：(http-stop server)
 
 ### http-stop
@@ -90,7 +90,7 @@
 * 参数作用：HTTP服务端、等待时间（秒）
 * 参数类型：http-server、int
 * 返回值：nil
-* 返回类型：nil
+* 返回类型：word
 * 示例：(http-stop server 1)
 
 ## http-get
