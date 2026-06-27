@@ -35,6 +35,8 @@ public class Env {
             new AbstractMap.SimpleEntry<>("os", new OSModule()),
             new AbstractMap.SimpleEntry<>("sign", new SignModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
+            new AbstractMap.SimpleEntry<>("tcp", new TCPModule()),
+            new AbstractMap.SimpleEntry<>("udp", new UDPModule()),
             new AbstractMap.SimpleEntry<>("hash", new HashModule())
     ).collect(Collectors.toMap(
             Map.Entry::getKey,

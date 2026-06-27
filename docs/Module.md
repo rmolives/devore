@@ -4,6 +4,8 @@
 
 * core：核心模块
 * http：http模块
+* tcp：TCP网络模块
+* udp：UDP网络模块
 * file：文件模块
 * json：json模块
 * thread：并发模块
