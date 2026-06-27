@@ -364,11 +364,6 @@ public class Env {
             tableEnv.table.put(key, value);
             return;
         }
-        Env importEnv = findImportEnv(key);
-        if (importEnv != null) {
-            importEnv.importEnvTable.get(key).set(key, value);
-            return;
-        }
         rootEnv().table.put(key, value);
     }
 
