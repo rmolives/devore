@@ -6,6 +6,8 @@
 
 这是Devore语言（一种Lisp方言）的解释器，运行于JVM平台。
 
+[文档](docs/README.md)
+
 ## 示例
 
 ### Sqrt
