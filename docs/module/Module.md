@@ -9,6 +9,7 @@
 * [file](File.md)：文件与目录的读写、查询和管理
 * [json](Json.md)：JSON数据的解析、生成与转换
 * [csv](Csv.md)：RFC 4180 CSV数据的解析、生成与文件读写
+* [xml](Xml.md)：XML数据的解析、生成与节点构造
 * [properties](Properties.md)：Properties配置的解析、生成与文件读写
 * [regex](Regex.md)：正则表达式匹配、查找、替换与分割
 * [thread](Thread.md)：线程创建、任务并发与同步控制
