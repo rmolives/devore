@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * 抽象语法树
  */
 public class Ast extends DToken {
-    public final static Ast empty = new Ast(DWord.NIL);     // 空白语法树
+    public static final Ast empty = new Ast(DWord.NIL);     // 空白语法树
     public List<Ast> children;                              // 子树
     public DToken symbol;                                   // 符号
     public Type type;                                       // 语法树类型
