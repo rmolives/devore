@@ -36,6 +36,7 @@ public class Env {
             new AbstractMap.SimpleEntry<>("os", new OSModule()),
             new AbstractMap.SimpleEntry<>("properties", new PropertiesModule()),
             new AbstractMap.SimpleEntry<>("regex", new RegexModule()),
+            new AbstractMap.SimpleEntry<>("reflect", new ReflectModule()),
             new AbstractMap.SimpleEntry<>("sign", new SignModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
             new AbstractMap.SimpleEntry<>("tcp", new TCPModule()),

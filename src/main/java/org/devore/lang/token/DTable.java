@@ -120,6 +120,15 @@ public class DTable extends DToken {
     }
 
     /**
+     * 转换为Java的Map
+     *
+     * @return 结果
+     */
+    public Map<DToken, DToken> toMap() {
+        return snapshot();
+    }
+
+    /**
      * 获取数量
      *
      * @return 数量
