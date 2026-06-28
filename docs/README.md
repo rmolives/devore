@@ -18,17 +18,16 @@
 * null：nil
 
 ## 注释
+
 使用`;xxx`进行注释。
 
-## 文档
-
-### 基础
+## 基础
 
 * [普通过程](Ordinary.md)
 * [类型](Type.md)
 * [模块](module/Module.md)
 
-### 数据处理
+## 数据处理
 
 * [字符串](String.md)
 * [列表](List.md)
@@ -44,7 +43,7 @@
 * [Properties](module/Properties.md)
 * [正则表达式](module/Regex.md)
 
-### 系统与工具
+## 系统与工具
 
 * [文件](module/File.md)
 * [HTTP](module/Http.md)
