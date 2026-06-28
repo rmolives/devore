@@ -4,6 +4,7 @@
 
 * [core](../README.md)：基础运行能力与通用工具
 * [http](Http.md)：HTTP客户端与服务端通信能力
+* [net](Net.md)：DNS查询、本机地址与网络接口信息查询
 * [tcp](TCP.md)：基于TCP协议的网络连接与数据传输
 * [udp](UDP.md)：基于UDP协议的数据报发送与接收
 * [file](File.md)：文件与目录的读写、查询和管理
