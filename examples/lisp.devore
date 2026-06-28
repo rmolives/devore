@@ -110,4 +110,4 @@
 (table-put! env "*" *)
 (table-put! env "/" /)
 (def (call code) (eval env (parse (lexer code))))
-(while true (println (call (read-line))))
+(println (call "(+ 3 (* 4 5))"))
