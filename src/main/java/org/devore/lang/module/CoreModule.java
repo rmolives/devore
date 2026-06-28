@@ -27,8 +27,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -1466,22 +1466,8 @@ public class CoreModule extends DModule {
             String str = args.get(0).toString();
             String sep = args.get(1).toString();
             String[] parts = str.split(Pattern.quote(sep), -1);
-            int end = IntStream.rangeClosed(0, parts.length)
-                    .map(i -> parts.length - i)
-                    .filter(i -> i == 0 || !parts[i - 1].isEmpty())
-                    .findFirst()
-                    .orElse(0);
-            return DList.valueOf(Arrays.stream(parts, 0, end)
+            return DList.valueOf(Arrays.stream(parts)
                     .map(DString::valueOf)
-                    .collect(Collectors.toList()));
-        }), 2, false);
-        dEnv.addTokenProcedure("string-split-regex", ((args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            if (!(args.get(1) instanceof DString))
-                throw new DevoreCastException(args.get(1).type(), "string");
-            return DList.valueOf(Arrays.stream(args.get(0).toString()
-                            .split(args.get(1).toString())).map(DString::valueOf)
                     .collect(Collectors.toList()));
         }), 2, false);
         dEnv.addTokenProcedure("string-trim", ((args, env) -> {
@@ -1521,16 +1507,6 @@ public class CoreModule extends DModule {
             return DString.valueOf(args.get(0).toString()
                     .replace(args.get(1).toString(), args.get(2).toString()));
         }), 3, false);
-        dEnv.addTokenProcedure("string-replace-regex", ((args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            if (!(args.get(1) instanceof DString))
-                throw new DevoreCastException(args.get(1).type(), "string");
-            if (!(args.get(2) instanceof DString))
-                throw new DevoreCastException(args.get(2).type(), "string");
-            return DString.valueOf(args.get(0).toString()
-                    .replaceAll(args.get(1).toString(), args.get(2).toString()));
-        }), 3, false);
         dEnv.addTokenProcedure("string-index", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
@@ -1551,13 +1527,6 @@ public class CoreModule extends DModule {
             if (!(args.get(1) instanceof DString))
                 throw new DevoreCastException(args.get(1).type(), "string");
             return DBool.valueOf(args.get(0).toString().contains(args.get(1).toString()));
-        }), 2, false);
-        dEnv.addTokenProcedure("string-match", ((args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            if (!(args.get(1) instanceof DString))
-                throw new DevoreCastException(args.get(1).type(), "string");
-            return DBool.valueOf(args.get(0).toString().matches(args.get(1).toString()));
         }), 2, false);
         dEnv.addTokenProcedure("string-empty?", ((args, env) -> {
             if (!(args.get(0) instanceof DString))

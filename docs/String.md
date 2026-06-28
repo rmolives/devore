@@ -100,16 +100,6 @@
 * 返回类型：bool
 * 示例：(string-contains "dabac" "a")
 
-## string-match
-
-* 作用：字符串是否符合正则
-* 参数数量：2
-* 参数作用：字符串、正则
-* 参数类型：string、string
-* 返回值：bool
-* 返回类型：bool
-* 示例：(string-match "dabac" "a")
-
 ## string-starts-with
 
 * 作用：字符串是否起始特定字符串
@@ -180,33 +170,13 @@
 * 返回类型：string
 * 示例：(string-replace "dabac" "a" "c")
 
-## string-replace-regex
-
-* 作用：替换字符串（正则）
-* 参数数量：2
-* 参数作用：原字符串、替换前、替换后
-* 参数类型：string、string、string
-* 返回值：替换后的内容
-* 返回类型：string
-* 示例：(string-replace-regex "dabac" "a" "c")
-
-## string-split-regex
-
-* 作用：分割字符串（正则）
-* 参数数量：2
-* 参数作用：原字符串、分割字符串
-* 参数类型：string、string
-* 返回值：list
-* 返回类型：list
-* 示例：(string-split-regex "dabac" "a")
-
 ## string-split
 
-* 作用：分割字符串（正则）
+* 作用：按特定字符串分割字符串
 * 参数数量：2
 * 参数作用：原字符串、分割字符串
 * 参数类型：string、string
-* 返回值：list
+* 返回值：分割后的列表，保留尾部空字符串
 * 返回类型：list
 * 示例：(string-split "dabac" "a")
 
