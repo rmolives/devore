@@ -1,4 +1,4 @@
-# Home
+# 文档
 
 欢迎使用**Devore Language**，是一门**Java**实现的**Lisp方言**，本wiki将讲解**Devore Language**的内置过程的用法等。
 
