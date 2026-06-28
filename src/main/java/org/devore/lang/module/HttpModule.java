@@ -184,6 +184,8 @@ public class HttpModule extends DModule {
         dEnv.addTokenProcedure("http-request", (args, env) ->
                 toResponseTable(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)),
                         toOptionalRequestBody(args.get(3)), toTimeout(args.get(4)))), 5, false);
+        registerRequestResult(dEnv, "http-request-binary", true);
+        registerRequestResult(dEnv, "http-request-string", false);
         dEnv.addTokenProcedure("http-get", (args, env) ->
                 toResponseTable(requestToken(args.get(0), "GET", null, null, DEFAULT_TIMEOUT)), 1, false);
         dEnv.addTokenProcedure("http-get", (args, env) -> {
@@ -205,30 +207,22 @@ public class HttpModule extends DModule {
         dEnv.addTokenProcedure("http-delete", (args, env) ->
                 toResponseTable(requestToken(args.get(0), "DELETE", toHeaders(args.get(1)), null,
                         toTimeout(args.get(2)))), 3, false);
-        registerGetResult(dEnv, "http-get-binary", true);
-        registerGetResult(dEnv, "http-get-string", false);
-        registerPostResult(dEnv, "http-post-binary", true);
-        registerPostResult(dEnv, "http-post-string",false);
-        dEnv.addTokenProcedure("http-post-form", (args, env) -> {
-            DTable headers = contentType(null, "application/x-www-form-urlencoded; charset=UTF-8");
-            return toResponseTable(requestToken(args.get(0), "POST", headers,
-                    buildQuery(toTableToken(args.get(1))).getBytes(StandardCharsets.UTF_8), DEFAULT_TIMEOUT));
-        }, 2, false);
-        dEnv.addTokenProcedure("http-post-form", (args, env) -> {
-            DTable headers = contentType(toHeaders(args.get(1)), "application/x-www-form-urlencoded; charset=UTF-8");
-            return toResponseTable(requestToken(args.get(0), "POST", headers,
-                    buildQuery(toTableToken(args.get(2))).getBytes(StandardCharsets.UTF_8), DEFAULT_TIMEOUT));
-        }, 3, false);
-        dEnv.addTokenProcedure("http-post-multipart", (args, env) -> {
-            MultipartBody body = multipart(toTableToken(args.get(1)), toTableToken(args.get(2)));
-            return toResponseTable(requestToken(args.get(0), "POST", contentType(null,
-                    "multipart/form-data; boundary=" + body.boundary), body.body, DEFAULT_TIMEOUT));
-        }, 3, false);
-        dEnv.addTokenProcedure("http-post-multipart", (args, env) -> {
-            MultipartBody body = multipart(toTableToken(args.get(2)), toTableToken(args.get(3)));
-            return toResponseTable(requestToken(args.get(0), "POST", contentType(toHeaders(args.get(1)),
-                    "multipart/form-data; boundary=" + body.boundary), body.body, DEFAULT_TIMEOUT));
-        }, 4, false);
+        registerNoBodyResult(dEnv, "http-get-binary", "GET", true);
+        registerNoBodyResult(dEnv, "http-get-string", "GET", false);
+        registerBodyResult(dEnv, "http-post-binary", "POST", true);
+        registerBodyResult(dEnv, "http-post-string", "POST", false);
+        registerBodyResult(dEnv, "http-put-binary", "PUT", true);
+        registerBodyResult(dEnv, "http-put-string", "PUT", false);
+        registerBodyResult(dEnv, "http-patch-binary", "PATCH", true);
+        registerBodyResult(dEnv, "http-patch-string", "PATCH", false);
+        registerNoBodyResult(dEnv, "http-delete-binary", "DELETE", true);
+        registerNoBodyResult(dEnv, "http-delete-string", "DELETE", false);
+        registerPostForm(dEnv);
+        registerPostFormResult(dEnv, "http-post-form-binary", true);
+        registerPostFormResult(dEnv, "http-post-form-string", false);
+        registerPostMultipart(dEnv);
+        registerPostMultipartResult(dEnv, "http-post-multipart-binary", true);
+        registerPostMultipartResult(dEnv, "http-post-multipart-string", false);
     }
 
     private void initHelpers(Env dEnv) {
@@ -269,70 +263,225 @@ public class HttpModule extends DModule {
                         toRequestBody(args.get(2)), toTimeout(args.get(3)))), 4, false);
     }
 
-    private void registerGetResult(Env dEnv, String name, boolean binary) {
+    private void registerRequestResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
-                responseBody(requestToken(args.get(0), "GET", null, null, DEFAULT_TIMEOUT), binary,
+                responseBody(requestToken(args.get(1), method(args.get(0)), null, null, DEFAULT_TIMEOUT), binary,
+                        StandardCharsets.UTF_8), 2, false);
+        dEnv.addTokenProcedure(name, (args, env) -> {
+            if (binary)
+                return responseBody(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)), null,
+                        DEFAULT_TIMEOUT), true, StandardCharsets.UTF_8);
+            if (args.get(2) instanceof DString)
+                return responseBody(requestToken(args.get(1), method(args.get(0)), null, null, DEFAULT_TIMEOUT),
+                        false, toCharset(args.get(2)));
+            return responseBody(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)), null,
+                    DEFAULT_TIMEOUT), false, StandardCharsets.UTF_8);
+        }, 3, false);
+        dEnv.addTokenProcedure(name, (args, env) ->
+                responseBody(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                        toOptionalRequestBody(args.get(3)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8),
+                4, false);
+        dEnv.addTokenProcedure(name, (args, env) -> {
+            if (binary)
+                return responseBody(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                        toOptionalRequestBody(args.get(3)), toTimeout(args.get(4))), true, StandardCharsets.UTF_8);
+            if (args.get(4) instanceof DInt)
+                return responseBody(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                        toOptionalRequestBody(args.get(3)), toTimeout(args.get(4))), false, StandardCharsets.UTF_8);
+            return responseBody(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                    toOptionalRequestBody(args.get(3)), DEFAULT_TIMEOUT), false, toCharset(args.get(4)));
+        }, 5, false);
+        if (!binary) {
+            dEnv.addTokenProcedure(name, (args, env) ->
+                    responseBody(requestToken(args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                            toOptionalRequestBody(args.get(3)), toTimeout(args.get(5))), false,
+                            toCharset(args.get(4))), 6, false);
+        }
+    }
+
+    private void registerNoBodyResult(Env dEnv, String name, String method, boolean binary) {
+        dEnv.addTokenProcedure(name, (args, env) ->
+                responseBody(requestToken(args.get(0), method, null, null, DEFAULT_TIMEOUT), binary,
                         StandardCharsets.UTF_8), 1, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (binary) {
                 RequestOptions options = headersOrTimeout(args.get(1));
-                return responseBody(requestToken(args.get(0), "GET", options.headers, null, options.timeout), true,
+                return responseBody(requestToken(args.get(0), method, options.headers, null, options.timeout), true,
                         StandardCharsets.UTF_8);
             }
             if (args.get(1) instanceof DString)
-                return responseBody(requestToken(args.get(0), "GET", null, null, DEFAULT_TIMEOUT), false,
+                return responseBody(requestToken(args.get(0), method, null, null, DEFAULT_TIMEOUT), false,
                         toCharset(args.get(1)));
             RequestOptions options = headersOrTimeout(args.get(1));
-            return responseBody(requestToken(args.get(0), "GET", options.headers, null, options.timeout), false,
+            return responseBody(requestToken(args.get(0), method, options.headers, null, options.timeout), false,
                     StandardCharsets.UTF_8);
         }, 2, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (binary)
-                return responseBody(requestToken(args.get(0), "GET", toHeaders(args.get(1)), null,
+                return responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)), null,
                         toTimeout(args.get(2))), true, StandardCharsets.UTF_8);
-            return responseBody(requestToken(args.get(0), "POST", toHeaders(args.get(1)), null, DEFAULT_TIMEOUT),
+            if (args.get(2) instanceof DInt)
+                return responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)), null,
+                        toTimeout(args.get(2))), false, StandardCharsets.UTF_8);
+            return responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)), null, DEFAULT_TIMEOUT),
                     false, toCharset(args.get(2)));
         }, 3, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
-                    responseBody(requestToken(args.get(0), "GET", toHeaders(args.get(1)), null,
+                    responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)), null,
                             toTimeout(args.get(3))), false, toCharset(args.get(2))), 4, false);
         }
     }
 
-    private void registerPostResult(Env dEnv, String name, boolean binary) {
+    private void registerBodyResult(Env dEnv, String name, String method, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
-                responseBody(requestToken(args.get(0), "POST", null, toRequestBody(args.get(1)), DEFAULT_TIMEOUT),
+                responseBody(requestToken(args.get(0), method, null, toRequestBody(args.get(1)), DEFAULT_TIMEOUT),
                         binary, StandardCharsets.UTF_8), 2, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(1) instanceof DTable)
-                return responseBody(requestToken(args.get(0), "POST", (DTable) args.get(1),
+                return responseBody(requestToken(args.get(0), method, (DTable) args.get(1),
                         toRequestBody(args.get(2)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
             if (binary)
-                return responseBody(requestToken(args.get(0), "POST", null, toRequestBody(args.get(1)),
+                return responseBody(requestToken(args.get(0), method, null, toRequestBody(args.get(1)),
                         toTimeout(args.get(2))), true, StandardCharsets.UTF_8);
             if (args.get(2) instanceof DInt)
-                return responseBody(requestToken(args.get(0), "POST", null, toRequestBody(args.get(1)),
+                return responseBody(requestToken(args.get(0), method, null, toRequestBody(args.get(1)),
                         toTimeout(args.get(2))), false, StandardCharsets.UTF_8);
-            return responseBody(requestToken(args.get(0), "POST", null, toRequestBody(args.get(1)),
+            return responseBody(requestToken(args.get(0), method, null, toRequestBody(args.get(1)),
                     DEFAULT_TIMEOUT), false, toCharset(args.get(2)));
         }, 3, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (binary)
-                return responseBody(requestToken(args.get(0), "POST", toHeaders(args.get(1)),
+                return responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)),
                         toRequestBody(args.get(2)), toTimeout(args.get(3))), true, StandardCharsets.UTF_8);
             if (args.get(3) instanceof DInt)
-                return responseBody(requestToken(args.get(0), "POST", toHeaders(args.get(1)),
+                return responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)),
                         toRequestBody(args.get(2)), toTimeout(args.get(3))), false, StandardCharsets.UTF_8);
-            return responseBody(requestToken(args.get(0), "POST", toHeaders(args.get(1)),
+            return responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)),
                     toRequestBody(args.get(2)), DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
         }, 4, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
-                    responseBody(requestToken(args.get(0), "POST", toHeaders(args.get(1)),
+                    responseBody(requestToken(args.get(0), method, toHeaders(args.get(1)),
                             toRequestBody(args.get(2)), toTimeout(args.get(4))), false, toCharset(args.get(3))),
                     5, false);
         }
+    }
+
+    private void registerPostForm(Env dEnv) {
+        dEnv.addTokenProcedure("http-post-form", (args, env) ->
+                toResponseTable(postForm(args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT)), 2, false);
+        dEnv.addTokenProcedure("http-post-form", (args, env) -> {
+            if (args.get(2) instanceof DInt)
+                return toResponseTable(postForm(args.get(0), null, toTableToken(args.get(1)), toTimeout(args.get(2))));
+            return toResponseTable(postForm(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    DEFAULT_TIMEOUT));
+        }, 3, false);
+        dEnv.addTokenProcedure("http-post-form", (args, env) ->
+                toResponseTable(postForm(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        toTimeout(args.get(3)))), 4, false);
+    }
+
+    private void registerPostFormResult(Env dEnv, String name, boolean binary) {
+        dEnv.addTokenProcedure(name, (args, env) ->
+                responseBody(postForm(args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT), binary,
+                        StandardCharsets.UTF_8), 2, false);
+        dEnv.addTokenProcedure(name, (args, env) -> {
+            if (args.get(2) instanceof DInt)
+                return responseBody(postForm(args.get(0), null, toTableToken(args.get(1)), toTimeout(args.get(2))),
+                        binary, StandardCharsets.UTF_8);
+            if (!binary && args.get(2) instanceof DString)
+                return responseBody(postForm(args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT), false,
+                        toCharset(args.get(2)));
+            return responseBody(postForm(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
+        }, 3, false);
+        dEnv.addTokenProcedure(name, (args, env) -> {
+            if (args.get(2) instanceof DString && args.get(3) instanceof DInt) {
+                if (binary)
+                    throw new DevoreCastException(args.get(2).type(), "table");
+                return responseBody(postForm(args.get(0), null, toTableToken(args.get(1)), toTimeout(args.get(3))),
+                        false, toCharset(args.get(2)));
+            }
+            if (binary)
+                return responseBody(postForm(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        toTimeout(args.get(3))), true, StandardCharsets.UTF_8);
+            if (args.get(3) instanceof DInt)
+                return responseBody(postForm(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        toTimeout(args.get(3))), false, StandardCharsets.UTF_8);
+            return responseBody(postForm(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
+        }, 4, false);
+        if (!binary) {
+            dEnv.addTokenProcedure(name, (args, env) ->
+                    responseBody(postForm(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                            toTimeout(args.get(4))), false, toCharset(args.get(3))), 5, false);
+        }
+    }
+
+    private void registerPostMultipart(Env dEnv) {
+        dEnv.addTokenProcedure("http-post-multipart", (args, env) ->
+                toResponseTable(postMultipart(args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), DEFAULT_TIMEOUT)), 3, false);
+        dEnv.addTokenProcedure("http-post-multipart", (args, env) -> {
+            if (args.get(3) instanceof DInt)
+                return toResponseTable(postMultipart(args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), toTimeout(args.get(3))));
+            return toResponseTable(postMultipart(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    toTableToken(args.get(3)), DEFAULT_TIMEOUT));
+        }, 4, false);
+        dEnv.addTokenProcedure("http-post-multipart", (args, env) ->
+                toResponseTable(postMultipart(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        toTableToken(args.get(3)), toTimeout(args.get(4)))), 5, false);
+    }
+
+    private void registerPostMultipartResult(Env dEnv, String name, boolean binary) {
+        dEnv.addTokenProcedure(name, (args, env) ->
+                responseBody(postMultipart(args.get(0), null, toTableToken(args.get(1)), toTableToken(args.get(2)),
+                        DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8), 3, false);
+        dEnv.addTokenProcedure(name, (args, env) -> {
+            if (args.get(3) instanceof DInt)
+                return responseBody(postMultipart(args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), toTimeout(args.get(3))), binary, StandardCharsets.UTF_8);
+            if (!binary && args.get(3) instanceof DString)
+                return responseBody(postMultipart(args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
+            return responseBody(postMultipart(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    toTableToken(args.get(3)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
+        }, 4, false);
+        dEnv.addTokenProcedure(name, (args, env) -> {
+            if (args.get(3) instanceof DString && args.get(4) instanceof DInt) {
+                if (binary)
+                    throw new DevoreCastException(args.get(3).type(), "table");
+                return responseBody(postMultipart(args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), toTimeout(args.get(4))), false, toCharset(args.get(3)));
+            }
+            if (binary)
+                return responseBody(postMultipart(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        toTableToken(args.get(3)), toTimeout(args.get(4))), true, StandardCharsets.UTF_8);
+            if (args.get(4) instanceof DInt)
+                return responseBody(postMultipart(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        toTableToken(args.get(3)), toTimeout(args.get(4))), false, StandardCharsets.UTF_8);
+            return responseBody(postMultipart(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    toTableToken(args.get(3)), DEFAULT_TIMEOUT), false, toCharset(args.get(4)));
+        }, 5, false);
+        if (!binary) {
+            dEnv.addTokenProcedure(name, (args, env) ->
+                    responseBody(postMultipart(args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                            toTableToken(args.get(3)), toTimeout(args.get(5))), false, toCharset(args.get(4))),
+                    6, false);
+        }
+    }
+
+    private static Response postForm(DToken url, DTable headers, DTable form, int timeout) {
+        DTable requestHeaders = contentType(headers, "application/x-www-form-urlencoded; charset=UTF-8");
+        return requestToken(url, "POST", requestHeaders, buildQuery(form).getBytes(StandardCharsets.UTF_8), timeout);
+    }
+
+    private static Response postMultipart(DToken url, DTable headers, DTable fields, DTable files, int timeout) {
+        MultipartBody body = multipart(fields, files);
+        DTable requestHeaders = contentType(headers, "multipart/form-data; boundary=" + body.boundary);
+        return requestToken(url, "POST", requestHeaders, body.body, timeout);
     }
 
     private static DToken registerHandler(List<DToken> args, Env env, DToken methodToken) {

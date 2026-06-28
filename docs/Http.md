@@ -325,142 +325,241 @@
 
 ## 字符串和二进制响应
 
-### http-get-string
+### http-request-string
 
-* 作用：GET访问http/https，并返回string
+* 作用：通用HTTP请求，并返回string
+* 参数数量：2
+* 参数作用：HTTP方法、url
+* 参数类型：string、string
+* 返回类型：string
+* 示例：(http-request-string "GET" "http://127.0.0.1/")
+
+### http-request-string
+
+* 作用：通用HTTP请求，并采用特定编码格式或使用headers
+* 参数数量：3
+* 参数作用：HTTP方法、url、编码格式|headers
+* 参数类型：string、string、string|table
+* 返回类型：string
+* 示例：(http-request-string "GET" "http://127.0.0.1/" "UTF-8")
+
+### http-request-string
+
+* 作用：通用HTTP请求，使用headers和body
+* 参数数量：4
+* 参数作用：HTTP方法、url、headers、body
+* 参数类型：string、string、table、string|list|nil
+* 返回类型：string
+* 示例：(http-request-string "PUT" "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello")
+
+### http-request-string
+
+* 作用：通用HTTP请求，使用headers、body，并采用特定编码格式或超时
+* 参数数量：5
+* 参数作用：HTTP方法、url、headers、body、编码格式|超时（秒）
+* 参数类型：string、string、table、string|list|nil、string|int
+* 返回类型：string
+* 示例：(http-request-string "PATCH" "http://127.0.0.1/" (table) "hello" "UTF-8")
+
+### http-request-string
+
+* 作用：通用HTTP请求，使用headers、body、编码格式和超时
+* 参数数量：6
+* 参数作用：HTTP方法、url、headers、body、编码格式、超时（秒）
+* 参数类型：string、string、table、string|list|nil、string、int
+* 返回类型：string
+* 示例：(http-request-string "PATCH" "http://127.0.0.1/" (table) "hello" "UTF-8" 5)
+
+### http-request-binary
+
+* 作用：通用HTTP请求，并返回binary
+* 参数数量：2
+* 参数作用：HTTP方法、url
+* 参数类型：string、string
+* 返回类型：list
+* 示例：(http-request-binary "GET" "http://127.0.0.1/")
+
+### http-request-binary
+
+* 作用：通用HTTP请求，使用headers
+* 参数数量：3
+* 参数作用：HTTP方法、url、headers
+* 参数类型：string、string、table
+* 返回类型：list
+* 示例：(http-request-binary "GET" "http://127.0.0.1/" (table \["a" "3"\]))
+
+### http-request-binary
+
+* 作用：通用HTTP请求，使用headers和body
+* 参数数量：4
+* 参数作用：HTTP方法、url、headers、body
+* 参数类型：string、string、table、string|list|nil
+* 返回类型：list
+* 示例：(http-request-binary "PUT" "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello")
+
+### http-request-binary
+
+* 作用：通用HTTP请求，使用headers、body和超时
+* 参数数量：5
+* 参数作用：HTTP方法、url、headers、body、超时（秒）
+* 参数类型：string、string、table、string|list|nil、int
+* 返回类型：list
+* 示例：(http-request-binary "PATCH" "http://127.0.0.1/" (table) "hello" 5)
+
+### http-get-string / http-delete-string
+
+* 作用：GET或DELETE访问http/https，并返回string
 * 参数数量：1
 * 参数作用：url
 * 参数类型：string
 * 返回类型：string
 * 示例：(http-get-string "http://127.0.0.1/")
 
-### http-get-string
+### http-get-string / http-delete-string
 
-* 作用：GET访问http/https，并采用特定编码格式或使用headers/超时
+* 作用：GET或DELETE访问http/https，并采用特定编码格式或使用headers/超时
 * 参数数量：2
 * 参数作用：url、编码格式|headers|超时（秒）
 * 参数类型：string、string|table|int
 * 返回类型：string
-* 示例：(http-get-string "http://127.0.0.1/" "UTF-8")
+* 示例：(http-delete-string "http://127.0.0.1/" "UTF-8")
 
-### http-get-string
+### http-get-string / http-delete-string
 
-* 作用：GET访问http/https，使用headers，并采用特定编码格式
+* 作用：GET或DELETE访问http/https，使用headers，并采用特定编码格式或超时
 * 参数数量：3
-* 参数作用：url、headers、编码格式
-* 参数类型：string、table、string
+* 参数作用：url、headers、编码格式|超时（秒）
+* 参数类型：string、table、string|int
 * 返回类型：string
 * 示例：(http-get-string "http://127.0.0.1/" (table \["a" "3"\]) "UTF-8")
 
-### http-get-string
+### http-get-string / http-delete-string
 
-* 作用：GET访问http/https，使用headers、编码格式和超时
+* 作用：GET或DELETE访问http/https，使用headers、编码格式和超时
 * 参数数量：4
 * 参数作用：url、headers、编码格式、超时（秒）
 * 参数类型：string、table、string、int
 * 返回类型：string
-* 示例：(http-get-string "http://127.0.0.1/" (table \["a" "3"\]) "UTF-8" 5)
+* 示例：(http-delete-string "http://127.0.0.1/" (table \["a" "3"\]) "UTF-8" 5)
 
-### http-post-string
+### http-post-string / http-put-string / http-patch-string
 
-* 作用：POST访问http/https，并返回string
+* 作用：POST、PUT或PATCH访问http/https，并返回string
 * 参数数量：2
 * 参数作用：url、body
 * 参数类型：string、string|list
 * 返回类型：string
 * 示例：(http-post-string "http://127.0.0.1/" "hello")
 
-### http-post-string
+### http-post-string / http-put-string / http-patch-string
 
-* 作用：POST访问http/https，使用编码格式、headers或超时
+* 作用：POST、PUT或PATCH访问http/https，使用编码格式、headers或超时
 * 参数数量：3
 * 参数作用：url、body、编码格式|超时（秒） 或 url、headers、body
 * 参数类型：string、string|list、string|int 或 string、table、string|list
 * 返回类型：string
-* 示例：(http-post-string "http://127.0.0.1/" "hello" "UTF-8")
+* 示例：(http-put-string "http://127.0.0.1/" "hello" "UTF-8")
 
-### http-post-string
+### http-post-string / http-put-string / http-patch-string
 
-* 作用：POST访问http/https，使用headers和编码格式或超时
+* 作用：POST、PUT或PATCH访问http/https，使用headers和编码格式或超时
 * 参数数量：4
 * 参数作用：url、headers、body、编码格式|超时（秒）
 * 参数类型：string、table、string|list、string|int
 * 返回类型：string
-* 示例：(http-post-string "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello" "UTF-8")
+* 示例：(http-patch-string "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello" "UTF-8")
 
-### http-post-string
+### http-post-string / http-put-string / http-patch-string
 
-* 作用：POST访问http/https，使用headers、编码格式和超时
+* 作用：POST、PUT或PATCH访问http/https，使用headers、编码格式和超时
 * 参数数量：5
 * 参数作用：url、headers、body、编码格式、超时（秒）
 * 参数类型：string、table、string|list、string、int
 * 返回类型：string
 * 示例：(http-post-string "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello" "UTF-8" 5)
 
-### http-get-binary
+### http-get-binary / http-delete-binary
 
-* 作用：GET访问http/https，并返回binary
+* 作用：GET或DELETE访问http/https，并返回binary
 * 参数数量：1
 * 参数作用：url
 * 参数类型：string
 * 返回类型：list
 * 示例：(http-get-binary "http://127.0.0.1/")
 
-### http-get-binary
+### http-get-binary / http-delete-binary
 
-* 作用：GET访问http/https，使用headers或超时
+* 作用：GET或DELETE访问http/https，使用headers或超时
 * 参数数量：2
 * 参数作用：url、headers|超时（秒）
 * 参数类型：string、table|int
 * 返回类型：list
-* 示例：(http-get-binary "http://127.0.0.1/" (table \["a" "3"\]))
+* 示例：(http-delete-binary "http://127.0.0.1/" (table \["a" "3"\]))
 
-### http-get-binary
+### http-get-binary / http-delete-binary
 
-* 作用：GET访问http/https，使用headers和超时
+* 作用：GET或DELETE访问http/https，使用headers和超时
 * 参数数量：3
 * 参数作用：url、headers、超时（秒）
 * 参数类型：string、table、int
 * 返回类型：list
 * 示例：(http-get-binary "http://127.0.0.1/" (table \["a" "3"\]) 5)
 
-### http-post-binary
+### http-post-binary / http-put-binary / http-patch-binary
 
-* 作用：POST访问http/https，并返回binary
+* 作用：POST、PUT或PATCH访问http/https，并返回binary
 * 参数数量：2
 * 参数作用：url、body
 * 参数类型：string、string|list
 * 返回类型：list
 * 示例：(http-post-binary "http://127.0.0.1/" "hello")
 
-### http-post-binary
+### http-post-binary / http-put-binary / http-patch-binary
 
-* 作用：POST访问http/https，使用headers或超时
+* 作用：POST、PUT或PATCH访问http/https，使用headers或超时
 * 参数数量：3
 * 参数作用：url、headers、body 或 url、body、超时（秒）
 * 参数类型：string、table、string|list 或 string、string|list、int
 * 返回类型：list
-* 示例：(http-post-binary "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello")
+* 示例：(http-put-binary "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello")
 
-### http-post-binary
+### http-post-binary / http-put-binary / http-patch-binary
 
-* 作用：POST访问http/https，使用headers和超时
+* 作用：POST、PUT或PATCH访问http/https，使用headers和超时
 * 参数数量：4
 * 参数作用：url、headers、body、超时（秒）
 * 参数类型：string、table、string|list、int
 * 返回类型：list
-* 示例：(http-post-binary "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello" 5)
+* 示例：(http-patch-binary "http://127.0.0.1/" (table \["Content-Type" "text/plain"\]) "hello" 5)
 
 ## 表单和上传
 
 ### http-post-form
 
+* 作用：以application/x-www-form-urlencoded提交表单，并返回详细响应
+* 参数数量：2
+* 参数作用：url、表单
+* 参数类型：string、table
+* 返回类型：table
+* 示例：(http-post-form "http://127.0.0.1/login" (table \["user" "root"\]))
+
+### http-post-form
+
 * 作用：以application/x-www-form-urlencoded提交表单，使用headers
 * 参数数量：3
-* 参数作用：url、headers、表单
-* 参数类型：string、table、table
+* 参数作用：url、headers、表单 或 url、表单、超时（秒）
+* 参数类型：string、table、table 或 string、table、int
 * 返回类型：table
 * 示例：(http-post-form "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]))
+
+### http-post-form
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers和超时
+* 参数数量：4
+* 参数作用：url、headers、表单、超时（秒）
+* 参数类型：string、table、table、int
+* 返回类型：table
+* 示例：(http-post-form "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) 5)
 
 ### http-post-multipart
 
@@ -473,12 +572,147 @@
 
 ### http-post-multipart
 
-* 作用：以multipart/form-data提交字段和文件，使用headers
+* 作用：以multipart/form-data提交字段和文件，使用headers或超时
 * 参数数量：4
-* 参数作用：url、headers、字段表、文件表
-* 参数类型：string、table、table、table
+* 参数作用：url、headers、字段表、文件表 或 url、字段表、文件表、超时（秒）
+* 参数类型：string、table、table、table 或 string、table、table、int
 * 返回类型：table
 * 示例：(http-post-multipart "http://127.0.0.1/upload" (table) (table \["name" "a"\]) (table \["file" "./a.txt"\]))
+
+### http-post-multipart
+
+* 作用：以multipart/form-data提交字段和文件，使用headers和超时
+* 参数数量：5
+* 参数作用：url、headers、字段表、文件表、超时（秒）
+* 参数类型：string、table、table、table、int
+* 返回类型：table
+* 示例：(http-post-multipart "http://127.0.0.1/upload" (table) (table \["name" "a"\]) (table \["file" "./a.txt"\]) 5)
+
+### http-post-form-string
+
+* 作用：以application/x-www-form-urlencoded提交表单，并返回string
+* 参数数量：2
+* 参数作用：url、表单
+* 参数类型：string、table
+* 返回类型：string
+* 示例：(http-post-form-string "http://127.0.0.1/login" (table \["user" "root"\]))
+
+### http-post-form-string
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用编码格式、headers或超时
+* 参数数量：3
+* 参数作用：url、表单、编码格式|超时（秒） 或 url、headers、表单
+* 参数类型：string、table、string|int 或 string、table、table
+* 返回类型：string
+* 示例：(http-post-form-string "http://127.0.0.1/login" (table \["user" "root"\]) "UTF-8")
+
+### http-post-form-string
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers和编码格式或超时，或使用编码格式和超时
+* 参数数量：4
+* 参数作用：url、headers、表单、编码格式|超时（秒） 或 url、表单、编码格式、超时（秒）
+* 参数类型：string、table、table、string|int 或 string、table、string、int
+* 返回类型：string
+* 示例：(http-post-form-string "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) "UTF-8")
+
+### http-post-form-string
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers、编码格式和超时
+* 参数数量：5
+* 参数作用：url、headers、表单、编码格式、超时（秒）
+* 参数类型：string、table、table、string、int
+* 返回类型：string
+* 示例：(http-post-form-string "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) "UTF-8" 5)
+
+### http-post-form-binary
+
+* 作用：以application/x-www-form-urlencoded提交表单，并返回binary
+* 参数数量：2
+* 参数作用：url、表单
+* 参数类型：string、table
+* 返回类型：list
+* 示例：(http-post-form-binary "http://127.0.0.1/login" (table \["user" "root"\]))
+
+### http-post-form-binary
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers或超时
+* 参数数量：3
+* 参数作用：url、headers、表单 或 url、表单、超时（秒）
+* 参数类型：string、table、table 或 string、table、int
+* 返回类型：list
+* 示例：(http-post-form-binary "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]))
+
+### http-post-form-binary
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers和超时
+* 参数数量：4
+* 参数作用：url、headers、表单、超时（秒）
+* 参数类型：string、table、table、int
+* 返回类型：list
+* 示例：(http-post-form-binary "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) 5)
+
+### http-post-multipart-string
+
+* 作用：以multipart/form-data提交字段和文件，并返回string
+* 参数数量：3
+* 参数作用：url、字段表、文件表
+* 参数类型：string、table、table
+* 返回类型：string
+* 示例：(http-post-multipart-string "http://127.0.0.1/upload" (table \["name" "a"\]) (table \["file" "./a.txt"\]))
+
+### http-post-multipart-string
+
+* 作用：以multipart/form-data提交字段和文件，使用编码格式、headers或超时
+* 参数数量：4
+* 参数作用：url、字段表、文件表、编码格式|超时（秒） 或 url、headers、字段表、文件表
+* 参数类型：string、table、table、string|int 或 string、table、table、table
+* 返回类型：string
+* 示例：(http-post-multipart-string "http://127.0.0.1/upload" (table \["name" "a"\]) (table \["file" "./a.txt"\]) "UTF-8")
+
+### http-post-multipart-string
+
+* 作用：以multipart/form-data提交字段和文件，使用headers和编码格式或超时，或使用编码格式和超时
+* 参数数量：5
+* 参数作用：url、headers、字段表、文件表、编码格式|超时（秒） 或 url、字段表、文件表、编码格式、超时（秒）
+* 参数类型：string、table、table、table、string|int 或 string、table、table、string、int
+* 返回类型：string
+* 示例：(http-post-multipart-string "http://127.0.0.1/upload" (table) (table \["name" "a"\]) (table \["file" "./a.txt"\]) "UTF-8")
+
+### http-post-multipart-string
+
+* 作用：以multipart/form-data提交字段和文件，使用headers、编码格式和超时
+* 参数数量：6
+* 参数作用：url、headers、字段表、文件表、编码格式、超时（秒）
+* 参数类型：string、table、table、table、string、int
+* 返回类型：string
+* 示例：(http-post-multipart-string "http://127.0.0.1/upload" (table) (table \["name" "a"\]) (table \["file" "./a.txt"\]) "UTF-8" 5)
+
+### http-post-multipart-binary
+
+* 作用：以multipart/form-data提交字段和文件，并返回binary
+* 参数数量：3
+* 参数作用：url、字段表、文件表
+* 参数类型：string、table、table
+* 返回类型：list
+* 示例：(http-post-multipart-binary "http://127.0.0.1/upload" (table \["name" "a"\]) (table \["file" "./a.txt"\]))
+
+### http-post-multipart-binary
+
+* 作用：以multipart/form-data提交字段和文件，使用headers或超时
+* 参数数量：4
+* 参数作用：url、headers、字段表、文件表 或 url、字段表、文件表、超时（秒）
+* 参数类型：string、table、table、table 或 string、table、table、int
+* 返回类型：list
+* 示例：(http-post-multipart-binary "http://127.0.0.1/upload" (table) (table \["name" "a"\]) (table \["file" "./a.txt"\]))
+
+### http-post-multipart-binary
+
+* 作用：以multipart/form-data提交字段和文件，使用headers和超时
+* 参数数量：5
+* 参数作用：url、headers、字段表、文件表、超时（秒）
+* 参数类型：string、table、table、table、int
+* 返回类型：list
+* 示例：(http-post-multipart-binary "http://127.0.0.1/upload" (table) (table \["name" "a"\]) (table \["file" "./a.txt"\]) 5)
 
 文件表的value支持两种格式：
 
