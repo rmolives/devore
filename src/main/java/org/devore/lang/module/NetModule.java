@@ -83,8 +83,6 @@ public class NetModule extends DModule {
         try {
             List<DToken> list = new ArrayList<>();
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            if (interfaces == null)
-                return DList.valueOf(list);
             for (NetworkInterface networkInterface : Collections.list(interfaces))
                 list.add(interfaceInfo(networkInterface));
             return DList.valueOf(list);
@@ -169,8 +167,6 @@ public class NetModule extends DModule {
 
     private static List<NetworkInterface> allInterfaces() throws SocketException {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        if (interfaces == null)
-            return Collections.emptyList();
         return Collections.list(interfaces);
     }
 
