@@ -16,6 +16,7 @@
 * [base64](Base64.md)：Base64编码与解码
 * [sign](Sign.md)：数据签名、验签与签名辅助能力
 * [crypto](Crypto.md)：加密、解密及相关密码学工具
+* [zip](Zip.md)：ZIP压缩包的创建、读取、解压与条目查询
 * [os](OS.md)：操作系统信息、环境变量与系统调用能力
 * [uuid](UUID.md)：UUID生成、解析与格式转换
 

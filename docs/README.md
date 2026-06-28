@@ -42,6 +42,7 @@
 * [UUID](module/UUID.md)
 * [Properties](module/Properties.md)
 * [正则表达式](module/Regex.md)
+* [ZIP](module/Zip.md)
 
 ## 系统与工具
 

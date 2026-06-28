@@ -40,7 +40,8 @@ public class Env {
             new AbstractMap.SimpleEntry<>("tcp", new TCPModule()),
             new AbstractMap.SimpleEntry<>("udp", new UDPModule()),
             new AbstractMap.SimpleEntry<>("uuid", new UUIDModule()),
-            new AbstractMap.SimpleEntry<>("hash", new HashModule())
+            new AbstractMap.SimpleEntry<>("hash", new HashModule()),
+            new AbstractMap.SimpleEntry<>("zip", new ZipModule())
     ).collect(Collectors.toMap(
             Map.Entry::getKey,
             Map.Entry::getValue,
