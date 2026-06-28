@@ -17,6 +17,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.function.BiFunction;
@@ -28,6 +37,8 @@ import java.util.stream.Stream;
  * 核心
  */
 public class CoreModule extends DModule {
+    private static final String DEFAULT_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
     public CoreModule() {
         super("core");
     }
@@ -1222,7 +1233,7 @@ public class CoreModule extends DModule {
     }
 
     /**
-     * 注册系统级过程，包括退出、休眠、取类型和当前时间
+     * 注册系统级过程，包括退出、休眠、取类型和时间处理
      *
      * @param dEnv 目标环境
      */
@@ -1248,6 +1259,65 @@ public class CoreModule extends DModule {
                 DString.valueOf(args.get(0).type())), 1, false);
         dEnv.addTokenProcedure("time", ((args, env) ->
                 DNumber.valueOf(System.currentTimeMillis())), 0, false);
+        dEnv.addTokenProcedure("format-time", ((args, env) ->
+                DString.valueOf(formatTime(DIntUtils.toLong(intArg(args.get(0))), DEFAULT_TIME_PATTERN))), 1, false);
+        dEnv.addTokenProcedure("format-time", ((args, env) ->
+                DString.valueOf(formatTime(DIntUtils.toLong(intArg(args.get(0))), stringArg(args.get(1))))), 2, false);
+        dEnv.addTokenProcedure("parse-time", ((args, env) ->
+                DNumber.valueOf(parseTime(stringArg(args.get(0)), DEFAULT_TIME_PATTERN))), 1, false);
+        dEnv.addTokenProcedure("parse-time", ((args, env) ->
+                DNumber.valueOf(parseTime(stringArg(args.get(0)), stringArg(args.get(1))))), 2, false);
+    }
+
+    private static DInt intArg(DToken token) {
+        if (!(token instanceof DInt))
+            throw new DevoreCastException(token.type(), "int");
+        return (DInt) token;
+    }
+
+    private static String stringArg(DToken token) {
+        if (!(token instanceof DString))
+            throw new DevoreCastException(token.type(), "string");
+        return token.toString();
+    }
+
+    private static String formatTime(long timestamp, String pattern) {
+        DateTimeFormatter formatter = timeFormatter(pattern);
+        try {
+            return Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).format(formatter);
+        } catch (DateTimeException e) {
+            throw new DevoreRuntimeException("格式化时间失败: " + e.getMessage());
+        }
+    }
+
+    private static long parseTime(String time, String pattern) {
+        DateTimeFormatter formatter = timeFormatter(pattern);
+        ZoneId zone = ZoneId.systemDefault();
+        try {
+            return ZonedDateTime.parse(time, formatter).toInstant().toEpochMilli();
+        } catch (DateTimeParseException ignored) {
+            try {
+                return OffsetDateTime.parse(time, formatter).toInstant().toEpochMilli();
+            } catch (DateTimeParseException ignoredOffset) {
+                try {
+                    return LocalDateTime.parse(time, formatter).atZone(zone).toInstant().toEpochMilli();
+                } catch (DateTimeParseException ignoredLocalDateTime) {
+                    try {
+                        return LocalDate.parse(time, formatter).atStartOfDay(zone).toInstant().toEpochMilli();
+                    } catch (DateTimeParseException e) {
+                        throw new DevoreRuntimeException("解析时间失败: " + time);
+                    }
+                }
+            }
+        }
+    }
+
+    private static DateTimeFormatter timeFormatter(String pattern) {
+        try {
+            return DateTimeFormatter.ofPattern(pattern);
+        } catch (IllegalArgumentException e) {
+            throw new DevoreRuntimeException("时间格式错误: " + pattern);
+        }
     }
 
     /**
