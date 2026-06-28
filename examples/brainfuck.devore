@@ -1,0 +1,99 @@
+(def (bf-command? ch)
+    (or (= ch ">")
+        (= ch "<")
+        (= ch "+")
+        (= ch "-")
+        (= ch ".")
+        (= ch ",")
+        (= ch "[")
+        (= ch "]")))
+(def (bf-normalize code)
+    (let ([chars (string->list code)]
+          [commands (list)]
+          [index 0])
+        (while (< index (length chars))
+            (begin
+                (if (bf-command? (list-get chars index))
+                    (list-add! commands (list-get chars index)))
+                (set! index (+ index 1))))
+        commands))
+
+(def (bf-build-jumps commands)
+    (let ([jumps (table)]
+          [stack (list)]
+          [index 0]
+          [open 0]
+          [command nil])
+        (while (< index (length commands))
+            (begin
+                (set! command (list-get commands index))
+                (cond [(= command "[")
+                       (list-add! stack index)]
+                      [(= command "]")
+                       (if (= (length stack) 0)
+                           (error "brainfuck: unmatched ] at instruction " index)
+                           (begin
+                               (set! open (last stack))
+                               (list-remove! stack (- (length stack) 1))
+                               (table-put! jumps open index)
+                               (table-put! jumps index open)))])
+                (set! index (+ index 1))))
+        (if (> (length stack) 0)
+            (error "brainfuck: unmatched [ at instruction " (last stack)))
+        jumps))
+(def (bf-tape-get tape pointer)
+    (list-get tape pointer))
+(def (bf-tape-set! tape pointer value)
+    (list-set! tape pointer value))
+(def (bf-cell-inc value)
+    (mod (+ value 1) 256))
+(def (bf-cell-dec value)
+    (mod (+ value 255) 256))
+(def (bf-read-input input input-pointer)
+    (if (< input-pointer (length input))
+        (char->unicode (string-get input input-pointer))
+        0))
+(def (brainfuck code)
+    (brainfuck code ""))
+(def (brainfuck code input)
+    (let ([commands (bf-normalize code)]
+          [jumps nil]
+          [tape (list 0)]
+          [pointer 0]
+          [ip 0]
+          [input-pointer 0]
+          [output ""]
+          [command nil])
+        (set! jumps (bf-build-jumps commands))
+        (while (< ip (length commands))
+            (begin
+                (set! command (list-get commands ip))
+                (cond [(= command ">")
+                       (begin
+                           (set! pointer (+ pointer 1))
+                           (if (= pointer (length tape))
+                               (list-add! tape 0)))]
+                      [(= command "<")
+                       (begin
+                           (set! pointer (- pointer 1))
+                           (if (< pointer 0)
+                               (error "brainfuck: tape pointer moved before cell 0")))]
+                      [(= command "+")
+                       (bf-tape-set! tape pointer (bf-cell-inc (bf-tape-get tape pointer)))]
+                      [(= command "-")
+                       (bf-tape-set! tape pointer (bf-cell-dec (bf-tape-get tape pointer)))]
+                      [(= command ".")
+                       (set! output (++ output (unicode->char (bf-tape-get tape pointer))))]
+                      [(= command ",")
+                       (begin
+                           (bf-tape-set! tape pointer (bf-read-input input input-pointer))
+                           (set! input-pointer (+ input-pointer 1)))]
+                      [(= command "[")
+                       (if (= (bf-tape-get tape pointer) 0)
+                           (set! ip (table-get jumps ip)))]
+                      [(= command "]")
+                       (if (/= (bf-tape-get tape pointer) 0)
+                           (set! ip (table-get jumps ip)))])
+                (set! ip (+ ip 1))))
+        output))
+(println (brainfuck "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>."))
