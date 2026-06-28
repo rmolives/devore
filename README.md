@@ -2,11 +2,11 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
+[文档](docs/README.md)
+
 ## 关于
 
 这是Devore语言（一种Lisp方言）的解释器，运行于JVM平台。
-
-[文档](docs/README.md)
 
 ## 示例
 

@@ -31,6 +31,7 @@ public class Env {
             new AbstractMap.SimpleEntry<>("csv", new CsvModule()),
             new AbstractMap.SimpleEntry<>("file", new FileModule()),
             new AbstractMap.SimpleEntry<>("crypto", new CryptoModule()),
+            new AbstractMap.SimpleEntry<>("html", new HtmlModule()),
             new AbstractMap.SimpleEntry<>("http", new HttpModule()),
             new AbstractMap.SimpleEntry<>("json", new JsonModule()),
             new AbstractMap.SimpleEntry<>("os", new OSModule()),

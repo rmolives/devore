@@ -10,6 +10,7 @@
 * [json](Json.md)：JSON数据的解析、生成与转换
 * [csv](Csv.md)：RFC 4180 CSV数据的解析、生成与文件读写
 * [xml](Xml.md)：XML数据的解析、生成与节点构造
+* [html](Html.md)：HTML实体转义与还原
 * [properties](Properties.md)：Properties配置的解析、生成与文件读写
 * [regex](Regex.md)：正则表达式匹配、查找、替换与分割
 * [reflect](Reflect.md)：Java类加载、对象构造与反射方法调用
