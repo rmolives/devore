@@ -39,6 +39,7 @@
 * [哈希](Hash.md)
 * [签名](Sign.md)
 * [加密](Crypto.md)
+* [UUID](UUID.md)
 
 ### 系统与工具
 
