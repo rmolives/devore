@@ -33,6 +33,7 @@ public class Env {
             new AbstractMap.SimpleEntry<>("http", new HttpModule()),
             new AbstractMap.SimpleEntry<>("json", new JsonModule()),
             new AbstractMap.SimpleEntry<>("os", new OSModule()),
+            new AbstractMap.SimpleEntry<>("properties", new PropertiesModule()),
             new AbstractMap.SimpleEntry<>("sign", new SignModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
             new AbstractMap.SimpleEntry<>("tcp", new TCPModule()),

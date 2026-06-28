@@ -8,6 +8,7 @@
 * udp：基于UDP协议的数据报发送与接收
 * file：文件与目录的读写、查询和管理
 * json：JSON数据的解析、生成与转换
+* properties：Properties配置的解析、生成与文件读写
 * thread：线程创建、任务并发与同步控制
 * hash：常用哈希摘要算法与校验能力
 * binary：二进制数据的读写、编码与转换
