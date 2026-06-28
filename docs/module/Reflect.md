@@ -43,9 +43,9 @@
 * 作用：调用Java构造方法创建对象
 * 参数数量：无穷（>= 1）
 * 参数作用：类名或Java Class包装对象，构造方法参数<*>
-* 参数类型：string|java-object, any<*>
+* 参数类型：string|java-object, token<*>
 * 返回值：Java对象包装对象，基础Java返回值会自动转换为Devore值
-* 返回类型：java-object|any
+* 返回类型：java-object|token
 * 示例：(reflect-new "java.lang.StringBuilder" "hello")
 
 ## reflect-call
@@ -53,9 +53,9 @@
 * 作用：调用Java实例方法；目标为Class包装对象或类名时调用静态方法
 * 参数数量：无穷（>= 2）
 * 参数作用：Java对象或类，方法名，方法参数<*>
-* 参数类型：java-object|string, string, any<*>
+* 参数类型：java-object|string, string, token<*>
 * 返回值：方法返回值
-* 返回类型：java-object|any
+* 返回类型：java-object|token
 * 示例：(reflect-call (reflect-new "java.lang.StringBuilder" "hello") "toString")
 
 ## reflect-static-call
@@ -63,7 +63,7 @@
 * 作用：调用Java静态方法
 * 参数数量：无穷（>= 2）
 * 参数作用：类名或Java Class包装对象，方法名，方法参数<*>
-* 参数类型：string|java-object, string, any<*>
+* 参数类型：string|java-object, string, token<*>
 * 返回值：方法返回值
-* 返回类型：java-object|any
+* 返回类型：java-object|token
 * 示例：(reflect-static-call "java.lang.Math" "max" 3 7)
