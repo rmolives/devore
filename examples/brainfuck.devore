@@ -17,7 +17,6 @@
                     (list-add! commands (list-get chars index)))
                 (set! index (+ index 1))))
         commands))
-
 (def (bf-build-jumps commands)
     (let ([jumps (table)]
           [stack (list)]
