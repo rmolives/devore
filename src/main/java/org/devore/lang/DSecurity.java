@@ -15,21 +15,24 @@ public class DSecurity {
 
     public DSecurity() {
         this.restrictions = Arrays.asList(Restriction.FILE, Restriction.NET,
-                Restriction.EXEC, Restriction.REFLECT);
+                Restriction.EXEC, Restriction.REFLECT, Restriction.SECURITY);
     }
 
     public boolean contains(Restriction restriction) {
         return this.restrictions.contains(restriction);
     }
 
+    public List<Restriction> restrictions() {
+        return new ArrayList<>(this.restrictions);
+    }
+
     public static DSecurity inherited(Env env) {
         List<Restriction> inherited = new ArrayList<>();
         Env temp = env;
         while (temp != null) {
-            for (Restriction restriction : temp.security.restrictions) {
+            for (Restriction restriction : temp.security.restrictions)
                 if (!inherited.contains(restriction))
                     inherited.add(restriction);
-            }
             temp = temp.father;
         }
         return new DSecurity(inherited);
@@ -67,7 +70,15 @@ public class DSecurity {
             throw new DevoreRuntimeException("当前环境禁止<Reflect>操作.");
     }
 
+    public static void checkRestrictSecurity(Env env) {
+        Env temp = env;
+        while (temp != null && !temp.security.contains(Restriction.SECURITY))
+            temp = temp.father;
+        if (temp != null)
+            throw new DevoreRuntimeException("当前环境禁止<Security>操作.");
+    }
+
     public static enum Restriction {
-        FILE, NET, EXEC, REFLECT
+        FILE, NET, EXEC, REFLECT, SECURITY
     }
 }

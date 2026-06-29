@@ -192,7 +192,6 @@ public class FileModule extends DModule {
                 throw new DevoreRuntimeException("追加文本文件失败: " + path + ", " + e.getMessage());
             }
         }, 3, false);
-
         dEnv.addTokenProcedure("file-exists?", (args, env) -> {
             DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
