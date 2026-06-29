@@ -157,6 +157,7 @@ public class Lexer {
             switch (expressionCharArray[index]) {
                 case '(':
                 case '[':
+                    checkLeftBracketSpacing(expressionCharArray, index, baseIndex);
                     tokens.add(new SourceToken(DWord.LB, baseIndex + index));
                     continue;
                 case ')':
@@ -249,6 +250,7 @@ public class Lexer {
                     && expressionCharArray[index] != '[' && expressionCharArray[index] != ']') {
                 int symbolStart = index;
                 while (index < expressionCharArray.length && !Character.isWhitespace(expressionCharArray[index])
+                        && expressionCharArray[index] != '(' && expressionCharArray[index] != '['
                         && expressionCharArray[index] != ')' && expressionCharArray[index] != ']')
                     ++index;
                 String symbol = IntStream.range(symbolStart, index)
@@ -259,5 +261,21 @@ public class Lexer {
             }
         }
         return tokens;
+    }
+
+    /**
+     * 检查左括号前是否有必要的分隔符
+     *
+     * @param expressionCharArray 表达式字符数组
+     * @param index               左括号位置
+     * @param baseIndex           基础位置
+     */
+    private static void checkLeftBracketSpacing(char[] expressionCharArray, int index, int baseIndex) {
+        if (index == 0)
+            return;
+        char previous = expressionCharArray[index - 1];
+        if (Character.isWhitespace(previous) || previous == '(' || previous == '[')
+            return;
+        throw new DevoreParseException("左括号前缺少空白分隔符: " + expressionCharArray[index], baseIndex + index);
     }
 }
