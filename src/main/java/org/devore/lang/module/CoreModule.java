@@ -468,8 +468,9 @@ public class CoreModule extends DModule {
                     if (!Files.exists(path))
                         throw new DevoreRuntimeException("模块 " + name + " 不存在.");
                     try {
-                        Env inEnv = Env.newEnv();
-                        inEnv.setSecurity(DSecurity.inherited(env));
+                        Env inEnvR = Env.newEnv();
+                        inEnvR.setSecurity(DSecurity.inherited(env));
+                        Env inEnv = inEnvR.createChild();
                         DToken temp = Devore.call(inEnv,
                                 new String(Files.readAllBytes(path), StandardCharsets.UTF_8), file);
                         if (temp instanceof DExport)

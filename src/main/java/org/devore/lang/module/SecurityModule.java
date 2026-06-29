@@ -34,7 +34,13 @@ public class SecurityModule extends DModule {
         dEnv.addTokenProcedure("security-remove!", (args, env) -> {
             DSecurity.checkRestrictSecurity(env);
             List<DSecurity.Restriction> restrictions = env.security.restrictions();
-            restrictions.removeAll(toRestrictions(args));
+            List<DSecurity.Restriction> removeRestrictions = toRestrictions(args);
+            for (DSecurity.Restriction restriction : removeRestrictions) {
+                if (!restrictions.contains(restriction))
+                    throw new DevoreRuntimeException("只能删除当前环境直接设置的安全限制: "
+                            + restriction.name().toLowerCase(Locale.ROOT));
+            }
+            restrictions.removeAll(removeRestrictions);
             env.setSecurity(new DSecurity(restrictions));
             return DWord.NIL;
         }, 1, true);
