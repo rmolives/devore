@@ -20,12 +20,25 @@ import java.util.Map;
  * 网络信息与DNS查询
  */
 public class NetModule extends DModule {
+    /**
+     * 创建Net模块实例
+     */
     public NetModule() {
         super("net");
     }
 
+    /**
+     * 初始化网络信息模块，注册DNS、主机、IP、MAC和网卡查询过程
+     */
     @Override
     public void init(Env dEnv) {
+        initNetworkProcedures(dEnv); // 网络信息
+    }
+
+    /**
+     * 注册DNS、主机、IP、MAC和网卡查询过程
+     */
+    private void initNetworkProcedures(Env dEnv) {
         dEnv.addTokenProcedure("dns-lookup", (args, env) ->
                 addresses(stringArg(args.get(0))), 1, false);
         dEnv.addTokenProcedure("dns-reverse-lookup", (args, env) ->
@@ -60,6 +73,9 @@ public class NetModule extends DModule {
                 networkInterfaces(), 0, false);
     }
 
+    /**
+     * 解析主机名对应的全部IP地址
+     */
     private static DList addresses(String host) {
         try {
             List<DToken> list = new ArrayList<>();
@@ -71,6 +87,9 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 解析单个主机或IP地址
+     */
     private static InetAddress address(String value) {
         try {
             return InetAddress.getByName(value);
@@ -79,6 +98,9 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 读取全部网络接口信息
+     */
     private static DList networkInterfaces() {
         try {
             List<DToken> list = new ArrayList<>();
@@ -91,6 +113,9 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 读取指定或全部网络接口的IP地址
+     */
     private static DList interfaceAddresses(NetworkInterface target) {
         try {
             List<DToken> list = new ArrayList<>();
@@ -105,6 +130,9 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 将网络接口信息转换为Devore表
+     */
     private static DTable interfaceInfo(NetworkInterface networkInterface) {
         Map<DToken, DToken> table = new HashMap<>();
         try {
@@ -124,6 +152,9 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 读取网络接口MAC地址
+     */
     private static DToken macAddress(NetworkInterface networkInterface) {
         try {
             byte[] hardwareAddress = networkInterface.getHardwareAddress();
@@ -138,6 +169,9 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 查找默认网络接口
+     */
     private static NetworkInterface defaultInterface() {
         try {
             InetAddress local = InetAddress.getLocalHost();
@@ -154,6 +188,9 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 按名称查找网络接口
+     */
     private static NetworkInterface interfaceByName(String name) {
         try {
             NetworkInterface networkInterface = NetworkInterface.getByName(name);
@@ -165,11 +202,17 @@ public class NetModule extends DModule {
         }
     }
 
+    /**
+     * 读取系统全部网络接口
+     */
     private static List<NetworkInterface> allInterfaces() throws SocketException {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         return Collections.list(interfaces);
     }
 
+    /**
+     * 校验并取得字符串参数
+     */
     private static String stringArg(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");

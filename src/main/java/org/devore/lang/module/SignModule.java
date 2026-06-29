@@ -24,12 +24,25 @@ public class SignModule extends DModule {
     private static final String DEFAULT_ECDSA_SIGNATURE = "SHA256withECDSA";
     private static final String DEFAULT_EC_CURVE = "secp256r1";
 
+    /**
+     * 创建Sign模块实例
+     */
     public SignModule() {
         super("sign");
     }
 
+    /**
+     * 初始化数字签名模块，注册密钥生成、签名和验签过程
+     */
     @Override
     public void init(Env dEnv) {
+        initSignProcedures(dEnv); // 数字签名
+    }
+
+    /**
+     * 注册密钥生成、签名和验签过程
+     */
+    private void initSignProcedures(Env dEnv) {
         if (!dEnv.contains("rsa-keypair"))
             dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
                 if (!(args.get(0) instanceof DInt))
@@ -72,6 +85,9 @@ public class SignModule extends DModule {
         }, 4, false);
     }
 
+    /**
+     * 生成指定曲线的EC密钥对
+     */
     private DToken ecKeyPair(String curve) {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
@@ -82,6 +98,9 @@ public class SignModule extends DModule {
         }
     }
 
+    /**
+     * 使用指定算法生成数字签名
+     */
     private DList sign(DToken data, DToken privateKey, String keyAlgorithm, String signatureAlgorithm) {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);
@@ -100,6 +119,9 @@ public class SignModule extends DModule {
         }
     }
 
+    /**
+     * 使用指定算法验证数字签名
+     */
     private DBool verify(DToken data, DToken signed, DToken publicKey, String keyAlgorithm, String signatureAlgorithm) {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);

@@ -16,12 +16,25 @@ import java.util.Map;
  * UDP网络
  */
 public class UDPModule extends DModule {
+    /**
+     * 创建UDP模块实例
+     */
     public UDPModule() {
         super("udp");
     }
 
+    /**
+     * 初始化UDP模块，注册套接字、绑定、发送、接收、超时和关闭过程
+     */
     @Override
     public void init(Env dEnv) {
+        initUdpProcedures(dEnv); // UDP网络
+    }
+
+    /**
+     * 注册UDP套接字、绑定、发送、接收、超时和关闭过程
+     */
+    private void initUdpProcedures(Env dEnv) {
         dEnv.addTokenProcedure("udp-socket?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DUDPSocket), 1, false);
         dEnv.addTokenProcedure("udp-open", (args, env) -> {

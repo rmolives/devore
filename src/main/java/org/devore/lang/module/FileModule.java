@@ -20,12 +20,25 @@ import java.util.stream.Stream;
  * 文件操作
  */
 public class FileModule extends DModule {
+    /**
+     * 创建File模块实例
+     */
     public FileModule() {
         super("file");
     }
 
+    /**
+     * 初始化文件模块，注册二进制、文本和路径操作过程
+     */
     @Override
     public void init(Env dEnv) {
+        initFileProcedures(dEnv); // 文件操作
+    }
+
+    /**
+     * 注册二进制、文本和路径操作过程
+     */
+    private void initFileProcedures(Env dEnv) {
         dEnv.addTokenProcedure("file-read-binary", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");

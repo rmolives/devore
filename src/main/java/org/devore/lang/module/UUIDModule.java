@@ -9,12 +9,25 @@ import org.devore.lang.token.DToken;
 import java.util.UUID;
 
 public class UUIDModule extends DModule {
+    /**
+     * 创建UUID模块实例
+     */
     public UUIDModule() {
         super("uuid");
     }
 
+    /**
+     * 初始化UUID模块，注册生成和规范化过程
+     */
     @Override
     public void init(Env dEnv) {
+        initUuidProcedures(dEnv); // UUID工具
+    }
+
+    /**
+     * 注册UUID生成和规范化过程
+     */
+    private void initUuidProcedures(Env dEnv) {
         dEnv.addTokenProcedure("uuid", (args, env) ->
                 DString.valueOf(UUID.randomUUID().toString()), 0, false);
         dEnv.addTokenProcedure("uuid-simple", (args, env) ->
@@ -25,6 +38,9 @@ public class UUIDModule extends DModule {
                 DString.valueOf(uuidArg(args.get(0)).toString().replace("-", "")), 1, false);
     }
 
+    /**
+     * 校验并解析UUID字符串参数
+     */
     private static UUID uuidArg(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");

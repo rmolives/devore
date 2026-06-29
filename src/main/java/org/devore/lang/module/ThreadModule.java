@@ -17,17 +17,26 @@ import java.util.stream.Collectors;
  * 线程和锁
  */
 public class ThreadModule extends DModule {
+    /**
+     * 创建Thread模块实例
+     */
     public ThreadModule() {
         super("thread");
     }
 
+    /**
+     * 初始化线程模块，注册线程、锁和类型判断过程
+     */
     @Override
     public void init(Env dEnv) {
-        initThreadProcedures(dEnv);
-        initLockProcedures(dEnv);
-        initPredicateProcedures(dEnv);
+        initThreadProcedures(dEnv);    // 线程操作
+        initLockProcedures(dEnv);      // 锁操作
+        initPredicateProcedures(dEnv); // 类型判断
     }
 
+    /**
+     * 注册线程创建、启动、等待和中断相关过程
+     */
     private void initThreadProcedures(Env dEnv) {
         dEnv.addAstProcedure("thread", (ast, env) -> {
             Env threadEnv = env.createChild();
@@ -88,6 +97,9 @@ public class ThreadModule extends DModule {
                 DThread.valueOf(Thread.currentThread()), 0, false);
     }
 
+    /**
+     * 注册锁创建、加锁、解锁、尝试加锁和作用域加锁过程
+     */
     private void initLockProcedures(Env dEnv) {
         dEnv.addTokenProcedure("lock", (args, env) -> DLock.newLock(), 0, false);
         dEnv.addTokenProcedure("lock!", (args, env) -> {
@@ -150,6 +162,9 @@ public class ThreadModule extends DModule {
         }, 2, true);
     }
 
+    /**
+     * 注册线程和锁类型判断过程
+     */
     private void initPredicateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("thread?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DThread), 1, false);

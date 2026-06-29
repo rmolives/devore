@@ -18,12 +18,25 @@ import java.util.Set;
  * JSON处理
  */
 public class JsonModule extends DModule {
+    /**
+     * 创建Json模块实例
+     */
     public JsonModule() {
         super("json");
     }
 
+    /**
+     * 初始化JSON模块，注册读写和合法性判断过程
+     */
     @Override
     public void init(Env dEnv) {
+        initJsonProcedures(dEnv); // JSON读写
+    }
+
+    /**
+     * 注册JSON读写和合法性判断过程
+     */
+    private void initJsonProcedures(Env dEnv) {
         dEnv.addTokenProcedure("json-read", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
@@ -36,14 +49,23 @@ public class JsonModule extends DModule {
                         Collections.newSetFromMap(new IdentityHashMap<>()))), 1, false);
     }
 
+    /**
+     * 解析JSON字符串为Devore值
+     */
     private static DToken readJson(String json) {
         return new Parser(json).parse();
     }
 
+    /**
+     * 将Devore值序列化为JSON字符串
+     */
     private static String writeJson(DToken token) {
         return writeJson(token, Collections.newSetFromMap(new IdentityHashMap<>()));
     }
 
+    /**
+     * 将Devore值序列化为JSON字符串
+     */
     private static String writeJson(DToken token, Set<DToken> parents) {
         if (token == DWord.NIL)
             return "null";
@@ -78,6 +100,9 @@ public class JsonModule extends DModule {
         throw new DevoreRuntimeException("JSON不支持类型: " + token.type());
     }
 
+    /**
+     * 判断Devore值是否可表示为JSON
+     */
     private static boolean isJson(DToken token, Set<DToken> parents) {
         if (token == DWord.NIL || token instanceof DBool || token instanceof DNumber || token instanceof DString)
             return true;
@@ -109,6 +134,9 @@ public class JsonModule extends DModule {
         return false;
     }
 
+    /**
+     * 按JSON规则转义字符串
+     */
     private static String quote(String value) {
         StringBuilder builder = new StringBuilder("\"");
         for (int i = 0; i < value.length(); ++i) {
@@ -149,11 +177,17 @@ public class JsonModule extends DModule {
         private final String json;
         private int index;
 
+        /**
+         * 创建JSON解析器
+         */
         private Parser(String json) {
             this.json = json;
             this.index = 0;
         }
 
+        /**
+         * 解析完整JSON文档
+         */
         private DToken parse() {
             DToken token = parseValue();
             skipWhitespace();
@@ -162,6 +196,9 @@ public class JsonModule extends DModule {
             return token;
         }
 
+        /**
+         * 解析任意JSON值
+         */
         private DToken parseValue() {
             skipWhitespace();
             if (end())
@@ -185,6 +222,9 @@ public class JsonModule extends DModule {
             return DWord.NIL;
         }
 
+        /**
+         * 解析JSON对象
+         */
         private DTable parseObject() {
             expect('{');
             skipWhitespace();
@@ -206,6 +246,9 @@ public class JsonModule extends DModule {
             }
         }
 
+        /**
+         * 解析JSON数组
+         */
         private DList parseArray() {
             expect('[');
             skipWhitespace();
@@ -221,6 +264,9 @@ public class JsonModule extends DModule {
             }
         }
 
+        /**
+         * 解析JSON数字
+         */
         private DNumber parseNumber() {
             int start = this.index;
             consume('-');
@@ -246,6 +292,9 @@ public class JsonModule extends DModule {
             }
         }
 
+        /**
+         * 解析JSON字符串
+         */
         private String parseString() {
             expect('"');
             StringBuilder builder = new StringBuilder();
@@ -294,6 +343,9 @@ public class JsonModule extends DModule {
             return "";
         }
 
+        /**
+         * 读取JSON unicode转义字符
+         */
         private char readUnicode() {
             if (this.index + 4 > this.json.length())
                 error("JSON unicode转义未完成.");
@@ -307,6 +359,9 @@ public class JsonModule extends DModule {
             return (char) value;
         }
 
+        /**
+         * 读取连续数字并校验至少存在一位
+         */
         private void readDigits(String message) {
             int start = this.index;
             while (!end() && isDigit(peek()))
@@ -315,6 +370,9 @@ public class JsonModule extends DModule {
                 error(message);
         }
 
+        /**
+         * 匹配指定JSON字面量
+         */
         private boolean match(String value) {
             if (!this.json.startsWith(value, this.index))
                 return false;
@@ -322,6 +380,9 @@ public class JsonModule extends DModule {
             return true;
         }
 
+        /**
+         * 跳过JSON空白字符
+         */
         private void skipWhitespace() {
             while (!end()) {
                 char c = peek();
@@ -331,11 +392,17 @@ public class JsonModule extends DModule {
             }
         }
 
+        /**
+         * 消费并校验指定字符
+         */
         private void expect(char c) {
             if (!consume(c))
                 error("JSON期望字符: " + c);
         }
 
+        /**
+         * 按需消费指定字符
+         */
         private boolean consume(char c) {
             if (end() || peek() != c)
                 return false;
@@ -343,22 +410,37 @@ public class JsonModule extends DModule {
             return true;
         }
 
+        /**
+         * 读取当前位置字符但不前进
+         */
         private char peek() {
             return this.json.charAt(this.index);
         }
 
+        /**
+         * 读取当前位置字符并前进
+         */
         private char next() {
             return this.json.charAt(this.index++);
         }
 
+        /**
+         * 判断是否到达JSON内容末尾
+         */
         private boolean end() {
             return this.index >= this.json.length();
         }
 
+        /**
+         * 判断字符是否为十进制数字
+         */
         private boolean isDigit(char c) {
             return c >= '0' && c <= '9';
         }
 
+        /**
+         * 抛出带当前位置的JSON解析错误
+         */
         private void error(String message) {
             throw new DevoreRuntimeException(message + ", index=" + this.index);
         }

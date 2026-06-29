@@ -23,12 +23,25 @@ import java.util.stream.Collectors;
  * Java反射
  */
 public class ReflectModule extends DModule {
+    /**
+     * 创建Reflect模块实例
+     */
     public ReflectModule() {
         super("reflect");
     }
 
+    /**
+     * 初始化Java反射模块，注册类加载、构造和方法调用过程
+     */
     @Override
     public void init(Env dEnv) {
+        initReflectProcedures(dEnv); // Java反射
+    }
+
+    /**
+     * 注册Java类加载、对象构造和方法调用过程
+     */
+    private void initReflectProcedures(Env dEnv) {
         dEnv.addTokenProcedure("java-object?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DJavaObject), 1, false);
         dEnv.addTokenProcedure("reflect-class", (args, env) ->
@@ -78,6 +91,9 @@ public class ReflectModule extends DModule {
         }, 2, true);
     }
 
+    /**
+     * 将字符串或Java对象参数转换为Class
+     */
     private static Class<?> classArg(DToken token) {
         if (token instanceof DJavaObject && ((DJavaObject) token).value() instanceof Class<?>)
             return (Class<?>) ((DJavaObject) token).value();
@@ -90,6 +106,9 @@ public class ReflectModule extends DModule {
         }
     }
 
+    /**
+     * 将参数转换为反射调用目标对象
+     */
     private static Object objectArg(DToken token) {
         if (token instanceof DJavaObject)
             return ((DJavaObject) token).value();
@@ -103,12 +122,18 @@ public class ReflectModule extends DModule {
         return toJavaValue(token);
     }
 
+    /**
+     * 校验并取得字符串参数
+     */
     private static String stringArg(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
         return token.toString();
     }
 
+    /**
+     * 选择最匹配的公开构造方法
+     */
     private static Constructor<?> bestConstructor(Class<?> clazz, List<DToken> args) {
         return java.util.Arrays.stream(clazz.getConstructors())
                 .filter(constructor -> constructor.getParameterCount() == args.size())
@@ -120,6 +145,9 @@ public class ReflectModule extends DModule {
                         + "/" + args.size()));
     }
 
+    /**
+     * 选择最匹配的公开方法
+     */
     private static Method bestMethod(Class<?> clazz, String name, List<DToken> args, boolean staticCall) {
         return java.util.Arrays.stream(clazz.getMethods())
                 .filter(method -> method.getName().equals(name))
@@ -133,6 +161,9 @@ public class ReflectModule extends DModule {
                         + "." + name + "/" + args.size()));
     }
 
+    /**
+     * 计算参数类型和Devore参数的匹配分数
+     */
     private static int score(Class<?>[] parameterTypes, List<DToken> args) {
         int score = 0;
         for (int i = 0; i < parameterTypes.length; ++i) {
@@ -144,6 +175,9 @@ public class ReflectModule extends DModule {
         return score;
     }
 
+    /**
+     * 计算参数类型和Devore参数的匹配分数
+     */
     private static int score(Class<?> target, DToken token) {
         Class<?> wrapped = wrap(target);
         if (token == DWord.NIL)
@@ -172,6 +206,9 @@ public class ReflectModule extends DModule {
         return -1;
     }
 
+    /**
+     * 按目标参数类型转换全部实参
+     */
     private static Object[] convertArgs(Class<?>[] parameterTypes, List<DToken> args) {
         Object[] values = new Object[args.size()];
         for (int i = 0; i < args.size(); ++i)
@@ -179,6 +216,9 @@ public class ReflectModule extends DModule {
         return values;
     }
 
+    /**
+     * 将单个Devore值转换为Java值
+     */
     private static Object convert(Class<?> target, DToken token) {
         if (token == DWord.NIL)
             return null;
@@ -213,6 +253,9 @@ public class ReflectModule extends DModule {
         return toJavaValue(token);
     }
 
+    /**
+     * 将Devore值转换为通用Java值
+     */
     private static Object toJavaValue(DToken token) {
         if (token == DWord.NIL)
             return null;
@@ -239,6 +282,9 @@ public class ReflectModule extends DModule {
         return result;
     }
 
+    /**
+     * 按目标数值类型转换Devore数值
+     */
     private static Object convertNumber(Class<?> target, DNumber number) {
         Class<?> wrapped = wrap(target);
         if (wrapped == Byte.class)
@@ -260,6 +306,9 @@ public class ReflectModule extends DModule {
         return number.toBigDecimal();
     }
 
+    /**
+     * 将Java返回值转换为Devore token
+     */
     private static DToken toToken(Object value) {
         if (value == null)
             return DWord.NIL;
@@ -293,6 +342,9 @@ public class ReflectModule extends DModule {
         return DJavaObject.valueOf(value);
     }
 
+    /**
+     * 将基本类型转换为包装类型
+     */
     private static Class<?> wrap(Class<?> type) {
         if (!type.isPrimitive())
             return type;
@@ -317,6 +369,9 @@ public class ReflectModule extends DModule {
         return type;
     }
 
+    /**
+     * 将反射调用异常转换为运行时异常
+     */
     private static DevoreRuntimeException invocationError(InvocationTargetException e) {
         Throwable cause = e.getCause() == null ? e : e.getCause();
         return new DevoreRuntimeException("Java调用异常: " + cause.getClass().getName()
@@ -327,6 +382,9 @@ public class ReflectModule extends DModule {
         private final T value;
         private final int score;
 
+        /**
+         * 记录反射候选项及其匹配分数
+         */
         private Match(T value, int score) {
             this.value = value;
             this.score = score;

@@ -12,12 +12,25 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class HashModule extends DModule {
+    /**
+     * 创建Hash模块实例
+     */
     public HashModule() {
         super("hash");
     }
 
+    /**
+     * 初始化哈希模块，注册MD5、SHA-1、SHA-256和SHA-512过程
+     */
     @Override
     public void init(Env dEnv) {
+        initHashProcedures(dEnv); // 哈希摘要
+    }
+
+    /**
+     * 注册MD5、SHA-1、SHA-256和SHA-512过程
+     */
+    private void initHashProcedures(Env dEnv) {
         dEnv.addTokenProcedure("md5", ((args, env) -> {
             if (args.get(0) instanceof DString)
                 return DString.valueOf(HashUtils.hash(args.get(0).toString()

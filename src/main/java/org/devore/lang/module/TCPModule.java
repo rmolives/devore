@@ -19,12 +19,25 @@ import java.net.SocketTimeoutException;
  * TCP网络
  */
 public class TCPModule extends DModule {
+    /**
+     * 创建TCP模块实例
+     */
     public TCPModule() {
         super("tcp");
     }
 
+    /**
+     * 初始化TCP模块，注册连接、监听、读写、超时和关闭过程
+     */
     @Override
     public void init(Env dEnv) {
+        initTcpProcedures(dEnv); // TCP网络
+    }
+
+    /**
+     * 注册TCP连接、监听、读写、超时和关闭过程
+     */
+    private void initTcpProcedures(Env dEnv) {
         dEnv.addTokenProcedure("tcp-socket?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DTCPSocket), 1, false);
         dEnv.addTokenProcedure("tcp-server?", (args, env) ->

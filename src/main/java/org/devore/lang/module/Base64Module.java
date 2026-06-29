@@ -15,12 +15,25 @@ import java.util.Base64;
  * Base64编码和解码工具
  */
 public class Base64Module extends DModule {
+    /**
+     * 创建Base64模块实例
+     */
     public Base64Module() {
         super("base64");
     }
 
+    /**
+     * 初始化Base64模块，注册编码和解码过程
+     */
     @Override
     public void init(Env dEnv) {
+        initCodecProcedures(dEnv); // Base64编解码
+    }
+
+    /**
+     * 注册Base64编码和解码过程
+     */
+    private void initCodecProcedures(Env dEnv) {
         dEnv.addTokenProcedure("base64-encode", (args, env) -> {
             DToken token = args.get(0);
             byte[] bytes;

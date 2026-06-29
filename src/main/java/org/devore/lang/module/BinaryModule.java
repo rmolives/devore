@@ -18,12 +18,25 @@ import java.util.stream.IntStream;
  * 二进制数据
  */
 public class BinaryModule extends DModule {
+    /**
+     * 创建Binary模块实例
+     */
     public BinaryModule() {
         super("binary");
     }
 
+    /**
+     * 初始化二进制模块，注册随机字节、字符串转换和十六进制转换过程
+     */
     @Override
     public void init(Env dEnv) {
+        initBinaryProcedures(dEnv); // 二进制转换
+    }
+
+    /**
+     * 注册随机字节、字符串转换和十六进制转换过程
+     */
+    private void initBinaryProcedures(Env dEnv) {
         dEnv.addTokenProcedure("random-binary", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");

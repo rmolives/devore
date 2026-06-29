@@ -47,19 +47,28 @@ import javax.net.ssl.SSLContext;
 public class HttpModule extends DModule {
     private static final int DEFAULT_TIMEOUT = 30000;
 
+    /**
+     * 创建Http模块实例
+     */
     public HttpModule() {
         super("http");
     }
 
+    /**
+     * 初始化Http模块，注册对外过程
+     */
     @Override
     public void init(Env dEnv) {
-        initConstants(dEnv);
-        initTypeAndUrl(dEnv);
-        initServer(dEnv);
-        initClient(dEnv);
-        initHelpers(dEnv);
+        initConstants(dEnv);  // HTTP状态码
+        initTypeAndUrl(dEnv); // 类型判断和URL
+        initServer(dEnv);     // 服务端
+        initClient(dEnv);     // 客户端
+        initHelpers(dEnv);    // 响应辅助
     }
 
+    /**
+     * 注册HTTP状态码常量
+     */
     private void initConstants(Env dEnv) {
         dEnv.put("http-status-ok", DNumber.valueOf(200));
         dEnv.put("http-status-created", DNumber.valueOf(201));
@@ -74,6 +83,9 @@ public class HttpModule extends DModule {
         dEnv.put("http-status-internal-server-error", DNumber.valueOf(500));
     }
 
+    /**
+     * 注册HTTP类型判断和URL编解码过程
+     */
     private void initTypeAndUrl(Env dEnv) {
         dEnv.addTokenProcedure("http-server?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DHttpServer), 1, false);
@@ -104,6 +116,9 @@ public class HttpModule extends DModule {
         }, 1, false);
     }
 
+    /**
+     * 注册HTTP服务端监听、路由、静态资源和关闭过程
+     */
     private void initServer(Env dEnv) {
         dEnv.addTokenProcedure("http-listen", (args, env) -> {
             int port = toPort(args.get(0));
@@ -172,6 +187,9 @@ public class HttpModule extends DModule {
         }, 2, false);
     }
 
+    /**
+     * 注册HTTP客户端请求过程
+     */
     private void initClient(Env dEnv) {
         dEnv.addTokenProcedure("http-request", (args, env) ->
                 toResponseTable(requestToken(args.get(1), method(args.get(0)), null, null, DEFAULT_TIMEOUT)), 2, false);
@@ -225,6 +243,9 @@ public class HttpModule extends DModule {
         registerPostMultipartResult(dEnv, "http-post-multipart-string", false);
     }
 
+    /**
+     * 注册HTTP头、重定向和Cookie辅助过程
+     */
     private void initHelpers(Env dEnv) {
         dEnv.addTokenProcedure("http-header", (args, env) -> {
             DTable headers = toTableToken(args.get(0));
@@ -247,6 +268,9 @@ public class HttpModule extends DModule {
                 toTableToken(args.get(3))), 4, false);
     }
 
+    /**
+     * 注册带请求体并返回响应表的HTTP方法过程
+     */
     private void registerBodyMethod(Env dEnv, String name, String method) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 toResponseTable(requestToken(args.get(0), method, null, toRequestBody(args.get(1)),
@@ -263,6 +287,9 @@ public class HttpModule extends DModule {
                         toRequestBody(args.get(2)), toTimeout(args.get(3)))), 4, false);
     }
 
+    /**
+     * 注册自定义HTTP方法并直接返回响应体的过程
+     */
     private void registerRequestResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(requestToken(args.get(1), method(args.get(0)), null, null, DEFAULT_TIMEOUT), binary,
@@ -299,6 +326,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 注册无请求体并直接返回响应体的HTTP方法过程
+     */
     private void registerNoBodyResult(Env dEnv, String name, String method, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(requestToken(args.get(0), method, null, null, DEFAULT_TIMEOUT), binary,
@@ -333,6 +363,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 注册带请求体并直接返回响应体的HTTP方法过程
+     */
     private void registerBodyResult(Env dEnv, String name, String method, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(requestToken(args.get(0), method, null, toRequestBody(args.get(1)), DEFAULT_TIMEOUT),
@@ -368,6 +401,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 注册表单POST请求过程
+     */
     private void registerPostForm(Env dEnv) {
         dEnv.addTokenProcedure("http-post-form", (args, env) ->
                 toResponseTable(postForm(args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT)), 2, false);
@@ -382,6 +418,9 @@ public class HttpModule extends DModule {
                         toTimeout(args.get(3)))), 4, false);
     }
 
+    /**
+     * 注册表单POST并直接返回响应体的过程
+     */
     private void registerPostFormResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(postForm(args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT), binary,
@@ -419,6 +458,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 注册multipart POST请求过程
+     */
     private void registerPostMultipart(Env dEnv) {
         dEnv.addTokenProcedure("http-post-multipart", (args, env) ->
                 toResponseTable(postMultipart(args.get(0), null, toTableToken(args.get(1)),
@@ -435,6 +477,9 @@ public class HttpModule extends DModule {
                         toTableToken(args.get(3)), toTimeout(args.get(4)))), 5, false);
     }
 
+    /**
+     * 注册multipart POST并直接返回响应体的过程
+     */
     private void registerPostMultipartResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(postMultipart(args.get(0), null, toTableToken(args.get(1)), toTableToken(args.get(2)),
@@ -473,17 +518,26 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 构造并发送application/x-www-form-urlencoded请求
+     */
     private static Response postForm(DToken url, DTable headers, DTable form, int timeout) {
         DTable requestHeaders = contentType(headers, "application/x-www-form-urlencoded; charset=UTF-8");
         return requestToken(url, "POST", requestHeaders, buildQuery(form).getBytes(StandardCharsets.UTF_8), timeout);
     }
 
+    /**
+     * 构造并发送multipart/form-data请求
+     */
     private static Response postMultipart(DToken url, DTable headers, DTable fields, DTable files, int timeout) {
         MultipartBody body = multipart(fields, files);
         DTable requestHeaders = contentType(headers, "multipart/form-data; boundary=" + body.boundary);
         return requestToken(url, "POST", requestHeaders, body.body, timeout);
     }
 
+    /**
+     * 注册HTTP路由处理器
+     */
     private static DToken registerHandler(List<DToken> args, Env env, DToken methodToken) {
         DHttpServer server = toServer(args.get(0));
         String method = methodToken == null ? null : method(methodToken);
@@ -523,6 +577,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 处理静态文件请求
+     */
     private static void handleStatic(HttpExchange exchange, String prefix, Path root) throws IOException {
         try {
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())
@@ -556,6 +613,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 将HTTP交换对象转换为请求表
+     */
     private static DTable toRequest(HttpExchange exchange, Map<DToken, DToken> params) throws IOException {
         Map<DToken, DToken> request = new HashMap<>();
         request.put(DString.valueOf("method"), DString.valueOf(exchange.getRequestMethod()));
@@ -590,6 +650,9 @@ public class HttpModule extends DModule {
         return params;
     }
 
+    /**
+     * 拆分并规范化URL路径片段
+     */
     private static List<String> pathParts(String path) {
         List<String> parts = new ArrayList<>();
         for (String part : path.split("/", -1)) {
@@ -599,6 +662,9 @@ public class HttpModule extends DModule {
         return parts;
     }
 
+    /**
+     * 根据路由模式计算HTTP上下文路径
+     */
     private static String contextPath(String pattern) {
         if ("/".equals(pattern))
             return "/";
@@ -608,6 +674,9 @@ public class HttpModule extends DModule {
         return parameter == 0 ? "/" : pattern.substring(0, parameter);
     }
 
+    /**
+     * 创建并启动HTTP服务端
+     */
     private static DHttpServer openServer(InetSocketAddress address) throws IOException {
         HttpServer server = HttpServer.create(address, 0);
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -633,6 +702,9 @@ public class HttpModule extends DModule {
         return DHttpServer.valueOf(server, executor);
     }
 
+    /**
+     * 发送HTTP请求并收集响应
+     */
     private static Response requestToken(DToken url, String method, DTable headers, byte[] requestBody, int timeout) {
         URI uri = toHttpUri(url);
         try {
@@ -664,6 +736,9 @@ public class HttpModule extends DModule {
         return new Response(status, headersToTable(connection.getHeaderFields()), body);
     }
 
+    /**
+     * 写入HTTP请求头
+     */
     private static void setRequestHeaders(HttpURLConnection connection, DTable headers) {
         for (DToken key : headers.keys()) {
             if (!(key instanceof DString))
@@ -675,6 +750,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 将HTTP响应转换为Devore表
+     */
     private static DTable toResponseTable(Response response) {
         Map<DToken, DToken> result = new HashMap<>();
         result.put(DString.valueOf("status"), DNumber.valueOf(response.status));
@@ -683,10 +761,16 @@ public class HttpModule extends DModule {
         return DTable.valueOf(result);
     }
 
+    /**
+     * 按文本或二进制格式提取响应体
+     */
     private static DToken responseBody(Response response, boolean binary, Charset charset) {
         return binary ? DByteUtils.toList(response.body) : DString.valueOf(new String(response.body, charset));
     }
 
+    /**
+     * 复制请求头并设置Content-Type
+     */
     private static DTable contentType(DTable headers, String contentType) {
         Map<DToken, DToken> result = new HashMap<>();
         if (headers != null) {
@@ -698,6 +782,9 @@ public class HttpModule extends DModule {
         return DTable.valueOf(result);
     }
 
+    /**
+     * 将表编码为URL查询字符串
+     */
     private static String buildQuery(DTable table) {
         StringJoiner joiner = new StringJoiner("&");
         for (DToken key : table.keys()) {
@@ -716,6 +803,9 @@ public class HttpModule extends DModule {
         return joiner.toString();
     }
 
+    /**
+     * 构造multipart请求体
+     */
     private static MultipartBody multipart(DTable fields, DTable files) {
         String boundary = "----DevoreBoundary" + Long.toHexString(System.nanoTime());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -746,6 +836,9 @@ public class HttpModule extends DModule {
         return new MultipartBody(boundary, out.toByteArray());
     }
 
+    /**
+     * 将文件参数转换为multipart文件段
+     */
     private static FilePart toFilePart(DToken token) throws IOException {
         if (token instanceof DString) {
             Path path = Paths.get(token.toString());
@@ -766,14 +859,23 @@ public class HttpModule extends DModule {
         throw new DevoreCastException(token.type(), "string|table");
     }
 
+    /**
+     * 按ASCII写入multipart控制内容
+     */
     private static void writeAscii(ByteArrayOutputStream out, String value) throws IOException {
         out.write(value.getBytes(StandardCharsets.US_ASCII));
     }
 
+    /**
+     * 转义HTTP头参数中的引号和反斜杠
+     */
     private static String escapeQuote(String value) {
         return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
+    /**
+     * 构造HTTP重定向响应表
+     */
     private static DToken redirect(DToken locationToken, int status) {
         if (!(locationToken instanceof DString))
             throw new DevoreCastException(locationToken.type(), "string");
@@ -786,6 +888,9 @@ public class HttpModule extends DModule {
         return DTable.valueOf(response);
     }
 
+    /**
+     * 向响应表写入Set-Cookie头
+     */
     private static DToken setCookie(DToken responseToken, DToken nameToken, DToken valueToken, DTable options) {
         if (!(nameToken instanceof DString))
             throw new DevoreCastException(nameToken.type(), "string");
@@ -829,6 +934,9 @@ public class HttpModule extends DModule {
         return DTable.valueOf(newResponse);
     }
 
+    /**
+     * 从请求头中读取指定Cookie值
+     */
     private static DToken cookie(DTable headers, String name) {
         DToken cookieHeader = getHeader(headers, "Cookie");
         if (!(cookieHeader instanceof DString))
@@ -844,6 +952,9 @@ public class HttpModule extends DModule {
         return DWord.NIL;
     }
 
+    /**
+     * 按名称读取HTTP头，兼容大小写
+     */
     private static DToken getHeader(DTable headers, String name) {
         for (DToken key : headers.keys()) {
             if (key instanceof DString && key.toString().equalsIgnoreCase(name))
@@ -852,6 +963,9 @@ public class HttpModule extends DModule {
         return DWord.NIL;
     }
 
+    /**
+     * 将URL查询字符串解析为表
+     */
     private static DTable queryToTable(String rawQuery) {
         Map<DToken, DToken> query = new HashMap<>();
         if (rawQuery == null || rawQuery.isEmpty())
@@ -868,6 +982,9 @@ public class HttpModule extends DModule {
         return DTable.valueOf(query);
     }
 
+    /**
+     * 将HTTP Headers转换为Devore表
+     */
     private static DTable toTable(Headers headers) {
         Map<DToken, DToken> table = new HashMap<>();
         for (Map.Entry<String, List<String>> entry : headers.entrySet())
@@ -884,6 +1001,9 @@ public class HttpModule extends DModule {
         return headers;
     }
 
+    /**
+     * 向HTTP客户端写出响应表
+     */
     private static void sendResponse(HttpExchange exchange, DToken response) throws IOException {
         int status = 200;
         DToken headers = DWord.NIL;
@@ -905,6 +1025,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 向HTTP响应写入头信息
+     */
     private static void setResponseHeaders(HttpExchange exchange, DToken headers) {
         if (!(headers instanceof DTable))
             throw new DevoreCastException(headers.type(), "table");
@@ -919,6 +1042,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 发送纯文本HTTP响应
+     */
     private static void sendPlain(HttpExchange exchange, int status, String message) throws IOException {
         byte[] body = message.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
@@ -928,6 +1054,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 校验并转换HTTP/HTTPS URI参数
+     */
     private static URI toHttpUri(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
@@ -942,18 +1071,27 @@ public class HttpModule extends DModule {
         return uri;
     }
 
+    /**
+     * 校验并取得HTTP方法参数
+     */
     private static String method(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
         return token.toString().toUpperCase();
     }
 
+    /**
+     * 校验并取得HTTP服务端参数
+     */
     private static DHttpServer toServer(DToken token) {
         if (!(token instanceof DHttpServer))
             throw new DevoreCastException(token.type(), "http-server");
         return (DHttpServer) token;
     }
 
+    /**
+     * 校验并规范化HTTP路径参数
+     */
     private static String toPath(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
@@ -963,22 +1101,34 @@ public class HttpModule extends DModule {
         return path;
     }
 
+    /**
+     * 读取可选HTTP头表参数
+     */
     private static DTable toHeaders(DToken token) {
         if (!(token instanceof DTable))
             throw new DevoreCastException(token.type(), "table");
         return (DTable) token;
     }
 
+    /**
+     * 校验并取得表参数
+     */
     private static DTable toTableToken(DToken token) {
         if (!(token instanceof DTable))
             throw new DevoreCastException(token.type(), "table");
         return (DTable) token;
     }
 
+    /**
+     * 读取可选HTTP请求体参数
+     */
     private static byte[] toOptionalRequestBody(DToken body) {
         return body == DWord.NIL ? null : toRequestBody(body);
     }
 
+    /**
+     * 校验并转换HTTP请求体参数
+     */
     private static byte[] toRequestBody(DToken body) {
         if (body == DWord.NIL)
             return new byte[0];
@@ -989,6 +1139,9 @@ public class HttpModule extends DModule {
         throw new DevoreCastException(body.type(), "string|list");
     }
 
+    /**
+     * 校验并取得字符集参数
+     */
     private static Charset toCharset(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
@@ -999,12 +1152,18 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 校验并取得端口参数
+     */
     private static int toPort(DToken token) {
         if (!(token instanceof DInt))
             throw new DevoreCastException(token.type(), "int");
         return DNetworkUtils.toPort((DInt) token);
     }
 
+    /**
+     * 校验并取得超时参数
+     */
     private static int toTimeout(DToken token) {
         if (!(token instanceof DInt))
             throw new DevoreCastException(token.type(), "int");
@@ -1014,6 +1173,9 @@ public class HttpModule extends DModule {
         return seconds * 1000;
     }
 
+    /**
+     * 校验并取得HTTP状态码参数
+     */
     private static int toStatus(DToken token) {
         if (!(token instanceof DInt))
             throw new DevoreCastException(token.type(), "int");
@@ -1023,6 +1185,9 @@ public class HttpModule extends DModule {
         return status;
     }
 
+    /**
+     * 将可选参数解析为请求头或超时设置
+     */
     private static RequestOptions headersOrTimeout(DToken token) {
         if (token instanceof DTable)
             return new RequestOptions((DTable) token, DEFAULT_TIMEOUT);
@@ -1031,6 +1196,9 @@ public class HttpModule extends DModule {
         throw new DevoreCastException(token.type(), "table|int");
     }
 
+    /**
+     * 按指定字符集执行URL编码
+     */
     private static String urlEncode(String value, Charset charset) {
         try {
             return URLEncoder.encode(value, charset.name());
@@ -1039,6 +1207,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 按指定字符集执行URL解码
+     */
     private static String urlDecode(String value, Charset charset) {
         try {
             return URLDecoder.decode(value, charset.name());
@@ -1049,6 +1220,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 将字符串或二进制列表转换为响应体字节
+     */
     private static byte[] toBodyBytes(DToken body) {
         if (body == DWord.NIL)
             return new byte[0];
@@ -1059,6 +1233,9 @@ public class HttpModule extends DModule {
         return body.toString().getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * 读取输入流中的全部字节
+     */
     private static byte[] readAll(InputStream input) throws IOException {
         try (InputStream in = input; ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[8192];
@@ -1069,6 +1246,9 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 提取异常消息文本
+     */
     private static String message(Throwable e) {
         return e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
     }
@@ -1078,6 +1258,9 @@ public class HttpModule extends DModule {
         private final Map<DToken, DToken> headers;
         private final byte[] body;
 
+        /**
+         * 创建HTTP响应结果对象
+         */
         private Response(int status, Map<DToken, DToken> headers, byte[] body) {
             this.status = status;
             this.headers = headers;
@@ -1089,6 +1272,9 @@ public class HttpModule extends DModule {
         private final DTable headers;
         private final int timeout;
 
+        /**
+         * 创建HTTP请求选项对象
+         */
         private RequestOptions(DTable headers, int timeout) {
             this.headers = headers;
             this.timeout = timeout;
@@ -1099,6 +1285,9 @@ public class HttpModule extends DModule {
         private final String boundary;
         private final byte[] body;
 
+        /**
+         * 创建multipart请求体对象
+         */
         private MultipartBody(String boundary, byte[] body) {
             this.boundary = boundary;
             this.body = body;
@@ -1110,6 +1299,9 @@ public class HttpModule extends DModule {
         private final String contentType;
         private final byte[] body;
 
+        /**
+         * 创建multipart文件段对象
+         */
         private FilePart(String filename, String contentType, byte[] body) {
             this.filename = filename;
             this.contentType = contentType;

@@ -39,14 +39,15 @@ import java.util.stream.Stream;
 public class CoreModule extends DModule {
     private static final String DEFAULT_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * 创建Core模块实例
+     */
     public CoreModule() {
         super("core");
     }
 
     /**
      * 初始化核心环境，按功能分类注册全部内置常量和过程
-     *
-     * @param dEnv 目标环境
      */
     public void init(Env dEnv) {
         initConstants(dEnv);                // 基础常量
@@ -69,8 +70,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册基础常量，如nil、true和false
-     *
-     * @param dEnv 目标环境
      */
     private void initConstants(Env dEnv) {
         dEnv.put("nil", DWord.NIL);
@@ -80,8 +79,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册数值计算相关过程，包括四则运算、幂、取模、三角函数、对数和取整等
-     *
-     * @param dEnv 目标环境
      */
     private void initNumberProcedures(Env dEnv) {
         dEnv.addTokenProcedure("+", ((args, env) -> {
@@ -397,8 +394,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册标准输入输出相关过程，包括print、println、read系列和换行
-     *
-     * @param dEnv 目标环境
      */
     private void initIOProcedures(Env dEnv) {
         dEnv.addTokenProcedure("println", ((args, env) -> {
@@ -427,8 +422,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册错误输出和主动抛出运行时错误的过程
-     *
-     * @param dEnv 目标环境
      */
     private void initErrorProcedures(Env dEnv) {
         dEnv.addTokenProcedure("error-println", ((args, env) -> {
@@ -450,8 +443,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册模块加载过程，用于导入并执行外部Devore文件
-     *a
-     * @param dEnv 目标环境
      */
     private void initModuleProcedures(Env dEnv) {
         dEnv.addAstProcedure("export", ((ast, env) ->
@@ -491,8 +482,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册定义和函数调用相关过程，包括def、lib、set!、宏、let、lambda、apply和act
-     *
-     * @param dEnv 目标环境
      */
     private void initDefinitionProcedures(Env dEnv) {
         dEnv.addAstProcedure("undef", ((ast, env) -> {
@@ -707,8 +696,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册通用比较过程，包括大小比较、相等和不等
-     *
-     * @param dEnv 目标环境
      */
     private void initComparisonProcedures(Env dEnv) {
         dEnv.addTokenProcedure(">", ((args, env) ->
@@ -727,8 +714,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册控制流过程，包括条件分支、异常捕获、begin和while
-     *
-     * @param dEnv 目标环境
      */
     private void initControlProcedures(Env dEnv) {
         dEnv.addAstProcedure("unless", (ast, env) -> {
@@ -824,8 +809,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册布尔逻辑和随机数相关过程
-     *
-     * @param dEnv 目标环境
      */
     private void initLogicAndRandomProcedures(Env dEnv) {
         dEnv.addTokenProcedure("and", ((args, env) -> DBool.valueOf(args.stream()
@@ -879,8 +862,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册列表、序列和高阶遍历相关过程，包括list、map、fold、filter和range
-     *
-     * @param dEnv 目标环境
      */
     private void initListProcedures(Env dEnv) {
         dEnv.addTokenProcedure("list", ((args, env) ->
@@ -1191,8 +1172,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册类型转换过程，包括字符串、符号、数字、布尔、列表和Unicode字符转换
-     *
-     * @param dEnv 目标环境
      */
     private void initConversionProcedures(Env dEnv) {
         dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
@@ -1234,8 +1213,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册系统级过程，包括退出、休眠、取类型和时间处理
-     *
-     * @param dEnv 目标环境
      */
     private void initSystemProcedures(Env dEnv) {
         dEnv.addTokenProcedure("exit", ((args, env) -> {
@@ -1269,18 +1246,27 @@ public class CoreModule extends DModule {
                 DNumber.valueOf(parseTime(stringArg(args.get(0)), stringArg(args.get(1))))), 2, false);
     }
 
+    /**
+     * 校验并取得整数参数
+     */
     private static DInt intArg(DToken token) {
         if (!(token instanceof DInt))
             throw new DevoreCastException(token.type(), "int");
         return (DInt) token;
     }
 
+    /**
+     * 校验并取得字符串参数
+     */
     private static String stringArg(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
         return token.toString();
     }
 
+    /**
+     * 按指定格式格式化时间戳
+     */
     private static String formatTime(long timestamp, String pattern) {
         DateTimeFormatter formatter = timeFormatter(pattern);
         try {
@@ -1290,6 +1276,9 @@ public class CoreModule extends DModule {
         }
     }
 
+    /**
+     * 按指定格式解析时间字符串
+     */
     private static long parseTime(String time, String pattern) {
         DateTimeFormatter formatter = timeFormatter(pattern);
         ZoneId zone = ZoneId.systemDefault();
@@ -1312,6 +1301,9 @@ public class CoreModule extends DModule {
         }
     }
 
+    /**
+     * 创建并校验时间格式化器
+     */
     private static DateTimeFormatter timeFormatter(String pattern) {
         try {
             return DateTimeFormatter.ofPattern(pattern);
@@ -1322,8 +1314,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册表结构相关过程，包括创建、查询、写入、删除和获取键列表
-     *
-     * @param dEnv 目标环境
      */
     private void initTableProcedures(Env dEnv) {
         dEnv.addAstProcedure("table", ((ast, env) -> {
@@ -1393,8 +1383,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册聚合比较过程，如max和min
-     *
-     * @param dEnv 目标环境
      */
     private void initAggregateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("max", ((args, env) -> args.stream()
@@ -1405,8 +1393,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册类型、绑定状态和特殊值判断过程，如bound?、number?、list?、nil?和zero?
-     *
-     * @param dEnv 目标环境
      */
     private void initPredicateProcedures(Env dEnv) {
         dEnv.addTokenProcedure("bool?", ((args, env) ->
@@ -1454,8 +1440,6 @@ public class CoreModule extends DModule {
 
     /**
      * 注册字符串处理过程，包括拆分、裁剪、大小写、替换、匹配、索引和截取
-     *
-     * @param dEnv 目标环境
      */
     private void initStringProcedures(Env dEnv) {
         dEnv.addTokenProcedure("string-split", ((args, env) -> {
@@ -1590,6 +1574,9 @@ public class CoreModule extends DModule {
         }), 3, false);
     }
 
+    /**
+     * 判断AST节点是否为空过程占位
+     */
     private boolean isEmptyProcedure(Ast ast) {
         return ast.type == Ast.Type.PROCEDURE
                 && ast.isEmpty()

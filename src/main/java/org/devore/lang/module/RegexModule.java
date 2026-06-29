@@ -17,12 +17,25 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class RegexModule extends DModule {
+    /**
+     * 创建Regex模块实例
+     */
     public RegexModule() {
         super("regex");
     }
 
+    /**
+     * 初始化正则模块，注册匹配、查找、替换、拆分和转义过程
+     */
     @Override
     public void init(Env dEnv) {
+        initRegexProcedures(dEnv); // 正则表达式
+    }
+
+    /**
+     * 注册正则匹配、查找、替换、拆分和转义过程
+     */
+    private void initRegexProcedures(Env dEnv) {
         dEnv.addTokenProcedure("regex-match", (args, env) ->
                 DBool.valueOf(pattern(args.get(0)).matcher(string(args.get(1))).matches()), 2, false);
         dEnv.addTokenProcedure("regex-find", (args, env) -> {
@@ -47,16 +60,25 @@ public class RegexModule extends DModule {
                 DString.valueOf(Pattern.quote(string(args.get(0)))), 1, false);
     }
 
+    /**
+     * 将字符串参数编译为正则模式
+     */
     private static Pattern pattern(DToken token) {
         return Pattern.compile(string(token));
     }
 
+    /**
+     * 校验并取得字符串参数
+     */
     private static String string(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
         return token.toString();
     }
 
+    /**
+     * 将正则匹配结果转换为Devore列表
+     */
     private static DList matchResult(Matcher matcher) {
         List<DToken> groups = new ArrayList<>();
         for (int i = 0; i <= matcher.groupCount(); i++)
@@ -69,6 +91,9 @@ public class RegexModule extends DModule {
         ));
     }
 
+    /**
+     * 读取匹配分组，未匹配时返回nil
+     */
     private static DToken group(Matcher matcher, int index) {
         String group = matcher.group(index);
         return group == null ? DWord.NIL : DString.valueOf(group);

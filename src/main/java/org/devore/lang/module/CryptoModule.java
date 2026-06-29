@@ -26,12 +26,25 @@ public class CryptoModule extends DModule {
     private static final String DEFAULT_AES_TRANSFORMATION = "AES/CBC/PKCS5Padding";
     private static final String DEFAULT_RSA_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
+    /**
+     * 创建Crypto模块实例
+     */
     public CryptoModule() {
         super("crypto");
     }
 
+    /**
+     * 初始化加密模块，注册AES和RSA过程
+     */
     @Override
     public void init(Env dEnv) {
+        initCryptoProcedures(dEnv); // 加密解密
+    }
+
+    /**
+     * 注册AES和RSA加密解密过程
+     */
+    private void initCryptoProcedures(Env dEnv) {
         dEnv.addTokenProcedure("aes-key", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
@@ -83,6 +96,9 @@ public class CryptoModule extends DModule {
         }, 3, false);
     }
 
+    /**
+     * 执行AES加密或解密
+     */
     private DList aes(DToken data, DToken key, DToken iv, String transformation, int mode) {
         try {
             byte[] keyBytes;
@@ -116,6 +132,9 @@ public class CryptoModule extends DModule {
         }
     }
 
+    /**
+     * 执行RSA加密或解密
+     */
     private DList rsa(DToken data, DToken key, String transformation, int mode) {
         try {
             Cipher cipher = Cipher.getInstance(transformation);

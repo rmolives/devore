@@ -27,12 +27,25 @@ import java.util.zip.ZipOutputStream;
  * ZIP压缩包操作
  */
 public class ZipModule extends DModule {
+    /**
+     * 创建Zip模块实例
+     */
     public ZipModule() {
         super("zip");
     }
 
+    /**
+     * 初始化压缩模块，注册ZIP和GZIP过程
+     */
     @Override
     public void init(Env dEnv) {
+        initZipProcedures(dEnv); // 压缩解压
+    }
+
+    /**
+     * 注册ZIP和GZIP压缩解压过程
+     */
+    private void initZipProcedures(Env dEnv) {
         dEnv.addTokenProcedure("zip-create", (args, env) -> {
             Path zipPath = stringPath(args.get(0));
             Path sourcePath = stringPath(args.get(1));
@@ -131,18 +144,27 @@ public class ZipModule extends DModule {
         }, 2, false);
     }
 
+    /**
+     * 校验字符串参数并转换为Path
+     */
     private static Path stringPath(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
         return Paths.get(token.toString());
     }
 
+    /**
+     * 校验并取得字符串参数
+     */
     private static String stringValue(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
         return token.toString();
     }
 
+    /**
+     * 从文件或目录创建ZIP文件
+     */
     private static void createZip(Path zipPath, Path sourcePath, String entryName) {
         if (!Files.exists(sourcePath))
             throw new DevoreRuntimeException("源路径不存在: " + sourcePath);
@@ -161,6 +183,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 递归添加目录到ZIP输出流
+     */
     private static void addDirectory(ZipOutputStream zipOut, Path sourcePath, String entryName) throws IOException {
         String baseName = directoryEntryName(entryName);
         addDirectoryEntry(zipOut, baseName);
@@ -180,6 +205,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 添加文件到ZIP输出流
+     */
     private static void addFile(ZipOutputStream zipOut, Path sourcePath, String entryName) throws IOException {
         ZipEntry entry = new ZipEntry(normalizeEntryName(entryName));
         zipOut.putNextEntry(entry);
@@ -187,12 +215,18 @@ public class ZipModule extends DModule {
         zipOut.closeEntry();
     }
 
+    /**
+     * 添加目录条目到ZIP输出流
+     */
     private static void addDirectoryEntry(ZipOutputStream zipOut, String entryName) throws IOException {
         ZipEntry entry = new ZipEntry(directoryEntryName(entryName));
         zipOut.putNextEntry(entry);
         zipOut.closeEntry();
     }
 
+    /**
+     * 解压整个ZIP文件并防止路径穿越
+     */
     private static void extractZip(Path zipPath, Path targetDir) {
         Path normalizedTargetDir = targetDir.toAbsolutePath().normalize();
         try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
@@ -220,6 +254,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 解压单个ZIP条目
+     */
     private static void extractEntry(Path zipPath, String entryName, Path targetPath) {
         try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
             ZipEntry entry = zipFile.getEntry(entryName);
@@ -241,6 +278,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 将ZIP条目信息转换为Devore表
+     */
     private static DTable entryTable(ZipEntry entry) {
         Map<DToken, DToken> table = new HashMap<>();
         table.put(DString.valueOf("name"), DString.valueOf(entry.getName()));
@@ -252,6 +292,9 @@ public class ZipModule extends DModule {
         return DTable.valueOf(table);
     }
 
+    /**
+     * 压缩字节数组为GZIP数据
+     */
     private static byte[] gzipCompress(byte[] bytes) {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
              GZIPOutputStream gzipOut = new GZIPOutputStream(out)) {
@@ -263,6 +306,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 解压GZIP字节数组
+     */
     private static byte[] gzipDecompress(byte[] bytes) {
         try (GZIPInputStream gzipIn = new GZIPInputStream(new java.io.ByteArrayInputStream(bytes));
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -273,6 +319,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 将单个文件压缩为GZIP文件
+     */
     private static void gzipCompressFile(Path sourcePath, Path gzipPath) {
         if (!Files.exists(sourcePath))
             throw new DevoreRuntimeException("源路径不存在: " + sourcePath);
@@ -291,6 +340,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 将GZIP文件解压到目标文件
+     */
     private static void gzipDecompressFile(Path gzipPath, Path targetPath) {
         try {
             Path parent = targetPath.getParent();
@@ -305,6 +357,9 @@ public class ZipModule extends DModule {
         }
     }
 
+    /**
+     * 根据源路径生成默认ZIP条目名
+     */
     private static String defaultEntryName(Path sourcePath) {
         Path fileName = sourcePath.getFileName();
         if (fileName == null)
@@ -312,6 +367,9 @@ public class ZipModule extends DModule {
         return normalizeEntryName(fileName.toString());
     }
 
+    /**
+     * 规范化并校验ZIP条目名
+     */
     private static String normalizeEntryName(String entryName) {
         String normalized = entryName.replace('\\', '/');
         while (normalized.startsWith("/"))
@@ -325,15 +383,24 @@ public class ZipModule extends DModule {
         return normalized;
     }
 
+    /**
+     * 生成目录形式ZIP条目名
+     */
     private static String directoryEntryName(String entryName) {
         String normalized = normalizeEntryName(entryName);
         return normalized.endsWith("/") ? normalized : normalized + "/";
     }
 
+    /**
+     * 将路径转换为ZIP内部路径名
+     */
     private static String toZipName(Path path) {
         return path.toString().replace('\\', '/');
     }
 
+    /**
+     * 复制输入流到输出流
+     */
     private static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[8192];
         int length;

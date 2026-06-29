@@ -44,12 +44,25 @@ public class XmlModule extends DModule {
     private static final DString TARGET = DString.valueOf("target");
     private static final DString DATA = DString.valueOf("data");
 
+    /**
+     * 创建Xml模块实例
+     */
     public XmlModule() {
         super("xml");
     }
 
+    /**
+     * 初始化Xml模块，注册对外过程
+     */
     @Override
     public void init(Env dEnv) {
+        initXmlProcedures(dEnv); // XML读写
+    }
+
+    /**
+     * 注册XML读写、构造和合法性判断过程
+     */
+    private void initXmlProcedures(Env dEnv) {
         dEnv.addTokenProcedure("xml-read-string", (args, env) ->
                 readString(stringArg(args.get(0))), 1, false);
         dEnv.addTokenProcedure("xml-write-string", (args, env) ->
@@ -82,21 +95,33 @@ public class XmlModule extends DModule {
                 DBool.valueOf(isXml(args.get(0))), 1, false);
     }
 
+    /**
+     * 读取XML字符串并转换为节点表
+     */
     private static DTable readString(String content) {
         try {
             DocumentBuilderFactory factory = documentBuilderFactory();
             javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
             builder.setErrorHandler(new org.xml.sax.ErrorHandler() {
+                /**
+                 * 将XML警告作为解析异常抛出
+                 */
                 @Override
                 public void warning(SAXParseException exception) throws SAXException {
                     throw exception;
                 }
 
+                /**
+                 * 将XML错误作为解析异常抛出
+                 */
                 @Override
                 public void error(SAXParseException exception) throws SAXException {
                     throw exception;
                 }
 
+                /**
+                 * 将XML致命错误作为解析异常抛出
+                 */
                 @Override
                 public void fatalError(SAXParseException exception) throws SAXException {
                     throw exception;
@@ -109,6 +134,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 按指定字符集读取XML文件
+     */
     private static DTable readFile(String file, Charset charset) {
         Path path = Paths.get(file);
         try {
@@ -118,10 +146,16 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 将XML节点表写为字符串
+     */
     private static String writeString(DToken token) {
         return writeNode(tableArg(token));
     }
 
+    /**
+     * 按指定字符集写入XML文件
+     */
     private static void writeFile(String file, DToken token, Charset charset) {
         Path path = Paths.get(file);
         try {
@@ -131,6 +165,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 创建安全配置的XML文档构建工厂
+     */
     private static DocumentBuilderFactory documentBuilderFactory() throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(false);
@@ -147,6 +184,9 @@ public class XmlModule extends DModule {
         return factory;
     }
 
+    /**
+     * 将DOM子节点列表转换为Devore列表
+     */
     private static DList children(NodeList nodeList) {
         List<DToken> children = new ArrayList<>();
         for (int i = 0; i < nodeList.getLength(); ++i) {
@@ -157,6 +197,9 @@ public class XmlModule extends DModule {
         return DList.valueOf(children);
     }
 
+    /**
+     * 将DOM节点转换为Devore节点表
+     */
     private static DToken toToken(Node node) {
         switch (node.getNodeType()) {
             case Node.DOCUMENT_NODE:
@@ -176,6 +219,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 将DOM属性集合转换为Devore表
+     */
     private static DTable attrs(NamedNodeMap nodeMap) {
         Map<DToken, DToken> attrs = new HashMap<>();
         for (int i = 0; i < nodeMap.getLength(); ++i) {
@@ -185,12 +231,18 @@ public class XmlModule extends DModule {
         return DTable.valueOf(attrs);
     }
 
+    /**
+     * 构造XML文档节点表
+     */
     private static DTable documentNode(DList children) {
         Map<DToken, DToken> node = baseNode("document");
         node.put(CHILDREN, children);
         return DTable.valueOf(node);
     }
 
+    /**
+     * 构造并校验XML元素节点表
+     */
     private static DTable elementNode(String name, DTable attrs, DList children) {
         validateName(name, "XML元素名");
         validateAttrs(attrs);
@@ -201,12 +253,18 @@ public class XmlModule extends DModule {
         return DTable.valueOf(node);
     }
 
+    /**
+     * 构造XML文本类节点表
+     */
     private static DTable textNode(String type, String text) {
         Map<DToken, DToken> node = baseNode(type);
         node.put(TEXT, DString.valueOf(text));
         return DTable.valueOf(node);
     }
 
+    /**
+     * 构造并校验XML处理指令节点表
+     */
     private static DTable piNode(String target, String data) {
         validateName(target, "XML处理指令目标");
         if ("xml".equalsIgnoreCase(target))
@@ -225,6 +283,9 @@ public class XmlModule extends DModule {
         return node;
     }
 
+    /**
+     * 将XML节点表序列化为字符串片段
+     */
     private static String writeNode(DTable node) {
         String type = requiredString(node, TYPE);
         switch (type) {
@@ -245,6 +306,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 序列化XML元素节点
+     */
     private static String writeElement(DTable node) {
         String name = requiredString(node, NAME);
         DTable attrs = requiredTable(node);
@@ -274,6 +338,9 @@ public class XmlModule extends DModule {
                 .toString();
     }
 
+    /**
+     * 序列化XML子节点列表
+     */
     private static String writeChildren(DList children, boolean document) {
         StringBuilder builder = new StringBuilder();
         int rootCount = 0;
@@ -288,18 +355,27 @@ public class XmlModule extends DModule {
         return builder.toString();
     }
 
+    /**
+     * 序列化CDATA节点内容
+     */
     private static String writeCdata(String text) {
         if (text.contains("]]>"))
             throw new DevoreRuntimeException("XML CDATA内容不能包含]]>.");
         return "<![CDATA[" + text + "]]>";
     }
 
+    /**
+     * 序列化XML注释内容
+     */
     private static String writeComment(String text) {
         if (text.contains("--") || text.endsWith("-"))
             throw new DevoreRuntimeException("XML注释内容不能包含--，也不能以-结尾.");
         return "<!--" + text + "-->";
     }
 
+    /**
+     * 序列化XML处理指令
+     */
     private static String writePi(DTable node) {
         String target = requiredString(node, TARGET);
         String data = requiredString(node, DATA);
@@ -311,6 +387,9 @@ public class XmlModule extends DModule {
         return data.isEmpty() ? "<?" + target + "?>" : "<?" + target + " " + data + "?>";
     }
 
+    /**
+     * 转义XML文本内容
+     */
     private static String escapeText(String text) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < text.length(); ++i) {
@@ -332,6 +411,9 @@ public class XmlModule extends DModule {
         return builder.toString();
     }
 
+    /**
+     * 转义XML属性值
+     */
     private static String escapeAttr(String text) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < text.length(); ++i) {
@@ -362,6 +444,9 @@ public class XmlModule extends DModule {
         return builder.toString();
     }
 
+    /**
+     * 判断Devore值是否为合法XML节点
+     */
     private static boolean isXml(DToken token) {
         if (!(token instanceof DTable))
             return false;
@@ -373,6 +458,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 校验XML节点表结构
+     */
     private static void validateNode(DTable node) {
         String type = requiredString(node, TYPE);
         switch (type) {
@@ -399,6 +487,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 校验XML属性表
+     */
     private static void validateAttrs(DTable attrs) {
         for (DToken key : attrs.keys()) {
             if (!(key instanceof DString))
@@ -410,6 +501,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 校验XML名称格式
+     */
     private static void validateName(String name, String label) {
         if (name.isEmpty())
             throw new DevoreRuntimeException(label + "不能为空.");
@@ -420,6 +514,9 @@ public class XmlModule extends DModule {
         }
     }
 
+    /**
+     * 读取节点表中的必需字符串字段
+     */
     private static String requiredString(DTable table, DString key) {
         DToken value = table.get(key);
         if (!(value instanceof DString))
@@ -427,6 +524,9 @@ public class XmlModule extends DModule {
         return value.toString();
     }
 
+    /**
+     * 读取元素节点中的属性表
+     */
     private static DTable requiredTable(DTable table) {
         DToken value = table.get(XmlModule.ATTRS);
         if (!(value instanceof DTable))
@@ -434,6 +534,9 @@ public class XmlModule extends DModule {
         return (DTable) value;
     }
 
+    /**
+     * 读取节点表中的子节点列表
+     */
     private static DList requiredList(DTable table) {
         DToken value = table.get(XmlModule.CHILDREN);
         if (!(value instanceof DList))
@@ -441,24 +544,36 @@ public class XmlModule extends DModule {
         return (DList) value;
     }
 
+    /**
+     * 校验并取得表参数
+     */
     private static DTable tableArg(DToken token) {
         if (!(token instanceof DTable))
             throw new DevoreCastException(token.type(), "table");
         return (DTable) token;
     }
 
+    /**
+     * 校验并取得列表参数
+     */
     private static DList listArg(DToken token) {
         if (!(token instanceof DList))
             throw new DevoreCastException(token.type(), "list");
         return (DList) token;
     }
 
+    /**
+     * 校验并取得字符串参数
+     */
     private static String stringArg(DToken token) {
         if (!(token instanceof DString))
             throw new DevoreCastException(token.type(), "string");
         return token.toString();
     }
 
+    /**
+     * 校验并取得字符集参数
+     */
     private static Charset charsetArg(DToken token) {
         try {
             return Charset.forName(stringArg(token));
