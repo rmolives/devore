@@ -161,12 +161,16 @@ public class Devore {
             throw new DevoreRuntimeException("栈溢出，可能存在无限递归或递归宏展开.",
                     exp.expression, exp.startIndex, source, code);
         } catch (DevoreParseException e) {
-            throw new DevoreRuntimeException(message(e), null, e.index(), source, code);
+            throw new DevoreRuntimeException(message(e), exp.expression, parseErrorIndex(e, exp), source, code);
         } catch (DevoreRuntimeException e) {
             throw e;
         } catch (RuntimeException e) {
             throw new DevoreRuntimeException(message(e), exp.expression, exp.startIndex, source, code);
         }
+    }
+
+    private static int parseErrorIndex(DevoreParseException e, Lexer.SourceExpression exp) {
+        return e.index() >= 0 ? e.index() : exp.startIndex;
     }
 
     private static String message(Throwable e) {
