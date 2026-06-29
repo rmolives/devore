@@ -3,6 +3,7 @@ package org.devore.lang;
 import org.devore.exception.DevoreRuntimeException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DSecurity {
@@ -10,6 +11,11 @@ public class DSecurity {
 
     public DSecurity(List<Restriction> restrictions) {
         this.restrictions = restrictions;
+    }
+
+    public DSecurity() {
+        this.restrictions = Arrays.asList(Restriction.FILE, Restriction.NET,
+                Restriction.EXEC, Restriction.REFLECT);
     }
 
     public boolean contains(Restriction restriction) {
