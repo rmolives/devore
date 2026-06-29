@@ -62,8 +62,10 @@ public class Lexer {
                             .filter(i -> codeCharArray[i] == '\n' || codeCharArray[i] == '\r')
                             .findFirst()
                             .orElse(codeCharArray.length);
-                else if (codeCharArray[index] == '(' || codeCharArray[index] == '[')
+                else if (codeCharArray[index] == '(' || codeCharArray[index] == '[') {
+                    checkLeftBracketSpacing(codeCharArray, index);
                     break;
+                }
                 else if (codeCharArray[index] == ')' || codeCharArray[index] == ']')
                     throw new DevoreParseException("多余的右括号: " + codeCharArray[index], index);
                 else
@@ -121,6 +123,7 @@ public class Lexer {
                     continue;
                 }
                 if (codeCharArray[index] == '(' || codeCharArray[index] == '[') {
+                    checkLeftBracketSpacing(codeCharArray, index);
                     brackets.push(codeCharArray[index]);
                     bracketIndexes.push(index);
                 } else if (codeCharArray[index] == ')' || codeCharArray[index] == ']') {
@@ -157,7 +160,6 @@ public class Lexer {
             switch (expressionCharArray[index]) {
                 case '(':
                 case '[':
-                    checkLeftBracketSpacing(expressionCharArray, index, baseIndex);
                     tokens.add(new SourceToken(DWord.LB, baseIndex + index));
                     continue;
                 case ')':
@@ -268,14 +270,13 @@ public class Lexer {
      *
      * @param expressionCharArray 表达式字符数组
      * @param index               左括号位置
-     * @param baseIndex           基础位置
      */
-    private static void checkLeftBracketSpacing(char[] expressionCharArray, int index, int baseIndex) {
+    private static void checkLeftBracketSpacing(char[] expressionCharArray, int index) {
         if (index == 0)
             return;
         char previous = expressionCharArray[index - 1];
         if (Character.isWhitespace(previous) || previous == '(' || previous == '[')
             return;
-        throw new DevoreParseException("左括号前缺少空白分隔符: " + expressionCharArray[index], baseIndex + index);
+        throw new DevoreParseException("左括号前缺少空白分隔符: " + expressionCharArray[index], index);
     }
 }
