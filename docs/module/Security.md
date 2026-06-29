@@ -25,6 +25,16 @@
 * 返回类型：word
 * 示例：(security-clear!)
 
+## security-remove!
+
+* 作用：删除当前环境直接设置的指定安全限制
+* 参数数量：无穷（>= 1）
+* 参数作用：安全限制<*>
+* 参数类型：string<*>
+* 返回值：nil
+* 返回类型：word
+* 示例：(security-remove! "file" "net")
+
 ## security-restrictions
 
 * 作用：获取当前环境及父环境合并后的安全限制

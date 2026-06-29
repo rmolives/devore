@@ -14,8 +14,8 @@ public class DSecurity {
     }
 
     public DSecurity() {
-        this.restrictions = Arrays.asList(Restriction.FILE, Restriction.NET,
-                Restriction.EXEC, Restriction.REFLECT, Restriction.SECURITY);
+        this.restrictions = new ArrayList<>(Arrays.asList(Restriction.FILE, Restriction.NET,
+                Restriction.EXEC, Restriction.REFLECT, Restriction.SECURITY));
     }
 
     public boolean contains(Restriction restriction) {

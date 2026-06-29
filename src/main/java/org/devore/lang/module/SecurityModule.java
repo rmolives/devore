@@ -31,6 +31,13 @@ public class SecurityModule extends DModule {
             env.setSecurity(new DSecurity(new ArrayList<>()));
             return DWord.NIL;
         }, 0, false);
+        dEnv.addTokenProcedure("security-remove!", (args, env) -> {
+            DSecurity.checkRestrictSecurity(env);
+            List<DSecurity.Restriction> restrictions = env.security.restrictions();
+            restrictions.removeAll(toRestrictions(args));
+            env.setSecurity(new DSecurity(restrictions));
+            return DWord.NIL;
+        }, 1, true);
         dEnv.addTokenProcedure("security-restrictions", (args, env) ->
                 toList(DSecurity.inherited(env).restrictions()), 0, false);
         dEnv.addTokenProcedure("security-restrict?", (args, env) ->
