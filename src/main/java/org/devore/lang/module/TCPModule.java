@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
@@ -43,6 +44,7 @@ public class TCPModule extends DModule {
         dEnv.addTokenProcedure("tcp-server?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DTCPServer), 1, false);
         dEnv.addTokenProcedure("tcp-connect", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DInt))
@@ -56,6 +58,7 @@ public class TCPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("tcp-connect", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DInt))
@@ -74,6 +77,7 @@ public class TCPModule extends DModule {
             }
         }, 3, false);
         dEnv.addTokenProcedure("tcp-listen", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
             int port = DNetworkUtils.toPort((DInt) args.get(0));
@@ -84,6 +88,7 @@ public class TCPModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("tcp-listen", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DInt))
@@ -99,6 +104,7 @@ public class TCPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("tcp-accept", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DTCPServer))
                 throw new DevoreCastException(args.get(0).type(), "tcp-server");
             try {
@@ -110,6 +116,7 @@ public class TCPModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("tcp-read", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DTCPSocket))
                 throw new DevoreCastException(args.get(0).type(), "tcp-socket");
             if (!(args.get(1) instanceof DInt))
@@ -131,6 +138,7 @@ public class TCPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("tcp-write", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DTCPSocket))
                 throw new DevoreCastException(args.get(0).type(), "tcp-socket");
             if (!(args.get(1) instanceof DList))
@@ -145,6 +153,7 @@ public class TCPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("tcp-set-timeout", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DTCPSocket))
                 throw new DevoreCastException(args.get(0).type(), "tcp-socket");
             if (!(args.get(1) instanceof DInt))
@@ -158,6 +167,7 @@ public class TCPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("tcp-server-set-timeout", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DTCPServer))
                 throw new DevoreCastException(args.get(0).type(), "tcp-server");
             if (!(args.get(1) instanceof DInt))
@@ -170,6 +180,7 @@ public class TCPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("tcp-close", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (args.get(0) instanceof DTCPSocket) {
                 ((DTCPSocket) args.get(0)).close();
                 return DWord.NIL;

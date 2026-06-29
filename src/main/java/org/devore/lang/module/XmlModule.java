@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.DBool;
 import org.devore.lang.token.DList;
@@ -67,15 +68,21 @@ public class XmlModule extends DModule {
                 readString(stringArg(args.get(0))), 1, false);
         dEnv.addTokenProcedure("xml-write-string", (args, env) ->
                 DString.valueOf(writeString(args.get(0))), 1, false);
-        dEnv.addTokenProcedure("xml-read-file", (args, env) ->
-                readFile(stringArg(args.get(0)), StandardCharsets.UTF_8), 1, false);
-        dEnv.addTokenProcedure("xml-read-file", (args, env) ->
-                readFile(stringArg(args.get(0)), charsetArg(args.get(1))), 2, false);
+        dEnv.addTokenProcedure("xml-read-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
+            return readFile(stringArg(args.get(0)), StandardCharsets.UTF_8);
+        }, 1, false);
+        dEnv.addTokenProcedure("xml-read-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
+            return readFile(stringArg(args.get(0)), charsetArg(args.get(1)));
+        }, 2, false);
         dEnv.addTokenProcedure("xml-write-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             writeFile(stringArg(args.get(0)), args.get(1), StandardCharsets.UTF_8);
             return DWord.NIL;
         }, 2, false);
         dEnv.addTokenProcedure("xml-write-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             writeFile(stringArg(args.get(0)), args.get(1), charsetArg(args.get(2)));
             return DWord.NIL;
         }, 3, false);

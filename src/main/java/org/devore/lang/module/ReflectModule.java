@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 
@@ -44,11 +45,16 @@ public class ReflectModule extends DModule {
     private void initReflectProcedures(Env dEnv) {
         dEnv.addTokenProcedure("java-object?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DJavaObject), 1, false);
-        dEnv.addTokenProcedure("reflect-class", (args, env) ->
-                DJavaObject.valueOf(classArg(args.get(0))), 1, false);
-        dEnv.addTokenProcedure("reflect-class-name", (args, env) ->
-                DString.valueOf(classArg(args.get(0)).getName()), 1, false);
+        dEnv.addTokenProcedure("reflect-class", (args, env) -> {
+            DSecurity.checkRestrictReflect(env);
+            return DJavaObject.valueOf(classArg(args.get(0)));
+        }, 1, false);
+        dEnv.addTokenProcedure("reflect-class-name", (args, env) -> {
+            DSecurity.checkRestrictReflect(env);
+            return DString.valueOf(classArg(args.get(0)).getName());
+        }, 1, false);
         dEnv.addTokenProcedure("reflect-new", (args, env) -> {
+            DSecurity.checkRestrictReflect(env);
             Class<?> clazz = classArg(args.get(0));
             List<DToken> values = args.subList(1, args.size());
             Constructor<?> constructor = bestConstructor(clazz, values);
@@ -61,6 +67,7 @@ public class ReflectModule extends DModule {
             }
         }, 1, true);
         dEnv.addTokenProcedure("reflect-call", (args, env) -> {
+            DSecurity.checkRestrictReflect(env);
             Object target = objectArg(args.get(0));
             String name = stringArg(args.get(1));
             List<DToken> values = args.subList(2, args.size());
@@ -77,6 +84,7 @@ public class ReflectModule extends DModule {
             }
         }, 2, true);
         dEnv.addTokenProcedure("reflect-static-call", (args, env) -> {
+            DSecurity.checkRestrictReflect(env);
             Class<?> clazz = classArg(args.get(0));
             String name = stringArg(args.get(1));
             List<DToken> values = args.subList(2, args.size());

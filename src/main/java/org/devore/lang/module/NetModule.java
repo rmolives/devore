@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 
@@ -39,11 +40,16 @@ public class NetModule extends DModule {
      * 注册DNS、主机、IP、MAC和网卡查询过程
      */
     private void initNetworkProcedures(Env dEnv) {
-        dEnv.addTokenProcedure("dns-lookup", (args, env) ->
-                addresses(stringArg(args.get(0))), 1, false);
-        dEnv.addTokenProcedure("dns-reverse-lookup", (args, env) ->
-                DString.valueOf(address(stringArg(args.get(0))).getHostName()), 1, false);
+        dEnv.addTokenProcedure("dns-lookup", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
+            return addresses(stringArg(args.get(0)));
+        }, 1, false);
+        dEnv.addTokenProcedure("dns-reverse-lookup", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
+            return DString.valueOf(address(stringArg(args.get(0))).getHostName());
+        }, 1, false);
         dEnv.addTokenProcedure("hostname", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             try {
                 return DString.valueOf(InetAddress.getLocalHost().getHostName());
             } catch (UnknownHostException e) {
@@ -51,26 +57,38 @@ public class NetModule extends DModule {
             }
         }, 0, false);
         dEnv.addTokenProcedure("ip", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             try {
                 return DString.valueOf(InetAddress.getLocalHost().getHostAddress());
             } catch (UnknownHostException e) {
                 throw new DevoreRuntimeException("获取本机IP失败: " + e.getMessage());
             }
         }, 0, false);
-        dEnv.addTokenProcedure("ips", (args, env) ->
-                interfaceAddresses(null), 0, false);
-        dEnv.addTokenProcedure("ips", (args, env) ->
-                interfaceAddresses(interfaceByName(stringArg(args.get(0)))), 1, false);
+        dEnv.addTokenProcedure("ips", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
+            return interfaceAddresses(null);
+        }, 0, false);
+        dEnv.addTokenProcedure("ips", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
+            return interfaceAddresses(interfaceByName(stringArg(args.get(0))));
+        }, 1, false);
         dEnv.addTokenProcedure("mac", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             NetworkInterface networkInterface = defaultInterface();
             return networkInterface == null ? DWord.NIL : macAddress(networkInterface);
         }, 0, false);
-        dEnv.addTokenProcedure("mac", (args, env) ->
-                macAddress(interfaceByName(stringArg(args.get(0)))), 1, false);
-        dEnv.addTokenProcedure("network-interface", (args, env) ->
-                interfaceInfo(interfaceByName(stringArg(args.get(0)))), 1, false);
-        dEnv.addTokenProcedure("network-interfaces", (args, env) ->
-                networkInterfaces(), 0, false);
+        dEnv.addTokenProcedure("mac", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
+            return macAddress(interfaceByName(stringArg(args.get(0))));
+        }, 1, false);
+        dEnv.addTokenProcedure("network-interface", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
+            return interfaceInfo(interfaceByName(stringArg(args.get(0))));
+        }, 1, false);
+        dEnv.addTokenProcedure("network-interfaces", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
+            return networkInterfaces();
+        }, 0, false);
     }
 
     /**

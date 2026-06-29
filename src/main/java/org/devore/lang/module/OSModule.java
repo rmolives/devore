@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 
@@ -98,10 +99,14 @@ public class OSModule extends DModule {
      * 注册外部命令执行过程
      */
     private void initProcessProcedures(Env dEnv) {
-        dEnv.addTokenProcedure("os-exec", (args, env) ->
-                exec(command(args.get(0)), null), 1, false);
-        dEnv.addTokenProcedure("os-exec", (args, env) ->
-                exec(command(args.get(0)), new File(stringArg(args.get(1)))), 2, false);
+        dEnv.addTokenProcedure("os-exec", (args, env) -> {
+            DSecurity.checkRestrictExec(env);
+            return exec(command(args.get(0)), null);
+        }, 1, false);
+        dEnv.addTokenProcedure("os-exec", (args, env) -> {
+            DSecurity.checkRestrictExec(env);
+            return exec(command(args.get(0)), new File(stringArg(args.get(1))));
+        }, 2, false);
     }
 
     /**

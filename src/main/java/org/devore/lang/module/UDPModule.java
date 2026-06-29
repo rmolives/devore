@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
@@ -38,6 +39,7 @@ public class UDPModule extends DModule {
         dEnv.addTokenProcedure("udp-socket?", (args, env) ->
                 DBool.valueOf(args.get(0) instanceof DUDPSocket), 1, false);
         dEnv.addTokenProcedure("udp-open", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             try {
                 return DUDPSocket.valueOf(new DatagramSocket());
             } catch (SocketException e) {
@@ -45,6 +47,7 @@ public class UDPModule extends DModule {
             }
         }, 0, false);
         dEnv.addTokenProcedure("udp-bind", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
             int port = DNetworkUtils.toPort((DInt) args.get(0));
@@ -55,6 +58,7 @@ public class UDPModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("udp-bind", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DInt))
@@ -68,6 +72,7 @@ public class UDPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("udp-send", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DUDPSocket))
                 throw new DevoreCastException(args.get(0).type(), "udp-socket");
             if (!(args.get(1) instanceof DString))
@@ -88,6 +93,7 @@ public class UDPModule extends DModule {
             }
         }, 4, false);
         dEnv.addTokenProcedure("udp-receive", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DUDPSocket))
                 throw new DevoreCastException(args.get(0).type(), "udp-socket");
             if (!(args.get(1) instanceof DInt))
@@ -111,6 +117,7 @@ public class UDPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("udp-set-timeout", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DUDPSocket))
                 throw new DevoreCastException(args.get(0).type(), "udp-socket");
             if (!(args.get(1) instanceof DInt))
@@ -123,6 +130,7 @@ public class UDPModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("udp-close", (args, env) -> {
+            DSecurity.checkRestrictNet(env);
             if (!(args.get(0) instanceof DUDPSocket))
                 throw new DevoreCastException(args.get(0).type(), "udp-socket");
             ((DUDPSocket) args.get(0)).close();

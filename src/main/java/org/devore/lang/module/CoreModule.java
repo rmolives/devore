@@ -3,6 +3,7 @@ package org.devore.lang.module;
 import org.devore.Devore;
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
@@ -461,12 +462,14 @@ public class CoreModule extends DModule {
                 if (env.modules.containsKey(name.toString()))
                     env.loadModule(name.toString());
                 else {
+                    DSecurity.checkRestrictFile(env);
                     String file = name.toString();
                     Path path = Paths.get(file);
                     if (!Files.exists(path))
                         throw new DevoreRuntimeException("模块 " + name + " 不存在.");
                     try {
                         Env inEnv = Env.newEnv();
+                        inEnv.setSecurity(DSecurity.inherited(env));
                         DToken temp = Devore.call(inEnv,
                                 new String(Files.readAllBytes(path), StandardCharsets.UTF_8), file);
                         if (temp instanceof DExport)
@@ -1216,6 +1219,7 @@ public class CoreModule extends DModule {
      */
     private void initSystemProcedures(Env dEnv) {
         dEnv.addTokenProcedure("exit", ((args, env) -> {
+            DSecurity.checkRestrictExec(env);
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
             System.exit(DIntUtils.toInt((DInt) args.get(0)));

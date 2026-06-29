@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
@@ -47,6 +48,7 @@ public class ZipModule extends DModule {
      */
     private void initZipProcedures(Env dEnv) {
         dEnv.addTokenProcedure("zip-create", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path zipPath = stringPath(args.get(0));
             Path sourcePath = stringPath(args.get(1));
             String entryName = defaultEntryName(sourcePath);
@@ -55,6 +57,7 @@ public class ZipModule extends DModule {
         }, 2, false);
 
         dEnv.addTokenProcedure("zip-create", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path zipPath = stringPath(args.get(0));
             Path sourcePath = stringPath(args.get(1));
             String entryName = stringValue(args.get(2));
@@ -63,6 +66,7 @@ public class ZipModule extends DModule {
         }, 3, false);
 
         dEnv.addTokenProcedure("zip-list", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path zipPath = stringPath(args.get(0));
             try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
                 List<DToken> entries = new ArrayList<>();
@@ -74,6 +78,7 @@ public class ZipModule extends DModule {
         }, 1, false);
 
         dEnv.addTokenProcedure("zip-entry-exists?", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path zipPath = stringPath(args.get(0));
             String entryName = stringValue(args.get(1));
             try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
@@ -84,6 +89,7 @@ public class ZipModule extends DModule {
         }, 2, false);
 
         dEnv.addTokenProcedure("zip-read-entry", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path zipPath = stringPath(args.get(0));
             String entryName = stringValue(args.get(1));
             try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
@@ -103,6 +109,7 @@ public class ZipModule extends DModule {
         }, 2, false);
 
         dEnv.addTokenProcedure("zip-extract", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path zipPath = stringPath(args.get(0));
             Path targetDir = stringPath(args.get(1));
             extractZip(zipPath, targetDir);
@@ -110,6 +117,7 @@ public class ZipModule extends DModule {
         }, 2, false);
 
         dEnv.addTokenProcedure("zip-extract-entry", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path zipPath = stringPath(args.get(0));
             String entryName = stringValue(args.get(1));
             Path targetPath = stringPath(args.get(2));
@@ -130,6 +138,7 @@ public class ZipModule extends DModule {
         }, 1, false);
 
         dEnv.addTokenProcedure("gzip-compress-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path sourcePath = stringPath(args.get(0));
             Path gzipPath = stringPath(args.get(1));
             gzipCompressFile(sourcePath, gzipPath);
@@ -137,6 +146,7 @@ public class ZipModule extends DModule {
         }, 2, false);
 
         dEnv.addTokenProcedure("gzip-decompress-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             Path gzipPath = stringPath(args.get(0));
             Path targetPath = stringPath(args.get(1));
             gzipDecompressFile(gzipPath, targetPath);

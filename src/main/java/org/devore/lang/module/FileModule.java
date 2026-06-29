@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
 import org.devore.utils.DByteUtils;
@@ -40,6 +41,7 @@ public class FileModule extends DModule {
      */
     private void initFileProcedures(Env dEnv) {
         dEnv.addTokenProcedure("file-read-binary", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
@@ -50,6 +52,7 @@ public class FileModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("file-write-binary", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DList))
@@ -65,6 +68,7 @@ public class FileModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("file-append-binary", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DList))
@@ -79,6 +83,7 @@ public class FileModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("file-read-string", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
@@ -89,6 +94,7 @@ public class FileModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("file-read-string", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DString))
@@ -107,6 +113,7 @@ public class FileModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("file-write-string", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DString))
@@ -122,6 +129,7 @@ public class FileModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("file-write-string", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DString))
@@ -145,6 +153,7 @@ public class FileModule extends DModule {
             }
         }, 3, false);
         dEnv.addTokenProcedure("file-append-string", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DString))
@@ -160,6 +169,7 @@ public class FileModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("file-append-string", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             if (!(args.get(1) instanceof DString))
@@ -184,26 +194,31 @@ public class FileModule extends DModule {
         }, 3, false);
 
         dEnv.addTokenProcedure("file-exists?", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DBool.valueOf(Files.exists(Paths.get(args.get(0).toString())));
         }, 1, false);
         dEnv.addTokenProcedure("file-regular?", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DBool.valueOf(Files.isRegularFile(Paths.get(args.get(0).toString())));
         }, 1, false);
         dEnv.addTokenProcedure("file-directory?", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DBool.valueOf(Files.isDirectory(Paths.get(args.get(0).toString())));
         }, 1, false);
         dEnv.addTokenProcedure("file-absolute-path", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             return DString.valueOf(Paths.get(args.get(0).toString()).toAbsolutePath().toString());
         }, 1, false);
         dEnv.addTokenProcedure("file-list", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
@@ -221,6 +236,7 @@ public class FileModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("file-size", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
@@ -231,6 +247,7 @@ public class FileModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("file-create-dirs", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());
@@ -242,6 +259,7 @@ public class FileModule extends DModule {
             }
         }, 1, false);
         dEnv.addTokenProcedure("file-delete!", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
             Path path = Paths.get(args.get(0).toString());

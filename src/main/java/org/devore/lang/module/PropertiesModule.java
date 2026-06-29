@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.token.DString;
 import org.devore.lang.token.DTable;
@@ -51,15 +52,21 @@ public class PropertiesModule extends DModule {
                 DString.valueOf(writeString(tableArg(args.get(0)))), 1, false);
         dEnv.addTokenProcedure("properties-get", (args, env) ->
                 propertyOrNil(tableArg(args.get(0)), stringArg(args.get(1))), 2, false);
-        dEnv.addTokenProcedure("properties-read-file", (args, env) ->
-                readFile(stringArg(args.get(0)), StandardCharsets.UTF_8), 1, false);
-        dEnv.addTokenProcedure("properties-read-file", (args, env) ->
-                readFile(stringArg(args.get(0)), charsetArg(args.get(1))), 2, false);
+        dEnv.addTokenProcedure("properties-read-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
+            return readFile(stringArg(args.get(0)), StandardCharsets.UTF_8);
+        }, 1, false);
+        dEnv.addTokenProcedure("properties-read-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
+            return readFile(stringArg(args.get(0)), charsetArg(args.get(1)));
+        }, 2, false);
         dEnv.addTokenProcedure("properties-write-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             writeFile(stringArg(args.get(0)), tableArg(args.get(1)), StandardCharsets.UTF_8);
             return DWord.NIL;
         }, 2, false);
         dEnv.addTokenProcedure("properties-write-file", (args, env) -> {
+            DSecurity.checkRestrictFile(env);
             writeFile(stringArg(args.get(0)), tableArg(args.get(1)), charsetArg(args.get(2)));
             return DWord.NIL;
         }, 3, false);

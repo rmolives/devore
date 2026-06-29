@@ -20,6 +20,7 @@ public class Env {
 
     public final Map<String, DToken> table;             // 环境表
     public Env father;                                  // 父环境
+    public DSecurity security;                          // 安全
     public final IOConfig io;                           // IO表
     public final Map<String, Env> importEnvTable;       // 导入的环境
 
@@ -61,11 +62,13 @@ public class Env {
      * @param father 父环境
      * @param io     IO表
      */
-    public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvTable, IOConfig io, boolean load) {
+    public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvTable, IOConfig io,
+               DSecurity security, boolean load) {
         this.table = concurrentMap(table);
         this.father = father;
         this.io = io;
         this.importEnvTable = concurrentMap(importEnvTable);
+        this.security = security;
         if (load)
             defaultModules.forEach(this::loadModule);
     }
@@ -74,6 +77,15 @@ public class Env {
         if (map instanceof ConcurrentMap)
             return map;
         return new ConcurrentHashMap<>(map);
+    }
+
+    /**
+     * 加载安全
+     *
+     * @param security 安全
+     */
+    public void setSecurity(DSecurity security) {
+        this.security = security;
     }
 
     /**
@@ -136,7 +148,7 @@ public class Env {
         if (imported == null)
             return current;
         return new Env(imported.table, appendFather(imported.father, current),
-                imported.importEnvTable, imported.io, false);
+                imported.importEnvTable, imported.io, imported.security, false);
     }
 
     private Env findTableEnv(String key) {
@@ -182,7 +194,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv() {
-        return new Env(new HashMap<>(), null, new HashMap<>(), new IOConfig(), true);
+        return new Env(new HashMap<>(), null, new HashMap<>(), new IOConfig(), new DSecurity(new ArrayList<>()), true);
     }
 
     /**
@@ -193,7 +205,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv(Env father, IOConfig io) {
-        return new Env(new HashMap<>(), father, new HashMap<>(), io, true);
+        return new Env(new HashMap<>(), father, new HashMap<>(), io, new DSecurity(new ArrayList<>()), true);
     }
 
     /**
@@ -203,7 +215,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv(IOConfig io) {
-        return new Env(new HashMap<>(), null, new HashMap<>(), io, true);
+        return new Env(new HashMap<>(), null, new HashMap<>(), io, new DSecurity(new ArrayList<>()), true);
     }
 
     /**
@@ -461,6 +473,6 @@ public class Env {
      * @return 子环境
      */
     public Env createChild() {
-        return new Env(new HashMap<>(), this, new HashMap<>(), this.io, false);
+        return new Env(new HashMap<>(), this, new HashMap<>(), this.io, new DSecurity(new ArrayList<>()), false);
     }
 }
