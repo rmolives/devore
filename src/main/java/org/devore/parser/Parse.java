@@ -37,18 +37,16 @@ public class Parse {
                 stack.push(current);
             } else if (token == DWord.RB) {
                 if (stack.isEmpty())
-                    throw new DevoreParseException("语法解析中栈顶为空.");
+                    throw new DevoreParseException("语法解析中栈顶为空.", sourceToken.index);
                 closeProcedure(stack.pop());
             } else {
                 if (stack.isEmpty())
-                    throw new DevoreParseException("语法解析中栈顶为空.");
+                    throw new DevoreParseException("语法解析中栈顶为空.", sourceToken.index);
                 stack.peek().add(newNode(token, sourceToken.index));
             }
         }
         if (node == null)
             return Ast.empty;
-        if (!stack.isEmpty())
-            throw new DevoreParseException("语法解析中括号未闭合.");
         return node;
     }
 
