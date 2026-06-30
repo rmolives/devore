@@ -31,7 +31,7 @@ public class DIntUtils {
      * 将DInt转为long
      *
      * @param value DInt值
-     * @return int值
+     * @return long值
      */
     public static long toLong(DInt value) {
         BigInteger integer = value.toBigInteger();
@@ -53,10 +53,22 @@ public class DIntUtils {
         return integer.intValue();
     }
 
+    /**
+     * 判断整数是否超出int范围
+     *
+     * @param integer 整数
+     * @return 是否超出int范围
+     */
     private static boolean outOfIntRange(BigInteger integer) {
         return integer.compareTo(MIN_INT) < 0 || integer.compareTo(MAX_INT) > 0;
     }
 
+    /**
+     * 判断整数是否超出long范围
+     *
+     * @param integer 整数
+     * @return 是否超出long范围
+     */
     private static boolean outOfLongRange(BigInteger integer) {
         return integer.compareTo(MIN_LONG) < 0 || integer.compareTo(MAX_LONG) > 0;
     }
