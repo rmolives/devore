@@ -29,6 +29,22 @@ public class DProcedure extends DToken {
     }
 
     /**
+     * 获取children
+     *
+     * @return chindren
+     */
+    public List<DProcedure> getChildren() {
+        return this.children;
+    }
+
+    /**
+     * 清空children
+     */
+    public void cleanChildren() {
+        this.children.clear();
+    }
+
+    /**
      * 创建新过程
      *
      * @param procedure 过程

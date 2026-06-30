@@ -26,6 +26,22 @@ public class DMacro extends DToken {
     }
 
     /**
+     * 获取children
+     *
+     * @return chindren
+     */
+    public List<DMacro> getChildren() {
+        return this.children;
+    }
+
+    /**
+     * 清空children
+     */
+    public void cleanChildren() {
+        this.children.clear();
+    }
+
+    /**
      * 创建宏
      *
      * @param params   params

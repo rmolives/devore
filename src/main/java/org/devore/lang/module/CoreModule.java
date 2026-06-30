@@ -476,11 +476,17 @@ public class CoreModule extends DModule {
                         if (temp instanceof DExport)
                             ((DExport) temp).keys.forEach(key -> {
                                 DToken token = inEnv.get(key);
-                                if (token instanceof DProcedure)
+                                if (token instanceof DProcedure) {
+                                    DProcedure procedure = (DProcedure) token;
                                     env.addProcedure(key, (DProcedure) token);
-                                else if (token instanceof DMacro)
-                                    env.addMacro(key, ((DMacro) token));
-                                else
+                                    procedure.getChildren().forEach(p -> env.addProcedure(key, p));
+                                    procedure.cleanChildren();
+                                } else if (token instanceof DMacro) {
+                                    DMacro macro = (DMacro) token;
+                                    env.addMacro(key, (DMacro) token);
+                                    macro.getChildren().forEach(p -> env.addMacro(key, p));
+                                    macro.cleanChildren();
+                                } else
                                     env.put(key, token);
                             });
                     } catch (IOException e) {
