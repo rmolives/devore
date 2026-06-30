@@ -44,11 +44,6 @@ public class Env {
     public final IOConfig io;
 
     /**
-     * 导入环境表
-     */
-    public final Map<String, Env> importEnvTable;
-
-    /**
      * 可加载模块表
      */
     public final Map<String, DModule> modules = Stream.of(
@@ -87,17 +82,15 @@ public class Env {
      *
      * @param table          环境符号表
      * @param father         父环境
-     * @param importEnvTable 导入环境表
      * @param io             IO配置
      * @param security       安全限制
      * @param load           是否加载默认模块
      */
-    public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvTable, IOConfig io,
+    public Env(Map<String, DToken> table, Env father, IOConfig io,
                DSecurity security, boolean load) {
         this.table = concurrentMap(table);
         this.father = father;
         this.io = io;
-        this.importEnvTable = concurrentMap(importEnvTable);
         this.security = security;
         if (load)
             defaultModules.forEach(this::loadModule);
@@ -156,47 +149,6 @@ public class Env {
     }
 
     /**
-     * 添加import导入的环境
-     *
-     * @param key 导入符号名
-     * @param env 导入环境
-     */
-    public synchronized void putImportEnv(String key, Env env) {
-        if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
-            throw new DevoreRuntimeException("定义冲突: " + key);
-        this.importEnvTable.put(key, env);
-    }
-
-    /**
-     * 获取import导入的环境
-     *
-     * @param key 导入符号名
-     * @return 环境
-     */
-    public Env getImportEnv(String key) {
-        Env temp = this;
-        while (temp != null && !temp.importEnvTable.containsKey(key))
-            temp = temp.father;
-        if (temp == null)
-            throw new DevoreRuntimeException("未定义: " + key);
-        return appendFather(temp.importEnvTable.get(key), this);
-    }
-
-    /**
-     * 将导入环境的父环境链追加到当前环境上
-     *
-     * @param imported 导入环境
-     * @param current  当前环境
-     * @return 追加父环境后的环境
-     */
-    private static Env appendFather(Env imported, Env current) {
-        if (imported == null)
-            return current;
-        return new Env(imported.table, appendFather(imported.father, current),
-                imported.importEnvTable, imported.io, imported.security, false);
-    }
-
-    /**
      * 沿父环境查找包含指定符号的环境
      *
      * @param key 符号名
@@ -206,22 +158,6 @@ public class Env {
         Env temp = this;
         while (temp != null) {
             if (temp.table.containsKey(key))
-                return temp;
-            temp = temp.father;
-        }
-        return null;
-    }
-
-    /**
-     * 沿父环境查找包含指定导入符号的环境
-     *
-     * @param key 导入符号名
-     * @return 包含导入符号的环境，不存在时返回null
-     */
-    private Env findImportEnv(String key) {
-        Env temp = this;
-        while (temp != null) {
-            if (temp.importEnvTable.containsKey(key))
                 return temp;
             temp = temp.father;
         }
@@ -250,9 +186,6 @@ public class Env {
         Env visibleEnv = this.father == null ? null : this.father.findTableEnv(key);
         if (visibleEnv != null)
             return visibleEnv.table.get(key);
-        Env importEnv = findImportEnv(key);
-        if (importEnv != null)
-            return importEnv.importEnvTable.get(key).get(key);
         return null;
     }
 
@@ -262,7 +195,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv() {
-        return new Env(new HashMap<>(), null, new HashMap<>(), new IOConfig(), new DSecurity(new ArrayList<>()), true);
+        return new Env(new HashMap<>(), null, new IOConfig(), new DSecurity(new ArrayList<>()), true);
     }
 
     /**
@@ -273,7 +206,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv(Env father, IOConfig io) {
-        return new Env(new HashMap<>(), father, new HashMap<>(), io, new DSecurity(new ArrayList<>()), true);
+        return new Env(new HashMap<>(), father, io, new DSecurity(new ArrayList<>()), true);
     }
 
     /**
@@ -283,7 +216,7 @@ public class Env {
      * @return 环境
      */
     public static Env newEnv(IOConfig io) {
-        return new Env(new HashMap<>(), null, new HashMap<>(), io, new DSecurity(new ArrayList<>()), true);
+        return new Env(new HashMap<>(), null, io, new DSecurity(new ArrayList<>()), true);
     }
 
     /**
@@ -293,9 +226,31 @@ public class Env {
      * @param value Token值
      */
     public synchronized void put(String key, DToken value) {
-        if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
+        if (this.table.containsKey(key))
             throw new DevoreRuntimeException("定义冲突: " + key);
         this.table.put(key, value);
+    }
+
+    /**
+     * 添加宏
+     *
+     * @param key   宏名
+     * @param macro 宏
+     */
+    public synchronized void addMacro(String key, DMacro macro) {
+        if (this.table.containsKey(key)) {
+            DToken token = this.table.get(key);
+            if (!(token instanceof DMacro))
+                throw new DevoreRuntimeException("定义冲突: " + key);
+            this.table.put(key, ((DMacro) token).addMacro(key, macro));
+            return;
+        }
+        DToken visibleToken = findVisibleTokenForLocalDefinition(key);
+        if (visibleToken instanceof DMacro) {
+            this.table.put(key, ((DMacro) visibleToken).copy().setMacro(macro));
+            return;
+        }
+        this.table.put(key, macro);
     }
 
     /**
@@ -399,6 +354,28 @@ public class Env {
     }
 
     /**
+     * 添加过程
+     *
+     * @param key       过程名
+     * @param procedure 过程
+     */
+    public synchronized void addProcedure(String key, DProcedure procedure) {
+        if (this.table.containsKey(key)) {
+            DToken token = this.table.get(key);
+            if (!(token instanceof DProcedure))
+                throw new DevoreRuntimeException("定义冲突: " + key);
+            this.table.put(key, ((DProcedure) token).addProcedure(key, procedure));
+            return;
+        }
+        DToken visibleToken = findVisibleTokenForLocalDefinition(key);
+        if (visibleToken instanceof DProcedure) {
+            this.table.put(key, ((DProcedure) visibleToken).copy().setProcedure(procedure));
+            return;
+        }
+        this.table.put(key, procedure);
+    }
+
+    /**
      * 更改Ast过程
      *
      * @param key       过程名
@@ -466,17 +443,7 @@ public class Env {
      * @return 是否包含指定符号
      */
     public boolean contains(String key) {
-        return findTableEnv(key) != null || findImportEnv(key) != null;
-    }
-
-    /**
-     * 查看环境是否包含特定import key
-     *
-     * @param key 导入符号名
-     * @return 是否包含指定导入符号
-     */
-    public boolean containsImport(String key) {
-        return findTableEnv(key) == null && findImportEnv(key) != null;
+        return findTableEnv(key) != null;
     }
 
     /**
@@ -489,9 +456,6 @@ public class Env {
         Env tableEnv = findTableEnv(key);
         if (tableEnv != null)
             return tableEnv.table.get(key);
-        Env importEnv = findImportEnv(key);
-        if (importEnv != null)
-            return importEnv.importEnvTable.get(key).get(key);
         throw new DevoreRuntimeException("未定义: " + key);
     }
 
@@ -502,13 +466,8 @@ public class Env {
      */
     public void remove(String key) {
         Env tableEnv = findTableEnv(key);
-        if (tableEnv != null) {
+        if (tableEnv != null)
             tableEnv.table.remove(key);
-            return;
-        }
-        Env importEnv = findImportEnv(key);
-        if (importEnv != null)
-            importEnv.importEnvTable.remove(key);
     }
 
     /**
@@ -516,7 +475,6 @@ public class Env {
      */
     public synchronized void clear() {
         this.table.clear();
-        this.importEnvTable.clear();
     }
 
     /**
@@ -529,7 +487,6 @@ public class Env {
         Env temp = this;
         while (temp != null) {
             keys.addAll(temp.table.keySet());
-            keys.addAll(temp.importEnvTable.keySet());
             temp = temp.father;
         }
         return keys;
@@ -541,6 +498,6 @@ public class Env {
      * @return 子环境
      */
     public Env createChild() {
-        return new Env(new HashMap<>(), this, new HashMap<>(), this.io, new DSecurity(new ArrayList<>()), false);
+        return new Env(new HashMap<>(), this, this.io, new DSecurity(new ArrayList<>()), false);
     }
 }

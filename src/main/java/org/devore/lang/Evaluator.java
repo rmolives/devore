@@ -23,17 +23,13 @@ public class Evaluator {
         try {
             if (node.symbol instanceof Ast)
                 node.symbol = eval(env, ((Ast) node.symbol).copy());
-            Env symbolEnv = env;
-            boolean importedSymbol = env.containsImport(node.symbol.toString());
-            if (importedSymbol)
-                symbolEnv = env.getImportEnv(node.symbol.toString());
-            node.symbol = resolveSymbol(symbolEnv, node.symbol);
+            node.symbol = resolveSymbol(env, node.symbol);
             if (node.symbol instanceof DMacro) {
                 DMacro macro = (DMacro) node.symbol;
                 List<Ast> bodies = macro.expand(node.children);
                 DToken result = DWord.NIL;
                 for (Ast temp : bodies)
-                    result = eval(symbolEnv, temp);
+                    result = eval(env, temp);
                 return result;
             }
             if (node.isEmpty() && node.type != Ast.Type.PROCEDURE)
@@ -46,10 +42,10 @@ public class Evaluator {
             }
             if (node.symbol instanceof DProcedure) {
                 DProcedure procedure = (DProcedure) node.symbol;
-                node.symbol = procedure.call(node, importedSymbol ? env : symbolEnv);
+                node.symbol = procedure.call(node, env);
                 node.clear();
             }
-            return resolveSymbol(symbolEnv, node.symbol);
+            return resolveSymbol(env, node.symbol);
         } catch (StackOverflowError e) {
             throw new DevoreRuntimeException("栈溢出，可能存在无限递归或递归宏展开.",
                     expression, index, node.source, node.code);
