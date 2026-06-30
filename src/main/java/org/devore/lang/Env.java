@@ -14,17 +14,43 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Devore运行环境，保存符号表、父环境、导入环境、IO配置、安全限制和模块表
+ */
 public class Env {
-    // 默认导入
+    /**
+     * 默认加载模块
+     */
     public static final List<String> defaultModules = Collections.unmodifiableList(Arrays.asList("core"));
 
-    public final Map<String, DToken> table;             // 环境表
-    public Env father;                                  // 父环境
-    public DSecurity security;                          // 安全
-    public final IOConfig io;                           // IO表
-    public final Map<String, Env> importEnvTable;       // 导入的环境
+    /**
+     * 当前环境符号表
+     */
+    public final Map<String, DToken> table;
 
-    // 模块表
+    /**
+     * 父环境
+     */
+    public Env father;
+
+    /**
+     * 当前环境直接设置的安全限制
+     */
+    public DSecurity security;
+
+    /**
+     * IO配置
+     */
+    public final IOConfig io;
+
+    /**
+     * 导入环境表
+     */
+    public final Map<String, Env> importEnvTable;
+
+    /**
+     * 可加载模块表
+     */
     public final Map<String, DModule> modules = Stream.of(
             new AbstractMap.SimpleEntry<>("binary", new BinaryModule()),
             new AbstractMap.SimpleEntry<>("base64", new Base64Module()),
@@ -59,9 +85,12 @@ public class Env {
     /**
      * 创建环境
      *
-     * @param table  环境表
-     * @param father 父环境
-     * @param io     IO表
+     * @param table          环境符号表
+     * @param father         父环境
+     * @param importEnvTable 导入环境表
+     * @param io             IO配置
+     * @param security       安全限制
+     * @param load           是否加载默认模块
      */
     public Env(Map<String, DToken> table, Env father, Map<String, Env> importEnvTable, IOConfig io,
                DSecurity security, boolean load) {
@@ -74,6 +103,14 @@ public class Env {
             defaultModules.forEach(this::loadModule);
     }
 
+    /**
+     * 将普通Map转换为并发Map
+     *
+     * @param map 原Map
+     * @param <K> key类型
+     * @param <V> value类型
+     * @return 并发Map
+     */
     private static <K, V> Map<K, V> concurrentMap(Map<K, V> map) {
         if (map instanceof ConcurrentMap)
             return map;
@@ -81,18 +118,18 @@ public class Env {
     }
 
     /**
-     * 加载安全
+     * 设置当前环境安全限制
      *
-     * @param security 安全
+     * @param security 安全限制
      */
     public void setSecurity(DSecurity security) {
         this.security = security;
     }
 
     /**
-     * 加载环境
+     * 按名称加载模块
      *
-     * @param name 名字
+     * @param name 模块名
      */
     public void loadModule(String name) {
         if (!this.modules.containsKey(name))
@@ -101,7 +138,7 @@ public class Env {
     }
 
     /**
-     * 加载环境
+     * 加载模块实例
      *
      * @param module 模块
      */
@@ -112,7 +149,7 @@ public class Env {
     /**
      * 添加模块
      *
-     * @param module 环境
+     * @param module 模块
      */
     public synchronized void addModule(DModule module) {
         this.modules.put(module.name, module);
@@ -121,8 +158,8 @@ public class Env {
     /**
      * 添加import导入的环境
      *
-     * @param key key
-     * @param env 环境
+     * @param key 导入符号名
+     * @param env 导入环境
      */
     public synchronized void putImportEnv(String key, Env env) {
         if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
@@ -131,9 +168,9 @@ public class Env {
     }
 
     /**
-     * 添加import导入的环境
+     * 获取import导入的环境
      *
-     * @param key key
+     * @param key 导入符号名
      * @return 环境
      */
     public Env getImportEnv(String key) {
@@ -145,6 +182,13 @@ public class Env {
         return appendFather(temp.importEnvTable.get(key), this);
     }
 
+    /**
+     * 将导入环境的父环境链追加到当前环境上
+     *
+     * @param imported 导入环境
+     * @param current  当前环境
+     * @return 追加父环境后的环境
+     */
     private static Env appendFather(Env imported, Env current) {
         if (imported == null)
             return current;
@@ -152,6 +196,12 @@ public class Env {
                 imported.importEnvTable, imported.io, imported.security, false);
     }
 
+    /**
+     * 沿父环境查找包含指定符号的环境
+     *
+     * @param key 符号名
+     * @return 包含符号的环境，不存在时返回null
+     */
     private Env findTableEnv(String key) {
         Env temp = this;
         while (temp != null) {
@@ -162,6 +212,12 @@ public class Env {
         return null;
     }
 
+    /**
+     * 沿父环境查找包含指定导入符号的环境
+     *
+     * @param key 导入符号名
+     * @return 包含导入符号的环境，不存在时返回null
+     */
     private Env findImportEnv(String key) {
         Env temp = this;
         while (temp != null) {
@@ -172,6 +228,11 @@ public class Env {
         return null;
     }
 
+    /**
+     * 获取根环境
+     *
+     * @return 根环境
+     */
     private Env rootEnv() {
         Env temp = this;
         while (temp.father != null)
@@ -179,6 +240,12 @@ public class Env {
         return temp;
     }
 
+    /**
+     * 查找当前局部定义可见的同名宏或过程
+     *
+     * @param key 符号名
+     * @return 可见Token，不存在时返回null
+     */
     private DToken findVisibleTokenForLocalDefinition(String key) {
         Env visibleEnv = this.father == null ? null : this.father.findTableEnv(key);
         if (visibleEnv != null)
@@ -220,10 +287,10 @@ public class Env {
     }
 
     /**
-     * 设置KY对
+     * 设置当前环境键值对
      *
-     * @param key   key
-     * @param value value
+     * @param key   符号名
+     * @param value Token值
      */
     public synchronized void put(String key, DToken value) {
         if (this.table.containsKey(key) || this.importEnvTable.containsKey(key))
@@ -234,9 +301,9 @@ public class Env {
     /**
      * 添加宏
      *
-     * @param key    key
-     * @param params params
-     * @param bodys  bodys
+     * @param key    宏名
+     * @param params 参数名列表
+     * @param bodys  宏体列表
      */
     public synchronized void addMacro(String key, List<String> params, List<Ast> bodys) {
         DMacro newMacro = DMacro.newMacro(key, params, bodys);
@@ -258,9 +325,9 @@ public class Env {
     /**
      * 更改宏
      *
-     * @param key    key
-     * @param params params
-     * @param bodys  bodys
+     * @param key    宏名
+     * @param params 参数名列表
+     * @param bodys  宏体列表
      */
     public synchronized void setMacro(String key, List<String> params, List<Ast> bodys) {
         Env temp = this;
@@ -276,7 +343,7 @@ public class Env {
     /**
      * 添加Ast过程
      *
-     * @param key       key
+     * @param key       过程名
      * @param procedure 过程
      * @param argc      参数数量
      * @param vararg    是否为可变参数
@@ -301,7 +368,7 @@ public class Env {
     /**
      * 添加普通过程
      *
-     * @param key       key
+     * @param key       过程名
      * @param procedure 过程
      * @param argc      参数数量
      * @param vararg    是否为可变参数
@@ -334,7 +401,7 @@ public class Env {
     /**
      * 更改Ast过程
      *
-     * @param key       key
+     * @param key       过程名
      * @param procedure 过程
      * @param argc      参数数量
      * @param vararg    是否为可变参数
@@ -353,7 +420,7 @@ public class Env {
     /**
      * 更改普通过程
      *
-     * @param key       key
+     * @param key       过程名
      * @param procedure 过程
      * @param argc      参数数量
      * @param vararg    是否为可变参数
@@ -378,10 +445,10 @@ public class Env {
     }
 
     /**
-     * 更改KY对
+     * 更改键值对，不存在时写入根环境
      *
-     * @param key   key
-     * @param value value
+     * @param key   符号名
+     * @param value Token值
      */
     public void set(String key, DToken value) {
         Env tableEnv = findTableEnv(key);
@@ -395,8 +462,8 @@ public class Env {
     /**
      * 查看是否包含特定key
      *
-     * @param key key
-     * @return 结果
+     * @param key 符号名
+     * @return 是否包含指定符号
      */
     public boolean contains(String key) {
         return findTableEnv(key) != null || findImportEnv(key) != null;
@@ -405,8 +472,8 @@ public class Env {
     /**
      * 查看环境是否包含特定import key
      *
-     * @param key key
-     * @return 结果
+     * @param key 导入符号名
+     * @return 是否包含指定导入符号
      */
     public boolean containsImport(String key) {
         return findTableEnv(key) == null && findImportEnv(key) != null;
@@ -415,8 +482,8 @@ public class Env {
     /**
      * 获取key对应的value
      *
-     * @param key key
-     * @return value
+     * @param key 符号名
+     * @return Token值
      */
     public DToken get(String key) {
         Env tableEnv = findTableEnv(key);
@@ -429,9 +496,9 @@ public class Env {
     }
 
     /**
-     * 删除KY对
+     * 删除键值对或导入环境
      *
-     * @param key key
+     * @param key 符号名
      */
     public void remove(String key) {
         Env tableEnv = findTableEnv(key);
