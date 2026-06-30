@@ -154,6 +154,28 @@
 * headers：响应头表
 * body：响应体，支持string或binary
 
+### http-server-response
+
+* 作用：定义HTTP服务端指定状态码的内部返回
+* 参数数量：3
+* 参数作用：HTTP服务端、状态码、响应体
+* 参数类型：http-server、int、string|list|nil
+* 返回值：nil
+* 返回类型：word
+* 说明：用于路由不匹配404、方法不允许405、处理失败500等服务端内部返回；未定义时使用默认纯文本返回
+* 示例：(http-server-response server http-status-not-found "not found")
+
+### http-server-response
+
+* 作用：定义HTTP服务端指定状态码的内部返回，并设置headers
+* 参数数量：4
+* 参数作用：HTTP服务端、状态码、headers、响应体
+* 参数类型：http-server、int、table、string|list|nil
+* 返回值：nil
+* 返回类型：word
+* 说明：用于路由不匹配404、方法不允许405、处理失败500等服务端内部返回；未定义时使用默认纯文本返回
+* 示例：(http-server-response server 404 (table \["Content-Type" "text/plain; charset=UTF-8"\]) "not found")
+
 ### http-static
 
 * 作用：注册静态文件目录
