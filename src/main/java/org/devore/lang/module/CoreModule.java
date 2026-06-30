@@ -629,8 +629,8 @@ public class CoreModule extends DModule {
         }), 2, true);
         dEnv.addAstProcedure("let", ((ast, env) -> {
             Env newEnv = env.createChild();
-            List<Ast> nodes = ast.get(0).children;
-            if (ast.get(0).symbol instanceof Ast)
+            List<Ast> nodes = new ArrayList<>(ast.get(0).children);
+            if (ast.get(0).symbol instanceof Ast && !isEmptyProcedure(ast.get(0)))
                 nodes.add(0, (Ast) ast.get(0).symbol);
             nodes.forEach(node -> {
                 DToken name = node.symbol;
