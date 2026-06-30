@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Devore运行环境，保存符号表、父环境、导入环境、IO配置、安全限制和模块表
+ * Devore运行环境
  */
 public class Env {
     /**
