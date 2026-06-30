@@ -3,9 +3,7 @@ package org.devore.lang.token;
 import com.sun.net.httpserver.HttpServer;
 import org.devore.exception.DevoreRuntimeException;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -14,12 +12,10 @@ import java.util.concurrent.ExecutorService;
 public class DHttpServer extends DToken {
     private final HttpServer server;                        // HTTP服务端
     private final ExecutorService executor;                 // 请求处理线程池
-    private final Map<Integer, DToken> statusResponses;     // 状态码响应表
 
     private DHttpServer(HttpServer server, ExecutorService executor) {
         this.server = server;
         this.executor = executor;
-        this.statusResponses = new ConcurrentHashMap<>();
     }
 
     /**
@@ -40,26 +36,6 @@ public class DHttpServer extends DToken {
      */
     public HttpServer toHttpServer() {
         return this.server;
-    }
-
-    /**
-     * 设置状态码对应的响应
-     *
-     * @param status   HTTP状态码
-     * @param response 响应
-     */
-    public void setStatusResponse(int status, DToken response) {
-        this.statusResponses.put(status, response);
-    }
-
-    /**
-     * 获取状态码对应的响应
-     *
-     * @param status HTTP状态码
-     * @return 响应
-     */
-    public DToken getStatusResponse(int status) {
-        return this.statusResponses.getOrDefault(status, DWord.NIL);
     }
 
     /**

@@ -163,20 +163,6 @@ public class HttpModule extends DModule {
         }, 4, false);
         dEnv.addTokenProcedure("http-handler", (args, env) -> registerHandler(args, env, null), 3, false);
         dEnv.addTokenProcedure("http-handler", (args, env) -> registerHandler(args, env, args.get(1)), 4, false);
-        dEnv.addTokenProcedure("http-server-response", (args, env) -> {
-            DSecurity.checkRestrictNet(env);
-            DHttpServer server = toServer(args.get(0));
-            int status = toStatus(args.get(1));
-            server.setStatusResponse(status, statusResponse(status, DWord.NIL, args.get(2)));
-            return DWord.NIL;
-        }, 3, false);
-        dEnv.addTokenProcedure("http-server-response", (args, env) -> {
-            DSecurity.checkRestrictNet(env);
-            DHttpServer server = toServer(args.get(0));
-            int status = toStatus(args.get(1));
-            server.setStatusResponse(status, statusResponse(status, toTableToken(args.get(2)), args.get(3)));
-            return DWord.NIL;
-        }, 4, false);
         dEnv.addTokenProcedure("http-static", (args, env) -> {
             DSecurity.checkRestrictNet(env);
             DSecurity.checkRestrictFile(env);
@@ -185,7 +171,7 @@ public class HttpModule extends DModule {
             if (!(args.get(2) instanceof DString))
                 throw new DevoreCastException(args.get(2).type(), "string");
             Path root = Paths.get(args.get(2).toString()).toAbsolutePath().normalize();
-            server.toHttpServer().createContext(prefix, exchange -> handleStatic(server, exchange, prefix, root));
+            server.toHttpServer().createContext(prefix, exchange -> handleStatic(exchange, prefix, root));
             return DWord.NIL;
         }, 3, false);
         dEnv.addTokenProcedure("http-start", (args, env) -> {
@@ -329,8 +315,8 @@ public class HttpModule extends DModule {
                     DEFAULT_TIMEOUT), false, StandardCharsets.UTF_8);
         }, 3, false);
         dEnv.addTokenProcedure(name, (args, env) ->
-                responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                        toOptionalRequestBody(args.get(3)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8),
+                        responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                                toOptionalRequestBody(args.get(3)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8),
                 4, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (binary)
@@ -345,7 +331,7 @@ public class HttpModule extends DModule {
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
                     responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                            toOptionalRequestBody(args.get(3)), toTimeout(args.get(5))), false,
+                                    toOptionalRequestBody(args.get(3)), toTimeout(args.get(5))), false,
                             toCharset(args.get(4))), 6, false);
         }
     }
@@ -419,8 +405,8 @@ public class HttpModule extends DModule {
         }, 4, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
-                    responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
-                            toRequestBody(args.get(2)), toTimeout(args.get(4))), false, toCharset(args.get(3))),
+                            responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
+                                    toRequestBody(args.get(2)), toTimeout(args.get(4))), false, toCharset(args.get(3))),
                     5, false);
         }
     }
@@ -536,8 +522,8 @@ public class HttpModule extends DModule {
         }, 5, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
-                    responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                            toTableToken(args.get(3)), toTimeout(args.get(5))), false, toCharset(args.get(4))),
+                            responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                                    toTableToken(args.get(3)), toTimeout(args.get(5))), false, toCharset(args.get(4))),
                     6, false);
         }
     }
@@ -575,29 +561,29 @@ public class HttpModule extends DModule {
         DProcedure handler = (DProcedure) args.get(handlerIndex);
         try {
             server.toHttpServer().createContext(contextPath(pattern), exchange ->
-                    handleExchange(server, exchange, method, pattern, handler, env.createChild()));
+                    handleExchange(exchange, method, pattern, handler, env.createChild()));
             return DWord.NIL;
         } catch (IllegalArgumentException e) {
             throw new DevoreRuntimeException("HTTP路由注册失败: " + pattern + ", " + e.getMessage());
         }
     }
 
-    private static void handleExchange(DHttpServer server, HttpExchange exchange, String method, String pattern,
+    private static void handleExchange(HttpExchange exchange, String method, String pattern,
                                        DProcedure handler, Env env) throws IOException {
         try {
             if (method != null && !method.equalsIgnoreCase(exchange.getRequestMethod())) {
-                sendStatusResponse(server, exchange, 405, "HTTP方法不允许: " + exchange.getRequestMethod());
+                sendHtml(exchange, 405, "<h1>405 Method Not Allowed</h1>\nHTTP方法不允许: " + exchange.getRequestMethod());
                 return;
             }
             Map<DToken, DToken> params = matchPath(pattern, exchange.getRequestURI().getPath());
             if (params == null) {
-                sendStatusResponse(server, exchange, 404, "HTTP路由不存在: " + exchange.getRequestURI().getPath());
+                sendHtml(exchange, 404, "<h1>404 Not Found</h1>HTTP路由不存在: " + exchange.getRequestURI().getPath());
                 return;
             }
             DToken response = handler.call(Collections.singletonList(toRequest(exchange, params)), env.createChild());
             sendResponse(exchange, response);
         } catch (Throwable e) {
-            sendStatusResponse(server, exchange, 500, "HTTP服务端处理失败: " + message(e));
+            sendHtml(exchange, 500, "<h1>500 Internal Server Error</h1>\n" + message(e));
         } finally {
             exchange.close();
         }
@@ -606,12 +592,12 @@ public class HttpModule extends DModule {
     /**
      * 处理静态文件请求
      */
-    private static void handleStatic(DHttpServer server, HttpExchange exchange, String prefix, Path root)
+    private static void handleStatic(HttpExchange exchange, String prefix, Path root)
             throws IOException {
         try {
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())
                     && !"HEAD".equalsIgnoreCase(exchange.getRequestMethod())) {
-                sendStatusResponse(server, exchange, 405, "HTTP方法不允许: " + exchange.getRequestMethod());
+                sendHtml(exchange, 405, "<h1>405 Method Not Allowed</h1>\nHTTP方法不允许: " + exchange.getRequestMethod());
                 return;
             }
             String path = exchange.getRequestURI().getPath();
@@ -620,7 +606,7 @@ public class HttpModule extends DModule {
                 relative = relative.substring(1);
             Path file = root.resolve(urlDecode(relative, StandardCharsets.UTF_8)).normalize();
             if (!file.startsWith(root) || !Files.isRegularFile(file)) {
-                sendStatusResponse(server, exchange, 404, "HTTP静态文件不存在: " + path);
+                sendHtml(exchange, 404, "<h1>404 Not Found</h1>HTTP静态文件不存在: " + path);
                 return;
             }
             String type = Files.probeContentType(file);
@@ -634,7 +620,7 @@ public class HttpModule extends DModule {
                 }
             }
         } catch (Throwable e) {
-            sendStatusResponse(server, exchange, 500, "HTTP静态文件处理失败: " + message(e));
+            sendHtml(exchange, 500, "<h1>500 Internal Server Error</h1>\n" + message(e));
         } finally {
             exchange.close();
         }
@@ -908,17 +894,6 @@ public class HttpModule extends DModule {
     }
 
     /**
-     * 构造HTTP状态响应表
-     */
-    private static DToken statusResponse(int status, DToken headers, DToken body) {
-        Map<DToken, DToken> response = new HashMap<>();
-        response.put(DString.valueOf("status"), DNumber.valueOf(status));
-        response.put(DString.valueOf("headers"), headers);
-        response.put(DString.valueOf("body"), body);
-        return DTable.valueOf(response);
-    }
-
-    /**
      * 构造HTTP重定向响应表
      */
     private static DToken redirect(DToken locationToken, int status) {
@@ -1071,19 +1046,6 @@ public class HttpModule extends DModule {
     }
 
     /**
-     * 发送可由HTTP服务端自定义的状态响应
-     */
-    private static void sendStatusResponse(DHttpServer server, HttpExchange exchange, int status, String message)
-            throws IOException {
-        DToken response = server.getStatusResponse(status);
-        if (response != DWord.NIL) {
-            sendResponse(exchange, response);
-            return;
-        }
-        sendPlain(exchange, status, message);
-    }
-
-    /**
      * 向HTTP响应写入头信息
      */
     private static void setResponseHeaders(HttpExchange exchange, DToken headers) {
@@ -1101,11 +1063,11 @@ public class HttpModule extends DModule {
     }
 
     /**
-     * 发送纯文本HTTP响应
+     * 发送Html的HTTP响应
      */
-    private static void sendPlain(HttpExchange exchange, int status, String message) throws IOException {
+    private static void sendHtml(HttpExchange exchange, int status, String message) throws IOException {
         byte[] body = message.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
+        exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
         exchange.sendResponseHeaders(status, body.length);
         try (OutputStream output = exchange.getResponseBody()) {
             output.write(body);
