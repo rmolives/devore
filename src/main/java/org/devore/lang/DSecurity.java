@@ -58,9 +58,11 @@ public class DSecurity {
         List<Restriction> inherited = new ArrayList<>();
         Env temp = env;
         while (temp != null) {
-            for (Restriction restriction : temp.security.restrictions)
-                if (!inherited.contains(restriction))
-                    inherited.add(restriction);
+            if (temp.security != null) {
+                for (Restriction restriction : temp.security.restrictions)
+                    if (!inherited.contains(restriction))
+                        inherited.add(restriction);
+            }
             temp = temp.father;
         }
         return new DSecurity(inherited);
@@ -73,7 +75,7 @@ public class DSecurity {
      */
     public static void checkRestrictFile(Env env) {
         Env temp = env;
-        while (temp != null && !temp.security.contains(Restriction.FILE))
+        while (temp != null && (temp.security == null || !temp.security.contains(Restriction.FILE)))
             temp = temp.father;
         if (temp != null)
             throw new DevoreRuntimeException("当前环境禁止<File>操作.");
@@ -86,7 +88,8 @@ public class DSecurity {
      */
     public static void checkRestrictNet(Env env) {
         Env temp = env;
-        while (temp != null && !temp.security.contains(Restriction.NET))
+        while (temp != null && (temp.security == null
+                || !temp.security.contains(Restriction.NET)))
             temp = temp.father;
         if (temp != null)
             throw new DevoreRuntimeException("当前环境禁止<Net>操作.");
@@ -99,7 +102,8 @@ public class DSecurity {
      */
     public static void checkRestrictExec(Env env) {
         Env temp = env;
-        while (temp != null && !temp.security.contains(Restriction.EXEC))
+        while (temp != null && (temp.security == null
+                || !temp.security.contains(Restriction.EXEC)))
             temp = temp.father;
         if (temp != null)
             throw new DevoreRuntimeException("当前环境禁止<Exec>操作.");
@@ -112,7 +116,8 @@ public class DSecurity {
      */
     public static void checkRestrictReflect(Env env) {
         Env temp = env;
-        while (temp != null && !temp.security.contains(Restriction.REFLECT))
+        while (temp != null && (temp.security == null
+                || !temp.security.contains(Restriction.REFLECT)))
             temp = temp.father;
         if (temp != null)
             throw new DevoreRuntimeException("当前环境禁止<Reflect>操作.");
@@ -125,7 +130,8 @@ public class DSecurity {
      */
     public static void checkRestrictSecurity(Env env) {
         Env temp = env;
-        while (temp != null && !temp.security.contains(Restriction.SECURITY))
+        while (temp != null && (temp.security == null
+                || !temp.security.contains(Restriction.SECURITY)))
             temp = temp.father;
         if (temp != null)
             throw new DevoreRuntimeException("当前环境禁止<Security>操作.");

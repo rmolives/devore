@@ -176,6 +176,10 @@ public class Ast extends DToken {
         if (this.isEmpty()) {
             if (this.symbol instanceof DString)
                 builder.append(FormatUtils.formatToken(this.symbol));
+            else if (this.type == Type.PROCEDURE
+                    && (this.symbol == DWord.NIL
+                    || this.symbol instanceof Ast && !((Ast) this.symbol).isNotNil()))
+                builder.append("()");
             else if (this.type == Type.PROCEDURE)
                 builder.append("(").append(this.symbol).append(")");
             else
