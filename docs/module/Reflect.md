@@ -74,6 +74,6 @@
 * 参数数量：1
 * 参数作用：Java对象包装对象
 * 参数类型：java-object
-* 返回值：转换后的Devore值。支持nil、string、bool、number、array、Iterable、Map递归转换；无法转换的对象保持为java-object
+* 返回值：转换后的Devore值。支持nil、string、bool、number、array、Iterable、Map递归转换
 * 返回类型：token
 * 示例：(java->devore (reflect-static-call "java.lang.Math" "max" 3 7))
