@@ -27,6 +27,8 @@ public class DJavaObject extends DToken {
 
     @Override
     protected String str() {
+        if (this.value == null)
+            return "<java-object:null>";
         if (this.value instanceof Class<?>)
             return "<java-class:" + ((Class<?>) this.value).getName() + ">";
         return "<java-object:" + this.value.getClass().getName() + ":" + this.value + ">";

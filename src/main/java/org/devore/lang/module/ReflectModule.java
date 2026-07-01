@@ -53,13 +53,15 @@ public class ReflectModule extends DModule {
             DSecurity.checkRestrictReflect(env);
             return DString.valueOf(classArg(args.get(0)).getName());
         }, 1, false);
+        dEnv.addTokenProcedure("java->devore", (args, env) ->
+                toDevore(javaArg(args.get(0))), 1, false);
         dEnv.addTokenProcedure("reflect-new", (args, env) -> {
             DSecurity.checkRestrictReflect(env);
             Class<?> clazz = classArg(args.get(0));
             List<DToken> values = args.subList(1, args.size());
             Constructor<?> constructor = bestConstructor(clazz, values);
             try {
-                return toToken(constructor.newInstance(convertArgs(constructor.getParameterTypes(), values)));
+                return DJavaObject.valueOf(constructor.newInstance(convertArgs(constructor.getParameterTypes(), values)));
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new DevoreRuntimeException("创建Java对象失败: " + clazz.getName() + ", " + e.getMessage());
             } catch (InvocationTargetException e) {
@@ -76,7 +78,7 @@ public class ReflectModule extends DModule {
             Method method = bestMethod(clazz, name, values, staticCall);
             try {
                 Object receiver = Modifier.isStatic(method.getModifiers()) ? null : target;
-                return toToken(method.invoke(receiver, convertArgs(method.getParameterTypes(), values)));
+                return DJavaObject.valueOf(method.invoke(receiver, convertArgs(method.getParameterTypes(), values)));
             } catch (IllegalAccessException e) {
                 throw new DevoreRuntimeException("调用Java方法失败: " + clazz.getName() + "." + name + ", " + e.getMessage());
             } catch (InvocationTargetException e) {
@@ -90,7 +92,7 @@ public class ReflectModule extends DModule {
             List<DToken> values = args.subList(2, args.size());
             Method method = bestMethod(clazz, name, values, true);
             try {
-                return toToken(method.invoke(null, convertArgs(method.getParameterTypes(), values)));
+                return DJavaObject.valueOf(method.invoke(null, convertArgs(method.getParameterTypes(), values)));
             } catch (IllegalAccessException e) {
                 throw new DevoreRuntimeException("调用Java静态方法失败: " + clazz.getName() + "." + name + ", " + e.getMessage());
             } catch (InvocationTargetException e) {
@@ -128,6 +130,15 @@ public class ReflectModule extends DModule {
             }
         }
         return toJavaValue(token);
+    }
+
+    /**
+     * 取得Java对象参数
+     */
+    private static Object javaArg(DToken token) {
+        if (!(token instanceof DJavaObject))
+            throw new DevoreCastException(token.type(), "java-object");
+        return ((DJavaObject) token).value();
     }
 
     /**
@@ -315,9 +326,9 @@ public class ReflectModule extends DModule {
     }
 
     /**
-     * 将Java返回值转换为Devore token
+     * 将Java值转换为Devore token
      */
-    private static DToken toToken(Object value) {
+    public static DToken toDevore(Object value) {
         if (value == null)
             return DWord.NIL;
         if (value instanceof DToken)
@@ -338,16 +349,21 @@ public class ReflectModule extends DModule {
             int length = Array.getLength(value);
             List<DToken> list = new ArrayList<>();
             for (int i = 0; i < length; ++i)
-                list.add(toToken(Array.get(value, i)));
+                list.add(toDevore(Array.get(value, i)));
             return DList.valueOf(list);
         }
         if (value instanceof Iterable<?>) {
             List<DToken> list = new ArrayList<>();
             for (Object item : (Iterable<?>) value)
-                list.add(toToken(item));
+                list.add(toDevore(item));
             return DList.valueOf(list);
         }
-        return DJavaObject.valueOf(value);
+        if (value instanceof Map<?, ?>) {
+            Map<DToken, DToken> table = new HashMap<>();
+            ((Map<?, ?>) value).forEach((key, item) -> table.put(toDevore(key), toDevore(item)));
+            return DTable.valueOf(table);
+        }
+        throw new DevoreRuntimeException("不支持的 Java 类型，无法转换为 Devore 值: " + value.getClass().getName());
     }
 
     /**
