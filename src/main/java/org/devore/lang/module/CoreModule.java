@@ -1114,12 +1114,8 @@ public class CoreModule extends DModule {
                 DBool.valueOf(args.get(0) instanceof DInt)), 1, false);
         dEnv.addTokenProcedure("list?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DList)), 1, false);
-        dEnv.addAstProcedure("macro?", ((ast, env) -> {
-            Ast arg = ast.get(0);
-            if (arg.isEmpty() && arg.symbol instanceof DSymbol && env.contains(arg.symbol.toString()))
-                return DBool.valueOf(env.get(arg.symbol.toString()) instanceof DMacro);
-            return DBool.valueOf(Evaluator.eval(env, arg.copy()) instanceof DMacro);
-        }), 1, false);
+        dEnv.addTokenProcedure("macro?", ((args, env) ->
+                DBool.valueOf(args.get(0) instanceof DMacro)), 1, false);
         dEnv.addAstProcedure("bound?", ((ast, env) -> {
             Ast arg = ast.get(0);
             if (arg.isEmpty() && arg.symbol instanceof DSymbol)

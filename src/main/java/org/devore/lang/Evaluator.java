@@ -24,7 +24,7 @@ public class Evaluator {
             if (node.symbol instanceof Ast)
                 node.symbol = eval(env, ((Ast) node.symbol).copy());
             node.symbol = resolveSymbol(env, node.symbol);
-            if (node.symbol instanceof DMacro) {
+            if (node.symbol instanceof DMacro && node.type == Ast.Type.PROCEDURE) {
                 DMacro macro = (DMacro) node.symbol;
                 List<Ast> bodies = macro.expand(node.children);
                 DToken result = DWord.NIL;
