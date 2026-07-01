@@ -5,15 +5,6 @@ plugins {
 group = "org.devore"
 version = "0.1-alpha"
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
-
 application {
     mainClass.set("org.devore.Main")
 }
@@ -24,10 +15,6 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
 
 tasks.jar {
