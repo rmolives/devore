@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 permissions:
   contents: write
 jobs:
@@ -17,8 +20,11 @@ jobs:
         with:
           java-version: '8'
           distribution: 'temurin'
+          cache: 'gradle'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Run DevoreTest
+        run: ./gradlew test --tests 'org.devore.DevoreTest*'
       - name: Extract Gradle version
         id: gradle_version
         run: |
