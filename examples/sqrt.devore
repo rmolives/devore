@@ -1,3 +1,4 @@
+(import "math")
 (def (mysqrt x)
     (def (good-enough guess)
         (< (abs (- (pow guess 2) x)) 0.001))

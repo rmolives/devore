@@ -56,6 +56,7 @@ public class Env {
             new AbstractMap.SimpleEntry<>("html", new HtmlModule()),
             new AbstractMap.SimpleEntry<>("http", new HttpModule()),
             new AbstractMap.SimpleEntry<>("json", new JsonModule()),
+            new AbstractMap.SimpleEntry<>("math", new MathModule()),
             new AbstractMap.SimpleEntry<>("net", new NetModule()),
             new AbstractMap.SimpleEntry<>("os", new OSModule()),
             new AbstractMap.SimpleEntry<>("properties", new PropertiesModule()),

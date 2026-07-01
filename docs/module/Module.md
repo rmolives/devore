@@ -9,6 +9,7 @@
 * [udp](UDP.md)：基于UDP协议的数据报发送与接收
 * [file](File.md)：文件与目录的读写、查询和管理
 * [json](Json.md)：JSON数据的解析、生成与转换
+* [math](Math.md)：复杂数学运算、取整、对数、三角函数与数论能力
 * [csv](Csv.md)：RFC 4180 CSV数据的解析、生成与文件读写
 * [xml](Xml.md)：XML数据的解析、生成与节点构造
 * [html](Html.md)：HTML实体转义与还原

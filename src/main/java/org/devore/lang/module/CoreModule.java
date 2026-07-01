@@ -9,7 +9,6 @@ import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
 import org.devore.parser.Ast;
 import org.devore.utils.DIntUtils;
-import org.devore.utils.NumberUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -41,7 +40,7 @@ public class CoreModule extends DModule {
      */
     public void init(Env dEnv) {
         initConstants(dEnv);                // 基础常量
-        initNumberProcedures(dEnv);         // 数值计算
+        initNumberProcedures(dEnv);         // 基础数值计算
         initIOProcedures(dEnv);             // 标准输入输出
         initErrorProcedures(dEnv);          // 错误输出和抛错
         initModuleProcedures(dEnv);         // 模块加载
@@ -68,7 +67,7 @@ public class CoreModule extends DModule {
     }
 
     /**
-     * 注册数值计算相关过程，包括四则运算、幂、取模、三角函数、对数和取整等
+     * 注册基础数值计算相关过程，包括四则运算、平均值、取模和绝对值
      */
     private void initNumberProcedures(Env dEnv) {
         dEnv.addTokenProcedure("+", ((args, env) -> {
@@ -125,13 +124,6 @@ public class CoreModule extends DModule {
                     })
                     .reduce(number, DNumber::div);
         }), 1, true);
-        dEnv.addTokenProcedure("pow", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            if (!(args.get(1) instanceof DNumber))
-                throw new DevoreCastException(args.get(1).type(), "number");
-            return ((DNumber) args.get(0)).pow(((DNumber) args.get(1)));
-        }), 2, false);
         dEnv.addTokenProcedure("average", ((args, env) -> {
             DNumber num = args.stream()
                     .map(arg -> {
@@ -164,221 +156,6 @@ public class CoreModule extends DModule {
             if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "number");
             return ((DNumber) args.get(0)).abs();
-        }), 1, false);
-        dEnv.addTokenProcedure("sqrt", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).sqrt();
-        }), 1, false);
-        dEnv.addTokenProcedure("cbrt", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).cbrt();
-        }), 1, false);
-        dEnv.addTokenProcedure("sin", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).sin();
-        }), 1, false);
-        dEnv.addTokenProcedure("sinh", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).sinh();
-        }), 1, false);
-        dEnv.addTokenProcedure("cos", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).cos();
-        }), 1, false);
-        dEnv.addTokenProcedure("cosh", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).cosh();
-        }), 1, false);
-        dEnv.addTokenProcedure("tan", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).tan();
-        }), 1, false);
-        dEnv.addTokenProcedure("tanh", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).tanh();
-        }), 1, false);
-        dEnv.addTokenProcedure("atan", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arctan();
-        }), 1, false);
-        dEnv.addTokenProcedure("atanh", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arctanh();
-        }), 1, false);
-        dEnv.addTokenProcedure("atan", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            if (!(args.get(1) instanceof DNumber))
-                throw new DevoreCastException(args.get(1).type(), "number");
-            return ((DNumber) args.get(0)).arctan((DNumber) args.get(1));
-        }), 2, false);
-        dEnv.addTokenProcedure("asin", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arcsin();
-        }), 1, false);
-        dEnv.addTokenProcedure("asinh", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arcsinh();
-        }), 1, false);
-        dEnv.addTokenProcedure("acos", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arccos();
-        }), 1, false);
-        dEnv.addTokenProcedure("acosh", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arccosh();
-        }), 1, false);
-        dEnv.addTokenProcedure("sech", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).sech();
-        }), 1, false);
-        dEnv.addTokenProcedure("csch", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).csch();
-        }), 1, false);
-        dEnv.addTokenProcedure("coth", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).coth();
-        }), 1, false);
-        dEnv.addTokenProcedure("asech", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arcsech();
-        }), 1, false);
-        dEnv.addTokenProcedure("acsch", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arccsch();
-        }), 1, false);
-        dEnv.addTokenProcedure("acoth", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arccoth();
-        }), 1, false);
-        dEnv.addTokenProcedure("sec", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).sec();
-        }), 1, false);
-        dEnv.addTokenProcedure("csc", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).csc();
-        }), 1, false);
-        dEnv.addTokenProcedure("cot", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).cot();
-        }), 1, false);
-        dEnv.addTokenProcedure("asec", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arcsec();
-        }), 1, false);
-        dEnv.addTokenProcedure("acsc", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arccsc();
-        }), 1, false);
-        dEnv.addTokenProcedure("acot", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).arccot();
-        }), 1, false);
-        dEnv.addTokenProcedure("prime?", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
-                throw new DevoreCastException(args.get(0).type(), "int");
-            return DBool.valueOf(((DInt) args.get(0)).toBigInteger().isProbablePrime(100));
-        }), 1, false);
-        dEnv.addTokenProcedure("prime?", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
-                throw new DevoreCastException(args.get(0).type(), "int");
-            if (!(args.get(1) instanceof DInt))
-                throw new DevoreCastException(args.get(1).type(), "int");
-            return DBool.valueOf(((DInt) args.get(0)).toBigInteger()
-                    .isProbablePrime(DIntUtils.toInt((DInt) args.get(1))));
-        }), 2, false);
-        dEnv.addTokenProcedure("gcd", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
-                throw new DevoreCastException(args.get(0).type(), "int");
-            BigInteger first = ((DInt) args.get(0)).toBigInteger();
-            return DNumber.valueOf(args.stream()
-                    .skip(1)
-                    .map(arg -> {
-                        if (!(arg instanceof DInt))
-                            throw new DevoreCastException(arg.type(), "int");
-                        return (DInt) arg;
-                    })
-                    .map(DInt::toBigInteger)
-                    .reduce(first, NumberUtils::gcd));
-        }), 2, true);
-        dEnv.addTokenProcedure("lcm", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
-                throw new DevoreCastException(args.get(0).type(), "int");
-            BigInteger first = ((DInt) args.get(0)).toBigInteger();
-            return DNumber.valueOf(args.stream()
-                    .skip(1)
-                    .map(arg -> {
-                        if (!(arg instanceof DInt))
-                            throw new DevoreCastException(arg.type(), "int");
-                        return (DInt) arg;
-                    })
-                    .map(DInt::toBigInteger)
-                    .reduce(first, NumberUtils::lcm));
-        }), 2, true);
-        dEnv.addTokenProcedure("log", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).ln();
-        }), 1, false);
-        dEnv.addTokenProcedure("log", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            if (!(args.get(1) instanceof DNumber))
-                throw new DevoreCastException(args.get(1).type(), "number");
-            return ((DNumber) args.get(0)).log((DNumber) args.get(1));
-        }), 2, false);
-        dEnv.addTokenProcedure("exp", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).exp();
-        }), 1, false);
-        dEnv.addTokenProcedure("ceiling", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).ceiling();
-        }), 1, false);
-        dEnv.addTokenProcedure("floor", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).floor();
-        }), 1, false);
-        dEnv.addTokenProcedure("truncate", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).truncate();
-        }), 1, false);
-        dEnv.addTokenProcedure("round", ((args, env) -> {
-            if (!(args.get(0) instanceof DNumber))
-                throw new DevoreCastException(args.get(0).type(), "number");
-            return ((DNumber) args.get(0)).round();
         }), 1, false);
     }
 

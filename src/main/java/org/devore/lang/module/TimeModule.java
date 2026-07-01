@@ -20,7 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class TimeModule extends DModule {
-    // 默认格式
     private static final String DEFAULT_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     /**

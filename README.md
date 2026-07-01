@@ -13,6 +13,8 @@
 ### Sqrt
 
 ```scheme
+(import "math")
+
 (def (mysqrt x)
     (def (good-enough guess)
         (< (abs (- (pow guess 2) x)) 0.001))
@@ -29,6 +31,8 @@
 ### Prime?
 
 ```scheme
+(import "math")
+
 (def (myprime? n)
     (def (divides? a b)
         (= (mod b a) 0))
