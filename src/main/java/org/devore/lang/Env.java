@@ -64,6 +64,7 @@ public class Env {
             new AbstractMap.SimpleEntry<>("security", new SecurityModule()),
             new AbstractMap.SimpleEntry<>("sign", new SignModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
+            new AbstractMap.SimpleEntry<>("time", new TimeModule()),
             new AbstractMap.SimpleEntry<>("tcp", new TCPModule()),
             new AbstractMap.SimpleEntry<>("udp", new UDPModule()),
             new AbstractMap.SimpleEntry<>("uuid", new UUIDModule()),
