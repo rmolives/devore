@@ -34,17 +34,18 @@ public class CryptoModule extends DModule {
     }
 
     /**
-     * 初始化加密模块，注册AES和RSA过程
+     * 初始化加密模块，按算法注册加密解密过程
      */
     @Override
     public void init(Env dEnv) {
-        initCryptoProcedures(dEnv); // 加密解密
+        initAesProcedures(dEnv); // AES密钥生成、加密和解密
+        initRsaProcedures(dEnv); // RSA密钥生成、加密和解密
     }
 
     /**
-     * 注册AES和RSA加密解密过程
+     * 注册AES密钥生成、加密和解密过程
      */
-    private void initCryptoProcedures(Env dEnv) {
+    private void initAesProcedures(Env dEnv) {
         dEnv.addTokenProcedure("aes-key", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
@@ -74,6 +75,12 @@ public class CryptoModule extends DModule {
                 throw new DevoreCastException(args.get(3).type(), "string");
             return aes(args.get(0), args.get(1), args.get(2), args.get(3).toString(), Cipher.DECRYPT_MODE);
         }, 4, false);
+    }
+
+    /**
+     * 注册RSA密钥生成、加密和解密过程
+     */
+    private void initRsaProcedures(Env dEnv) {
         if (!dEnv.contains("rsa-keypair"))
             dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
                 if (!(args.get(0) instanceof DInt))

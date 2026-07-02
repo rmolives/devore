@@ -32,29 +32,24 @@ public class SignModule extends DModule {
     }
 
     /**
-     * 初始化数字签名模块，注册密钥生成、签名和验签过程
+     * 初始化数字签名模块，按算法注册密钥生成、签名和验签过程
      */
     @Override
     public void init(Env dEnv) {
-        initSignProcedures(dEnv); // 数字签名
+        initRsaProcedures(dEnv);   // RSA密钥生成、签名和验签
+        initEcdsaProcedures(dEnv); // ECDSA密钥生成、签名和验签
     }
 
     /**
-     * 注册密钥生成、签名和验签过程
+     * 注册RSA密钥生成、签名和验签过程
      */
-    private void initSignProcedures(Env dEnv) {
+    private void initRsaProcedures(Env dEnv) {
         if (!dEnv.contains("rsa-keypair"))
             dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
                 if (!(args.get(0) instanceof DInt))
                     throw new DevoreCastException(args.get(0).type(), "int");
                 return DCryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
             }, 1, false);
-        dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> ecKeyPair(DEFAULT_EC_CURVE), 0, false);
-        dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            return ecKeyPair(args.get(0).toString());
-        }, 1, false);
         dEnv.addTokenProcedure("rsa-sign", (args, env) ->
                 sign(args.get(0), args.get(1), "RSA", DEFAULT_RSA_SIGNATURE), 2, false);
         dEnv.addTokenProcedure("rsa-sign", (args, env) -> {
@@ -69,6 +64,18 @@ public class SignModule extends DModule {
                 throw new DevoreCastException(args.get(3).type(), "string");
             return verify(args.get(0), args.get(1), args.get(2), "RSA", args.get(3).toString());
         }, 4, false);
+    }
+
+    /**
+     * 注册ECDSA密钥生成、签名和验签过程
+     */
+    private void initEcdsaProcedures(Env dEnv) {
+        dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> ecKeyPair(DEFAULT_EC_CURVE), 0, false);
+        dEnv.addTokenProcedure("ecdsa-keypair", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            return ecKeyPair(args.get(0).toString());
+        }, 1, false);
         dEnv.addTokenProcedure("ecdsa-sign", (args, env) ->
                 sign(args.get(0), args.get(1), "EC", DEFAULT_ECDSA_SIGNATURE), 2, false);
         dEnv.addTokenProcedure("ecdsa-sign", (args, env) -> {
