@@ -11,6 +11,9 @@ import org.devore.utils.HashUtils;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Hash
+ */
 public class HashModule extends DModule {
     /**
      * 创建Hash模块实例
