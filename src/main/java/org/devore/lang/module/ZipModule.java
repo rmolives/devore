@@ -25,7 +25,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- * ZIP压缩包操作
+ * ZIP压缩包和GZIP数据压缩操作
  */
 public class ZipModule extends DModule {
     /**
@@ -36,15 +36,16 @@ public class ZipModule extends DModule {
     }
 
     /**
-     * 初始化压缩模块，注册ZIP和GZIP过程
+     * 初始化压缩模块，分别注册ZIP和GZIP过程
      */
     @Override
     public void init(Env dEnv) {
-        initZipProcedures(dEnv); // 压缩解压
+        initZipProcedures(dEnv);  // ZIP压缩包创建、读取和解压
+        initGzipProcedures(dEnv); // GZIP字节数据和单文件压缩解压
     }
 
     /**
-     * 注册ZIP和GZIP压缩解压过程
+     * 注册ZIP压缩包创建、读取和解压过程
      */
     private void initZipProcedures(Env dEnv) {
         dEnv.addTokenProcedure("zip-create", (args, env) -> {
@@ -124,7 +125,12 @@ public class ZipModule extends DModule {
             extractEntry(zipPath, entryName, targetPath);
             return DWord.NIL;
         }, 3, false);
+    }
 
+    /**
+     * 注册GZIP字节数据和单文件压缩解压过程
+     */
+    private void initGzipProcedures(Env dEnv) {
         dEnv.addTokenProcedure("gzip-compress", (args, env) -> {
             if (!(args.get(0) instanceof DList))
                 throw new DevoreCastException(args.get(0).type(), "list");
