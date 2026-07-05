@@ -180,7 +180,7 @@ public class Env {
     }
 
     /**
-     * 查找当前局部定义可见的同名宏或过程
+     * 查找当前局部绑定可见的同名宏或过程
      *
      * @param key 符号名
      * @return 可见Token，不存在时返回null
@@ -230,7 +230,7 @@ public class Env {
      */
     public synchronized void put(String key, DToken value) {
         if (this.table.containsKey(key))
-            throw new DevoreRuntimeException("定义冲突: " + key);
+            throw new DevoreRuntimeException("绑定冲突: " + key);
         this.table.put(key, value);
     }
 
@@ -244,7 +244,7 @@ public class Env {
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
             if (!(token instanceof DMacro))
-                throw new DevoreRuntimeException("定义冲突: " + key);
+                throw new DevoreRuntimeException("绑定冲突: " + key);
             this.table.put(key, ((DMacro) token).addMacro(key, macro));
             return;
         }
@@ -268,7 +268,7 @@ public class Env {
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
             if (!(token instanceof DMacro))
-                throw new DevoreRuntimeException("定义冲突: " + key);
+                throw new DevoreRuntimeException("绑定冲突: " + key);
             this.table.put(key, ((DMacro) token).addMacro(key, newMacro));
             return;
         }
@@ -311,7 +311,7 @@ public class Env {
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
             if (!(token instanceof DProcedure))
-                throw new DevoreRuntimeException("定义冲突: " + key);
+                throw new DevoreRuntimeException("绑定冲突: " + key);
             this.table.put(key, ((DProcedure) token).addProcedure(key, newProcedure));
             return;
         }
@@ -337,7 +337,7 @@ public class Env {
             for (int i = 0; i < ast.size(); ++i) {
                 DToken token = Evaluator.eval(env, ast.get(i).copy());
                 if (token instanceof DSymbol)
-                    throw new DevoreRuntimeException("找不到: " + token);
+                    throw new DevoreRuntimeException("找不到匹配的绑定: " + token);
                 args.add(token);
             }
             return procedure.apply(args, env);
@@ -346,7 +346,7 @@ public class Env {
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
             if (!(token instanceof DProcedure))
-                throw new DevoreRuntimeException("定义冲突: " + key);
+                throw new DevoreRuntimeException("绑定冲突: " + key);
             this.table.put(key, ((DProcedure) token).addProcedure(key, newProcedure));
             return;
         }
@@ -368,7 +368,7 @@ public class Env {
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
             if (!(token instanceof DProcedure))
-                throw new DevoreRuntimeException("定义冲突: " + key);
+                throw new DevoreRuntimeException("绑定冲突: " + key);
             this.table.put(key, ((DProcedure) token).addProcedure(key, procedure));
             return;
         }
@@ -461,7 +461,7 @@ public class Env {
         Env tableEnv = findTableEnv(key);
         if (tableEnv != null)
             return tableEnv.table.get(key);
-        throw new DevoreRuntimeException("未定义: " + key);
+        throw new DevoreRuntimeException("未绑定: " + key);
     }
 
     /**
