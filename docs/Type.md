@@ -105,16 +105,6 @@
 * 返回类型：bool
 * 示例：(string? 3)
 
-## symbol?
-
-* 作用：判断是否为symbol类型
-* 参数数量：1
-* 参数作用：内容
-* 参数类型：token
-* 返回值：是否为symbol类型
-* 返回类型：bool
-* 示例：(symbol? 3)
-
 ## table?
 
 * 作用：判断是否为table类型

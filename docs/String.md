@@ -50,16 +50,6 @@
 * 返回类型：bool
 * 示例：(string->bool "false")
 
-## string->symbol
-
-* 作用：将字符串转换为symbol
-* 参数数量：1
-* 参数作用：内容
-* 参数类型：string
-* 返回值：symbol
-* 返回类型：symbol
-* 示例：(string->symbol "a")
-
 ## string->list
 
 * 作用：将字符串转换为list

@@ -958,11 +958,6 @@ public class CoreModule extends DModule {
      * 注册类型转换过程，包括字符串、符号、数字、布尔、列表和Unicode字符转换
      */
     private void initConversionProcedures(Env dEnv) {
-        dEnv.addTokenProcedure("string->symbol", ((args, env) -> {
-            if (!(args.get(0) instanceof DString))
-                throw new DevoreCastException(args.get(0).type(), "string");
-            return DSymbol.valueOf(args.get(0).toString());
-        }), 1, false);
         dEnv.addTokenProcedure("string->number", ((args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
@@ -1133,8 +1128,6 @@ public class CoreModule extends DModule {
                 DBool.valueOf(args.get(0) instanceof DProcedure)), 1, false);
         dEnv.addTokenProcedure("string?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DString)), 1, false);
-        dEnv.addTokenProcedure("symbol?", ((args, env) ->
-                DBool.valueOf(args.get(0) instanceof DSymbol)), 1, false);
         dEnv.addTokenProcedure("table?", ((args, env) ->
                 DBool.valueOf(args.get(0) instanceof DTable)), 1, false);
         dEnv.addTokenProcedure("word?", ((args, env) ->

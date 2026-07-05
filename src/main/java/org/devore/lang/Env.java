@@ -4,6 +4,7 @@ import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.module.*;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
+import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.DToken;
 import org.devore.parser.Ast;
 
@@ -334,8 +335,10 @@ public class Env {
         BiFunction<Ast, Env, DToken> df = (ast, env) -> {
             List<DToken> args = new ArrayList<>();
             for (int i = 0; i < ast.size(); ++i) {
-                ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
-                args.add(ast.get(i).symbol);
+                DToken token = Evaluator.eval(env, ast.get(i).copy());
+                if (token instanceof DSymbol)
+                    throw new DevoreRuntimeException("找不到: " + token);
+                args.add(token);
             }
             return procedure.apply(args, env);
         };
