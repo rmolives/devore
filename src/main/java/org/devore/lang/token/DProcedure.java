@@ -91,7 +91,7 @@ public class DProcedure extends DToken {
      */
     public DProcedure addProcedure(String name, DProcedure procedure) {
         if (this.match(procedure.argc) != null)
-            throw new DevoreRuntimeException("定义冲突: " + name);
+            throw new DevoreRuntimeException("绑定冲突: " + name);
         this.children.add(procedure);
         return this;
     }
@@ -165,7 +165,7 @@ public class DProcedure extends DToken {
     public DToken call(Ast node, Env env) {
         DProcedure df = this.match(node.size());
         if (df == null)
-            throw new DevoreRuntimeException("找不到匹配条件的过程: " + this.name);
+            throw new DevoreRuntimeException("找不到匹配的过程: " + this.name);
         return df.procedure.apply(node, env);
     }
 
@@ -179,7 +179,7 @@ public class DProcedure extends DToken {
     public DToken call(List<DToken> args, Env env) {
         DProcedure df = this.match(args.size());
         if (df == null)
-            throw new DevoreRuntimeException("找不到匹配条件的过程: " + this.name);
+            throw new DevoreRuntimeException("找不到匹配的过程: " + this.name);
         Ast ast = Ast.empty.copy();
         args.stream()
                 .map(Ast::new)

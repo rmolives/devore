@@ -74,7 +74,7 @@ public class DMacro extends DToken {
      */
     public DMacro addMacro(String name, DMacro macro) {
         if (this.match(macro.params.size()) != null)
-            throw new DevoreRuntimeException("定义冲突: " + name);
+            throw new DevoreRuntimeException("绑定冲突: " + name);
         this.children.add(macro);
         return this;
     }
@@ -171,7 +171,7 @@ public class DMacro extends DToken {
     public List<Ast> expand(List<Ast> nodes) {
         DMacro dm = this.match(nodes.size());
         if (dm == null)
-            throw new DevoreRuntimeException("找不到匹配条件的宏: " + this.name);
+            throw new DevoreRuntimeException("找不到匹配的宏: " + this.name);
         return dm.bodys.stream()
                 .map(body -> dm.expand(body.copy(), nodes))
                 .collect(Collectors.toList());

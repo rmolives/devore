@@ -38,7 +38,7 @@ public class Evaluator {
                 if (node.isEmpty() && node.symbol == DWord.NIL)
                     return DWord.NIL;
                 if (!(node.symbol instanceof DProcedure))
-                    throw new DevoreRuntimeException("找不到匹配条件的过程: " + node.symbol);
+                    throw new DevoreRuntimeException("找不到匹配的过程: " + node.symbol);
             }
             if (node.symbol instanceof DProcedure) {
                 DProcedure procedure = (DProcedure) node.symbol;
