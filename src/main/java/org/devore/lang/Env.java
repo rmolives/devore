@@ -331,12 +331,9 @@ public class Env {
      * @param vararg    是否为可变参数
      */
     public synchronized void addTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
-        BiFunction<Ast, Env, DToken> df = (ast, env) -> {
-            List<DToken> args = new ArrayList<>();
-            for (int i = 0; i < ast.size(); ++i)
-                args.add(Evaluator.eval(env, ast.get(i).copy()));
-            return procedure.apply(args, env);
-        };
+        BiFunction<Ast, Env, DToken> df = (ast, env) -> procedure.apply(ast.children.stream()
+                .map(token -> Evaluator.eval(env, token.copy()))
+                .collect(Collectors.toList()), env);
         DProcedure newProcedure = DProcedure.newProcedure(key, df, argc, vararg);
         if (this.table.containsKey(key)) {
             DToken token = this.table.get(key);
@@ -406,14 +403,9 @@ public class Env {
         Env temp = this;
         while (temp.father != null && !temp.table.containsKey(key))
             temp = temp.father;
-        BiFunction<Ast, Env, DToken> df = (ast, env) -> {
-            List<DToken> args = new ArrayList<>();
-            for (int i = 0; i < ast.size(); ++i) {
-                ast.get(i).symbol = Evaluator.eval(env, ast.get(i).copy());
-                args.add(ast.get(i).symbol);
-            }
-            return procedure.apply(args, env);
-        };
+        BiFunction<Ast, Env, DToken> df = (ast, env) -> procedure.apply(ast.children.stream()
+                .map(token -> Evaluator.eval(env, token.copy()))
+                .collect(Collectors.toList()), env);
         DProcedure newProcedure = DProcedure.newProcedure(key, df, argc, vararg);
         DToken token = temp.table.get(key);
         if (token instanceof DProcedure)
