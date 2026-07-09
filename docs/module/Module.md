@@ -22,7 +22,6 @@
 * [hash](Hash.md)：常用哈希摘要算法与校验能力
 * [binary](Binary.md)：二进制数据的读写、编码与转换
 * [base64](Base64.md)：Base64编码与解码
-* [sign](Sign.md)：数据签名、验签与签名辅助能力
 * [crypto](Crypto.md)：加密、解密及相关密码学工具
 * [zip](Zip.md)：ZIP压缩包的创建、读取、解压与条目查询
 * [os](OS.md)：操作系统信息、环境变量与系统调用能力

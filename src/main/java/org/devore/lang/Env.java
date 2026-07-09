@@ -63,7 +63,6 @@ public class Env {
             new AbstractMap.SimpleEntry<>("regex", new RegexModule()),
             new AbstractMap.SimpleEntry<>("reflect", new ReflectModule()),
             new AbstractMap.SimpleEntry<>("security", new SecurityModule()),
-            new AbstractMap.SimpleEntry<>("sign", new SignModule()),
             new AbstractMap.SimpleEntry<>("thread", new ThreadModule()),
             new AbstractMap.SimpleEntry<>("time", new TimeModule()),
             new AbstractMap.SimpleEntry<>("tcp", new TCPModule()),

@@ -41,7 +41,6 @@
 * [二进制](module/Binary.md)
 * [Base64](module/Base64.md)
 * [哈希](module/Hash.md)
-* [签名](module/Sign.md)
 * [加密](module/Crypto.md)
 * [UUID](module/UUID.md)
 * [Properties](module/Properties.md)
