@@ -4,7 +4,6 @@ import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.Env;
 import org.devore.lang.token.*;
-import org.devore.utils.DCryptoUtils;
 import org.devore.utils.DByteUtils;
 import org.devore.utils.DIntUtils;
 
@@ -16,6 +15,11 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 加密工具
@@ -86,7 +90,7 @@ public class CryptoModule extends DModule {
         dEnv.addTokenProcedure("rsa-keypair", (args, env) -> {
             if (!(args.get(0) instanceof DInt))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            return DCryptoUtils.rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
+            return rsaKeyPair(DIntUtils.toInt((DInt) args.get(0)));
         }, 1, false);
         dEnv.addTokenProcedure("rsa-encrypt", (args, env) ->
                 rsa(args.get(0), args.get(1), DEFAULT_RSA_TRANSFORMATION, Cipher.ENCRYPT_MODE), 2, false);
@@ -184,9 +188,9 @@ public class CryptoModule extends DModule {
         try {
             Cipher cipher = Cipher.getInstance(transformation);
             if (mode == Cipher.ENCRYPT_MODE)
-                cipher.init(mode, DCryptoUtils.publicKey("RSA", key));
+                cipher.init(mode, publicKey("RSA", key));
             else
-                cipher.init(mode, DCryptoUtils.privateKey("RSA", key));
+                cipher.init(mode, privateKey("RSA", key));
             byte[] dataBytes;
             if (data instanceof DList)
                 dataBytes = DByteUtils.toBytes((DList) data);
@@ -208,7 +212,7 @@ public class CryptoModule extends DModule {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
             generator.initialize(new ECGenParameterSpec(curve));
-            return DCryptoUtils.keyPairTable(generator.generateKeyPair());
+            return keyPairTable(generator.generateKeyPair());
         } catch (GeneralSecurityException e) {
             throw new DevoreRuntimeException("ECDSA密钥生成失败: " + e.getMessage());
         }
@@ -220,7 +224,7 @@ public class CryptoModule extends DModule {
     private DList sign(DToken data, DToken privateKey, String keyAlgorithm, String signatureAlgorithm) {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);
-            signature.initSign(DCryptoUtils.privateKey(keyAlgorithm, privateKey));
+            signature.initSign(privateKey(keyAlgorithm, privateKey));
             byte[] dataBytes;
             if (data instanceof DList)
                 dataBytes = DByteUtils.toBytes((DList) data);
@@ -241,7 +245,7 @@ public class CryptoModule extends DModule {
     private DBool verify(DToken data, DToken signed, DToken publicKey, String keyAlgorithm, String signatureAlgorithm) {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);
-            signature.initVerify(DCryptoUtils.publicKey(keyAlgorithm, publicKey));
+            signature.initVerify(publicKey(keyAlgorithm, publicKey));
             byte[] dataBytes;
             if (data instanceof DList)
                 dataBytes = DByteUtils.toBytes((DList) data);
@@ -260,6 +264,75 @@ public class CryptoModule extends DModule {
             return DBool.valueOf(signature.verify(signedBytes));
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new DevoreRuntimeException("验签失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 从Base64编码的X.509公钥字符串解析公钥
+     *
+     * @param algorithm 密钥算法，如RSA或EC
+     * @param token     Base64编码的公钥字符串
+     * @return 公钥对象
+     */
+    public static PublicKey publicKey(String algorithm, DToken token) {
+        if (!(token instanceof DString))
+            throw new DevoreCastException(token.type(), "string");
+        try {
+            byte[] encoded = Base64.getDecoder().decode(token.toString());
+            return KeyFactory.getInstance(algorithm).generatePublic(new X509EncodedKeySpec(encoded));
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
+            throw new DevoreRuntimeException("公钥解析失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 从Base64编码的PKCS#8私钥字符串解析私钥
+     *
+     * @param algorithm 密钥算法，如RSA或EC
+     * @param token     Base64编码的私钥字符串
+     * @return 私钥对象
+     */
+    public static PrivateKey privateKey(String algorithm, DToken token) {
+        if (!(token instanceof DString))
+            throw new DevoreCastException(token.type(), "string");
+        try {
+            byte[] encoded = Base64.getDecoder().decode(token.toString());
+            return KeyFactory.getInstance(algorithm).generatePrivate(new PKCS8EncodedKeySpec(encoded));
+        } catch (GeneralSecurityException | IllegalArgumentException e) {
+            throw new DevoreRuntimeException("私钥解析失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 将Java密钥对转换为DTable
+     *
+     * @param keyPair Java密钥对
+     * @return 包含public和private字段的表
+     */
+    public static DTable keyPairTable(KeyPair keyPair) {
+        Map<DToken, DToken> table = new HashMap<>();
+        table.put(DString.valueOf("public"),
+                DString.valueOf(Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded())));
+        table.put(DString.valueOf("private"),
+                DString.valueOf(Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded())));
+        return DTable.valueOf(table);
+    }
+
+    /**
+     * 生成RSA密钥对
+     *
+     * @param bits 密钥位数，不能小于1024
+     * @return 包含public和private字段的表
+     */
+    public static DTable rsaKeyPair(int bits) {
+        if (bits < 1024)
+            throw new DevoreRuntimeException("RSA密钥长度不能小于1024位.");
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(bits);
+            return keyPairTable(generator.generateKeyPair());
+        } catch (GeneralSecurityException e) {
+            throw new DevoreRuntimeException("RSA密钥生成失败: " + e.getMessage());
         }
     }
 }
