@@ -67,6 +67,8 @@ public class Evaluator {
         DToken temp = token;
         while (temp instanceof DSymbol && env.contains(temp.toString()))
             temp = env.get(temp.toString());
+        if (temp instanceof DSymbol)
+            throw new DevoreRuntimeException("找不到匹配的绑定: " + temp);
         return temp;
     }
 }

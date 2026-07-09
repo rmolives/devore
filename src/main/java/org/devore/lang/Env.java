@@ -4,7 +4,6 @@ import org.devore.exception.DevoreRuntimeException;
 import org.devore.lang.module.*;
 import org.devore.lang.token.DMacro;
 import org.devore.lang.token.DProcedure;
-import org.devore.lang.token.DSymbol;
 import org.devore.lang.token.DToken;
 import org.devore.parser.Ast;
 
@@ -334,12 +333,8 @@ public class Env {
     public synchronized void addTokenProcedure(String key, BiFunction<List<DToken>, Env, DToken> procedure, int argc, boolean vararg) {
         BiFunction<Ast, Env, DToken> df = (ast, env) -> {
             List<DToken> args = new ArrayList<>();
-            for (int i = 0; i < ast.size(); ++i) {
-                DToken token = Evaluator.eval(env, ast.get(i).copy());
-                if (token instanceof DSymbol)
-                    throw new DevoreRuntimeException("找不到匹配的绑定: " + token);
-                args.add(token);
-            }
+            for (int i = 0; i < ast.size(); ++i)
+                args.add(Evaluator.eval(env, ast.get(i).copy()));
             return procedure.apply(args, env);
         };
         DProcedure newProcedure = DProcedure.newProcedure(key, df, argc, vararg);
