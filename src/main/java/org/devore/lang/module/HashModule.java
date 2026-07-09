@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Hash
@@ -145,9 +147,8 @@ public class HashModule extends DModule {
      * @return 小写十六进制字符串
      */
     private static String toHex(byte[] bytes) {
-        StringBuilder builder = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes)
-            builder.append(String.format("%02x", b & 0xff));
-        return builder.toString();
+        return IntStream.range(0, bytes.length)
+                .mapToObj(i -> String.format("%02x", Byte.toUnsignedInt(bytes[i])))
+                .collect(Collectors.joining());
     }
 }
