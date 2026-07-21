@@ -177,7 +177,7 @@
 * 作用：在指定工作目录执行操作系统命令
 * 参数数量：2
 * 参数作用：命令、工作目录
-* 参数类型：\[string|list\] string
+* 参数类型：\[string|list\]、string
 * 返回值：命令执行结果表，包含exit-code、stdout、stderr
 * 返回类型：table
 * 示例：(os-exec "pwd" "/tmp")
