@@ -5,12 +5,13 @@
 ## base64-encode
 
 * 作用：把原始字节编码成Base64字符串
-* 参数数量：1
-* 参数作用：原始字节
-* 参数类型：\[string|list\]
+* 参数数量：1/2
+* 参数作用：原始字节/原始字符串与字符集
+* 参数类型：\[string|list\]/\[string,string\]
 * 返回值：Base64
 * 返回类型：string
 * 示例：(base64-encode "abc")
+* 示例：(base64-encode "中文" "UTF-8")
 
 ## base64-decode
 

@@ -8,6 +8,7 @@ import org.devore.lang.token.DString;
 import org.devore.lang.token.DToken;
 import org.devore.utils.DByteUtils;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -45,6 +46,19 @@ public class Base64Module extends DModule {
                 throw new DevoreCastException(token.type(), "list|string");
             return DString.valueOf(Base64.getEncoder().encodeToString(bytes));
         }, 1, false);
+        dEnv.addTokenProcedure("base64-encode", (args, env) -> {
+            if (!(args.get(0) instanceof DString))
+                throw new DevoreCastException(args.get(0).type(), "string");
+            if (!(args.get(1) instanceof DString))
+                throw new DevoreCastException(args.get(1).type(), "string");
+            Charset charset;
+            try {
+                charset = Charset.forName(args.get(1).toString());
+            } catch (RuntimeException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + args.get(1));
+            }
+            return DString.valueOf(Base64.getEncoder().encodeToString(args.get(0).toString().getBytes(charset)));
+        }, 2, false);
         dEnv.addTokenProcedure("base64-decode", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
