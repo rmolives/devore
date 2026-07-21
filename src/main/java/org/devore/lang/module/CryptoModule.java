@@ -12,7 +12,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -150,27 +149,9 @@ public class CryptoModule extends DModule {
      */
     private DList aes(DToken data, DToken key, DToken iv, String transformation, int mode) {
         try {
-            byte[] keyBytes;
-            if (key instanceof DList)
-                keyBytes = DByteUtils.toBytes((DList) key);
-            else if (key instanceof DString)
-                keyBytes = key.toString().getBytes(StandardCharsets.UTF_8);
-            else
-                throw new DevoreCastException(key.type(), "list|string");
-            byte[] ivBytes;
-            if (iv instanceof DList)
-                ivBytes = DByteUtils.toBytes((DList) iv);
-            else if (iv instanceof DString)
-                ivBytes = iv.toString().getBytes(StandardCharsets.UTF_8);
-            else
-                throw new DevoreCastException(iv.type(), "list|string");
-            byte[] dataBytes;
-            if (data instanceof DList)
-                dataBytes = DByteUtils.toBytes((DList) data);
-            else if (data instanceof DString)
-                dataBytes = data.toString().getBytes(StandardCharsets.UTF_8);
-            else
-                throw new DevoreCastException(data.type(), "list|string");
+            byte[] keyBytes = binary(key);
+            byte[] ivBytes = binary(iv);
+            byte[] dataBytes = binary(data);
             SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
             Cipher cipher = Cipher.getInstance(transformation);
             cipher.init(mode, keySpec, new IvParameterSpec(ivBytes));
@@ -191,13 +172,7 @@ public class CryptoModule extends DModule {
                 cipher.init(mode, publicKey("RSA", key));
             else
                 cipher.init(mode, privateKey("RSA", key));
-            byte[] dataBytes;
-            if (data instanceof DList)
-                dataBytes = DByteUtils.toBytes((DList) data);
-            else if (data instanceof DString)
-                dataBytes = data.toString().getBytes(StandardCharsets.UTF_8);
-            else
-                throw new DevoreCastException(data.type(), "list|string");
+            byte[] dataBytes = binary(data);
             return DByteUtils.toList(cipher.doFinal(dataBytes));
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             String action = mode == Cipher.ENCRYPT_MODE ? "RSA加密" : "RSA解密";
@@ -225,13 +200,7 @@ public class CryptoModule extends DModule {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);
             signature.initSign(privateKey(keyAlgorithm, privateKey));
-            byte[] dataBytes;
-            if (data instanceof DList)
-                dataBytes = DByteUtils.toBytes((DList) data);
-            else if (data instanceof DString)
-                dataBytes = data.toString().getBytes(StandardCharsets.UTF_8);
-            else
-                throw new DevoreCastException(data.type(), "list|string");
+            byte[] dataBytes = binary(data);
             signature.update(dataBytes);
             return DByteUtils.toList(signature.sign());
         } catch (GeneralSecurityException | IllegalArgumentException e) {
@@ -246,25 +215,22 @@ public class CryptoModule extends DModule {
         try {
             Signature signature = Signature.getInstance(signatureAlgorithm);
             signature.initVerify(publicKey(keyAlgorithm, publicKey));
-            byte[] dataBytes;
-            if (data instanceof DList)
-                dataBytes = DByteUtils.toBytes((DList) data);
-            else if (data instanceof DString)
-                dataBytes = data.toString().getBytes(StandardCharsets.UTF_8);
-            else
-                throw new DevoreCastException(data.type(), "list|string");
-            byte[] signedBytes;
-            if (signed instanceof DList)
-                signedBytes = DByteUtils.toBytes((DList) signed);
-            else if (signed instanceof DString)
-                signedBytes = signed.toString().getBytes(StandardCharsets.UTF_8);
-            else
-                throw new DevoreCastException(signed.type(), "list|string");
+            byte[] dataBytes = binary(data);
+            byte[] signedBytes = binary(signed);
             signature.update(dataBytes);
             return DBool.valueOf(signature.verify(signedBytes));
         } catch (GeneralSecurityException | IllegalArgumentException e) {
             throw new DevoreRuntimeException("验签失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 将Devore binary(list)转换为字节数组。
+     */
+    private static byte[] binary(DToken token) {
+        if (!(token instanceof DList))
+            throw new DevoreCastException(token.type(), "list");
+        return DByteUtils.toBytes((DList) token);
     }
 
     /**
