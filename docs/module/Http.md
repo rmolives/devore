@@ -85,6 +85,17 @@
 * 说明：key必须是string；value为list时会生成同名多值参数
 * 示例：(http-build-query (table \\["a" "1"\\] \\["b" "x y"\\]))
 
+### http-build-query
+
+* 作用：使用指定字符集将表转换为URL查询字符串
+* 参数数量：2
+* 参数作用：参数表、编码格式
+* 参数类型：table、string
+* 返回值：查询字符串
+* 返回类型：string
+* 说明：key必须是string；value为list时会生成同名多值参数
+* 示例：(http-build-query (table \\["kw" "中文"\\]) "GBK")
+
 ## HTTP服务端
 
 ### http-listen
@@ -163,6 +174,16 @@
 * 返回值：nil
 * 返回类型：word
 * 示例：(http-static server "/assets" "./public")
+
+### http-static
+
+* 作用：使用指定字符集解码URL路径并注册静态文件目录
+* 参数数量：4
+* 参数作用：HTTP服务端、URL前缀、本地目录、编码格式
+* 参数类型：http-server、string、string、string
+* 返回值：nil
+* 返回类型：word
+* 示例：(http-static server "/assets" "./public" "GBK")
 
 ### http-start
 
@@ -545,21 +566,30 @@
 
 ### http-post-form
 
-* 作用：以application/x-www-form-urlencoded提交表单，使用headers
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers、编码格式或超时
 * 参数数量：3
-* 参数作用：url、headers、表单 或 url、表单、超时（秒）
-* 参数类型：string、table、table 或 string、table、int
+* 参数作用：url、headers、表单 或 url、表单、编码格式|超时（秒）
+* 参数类型：string、table、table 或 string、table、string|int
 * 返回类型：table
 * 示例：(http-post-form "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]))
 
 ### http-post-form
 
-* 作用：以application/x-www-form-urlencoded提交表单，使用headers和超时
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers和编码格式或超时
 * 参数数量：4
-* 参数作用：url、headers、表单、超时（秒）
-* 参数类型：string、table、table、int
+* 参数作用：url、headers、表单、编码格式|超时（秒）
+* 参数类型：string、table、table、string|int
 * 返回类型：table
 * 示例：(http-post-form "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) 5)
+
+### http-post-form
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers、编码格式和超时
+* 参数数量：5
+* 参数作用：url、headers、表单、编码格式、超时（秒）
+* 参数类型：string、table、table、string、int
+* 返回类型：table
+* 示例：(http-post-form "http://127.0.0.1/login" (table) (table \["kw" "中文"\]) "GBK" 5)
 
 ### http-post-multipart
 
@@ -604,6 +634,7 @@
 * 参数作用：url、表单、编码格式|超时（秒） 或 url、headers、表单
 * 参数类型：string、table、string|int 或 string、table、table
 * 返回类型：string
+* 说明：编码格式同时用于表单URL编码、请求体字节编码和响应体字符串解码
 * 示例：(http-post-form-string "http://127.0.0.1/login" (table \["user" "root"\]) "UTF-8")
 
 ### http-post-form-string
@@ -613,6 +644,7 @@
 * 参数作用：url、headers、表单、编码格式|超时（秒） 或 url、表单、编码格式、超时（秒）
 * 参数类型：string、table、table、string|int 或 string、table、string、int
 * 返回类型：string
+* 说明：编码格式同时用于表单URL编码、请求体字节编码和响应体字符串解码
 * 示例：(http-post-form-string "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) "UTF-8")
 
 ### http-post-form-string
@@ -622,6 +654,7 @@
 * 参数作用：url、headers、表单、编码格式、超时（秒）
 * 参数类型：string、table、table、string、int
 * 返回类型：string
+* 说明：编码格式同时用于表单URL编码、请求体字节编码和响应体字符串解码
 * 示例：(http-post-form-string "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) "UTF-8" 5)
 
 ### http-post-form-binary
@@ -635,21 +668,30 @@
 
 ### http-post-form-binary
 
-* 作用：以application/x-www-form-urlencoded提交表单，使用headers或超时
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers、编码格式或超时
 * 参数数量：3
-* 参数作用：url、headers、表单 或 url、表单、超时（秒）
-* 参数类型：string、table、table 或 string、table、int
+* 参数作用：url、headers、表单 或 url、表单、编码格式|超时（秒）
+* 参数类型：string、table、table 或 string、table、string|int
 * 返回类型：list
 * 示例：(http-post-form-binary "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]))
 
 ### http-post-form-binary
 
-* 作用：以application/x-www-form-urlencoded提交表单，使用headers和超时
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers和编码格式或超时，或使用编码格式和超时
 * 参数数量：4
-* 参数作用：url、headers、表单、超时（秒）
-* 参数类型：string、table、table、int
+* 参数作用：url、headers、表单、编码格式|超时（秒） 或 url、表单、编码格式、超时（秒）
+* 参数类型：string、table、table、string|int 或 string、table、string、int
 * 返回类型：list
 * 示例：(http-post-form-binary "http://127.0.0.1/login" (table \["a" "3"\]) (table \["user" "root"\]) 5)
+
+### http-post-form-binary
+
+* 作用：以application/x-www-form-urlencoded提交表单，使用headers、编码格式和超时
+* 参数数量：5
+* 参数作用：url、headers、表单、编码格式、超时（秒）
+* 参数类型：string、table、table、string、int
+* 返回类型：list
+* 示例：(http-post-form-binary "http://127.0.0.1/login" (table) (table \["kw" "中文"\]) "GBK" 5)
 
 ### http-post-multipart-string
 

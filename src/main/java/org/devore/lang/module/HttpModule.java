@@ -114,8 +114,13 @@ public class HttpModule extends DModule {
         dEnv.addTokenProcedure("http-build-query", (args, env) -> {
             if (!(args.get(0) instanceof DTable))
                 throw new DevoreCastException(args.get(0).type(), "table");
-            return DString.valueOf(buildQuery((DTable) args.get(0)));
+            return DString.valueOf(buildQuery((DTable) args.get(0), StandardCharsets.UTF_8));
         }, 1, false);
+        dEnv.addTokenProcedure("http-build-query", (args, env) -> {
+            if (!(args.get(0) instanceof DTable))
+                throw new DevoreCastException(args.get(0).type(), "table");
+            return DString.valueOf(buildQuery((DTable) args.get(0), toCharset(args.get(1))));
+        }, 2, false);
     }
 
     /**
@@ -164,17 +169,10 @@ public class HttpModule extends DModule {
         }, 4, false);
         dEnv.addTokenProcedure("http-handler", (args, env) -> registerHandler(args, env, null), 3, false);
         dEnv.addTokenProcedure("http-handler", (args, env) -> registerHandler(args, env, args.get(1)), 4, false);
-        dEnv.addTokenProcedure("http-static", (args, env) -> {
-            DSecurity.checkRestrictNet(env);
-            DSecurity.checkRestrictFile(env);
-            DHttpServer server = toServer(args.get(0));
-            String prefix = toPath(args.get(1));
-            if (!(args.get(2) instanceof DString))
-                throw new DevoreCastException(args.get(2).type(), "string");
-            Path root = Paths.get(args.get(2).toString()).toAbsolutePath().normalize();
-            server.toHttpServer().createContext(prefix, exchange -> handleStatic(exchange, prefix, root));
-            return DWord.NIL;
-        }, 3, false);
+        dEnv.addTokenProcedure("http-static", (args, env) ->
+                registerStatic(args, env, StandardCharsets.UTF_8), 3, false);
+        dEnv.addTokenProcedure("http-static", (args, env) ->
+                registerStatic(args, env, toCharset(args.get(3))), 4, false);
         dEnv.addTokenProcedure("http-start", (args, env) -> {
             DSecurity.checkRestrictNet(env);
             toServer(args.get(0)).start();
@@ -417,16 +415,28 @@ public class HttpModule extends DModule {
      */
     private void registerPostForm(Env dEnv) {
         dEnv.addTokenProcedure("http-post-form", (args, env) ->
-                toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT)), 2, false);
+                toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)), StandardCharsets.UTF_8,
+                        DEFAULT_TIMEOUT)), 2, false);
         dEnv.addTokenProcedure("http-post-form", (args, env) -> {
             if (args.get(2) instanceof DInt)
-                return toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)), toTimeout(args.get(2))));
+                return toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)),
+                        StandardCharsets.UTF_8, toTimeout(args.get(2))));
+            if (args.get(2) instanceof DString)
+                return toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)),
+                        toCharset(args.get(2)), DEFAULT_TIMEOUT));
             return toResponseTable(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    DEFAULT_TIMEOUT));
+                    StandardCharsets.UTF_8, DEFAULT_TIMEOUT));
         }, 3, false);
+        dEnv.addTokenProcedure("http-post-form", (args, env) -> {
+            if (args.get(3) instanceof DInt)
+                return toResponseTable(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        StandardCharsets.UTF_8, toTimeout(args.get(3))));
+            return toResponseTable(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    toCharset(args.get(3)), DEFAULT_TIMEOUT));
+        }, 4, false);
         dEnv.addTokenProcedure("http-post-form", (args, env) ->
                 toResponseTable(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        toTimeout(args.get(3)))), 4, false);
+                        toCharset(args.get(3)), toTimeout(args.get(4)))), 5, false);
     }
 
     /**
@@ -434,38 +444,47 @@ public class HttpModule extends DModule {
      */
     private void registerPostFormResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
-                responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT), binary,
-                        StandardCharsets.UTF_8), 2, false);
+                responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), StandardCharsets.UTF_8,
+                        DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8), 2, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(2) instanceof DInt)
-                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toTimeout(args.get(2))),
-                        binary, StandardCharsets.UTF_8);
+                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), StandardCharsets.UTF_8,
+                        toTimeout(args.get(2))), binary, StandardCharsets.UTF_8);
             if (!binary && args.get(2) instanceof DString)
-                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), DEFAULT_TIMEOUT), false,
-                        toCharset(args.get(2)));
+                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toCharset(args.get(2)),
+                        DEFAULT_TIMEOUT), false, toCharset(args.get(2)));
+            if (binary && args.get(2) instanceof DString)
+                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toCharset(args.get(2)),
+                        DEFAULT_TIMEOUT), true, StandardCharsets.UTF_8);
             return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
+                    StandardCharsets.UTF_8, DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
         }, 3, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(2) instanceof DString && args.get(3) instanceof DInt) {
-                if (binary)
-                    throw new DevoreCastException(args.get(2).type(), "table");
-                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toTimeout(args.get(3))),
-                        false, toCharset(args.get(2)));
+                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toCharset(args.get(2)),
+                        toTimeout(args.get(3))), binary, binary ? StandardCharsets.UTF_8 : toCharset(args.get(2)));
             }
-            if (binary)
+            if (binary) {
+                if (args.get(3) instanceof DString)
+                    return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                            toCharset(args.get(3)), DEFAULT_TIMEOUT), true, StandardCharsets.UTF_8);
                 return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        toTimeout(args.get(3))), true, StandardCharsets.UTF_8);
+                        StandardCharsets.UTF_8, toTimeout(args.get(3))), true, StandardCharsets.UTF_8);
+            }
             if (args.get(3) instanceof DInt)
                 return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        toTimeout(args.get(3))), false, StandardCharsets.UTF_8);
+                        StandardCharsets.UTF_8, toTimeout(args.get(3))), false, StandardCharsets.UTF_8);
             return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
+                    toCharset(args.get(3)), DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
         }, 4, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
                     responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                            toTimeout(args.get(4))), false, toCharset(args.get(3))), 5, false);
+                            toCharset(args.get(3)), toTimeout(args.get(4))), false, toCharset(args.get(3))), 5, false);
+        } else {
+            dEnv.addTokenProcedure(name, (args, env) ->
+                    responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                            toCharset(args.get(3)), toTimeout(args.get(4))), true, StandardCharsets.UTF_8), 5, false);
         }
     }
 
@@ -532,9 +551,9 @@ public class HttpModule extends DModule {
     /**
      * 构造并发送application/x-www-form-urlencoded请求
      */
-    private static Response postForm(Env env, DToken url, DTable headers, DTable form, int timeout) {
-        DTable requestHeaders = contentType(headers, "application/x-www-form-urlencoded; charset=UTF-8");
-        return requestToken(env, url, "POST", requestHeaders, buildQuery(form).getBytes(StandardCharsets.UTF_8), timeout);
+    private static Response postForm(Env env, DToken url, DTable headers, DTable form, Charset charset, int timeout) {
+        DTable requestHeaders = contentType(headers, "application/x-www-form-urlencoded; charset=" + charset.name());
+        return requestToken(env, url, "POST", requestHeaders, buildQuery(form, charset).getBytes(charset), timeout);
     }
 
     /**
@@ -569,6 +588,21 @@ public class HttpModule extends DModule {
         }
     }
 
+    /**
+     * 注册静态文件目录
+     */
+    private static DToken registerStatic(List<DToken> args, Env env, Charset charset) {
+        DSecurity.checkRestrictNet(env);
+        DSecurity.checkRestrictFile(env);
+        DHttpServer server = toServer(args.get(0));
+        String prefix = toPath(args.get(1));
+        if (!(args.get(2) instanceof DString))
+            throw new DevoreCastException(args.get(2).type(), "string");
+        Path root = Paths.get(args.get(2).toString()).toAbsolutePath().normalize();
+        server.toHttpServer().createContext(prefix, exchange -> handleStatic(exchange, prefix, root, charset));
+        return DWord.NIL;
+    }
+
     private static void handleExchange(HttpExchange exchange, String method, String pattern,
                                        DProcedure handler, Env env) throws IOException {
         try {
@@ -593,7 +627,7 @@ public class HttpModule extends DModule {
     /**
      * 处理静态文件请求
      */
-    private static void handleStatic(HttpExchange exchange, String prefix, Path root)
+    private static void handleStatic(HttpExchange exchange, String prefix, Path root, Charset charset)
             throws IOException {
         try {
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())
@@ -605,7 +639,7 @@ public class HttpModule extends DModule {
             String relative = path.length() <= prefix.length() ? "" : path.substring(prefix.length());
             while (relative.startsWith("/"))
                 relative = relative.substring(1);
-            Path file = root.resolve(urlDecode(relative, StandardCharsets.UTF_8)).normalize();
+            Path file = root.resolve(urlDecode(relative, charset)).normalize();
             if (!file.startsWith(root) || !Files.isRegularFile(file)) {
                 sendHtml(exchange, 404, "<h1>404 Not Found</h1>HTTP静态文件不存在: " + path);
                 return;
@@ -805,7 +839,7 @@ public class HttpModule extends DModule {
     /**
      * 将表编码为URL查询字符串
      */
-    private static String buildQuery(DTable table) {
+    private static String buildQuery(DTable table, Charset charset) {
         StringJoiner joiner = new StringJoiner("&");
         for (DToken key : table.keys()) {
             if (!(key instanceof DString))
@@ -813,11 +847,9 @@ public class HttpModule extends DModule {
             DToken value = table.get(key);
             if (value instanceof DList) {
                 for (DToken item : ((DList) value).toList())
-                    joiner.add(urlEncode(key.toString(), StandardCharsets.UTF_8) + "="
-                            + urlEncode(item.toString(), StandardCharsets.UTF_8));
+                    joiner.add(urlEncode(key.toString(), charset) + "=" + urlEncode(item.toString(), charset));
             } else {
-                joiner.add(urlEncode(key.toString(), StandardCharsets.UTF_8) + "="
-                        + urlEncode(value.toString(), StandardCharsets.UTF_8));
+                joiner.add(urlEncode(key.toString(), charset) + "=" + urlEncode(value.toString(), charset));
             }
         }
         return joiner.toString();
