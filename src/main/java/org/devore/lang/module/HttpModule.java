@@ -48,6 +48,7 @@ import javax.net.ssl.SSLContext;
  */
 public class HttpModule extends DModule {
     private static final int DEFAULT_TIMEOUT = 30000;
+    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     /**
      * 创建Http模块实例
@@ -94,7 +95,7 @@ public class HttpModule extends DModule {
         dEnv.addTokenProcedure("http-url-encode", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
-            return DString.valueOf(urlEncode(args.get(0).toString(), StandardCharsets.UTF_8));
+            return DString.valueOf(urlEncode(args.get(0).toString(), DEFAULT_CHARSET));
         }, 1, false);
         dEnv.addTokenProcedure("http-url-encode", (args, env) -> {
             if (!(args.get(0) instanceof DString))
@@ -104,7 +105,7 @@ public class HttpModule extends DModule {
         dEnv.addTokenProcedure("http-url-decode", (args, env) -> {
             if (!(args.get(0) instanceof DString))
                 throw new DevoreCastException(args.get(0).type(), "string");
-            return DString.valueOf(urlDecode(args.get(0).toString(), StandardCharsets.UTF_8));
+            return DString.valueOf(urlDecode(args.get(0).toString(), DEFAULT_CHARSET));
         }, 1, false);
         dEnv.addTokenProcedure("http-url-decode", (args, env) -> {
             if (!(args.get(0) instanceof DString))
@@ -114,7 +115,7 @@ public class HttpModule extends DModule {
         dEnv.addTokenProcedure("http-build-query", (args, env) -> {
             if (!(args.get(0) instanceof DTable))
                 throw new DevoreCastException(args.get(0).type(), "table");
-            return DString.valueOf(buildQuery((DTable) args.get(0), StandardCharsets.UTF_8));
+            return DString.valueOf(buildQuery((DTable) args.get(0), DEFAULT_CHARSET));
         }, 1, false);
         dEnv.addTokenProcedure("http-build-query", (args, env) -> {
             if (!(args.get(0) instanceof DTable))
@@ -167,10 +168,17 @@ public class HttpModule extends DModule {
                 throw new DevoreRuntimeException("HTTPS监听失败: " + host + ":" + port + ", " + e.getMessage());
             }
         }, 4, false);
-        dEnv.addTokenProcedure("http-handler", (args, env) -> registerHandler(args, env, null), 3, false);
-        dEnv.addTokenProcedure("http-handler", (args, env) -> registerHandler(args, env, args.get(1)), 4, false);
+        dEnv.addTokenProcedure("http-handler", (args, env) -> registerHandler(args, env, null, DEFAULT_CHARSET),
+                3, false);
+        dEnv.addTokenProcedure("http-handler", (args, env) -> {
+            if (args.get(2) instanceof DProcedure)
+                return registerHandler(args, env, null, toCharset(args.get(3)));
+            return registerHandler(args, env, args.get(1), DEFAULT_CHARSET);
+        }, 4, false);
+        dEnv.addTokenProcedure("http-handler", (args, env) ->
+                registerHandler(args, env, args.get(1), toCharset(args.get(4))), 5, false);
         dEnv.addTokenProcedure("http-static", (args, env) ->
-                registerStatic(args, env, StandardCharsets.UTF_8), 3, false);
+                registerStatic(args, env, DEFAULT_CHARSET), 3, false);
         dEnv.addTokenProcedure("http-static", (args, env) ->
                 registerStatic(args, env, toCharset(args.get(3))), 4, false);
         dEnv.addTokenProcedure("http-start", (args, env) -> {
@@ -207,10 +215,19 @@ public class HttpModule extends DModule {
                         DEFAULT_TIMEOUT)), 3, false);
         dEnv.addTokenProcedure("http-request", (args, env) ->
                 toResponseTable(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                        toOptionalRequestBody(args.get(3)), DEFAULT_TIMEOUT)), 4, false);
+                        toOptionalRequestBody(args.get(3), requestCharset(toHeaders(args.get(2)))), DEFAULT_TIMEOUT)),
+                4, false);
+        dEnv.addTokenProcedure("http-request", (args, env) -> {
+            if (args.get(4) instanceof DString)
+                return toResponseTable(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                        toOptionalRequestBody(args.get(3), toCharset(args.get(4))), DEFAULT_TIMEOUT));
+            return toResponseTable(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                    toOptionalRequestBody(args.get(3), requestCharset(toHeaders(args.get(2)))),
+                    toTimeout(args.get(4))));
+        }, 5, false);
         dEnv.addTokenProcedure("http-request", (args, env) ->
                 toResponseTable(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                        toOptionalRequestBody(args.get(3)), toTimeout(args.get(4)))), 5, false);
+                        toOptionalRequestBody(args.get(3), toCharset(args.get(4))), toTimeout(args.get(5)))), 6, false);
         registerRequestResult(dEnv, "http-request-binary", true);
         registerRequestResult(dEnv, "http-request-string", false);
         dEnv.addTokenProcedure("http-get", (args, env) ->
@@ -269,12 +286,26 @@ public class HttpModule extends DModule {
             if (!(args.get(1) instanceof DString))
                 throw new DevoreCastException(args.get(1).type(), "string");
             DToken headers = request.get(DString.valueOf("headers"));
-            return headers instanceof DTable ? cookie((DTable) headers, args.get(1).toString()) : DWord.NIL;
+            return headers instanceof DTable ? cookie((DTable) headers, args.get(1).toString(), DEFAULT_CHARSET)
+                    : DWord.NIL;
         }, 2, false);
+        dEnv.addTokenProcedure("http-cookie", (args, env) -> {
+            DTable request = toTableToken(args.get(0));
+            if (!(args.get(1) instanceof DString))
+                throw new DevoreCastException(args.get(1).type(), "string");
+            DToken headers = request.get(DString.valueOf("headers"));
+            return headers instanceof DTable ? cookie((DTable) headers, args.get(1).toString(), toCharset(args.get(2)))
+                    : DWord.NIL;
+        }, 3, false);
         dEnv.addTokenProcedure("http-set-cookie", (args, env) -> setCookie(args.get(0), args.get(1), args.get(2),
-                null), 3, false);
+                null, DEFAULT_CHARSET), 3, false);
+        dEnv.addTokenProcedure("http-set-cookie", (args, env) -> {
+            if (args.get(3) instanceof DString)
+                return setCookie(args.get(0), args.get(1), args.get(2), null, toCharset(args.get(3)));
+            return setCookie(args.get(0), args.get(1), args.get(2), toTableToken(args.get(3)), DEFAULT_CHARSET);
+        }, 4, false);
         dEnv.addTokenProcedure("http-set-cookie", (args, env) -> setCookie(args.get(0), args.get(1), args.get(2),
-                toTableToken(args.get(3))), 4, false);
+                toTableToken(args.get(3)), toCharset(args.get(4))), 5, false);
     }
 
     /**
@@ -287,13 +318,27 @@ public class HttpModule extends DModule {
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(1) instanceof DTable)
                 return toResponseTable(requestToken(env, args.get(0), method, (DTable) args.get(1),
-                        toRequestBody(args.get(2)), DEFAULT_TIMEOUT));
+                        toRequestBody(args.get(2), requestCharset((DTable) args.get(1))), DEFAULT_TIMEOUT));
+            if (args.get(2) instanceof DString)
+                return toResponseTable(requestToken(env, args.get(0), method, null,
+                        toRequestBody(args.get(1), toCharset(args.get(2))), DEFAULT_TIMEOUT));
             return toResponseTable(requestToken(env, args.get(0), method, null, toRequestBody(args.get(1)),
                     toTimeout(args.get(2))));
         }, 3, false);
+        dEnv.addTokenProcedure(name, (args, env) -> {
+            if (args.get(1) instanceof DTable) {
+                if (args.get(3) instanceof DString)
+                    return toResponseTable(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
+                            toRequestBody(args.get(2), toCharset(args.get(3))), DEFAULT_TIMEOUT));
+                return toResponseTable(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
+                        toRequestBody(args.get(2), requestCharset(toHeaders(args.get(1)))), toTimeout(args.get(3))));
+            }
+            return toResponseTable(requestToken(env, args.get(0), method, null,
+                    toRequestBody(args.get(1), toCharset(args.get(2))), toTimeout(args.get(3))));
+        }, 4, false);
         dEnv.addTokenProcedure(name, (args, env) ->
                 toResponseTable(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
-                        toRequestBody(args.get(2)), toTimeout(args.get(3)))), 4, false);
+                        toRequestBody(args.get(2), toCharset(args.get(3))), toTimeout(args.get(4)))), 5, false);
     }
 
     /**
@@ -302,36 +347,51 @@ public class HttpModule extends DModule {
     private void registerRequestResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(requestToken(env, args.get(1), method(args.get(0)), null, null, DEFAULT_TIMEOUT), binary,
-                        StandardCharsets.UTF_8), 2, false);
+                        DEFAULT_CHARSET), 2, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (binary)
                 return responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)), null,
-                        DEFAULT_TIMEOUT), true, StandardCharsets.UTF_8);
+                        DEFAULT_TIMEOUT), true, DEFAULT_CHARSET);
             if (args.get(2) instanceof DString)
                 return responseBody(requestToken(env, args.get(1), method(args.get(0)), null, null, DEFAULT_TIMEOUT),
                         false, toCharset(args.get(2)));
             return responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)), null,
-                    DEFAULT_TIMEOUT), false, StandardCharsets.UTF_8);
+                    DEFAULT_TIMEOUT), false, DEFAULT_CHARSET);
         }, 3, false);
         dEnv.addTokenProcedure(name, (args, env) ->
                         responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                                toOptionalRequestBody(args.get(3)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8),
+                                toOptionalRequestBody(args.get(3), requestCharset(toHeaders(args.get(2)))),
+                                DEFAULT_TIMEOUT), binary, DEFAULT_CHARSET),
                 4, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
-            if (binary)
+            if (binary) {
+                if (args.get(4) instanceof DString)
+                    return responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                            toOptionalRequestBody(args.get(3), toCharset(args.get(4))), DEFAULT_TIMEOUT), true,
+                            DEFAULT_CHARSET);
                 return responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                        toOptionalRequestBody(args.get(3)), toTimeout(args.get(4))), true, StandardCharsets.UTF_8);
+                        toOptionalRequestBody(args.get(3), requestCharset(toHeaders(args.get(2)))),
+                        toTimeout(args.get(4))), true, DEFAULT_CHARSET);
+            }
             if (args.get(4) instanceof DInt)
                 return responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                        toOptionalRequestBody(args.get(3)), toTimeout(args.get(4))), false, StandardCharsets.UTF_8);
+                        toOptionalRequestBody(args.get(3), requestCharset(toHeaders(args.get(2)))),
+                        toTimeout(args.get(4))), false, DEFAULT_CHARSET);
             return responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                    toOptionalRequestBody(args.get(3)), DEFAULT_TIMEOUT), false, toCharset(args.get(4)));
+                    toOptionalRequestBody(args.get(3), toCharset(args.get(4))), DEFAULT_TIMEOUT), false,
+                    toCharset(args.get(4)));
         }, 5, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
                     responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
-                                    toOptionalRequestBody(args.get(3)), toTimeout(args.get(5))), false,
+                                    toOptionalRequestBody(args.get(3), toCharset(args.get(4))), toTimeout(args.get(5))),
+                            false,
                             toCharset(args.get(4))), 6, false);
+        } else {
+            dEnv.addTokenProcedure(name, (args, env) ->
+                    responseBody(requestToken(env, args.get(1), method(args.get(0)), toHeaders(args.get(2)),
+                                    toOptionalRequestBody(args.get(3), toCharset(args.get(4))), toTimeout(args.get(5))),
+                            true, DEFAULT_CHARSET), 6, false);
         }
     }
 
@@ -341,27 +401,27 @@ public class HttpModule extends DModule {
     private void registerNoBodyResult(Env dEnv, String name, String method, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(requestToken(env, args.get(0), method, null, null, DEFAULT_TIMEOUT), binary,
-                        StandardCharsets.UTF_8), 1, false);
+                        DEFAULT_CHARSET), 1, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (binary) {
                 RequestOptions options = headersOrTimeout(args.get(1));
                 return responseBody(requestToken(env, args.get(0), method, options.headers, null, options.timeout), true,
-                        StandardCharsets.UTF_8);
+                        DEFAULT_CHARSET);
             }
             if (args.get(1) instanceof DString)
                 return responseBody(requestToken(env, args.get(0), method, null, null, DEFAULT_TIMEOUT), false,
                         toCharset(args.get(1)));
             RequestOptions options = headersOrTimeout(args.get(1));
             return responseBody(requestToken(env, args.get(0), method, options.headers, null, options.timeout), false,
-                    StandardCharsets.UTF_8);
+                    DEFAULT_CHARSET);
         }, 2, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (binary)
                 return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)), null,
-                        toTimeout(args.get(2))), true, StandardCharsets.UTF_8);
+                        toTimeout(args.get(2))), true, DEFAULT_CHARSET);
             if (args.get(2) instanceof DInt)
                 return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)), null,
-                        toTimeout(args.get(2))), false, StandardCharsets.UTF_8);
+                        toTimeout(args.get(2))), false, DEFAULT_CHARSET);
             return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)), null, DEFAULT_TIMEOUT),
                     false, toCharset(args.get(2)));
         }, 3, false);
@@ -378,34 +438,61 @@ public class HttpModule extends DModule {
     private void registerBodyResult(Env dEnv, String name, String method, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(requestToken(env, args.get(0), method, null, toRequestBody(args.get(1)), DEFAULT_TIMEOUT),
-                        binary, StandardCharsets.UTF_8), 2, false);
+                        binary, DEFAULT_CHARSET), 2, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(1) instanceof DTable)
                 return responseBody(requestToken(env, args.get(0), method, (DTable) args.get(1),
-                        toRequestBody(args.get(2)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
-            if (binary)
+                        toRequestBody(args.get(2), requestCharset((DTable) args.get(1))), DEFAULT_TIMEOUT), binary,
+                        DEFAULT_CHARSET);
+            if (binary) {
+                if (args.get(2) instanceof DString)
+                    return responseBody(requestToken(env, args.get(0), method, null,
+                            toRequestBody(args.get(1), toCharset(args.get(2))), DEFAULT_TIMEOUT), true,
+                            DEFAULT_CHARSET);
                 return responseBody(requestToken(env, args.get(0), method, null, toRequestBody(args.get(1)),
-                        toTimeout(args.get(2))), true, StandardCharsets.UTF_8);
+                        toTimeout(args.get(2))), true, DEFAULT_CHARSET);
+            }
             if (args.get(2) instanceof DInt)
                 return responseBody(requestToken(env, args.get(0), method, null, toRequestBody(args.get(1)),
-                        toTimeout(args.get(2))), false, StandardCharsets.UTF_8);
-            return responseBody(requestToken(env, args.get(0), method, null, toRequestBody(args.get(1)),
+                        toTimeout(args.get(2))), false, DEFAULT_CHARSET);
+            return responseBody(requestToken(env, args.get(0), method, null,
+                    toRequestBody(args.get(1), toCharset(args.get(2))),
                     DEFAULT_TIMEOUT), false, toCharset(args.get(2)));
         }, 3, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
-            if (binary)
+            if (args.get(1) instanceof DTable) {
+                if (binary) {
+                    if (args.get(3) instanceof DString)
+                        return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
+                                toRequestBody(args.get(2), toCharset(args.get(3))), DEFAULT_TIMEOUT), true,
+                                DEFAULT_CHARSET);
+                    return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
+                            toRequestBody(args.get(2), requestCharset(toHeaders(args.get(1)))),
+                            toTimeout(args.get(3))), true, DEFAULT_CHARSET);
+                }
+                if (args.get(3) instanceof DInt)
+                    return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
+                            toRequestBody(args.get(2), requestCharset(toHeaders(args.get(1)))),
+                            toTimeout(args.get(3))), false, DEFAULT_CHARSET);
                 return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
-                        toRequestBody(args.get(2)), toTimeout(args.get(3))), true, StandardCharsets.UTF_8);
-            if (args.get(3) instanceof DInt)
-                return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
-                        toRequestBody(args.get(2)), toTimeout(args.get(3))), false, StandardCharsets.UTF_8);
-            return responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
-                    toRequestBody(args.get(2)), DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
+                        toRequestBody(args.get(2), toCharset(args.get(3))), DEFAULT_TIMEOUT), false,
+                        toCharset(args.get(3)));
+            }
+            return responseBody(requestToken(env, args.get(0), method, null,
+                    toRequestBody(args.get(1), toCharset(args.get(2))), toTimeout(args.get(3))), binary,
+                    binary ? DEFAULT_CHARSET : toCharset(args.get(2)));
         }, 4, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
                             responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
-                                    toRequestBody(args.get(2)), toTimeout(args.get(4))), false, toCharset(args.get(3))),
+                                    toRequestBody(args.get(2), toCharset(args.get(3))), toTimeout(args.get(4))),
+                                    false, toCharset(args.get(3))),
+                    5, false);
+        } else {
+            dEnv.addTokenProcedure(name, (args, env) ->
+                            responseBody(requestToken(env, args.get(0), method, toHeaders(args.get(1)),
+                                    toRequestBody(args.get(2), toCharset(args.get(3))), toTimeout(args.get(4))),
+                                    true, DEFAULT_CHARSET),
                     5, false);
         }
     }
@@ -415,22 +502,23 @@ public class HttpModule extends DModule {
      */
     private void registerPostForm(Env dEnv) {
         dEnv.addTokenProcedure("http-post-form", (args, env) ->
-                toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)), StandardCharsets.UTF_8,
+                toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)), DEFAULT_CHARSET,
                         DEFAULT_TIMEOUT)), 2, false);
         dEnv.addTokenProcedure("http-post-form", (args, env) -> {
             if (args.get(2) instanceof DInt)
                 return toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)),
-                        StandardCharsets.UTF_8, toTimeout(args.get(2))));
+                        DEFAULT_CHARSET, toTimeout(args.get(2))));
             if (args.get(2) instanceof DString)
                 return toResponseTable(postForm(env, args.get(0), null, toTableToken(args.get(1)),
                         toCharset(args.get(2)), DEFAULT_TIMEOUT));
-            return toResponseTable(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    StandardCharsets.UTF_8, DEFAULT_TIMEOUT));
+            DTable headers = toHeaders(args.get(1));
+            return toResponseTable(postForm(env, args.get(0), headers, toTableToken(args.get(2)),
+                    requestCharset(headers), DEFAULT_TIMEOUT));
         }, 3, false);
         dEnv.addTokenProcedure("http-post-form", (args, env) -> {
             if (args.get(3) instanceof DInt)
                 return toResponseTable(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        StandardCharsets.UTF_8, toTimeout(args.get(3))));
+                        requestCharset(toHeaders(args.get(1))), toTimeout(args.get(3))));
             return toResponseTable(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
                     toCharset(args.get(3)), DEFAULT_TIMEOUT));
         }, 4, false);
@@ -444,36 +532,37 @@ public class HttpModule extends DModule {
      */
     private void registerPostFormResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
-                responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), StandardCharsets.UTF_8,
-                        DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8), 2, false);
+                responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), DEFAULT_CHARSET,
+                        DEFAULT_TIMEOUT), binary, DEFAULT_CHARSET), 2, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(2) instanceof DInt)
-                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), StandardCharsets.UTF_8,
-                        toTimeout(args.get(2))), binary, StandardCharsets.UTF_8);
+                return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), DEFAULT_CHARSET,
+                        toTimeout(args.get(2))), binary, DEFAULT_CHARSET);
             if (!binary && args.get(2) instanceof DString)
                 return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toCharset(args.get(2)),
                         DEFAULT_TIMEOUT), false, toCharset(args.get(2)));
             if (binary && args.get(2) instanceof DString)
                 return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toCharset(args.get(2)),
-                        DEFAULT_TIMEOUT), true, StandardCharsets.UTF_8);
-            return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    StandardCharsets.UTF_8, DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
+                        DEFAULT_TIMEOUT), true, DEFAULT_CHARSET);
+            DTable headers = toHeaders(args.get(1));
+            return responseBody(postForm(env, args.get(0), headers, toTableToken(args.get(2)),
+                    requestCharset(headers), DEFAULT_TIMEOUT), binary, DEFAULT_CHARSET);
         }, 3, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(2) instanceof DString && args.get(3) instanceof DInt) {
                 return responseBody(postForm(env, args.get(0), null, toTableToken(args.get(1)), toCharset(args.get(2)),
-                        toTimeout(args.get(3))), binary, binary ? StandardCharsets.UTF_8 : toCharset(args.get(2)));
+                        toTimeout(args.get(3))), binary, binary ? DEFAULT_CHARSET : toCharset(args.get(2)));
             }
             if (binary) {
                 if (args.get(3) instanceof DString)
                     return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                            toCharset(args.get(3)), DEFAULT_TIMEOUT), true, StandardCharsets.UTF_8);
+                            toCharset(args.get(3)), DEFAULT_TIMEOUT), true, DEFAULT_CHARSET);
                 return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        StandardCharsets.UTF_8, toTimeout(args.get(3))), true, StandardCharsets.UTF_8);
+                        requestCharset(toHeaders(args.get(1))), toTimeout(args.get(3))), true, DEFAULT_CHARSET);
             }
             if (args.get(3) instanceof DInt)
                 return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        StandardCharsets.UTF_8, toTimeout(args.get(3))), false, StandardCharsets.UTF_8);
+                        requestCharset(toHeaders(args.get(1))), toTimeout(args.get(3))), false, DEFAULT_CHARSET);
             return responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
                     toCharset(args.get(3)), DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
         }, 4, false);
@@ -484,7 +573,7 @@ public class HttpModule extends DModule {
         } else {
             dEnv.addTokenProcedure(name, (args, env) ->
                     responseBody(postForm(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                            toCharset(args.get(3)), toTimeout(args.get(4))), true, StandardCharsets.UTF_8), 5, false);
+                            toCharset(args.get(3)), toTimeout(args.get(4))), true, DEFAULT_CHARSET), 5, false);
         }
     }
 
@@ -494,17 +583,31 @@ public class HttpModule extends DModule {
     private void registerPostMultipart(Env dEnv) {
         dEnv.addTokenProcedure("http-post-multipart", (args, env) ->
                 toResponseTable(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
-                        toTableToken(args.get(2)), DEFAULT_TIMEOUT)), 3, false);
+                        toTableToken(args.get(2)), DEFAULT_CHARSET, DEFAULT_TIMEOUT)), 3, false);
         dEnv.addTokenProcedure("http-post-multipart", (args, env) -> {
             if (args.get(3) instanceof DInt)
                 return toResponseTable(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
-                        toTableToken(args.get(2)), toTimeout(args.get(3))));
-            return toResponseTable(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    toTableToken(args.get(3)), DEFAULT_TIMEOUT));
+                        toTableToken(args.get(2)), DEFAULT_CHARSET, toTimeout(args.get(3))));
+            if (args.get(3) instanceof DString)
+                return toResponseTable(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), toCharset(args.get(3)), DEFAULT_TIMEOUT));
+            DTable headers = toHeaders(args.get(1));
+            return toResponseTable(postMultipart(env, args.get(0), headers, toTableToken(args.get(2)),
+                    toTableToken(args.get(3)), requestCharset(headers), DEFAULT_TIMEOUT));
         }, 4, false);
+        dEnv.addTokenProcedure("http-post-multipart", (args, env) -> {
+            if (args.get(3) instanceof DString && args.get(4) instanceof DInt)
+                return toResponseTable(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), toCharset(args.get(3)), toTimeout(args.get(4))));
+            if (args.get(4) instanceof DInt)
+                return toResponseTable(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                        toTableToken(args.get(3)), requestCharset(toHeaders(args.get(1))), toTimeout(args.get(4))));
+            return toResponseTable(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                    toTableToken(args.get(3)), toCharset(args.get(4)), DEFAULT_TIMEOUT));
+        }, 5, false);
         dEnv.addTokenProcedure("http-post-multipart", (args, env) ->
                 toResponseTable(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        toTableToken(args.get(3)), toTimeout(args.get(4)))), 5, false);
+                        toTableToken(args.get(3)), toCharset(args.get(4)), toTimeout(args.get(5)))), 6, false);
     }
 
     /**
@@ -513,37 +616,57 @@ public class HttpModule extends DModule {
     private void registerPostMultipartResult(Env dEnv, String name, boolean binary) {
         dEnv.addTokenProcedure(name, (args, env) ->
                 responseBody(postMultipart(env, args.get(0), null, toTableToken(args.get(1)), toTableToken(args.get(2)),
-                        DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8), 3, false);
+                        DEFAULT_CHARSET, DEFAULT_TIMEOUT), binary, DEFAULT_CHARSET), 3, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(3) instanceof DInt)
                 return responseBody(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
-                        toTableToken(args.get(2)), toTimeout(args.get(3))), binary, StandardCharsets.UTF_8);
+                        toTableToken(args.get(2)), DEFAULT_CHARSET, toTimeout(args.get(3))), binary,
+                        DEFAULT_CHARSET);
             if (!binary && args.get(3) instanceof DString)
                 return responseBody(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
-                        toTableToken(args.get(2)), DEFAULT_TIMEOUT), false, toCharset(args.get(3)));
-            return responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    toTableToken(args.get(3)), DEFAULT_TIMEOUT), binary, StandardCharsets.UTF_8);
+                        toTableToken(args.get(2)), toCharset(args.get(3)), DEFAULT_TIMEOUT), false,
+                        toCharset(args.get(3)));
+            if (binary && args.get(3) instanceof DString)
+                return responseBody(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
+                        toTableToken(args.get(2)), toCharset(args.get(3)), DEFAULT_TIMEOUT), true,
+                        DEFAULT_CHARSET);
+            DTable headers = toHeaders(args.get(1));
+            return responseBody(postMultipart(env, args.get(0), headers, toTableToken(args.get(2)),
+                    toTableToken(args.get(3)), requestCharset(headers), DEFAULT_TIMEOUT), binary, DEFAULT_CHARSET);
         }, 4, false);
         dEnv.addTokenProcedure(name, (args, env) -> {
             if (args.get(3) instanceof DString && args.get(4) instanceof DInt) {
-                if (binary)
-                    throw new DevoreCastException(args.get(3).type(), "table");
                 return responseBody(postMultipart(env, args.get(0), null, toTableToken(args.get(1)),
-                        toTableToken(args.get(2)), toTimeout(args.get(4))), false, toCharset(args.get(3)));
+                        toTableToken(args.get(2)), toCharset(args.get(3)), toTimeout(args.get(4))), binary,
+                        binary ? DEFAULT_CHARSET : toCharset(args.get(3)));
             }
-            if (binary)
+            if (binary) {
+                if (args.get(4) instanceof DString)
+                    return responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                            toTableToken(args.get(3)), toCharset(args.get(4)), DEFAULT_TIMEOUT), true,
+                            DEFAULT_CHARSET);
                 return responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        toTableToken(args.get(3)), toTimeout(args.get(4))), true, StandardCharsets.UTF_8);
+                        toTableToken(args.get(3)), requestCharset(toHeaders(args.get(1))), toTimeout(args.get(4))), true,
+                        DEFAULT_CHARSET);
+            }
             if (args.get(4) instanceof DInt)
                 return responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                        toTableToken(args.get(3)), toTimeout(args.get(4))), false, StandardCharsets.UTF_8);
+                        toTableToken(args.get(3)), requestCharset(toHeaders(args.get(1))), toTimeout(args.get(4))), false,
+                        DEFAULT_CHARSET);
             return responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                    toTableToken(args.get(3)), DEFAULT_TIMEOUT), false, toCharset(args.get(4)));
+                    toTableToken(args.get(3)), toCharset(args.get(4)), DEFAULT_TIMEOUT), false, toCharset(args.get(4)));
         }, 5, false);
         if (!binary) {
             dEnv.addTokenProcedure(name, (args, env) ->
                             responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
-                                    toTableToken(args.get(3)), toTimeout(args.get(5))), false, toCharset(args.get(4))),
+                                    toTableToken(args.get(3)), toCharset(args.get(4)), toTimeout(args.get(5))), false,
+                                    toCharset(args.get(4))),
+                    6, false);
+        } else {
+            dEnv.addTokenProcedure(name, (args, env) ->
+                            responseBody(postMultipart(env, args.get(0), toHeaders(args.get(1)), toTableToken(args.get(2)),
+                                    toTableToken(args.get(3)), toCharset(args.get(4)), toTimeout(args.get(5))), true,
+                                    DEFAULT_CHARSET),
                     6, false);
         }
     }
@@ -559,9 +682,10 @@ public class HttpModule extends DModule {
     /**
      * 构造并发送multipart/form-data请求
      */
-    private static Response postMultipart(Env env, DToken url, DTable headers, DTable fields, DTable files, int timeout) {
+    private static Response postMultipart(Env env, DToken url, DTable headers, DTable fields, DTable files,
+                                          Charset charset, int timeout) {
         DSecurity.checkRestrictNet(env);
-        MultipartBody body = multipart(env, fields, files);
+        MultipartBody body = multipart(env, fields, files, charset);
         DTable requestHeaders = contentType(headers, "multipart/form-data; boundary=" + body.boundary);
         return requestToken(url, "POST", requestHeaders, body.body, timeout);
     }
@@ -569,7 +693,7 @@ public class HttpModule extends DModule {
     /**
      * 注册HTTP路由处理器
      */
-    private static DToken registerHandler(List<DToken> args, Env env, DToken methodToken) {
+    private static DToken registerHandler(List<DToken> args, Env env, DToken methodToken, Charset charset) {
         DSecurity.checkRestrictNet(env);
         DHttpServer server = toServer(args.get(0));
         String method = methodToken == null ? null : method(methodToken);
@@ -581,7 +705,7 @@ public class HttpModule extends DModule {
         DProcedure handler = (DProcedure) args.get(handlerIndex);
         try {
             server.toHttpServer().createContext(contextPath(pattern), exchange ->
-                    handleExchange(exchange, method, pattern, handler, env.createChild()));
+                    handleExchange(exchange, method, pattern, handler, env.createChild(), charset));
             return DWord.NIL;
         } catch (IllegalArgumentException e) {
             throw new DevoreRuntimeException("HTTP路由注册失败: " + pattern + ", " + e.getMessage());
@@ -604,18 +728,19 @@ public class HttpModule extends DModule {
     }
 
     private static void handleExchange(HttpExchange exchange, String method, String pattern,
-                                       DProcedure handler, Env env) throws IOException {
+                                       DProcedure handler, Env env, Charset charset) throws IOException {
         try {
             if (method != null && !method.equalsIgnoreCase(exchange.getRequestMethod())) {
                 sendHtml(exchange, 405, "<h1>405 Method Not Allowed</h1>\nHTTP方法不允许: " + exchange.getRequestMethod());
                 return;
             }
-            Map<DToken, DToken> params = matchPath(pattern, exchange.getRequestURI().getPath());
+            Map<DToken, DToken> params = matchPath(pattern, exchange.getRequestURI().getPath(), charset);
             if (params == null) {
                 sendHtml(exchange, 404, "<h1>404 Not Found</h1>HTTP路由不存在: " + exchange.getRequestURI().getPath());
                 return;
             }
-            DToken response = handler.call(Collections.singletonList(toRequest(exchange, params)), env.createChild());
+            DToken response = handler.call(Collections.singletonList(toRequest(exchange, params, charset)),
+                    env.createChild());
             sendResponse(exchange, response);
         } catch (Throwable e) {
             sendHtml(exchange, 500, "<h1>500 Internal Server Error</h1>\n" + message(e));
@@ -664,12 +789,13 @@ public class HttpModule extends DModule {
     /**
      * 将HTTP交换对象转换为请求表
      */
-    private static DTable toRequest(HttpExchange exchange, Map<DToken, DToken> params) throws IOException {
+    private static DTable toRequest(HttpExchange exchange, Map<DToken, DToken> params, Charset charset)
+            throws IOException {
         Map<DToken, DToken> request = new HashMap<>();
         request.put(DString.valueOf("method"), DString.valueOf(exchange.getRequestMethod()));
         request.put(DString.valueOf("path"), DString.valueOf(exchange.getRequestURI().getPath()));
         request.put(DString.valueOf("params"), DTable.valueOf(params));
-        request.put(DString.valueOf("query"), queryToTable(exchange.getRequestURI().getRawQuery()));
+        request.put(DString.valueOf("query"), queryToTable(exchange.getRequestURI().getRawQuery(), charset));
         request.put(DString.valueOf("headers"), toTable(exchange.getRequestHeaders()));
         request.put(DString.valueOf("body"), DByteUtils.toList(readAll(exchange.getRequestBody())));
         request.put(DString.valueOf("remote-host"), DString.valueOf(exchange.getRemoteAddress().getHostString()));
@@ -677,7 +803,7 @@ public class HttpModule extends DModule {
         return DTable.valueOf(request);
     }
 
-    private static Map<DToken, DToken> matchPath(String pattern, String path) {
+    private static Map<DToken, DToken> matchPath(String pattern, String path, Charset charset) {
         List<String> patternParts = pathParts(pattern);
         List<String> pathParts = pathParts(path);
         if (patternParts.size() != pathParts.size())
@@ -690,7 +816,7 @@ public class HttpModule extends DModule {
                 if (patternPart.length() == 1)
                     throw new DevoreRuntimeException("HTTP路径参数名不能为空: " + pattern);
                 params.put(DString.valueOf(patternPart.substring(1)),
-                        DString.valueOf(urlDecode(pathPart, StandardCharsets.UTF_8)));
+                        DString.valueOf(urlDecode(pathPart, charset)));
             } else if (!patternPart.equals(pathPart)) {
                 return null;
             }
@@ -858,7 +984,7 @@ public class HttpModule extends DModule {
     /**
      * 构造multipart请求体
      */
-    private static MultipartBody multipart(Env env, DTable fields, DTable files) {
+    private static MultipartBody multipart(Env env, DTable fields, DTable files, Charset charset) {
         String boundary = "----DevoreBoundary" + Long.toHexString(System.nanoTime());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
@@ -867,13 +993,13 @@ public class HttpModule extends DModule {
                     throw new DevoreCastException(key.type(), "string");
                 writeAscii(out, "--" + boundary + "\r\n");
                 writeAscii(out, "Content-Disposition: form-data; name=\"" + escapeQuote(key.toString()) + "\"\r\n\r\n");
-                out.write(fields.get(key).toString().getBytes(StandardCharsets.UTF_8));
+                out.write(fields.get(key).toString().getBytes(charset));
                 writeAscii(out, "\r\n");
             }
             for (DToken key : files.keys()) {
                 if (!(key instanceof DString))
                     throw new DevoreCastException(key.type(), "string");
-                FilePart part = toFilePart(env, files.get(key));
+                FilePart part = toFilePart(env, files.get(key), charset);
                 writeAscii(out, "--" + boundary + "\r\n");
                 writeAscii(out, "Content-Disposition: form-data; name=\"" + escapeQuote(key.toString())
                         + "\"; filename=\"" + escapeQuote(part.filename) + "\"\r\n");
@@ -891,7 +1017,7 @@ public class HttpModule extends DModule {
     /**
      * 将文件参数转换为multipart文件段
      */
-    private static FilePart toFilePart(Env env, DToken token) throws IOException {
+    private static FilePart toFilePart(Env env, DToken token, Charset charset) throws IOException {
         if (token instanceof DString) {
             DSecurity.checkRestrictFile(env);
             Path path = Paths.get(token.toString());
@@ -907,7 +1033,8 @@ public class HttpModule extends DModule {
             if (!(filename instanceof DString))
                 throw new DevoreCastException(filename.type(), "string");
             return new FilePart(filename.toString(),
-                    type instanceof DString ? type.toString() : "application/octet-stream", toRequestBody(body));
+                    type instanceof DString ? type.toString() : "application/octet-stream",
+                    toRequestBody(body, charset));
         }
         throw new DevoreCastException(token.type(), "string|table");
     }
@@ -944,7 +1071,8 @@ public class HttpModule extends DModule {
     /**
      * 向响应表写入Set-Cookie头
      */
-    private static DToken setCookie(DToken responseToken, DToken nameToken, DToken valueToken, DTable options) {
+    private static DToken setCookie(DToken responseToken, DToken nameToken, DToken valueToken, DTable options,
+                                    Charset charset) {
         if (!(nameToken instanceof DString))
             throw new DevoreCastException(nameToken.type(), "string");
         if (!(valueToken instanceof DString))
@@ -962,7 +1090,7 @@ public class HttpModule extends DModule {
         DTable headers = response.get(DString.valueOf("headers")) instanceof DTable
                 ? (DTable) response.get(DString.valueOf("headers")) : DTable.valueOf(new HashMap<>());
         StringBuilder cookie = new StringBuilder(nameToken.toString()).append("=")
-                .append(urlEncode(valueToken.toString(), StandardCharsets.UTF_8));
+                .append(urlEncode(valueToken.toString(), charset));
         if (options != null) {
             for (DToken key : options.keys()) {
                 if (!(key instanceof DString))
@@ -990,7 +1118,7 @@ public class HttpModule extends DModule {
     /**
      * 从请求头中读取指定Cookie值
      */
-    private static DToken cookie(DTable headers, String name) {
+    private static DToken cookie(DTable headers, String name, Charset charset) {
         DToken cookieHeader = getHeader(headers, "Cookie");
         if (!(cookieHeader instanceof DString))
             return DWord.NIL;
@@ -1000,7 +1128,7 @@ public class HttpModule extends DModule {
                 continue;
             String key = part.substring(0, index).trim();
             if (key.equals(name))
-                return DString.valueOf(urlDecode(part.substring(index + 1).trim(), StandardCharsets.UTF_8));
+                return DString.valueOf(urlDecode(part.substring(index + 1).trim(), charset));
         }
         return DWord.NIL;
     }
@@ -1019,7 +1147,7 @@ public class HttpModule extends DModule {
     /**
      * 将URL查询字符串解析为表
      */
-    private static DTable queryToTable(String rawQuery) {
+    private static DTable queryToTable(String rawQuery, Charset charset) {
         Map<DToken, DToken> query = new HashMap<>();
         if (rawQuery == null || rawQuery.isEmpty())
             return DTable.valueOf(query);
@@ -1029,8 +1157,7 @@ public class HttpModule extends DModule {
             int index = pair.indexOf('=');
             String key = index < 0 ? pair : pair.substring(0, index);
             String value = index < 0 ? "" : pair.substring(index + 1);
-            query.put(DString.valueOf(urlDecode(key, StandardCharsets.UTF_8)),
-                    DString.valueOf(urlDecode(value, StandardCharsets.UTF_8)));
+            query.put(DString.valueOf(urlDecode(key, charset)), DString.valueOf(urlDecode(value, charset)));
         }
         return DTable.valueOf(query);
     }
@@ -1071,11 +1198,29 @@ public class HttpModule extends DModule {
         }
         if (headers != DWord.NIL)
             setResponseHeaders(exchange, headers);
-        byte[] bodyBytes = toBodyBytes(body);
+        byte[] bodyBytes = toBodyBytes(body, responseCharset(headers));
         exchange.sendResponseHeaders(status, bodyBytes.length);
         try (OutputStream output = exchange.getResponseBody()) {
             output.write(bodyBytes);
         }
+    }
+
+    private static Charset responseCharset(DToken headers) {
+        if (!(headers instanceof DTable))
+            return DEFAULT_CHARSET;
+        DToken contentType = getHeader((DTable) headers, "Content-Type");
+        if (!(contentType instanceof DString))
+            return DEFAULT_CHARSET;
+        return charsetFromContentType(contentType.toString());
+    }
+
+    private static Charset requestCharset(DTable headers) {
+        if (headers == null)
+            return DEFAULT_CHARSET;
+        DToken contentType = getHeader(headers, "Content-Type");
+        if (!(contentType instanceof DString))
+            return DEFAULT_CHARSET;
+        return charsetFromContentType(contentType.toString());
     }
 
     /**
@@ -1099,8 +1244,8 @@ public class HttpModule extends DModule {
      * 发送Html的HTTP响应
      */
     private static void sendHtml(HttpExchange exchange, int status, String message) throws IOException {
-        byte[] body = message.getBytes(StandardCharsets.UTF_8);
-        exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+        byte[] body = message.getBytes(DEFAULT_CHARSET);
+        exchange.getResponseHeaders().set("Content-Type", "text/html; charset=" + DEFAULT_CHARSET.name());
         exchange.sendResponseHeaders(status, body.length);
         try (OutputStream output = exchange.getResponseBody()) {
             output.write(body);
@@ -1172,23 +1317,24 @@ public class HttpModule extends DModule {
         return (DTable) token;
     }
 
-    /**
-     * 读取可选HTTP请求体参数
-     */
-    private static byte[] toOptionalRequestBody(DToken body) {
-        return body == DWord.NIL ? null : toRequestBody(body);
+    private static byte[] toOptionalRequestBody(DToken body, Charset charset) {
+        return body == DWord.NIL ? null : toRequestBody(body, charset);
     }
 
     /**
      * 校验并转换HTTP请求体参数
      */
     private static byte[] toRequestBody(DToken body) {
+        return toRequestBody(body, DEFAULT_CHARSET);
+    }
+
+    private static byte[] toRequestBody(DToken body, Charset charset) {
         if (body == DWord.NIL)
             return new byte[0];
         if (body instanceof DList)
             return DByteUtils.toBytes((DList) body);
         if (body instanceof DString)
-            return body.toString().getBytes(StandardCharsets.UTF_8);
+            return body.toString().getBytes(charset);
         throw new DevoreCastException(body.type(), "string|list");
     }
 
@@ -1203,6 +1349,24 @@ public class HttpModule extends DModule {
         } catch (RuntimeException e) {
             throw new DevoreRuntimeException("字符集不存在: " + token);
         }
+    }
+
+    private static Charset charsetFromContentType(String contentType) {
+        for (String part : contentType.split(";")) {
+            String value = part.trim();
+            int index = value.indexOf('=');
+            if (index < 0 || !"charset".equalsIgnoreCase(value.substring(0, index).trim()))
+                continue;
+            String charset = value.substring(index + 1).trim();
+            if (charset.length() >= 2 && charset.startsWith("\"") && charset.endsWith("\""))
+                charset = charset.substring(1, charset.length() - 1);
+            try {
+                return Charset.forName(charset);
+            } catch (RuntimeException e) {
+                throw new DevoreRuntimeException("字符集不存在: " + charset);
+            }
+        }
+        return HttpModule.DEFAULT_CHARSET;
     }
 
     /**
@@ -1276,14 +1440,14 @@ public class HttpModule extends DModule {
     /**
      * 将字符串或二进制列表转换为响应体字节
      */
-    private static byte[] toBodyBytes(DToken body) {
+    private static byte[] toBodyBytes(DToken body, Charset charset) {
         if (body == DWord.NIL)
             return new byte[0];
         if (body instanceof DList)
             return DByteUtils.toBytes((DList) body);
         if (body instanceof DString)
-            return body.toString().getBytes(StandardCharsets.UTF_8);
-        return body.toString().getBytes(StandardCharsets.UTF_8);
+            return body.toString().getBytes(charset);
+        return body.toString().getBytes(charset);
     }
 
     /**
