@@ -69,16 +69,25 @@ public class DSecurity {
     }
 
     /**
+     * 检查当前环境是否禁止相关操作
+     *
+     * @param env 环境
+     */
+    public static void checkRestrictThread(Env env, Restriction restriction) {
+        Env temp = env;
+        while (temp != null && (temp.security == null || !temp.security.contains(restriction)))
+            temp = temp.father;
+        if (temp != null)
+            throw new DevoreRuntimeException("当前环境禁止<"  + restriction.toString() + ">操作.");
+    }
+
+    /**
      * 检查当前环境是否禁止并发操作
      *
      * @param env 环境
      */
     public static void checkRestrictThread(Env env) {
-        Env temp = env;
-        while (temp != null && (temp.security == null || !temp.security.contains(Restriction.THREAD)))
-            temp = temp.father;
-        if (temp != null)
-            throw new DevoreRuntimeException("当前环境禁止<Thread>操作.");
+        checkRestrictThread(env, Restriction.THREAD);
     }
 
     /**
@@ -87,11 +96,7 @@ public class DSecurity {
      * @param env 环境
      */
     public static void checkRestrictFile(Env env) {
-        Env temp = env;
-        while (temp != null && (temp.security == null || !temp.security.contains(Restriction.FILE)))
-            temp = temp.father;
-        if (temp != null)
-            throw new DevoreRuntimeException("当前环境禁止<File>操作.");
+        checkRestrictThread(env, Restriction.FILE);
     }
 
     /**
@@ -100,12 +105,7 @@ public class DSecurity {
      * @param env 环境
      */
     public static void checkRestrictExec(Env env) {
-        Env temp = env;
-        while (temp != null && (temp.security == null
-                || !temp.security.contains(Restriction.EXEC)))
-            temp = temp.father;
-        if (temp != null)
-            throw new DevoreRuntimeException("当前环境禁止<Exec>操作.");
+        checkRestrictThread(env, Restriction.EXEC);
     }
 
     /**
@@ -114,12 +114,7 @@ public class DSecurity {
      * @param env 环境
      */
     public static void checkRestrictSecurity(Env env) {
-        Env temp = env;
-        while (temp != null && (temp.security == null
-                || !temp.security.contains(Restriction.SECURITY)))
-            temp = temp.father;
-        if (temp != null)
-            throw new DevoreRuntimeException("当前环境禁止<Security>操作.");
+        checkRestrictThread(env, Restriction.SECURITY);
     }
 
     /**
