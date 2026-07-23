@@ -2,6 +2,7 @@ package org.devore.lang.module;
 
 import org.devore.exception.DevoreCastException;
 import org.devore.exception.DevoreRuntimeException;
+import org.devore.lang.DSecurity;
 import org.devore.lang.Env;
 import org.devore.lang.Evaluator;
 import org.devore.lang.token.*;
@@ -39,6 +40,7 @@ public class ThreadModule extends DModule {
      */
     private void initThreadProcedures(Env dEnv) {
         dEnv.addAstProcedure("thread", (ast, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             Env threadEnv = env.createChild();
             List<Ast> bodies = ast.children.stream()
                     .map(Ast::copy)
@@ -49,6 +51,7 @@ public class ThreadModule extends DModule {
                     .orElse(DWord.NIL));
         }, 1, true);
         dEnv.addTokenProcedure("thread-start", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             args.forEach((arg) -> {
                 if (!(arg instanceof DThread))
                     throw new DevoreCastException(arg.type(), "thread");
@@ -57,6 +60,7 @@ public class ThreadModule extends DModule {
             return DWord.NIL;
         }, 1, true);
         dEnv.addTokenProcedure("join", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DThread))
                 throw new DevoreCastException(args.get(0).type(), "thread");
             DThread thread = (DThread) args.get(0);
@@ -69,6 +73,7 @@ public class ThreadModule extends DModule {
             return thread.result();
         }, 1, false);
         dEnv.addTokenProcedure("join", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DThread))
                 throw new DevoreCastException(args.get(0).type(), "thread");
             if (!(args.get(1) instanceof DInt))
@@ -83,11 +88,13 @@ public class ThreadModule extends DModule {
             return thread.toThread().isAlive() ? DWord.NIL : thread.result();
         }, 2, false);
         dEnv.addTokenProcedure("thread-alive?", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DThread))
                 throw new DevoreCastException(args.get(0).type(), "thread");
             return DBool.valueOf(((DThread) args.get(0)).toThread().isAlive());
         }, 1, false);
         dEnv.addTokenProcedure("thread-interrupt!", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DThread))
                 throw new DevoreCastException(args.get(0).type(), "thread");
             ((DThread) args.get(0)).toThread().interrupt();
@@ -101,14 +108,19 @@ public class ThreadModule extends DModule {
      * 注册锁创建、加锁、解锁、尝试加锁和作用域加锁过程
      */
     private void initLockProcedures(Env dEnv) {
-        dEnv.addTokenProcedure("lock", (args, env) -> DLock.newLock(), 0, false);
+        dEnv.addTokenProcedure("lock", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
+            return DLock.newLock();
+        }, 0, false);
         dEnv.addTokenProcedure("lock!", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DLock))
                 throw new DevoreCastException(args.get(0).type(), "lock");
             ((DLock) args.get(0)).toReentrantLock().lock();
             return DWord.NIL;
         }, 1, false);
         dEnv.addTokenProcedure("unlock!", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DLock))
                 throw new DevoreCastException(args.get(0).type(), "lock");
             ReentrantLock lock = ((DLock) args.get(0)).toReentrantLock();
@@ -118,11 +130,13 @@ public class ThreadModule extends DModule {
             return DWord.NIL;
         }, 1, false);
         dEnv.addTokenProcedure("try-lock!", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DLock))
                 throw new DevoreCastException(args.get(0).type(), "lock");
             return DBool.valueOf(((DLock) args.get(0)).toReentrantLock().tryLock());
         }, 1, false);
         dEnv.addTokenProcedure("try-lock!", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DLock))
                 throw new DevoreCastException(args.get(0).type(), "lock");
             if (!(args.get(1) instanceof DInt))
@@ -136,16 +150,19 @@ public class ThreadModule extends DModule {
             }
         }, 2, false);
         dEnv.addTokenProcedure("locked?", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DLock))
                 throw new DevoreCastException(args.get(0).type(), "lock");
             return DBool.valueOf(((DLock) args.get(0)).toReentrantLock().isLocked());
         }, 1, false);
         dEnv.addTokenProcedure("held-by-current-thread?", (args, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             if (!(args.get(0) instanceof DLock))
                 throw new DevoreCastException(args.get(0).type(), "lock");
             return DBool.valueOf(((DLock) args.get(0)).toReentrantLock().isHeldByCurrentThread());
         }, 1, false);
         dEnv.addAstProcedure("with-lock", (ast, env) -> {
+            DSecurity.checkRestrictThread(dEnv);
             DToken token = Evaluator.eval(env, ast.get(0).copy());
             if (!(token instanceof DLock))
                 throw new DevoreCastException(token.type(), "lock");

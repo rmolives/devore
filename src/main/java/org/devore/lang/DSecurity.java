@@ -25,7 +25,8 @@ public class DSecurity {
      * 创建默认安全配置，默认限制全部敏感操作
      */
     public DSecurity() {
-        this.restrictions = new ArrayList<>(Arrays.asList(Restriction.FILE, Restriction.EXEC, Restriction.SECURITY));
+        this.restrictions = new ArrayList<>(Arrays.asList(Restriction.FILE, Restriction.THREAD,
+                Restriction.EXEC, Restriction.SECURITY));
     }
 
     /**
@@ -65,6 +66,19 @@ public class DSecurity {
             temp = temp.father;
         }
         return new DSecurity(inherited);
+    }
+
+    /**
+     * 检查当前环境是否禁止并发操作
+     *
+     * @param env 环境
+     */
+    public static void checkRestrictThread(Env env) {
+        Env temp = env;
+        while (temp != null && (temp.security == null || !temp.security.contains(Restriction.THREAD)))
+            temp = temp.father;
+        if (temp != null)
+            throw new DevoreRuntimeException("当前环境禁止<Thread>操作.");
     }
 
     /**
@@ -114,6 +128,7 @@ public class DSecurity {
     public static enum Restriction {
         FILE,       // 文件操作
         EXEC,       // 执行操作
+        THREAD,     // 并发
         SECURITY    // 安全限制修改
     }
 }

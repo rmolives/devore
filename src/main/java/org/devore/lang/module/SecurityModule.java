@@ -97,7 +97,7 @@ public class SecurityModule extends DModule {
         try {
             return DSecurity.Restriction.valueOf(name);
         } catch (IllegalArgumentException e) {
-            throw new DevoreRuntimeException("未知安全限制: " + token + ", 可选值: file, net, exec, reflect, security.");
+            throw new DevoreRuntimeException("未知安全限制: " + token + ", 可选值: file、thread、exec、security.");
         }
     }
 
