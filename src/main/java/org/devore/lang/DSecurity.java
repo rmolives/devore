@@ -25,8 +25,7 @@ public class DSecurity {
      * 创建默认安全配置，默认限制全部敏感操作
      */
     public DSecurity() {
-        this.restrictions = new ArrayList<>(Arrays.asList(Restriction.FILE, Restriction.NET,
-                Restriction.EXEC, Restriction.REFLECT, Restriction.SECURITY));
+        this.restrictions = new ArrayList<>(Arrays.asList(Restriction.FILE, Restriction.EXEC, Restriction.SECURITY));
     }
 
     /**
@@ -82,20 +81,6 @@ public class DSecurity {
     }
 
     /**
-     * 检查当前环境是否禁止网络操作
-     *
-     * @param env 环境
-     */
-    public static void checkRestrictNet(Env env) {
-        Env temp = env;
-        while (temp != null && (temp.security == null
-                || !temp.security.contains(Restriction.NET)))
-            temp = temp.father;
-        if (temp != null)
-            throw new DevoreRuntimeException("当前环境禁止<Net>操作.");
-    }
-
-    /**
      * 检查当前环境是否禁止执行操作
      *
      * @param env 环境
@@ -107,20 +92,6 @@ public class DSecurity {
             temp = temp.father;
         if (temp != null)
             throw new DevoreRuntimeException("当前环境禁止<Exec>操作.");
-    }
-
-    /**
-     * 检查当前环境是否禁止反射操作
-     *
-     * @param env 环境
-     */
-    public static void checkRestrictReflect(Env env) {
-        Env temp = env;
-        while (temp != null && (temp.security == null
-                || !temp.security.contains(Restriction.REFLECT)))
-            temp = temp.father;
-        if (temp != null)
-            throw new DevoreRuntimeException("当前环境禁止<Reflect>操作.");
     }
 
     /**
@@ -142,9 +113,7 @@ public class DSecurity {
      */
     public static enum Restriction {
         FILE,       // 文件操作
-        NET,        // 网络操作
         EXEC,       // 执行操作
-        REFLECT,    // 反射操作
         SECURITY    // 安全限制修改
     }
 }
