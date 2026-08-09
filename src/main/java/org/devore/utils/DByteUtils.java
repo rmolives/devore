@@ -40,7 +40,7 @@ public class DByteUtils {
     }
 
     /**
-     * 将DList转为byte
+     * 将DList转为bytes
      *
      * @param value DList值
      * @return bytes
