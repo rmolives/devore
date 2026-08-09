@@ -259,7 +259,7 @@ public class DList extends DToken {
 
     @Override
     protected String str() {
-        return snapshot().stream()
+        return this.snapshot().stream()
                 .map(FormatUtils::formatToken)
                 .collect(Collectors.joining(", ", "[", "]"));
     }
@@ -269,7 +269,7 @@ public class DList extends DToken {
         if (!(t instanceof DList))
             return -1;
         DList other = (DList) t;
-        List<DToken> thisSnapshot = snapshot();
+        List<DToken> thisSnapshot = this.snapshot();
         List<DToken> otherSnapshot = other.snapshot();
         if (otherSnapshot.size() != thisSnapshot.size())
             return -1;

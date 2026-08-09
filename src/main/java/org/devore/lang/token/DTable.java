@@ -152,7 +152,7 @@ public class DTable extends DToken {
 
     @Override
     protected String str() {
-        return snapshot().entrySet().stream()
+        return this.snapshot().entrySet().stream()
                 .map(entry -> FormatUtils.formatToken(entry.getKey())
                         + "=" + FormatUtils.formatToken(entry.getValue()))
                 .collect(Collectors.joining(", ", "{", "}"));
@@ -163,7 +163,7 @@ public class DTable extends DToken {
         if (!(t instanceof DTable))
             return -1;
         DTable other = (DTable) t;
-        Map<DToken, DToken> thisSnapshot = snapshot();
+        Map<DToken, DToken> thisSnapshot = this.snapshot();
         Map<DToken, DToken> otherSnapshot = other.snapshot();
         if (thisSnapshot.size() != otherSnapshot.size())
             return -1;
