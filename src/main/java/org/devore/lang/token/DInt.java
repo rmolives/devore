@@ -28,7 +28,6 @@ public class DInt extends DNumber {
         return "int";
     }
 
-
     /**
      * 取模运算
      *
