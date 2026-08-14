@@ -34,8 +34,8 @@ public class DInt extends DNumber {
      * @param a 模数
      * @return 结果
      */
-    public DNumber mod(DInt a) {
-        return DNumber.valueOf(this.toBigInteger().mod(a.toBigInteger()));
+    public DInt mod(DInt a) {
+        return new DInt(this.toBigInteger().mod(a.toBigInteger()));
     }
 
     /**
@@ -44,7 +44,7 @@ public class DInt extends DNumber {
      * @param a 除数
      * @return 结果
      */
-    public DNumber rem(DInt a) {
-        return DNumber.valueOf(this.toBigInteger().remainder(a.toBigInteger()));
+    public DInt rem(DInt a) {
+        return new DInt(this.toBigInteger().remainder(a.toBigInteger()));
     }
 }
