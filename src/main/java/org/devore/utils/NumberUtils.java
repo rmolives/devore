@@ -70,14 +70,13 @@ public class NumberUtils {
      *
      * @param a  被除数
      * @param b  除数
-     * @param mc 精度
      * @return a / b
      */
-    public static BigDecimal divide(BigDecimal a, BigDecimal b, MathContext mc) {
+    public static BigDecimal divide(BigDecimal a, BigDecimal b) {
         try {
             return a.divide(b);
         } catch (ArithmeticException e) {
-            return a.divide(b, mc);
+            return a.divide(b, DEFAULT_CONTEXT);
         }
     }
 
@@ -89,8 +88,8 @@ public class NumberUtils {
     private static BigDecimal approximatePi() {
         MathContext extendedMc = new MathContext(DEFAULT_CONTEXT.getPrecision() + 10,
                 DEFAULT_CONTEXT.getRoundingMode());
-        BigDecimal term1 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(5), extendedMc), extendedMc);
-        BigDecimal term2 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(239), extendedMc), extendedMc);
+        BigDecimal term1 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(5), extendedMc));
+        BigDecimal term2 = arctanTaylor(BigDecimal.ONE.divide(BigDecimal.valueOf(239), extendedMc));
         BigDecimal pi = BigDecimal.valueOf(4).multiply(
                 BigDecimal.valueOf(4).multiply(term1, extendedMc)
                         .subtract(term2, extendedMc), extendedMc);
@@ -102,294 +101,274 @@ public class NumberUtils {
      *
      * @param y  Y坐标
      * @param x  X坐标
-     * @param mc 精度
      * @return 角度
      */
-    public static BigDecimal arctan2(BigDecimal y, BigDecimal x, MathContext mc) {
+    public static BigDecimal arctan2(BigDecimal y, BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0 && y.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return y.compareTo(BigDecimal.ZERO) > 0
-                    ? PI.divide(BigDecimal.valueOf(2), mc)
-                    : PI.divide(BigDecimal.valueOf(2), mc).negate();
+                    ? PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT)
+                    : PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT).negate();
         if (y.compareTo(BigDecimal.ZERO) == 0)
             return x.compareTo(BigDecimal.ZERO) > 0
                     ? BigDecimal.ZERO
                     : PI;
-        BigDecimal ratio = y.divide(x, mc);
-        BigDecimal basicAngle = arctan(ratio.abs(), mc);
+        BigDecimal ratio = y.divide(x, DEFAULT_CONTEXT);
+        BigDecimal basicAngle = arctan(ratio.abs());
         return x.compareTo(BigDecimal.ZERO) > 0 ?
                 y.compareTo(BigDecimal.ZERO) > 0
                         ? basicAngle
                         : basicAngle.negate()
                 : y.compareTo(BigDecimal.ZERO) > 0
-                ? PI.subtract(basicAngle, mc)
-                : basicAngle.subtract(PI, mc);
+                ? PI.subtract(basicAngle, DEFAULT_CONTEXT)
+                : basicAngle.subtract(PI, DEFAULT_CONTEXT);
     }
 
     /**
      * sech(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return sech(x)
      */
-    public static BigDecimal sech(BigDecimal x, MathContext mc) {
-        return BigDecimal.ONE.divide(cosh(x, mc), mc);
+    public static BigDecimal sech(BigDecimal x) {
+        return BigDecimal.ONE.divide(cosh(x), DEFAULT_CONTEXT);
     }
 
     /**
      * csch(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return csch(x)
      */
-    public static BigDecimal csch(BigDecimal x, MathContext mc) {
+    public static BigDecimal csch(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("csch(x)要求x不为0, 实际x=" + plain(x));
-        return BigDecimal.ONE.divide(sinh(x, mc), mc);
+        return BigDecimal.ONE.divide(sinh(x), DEFAULT_CONTEXT);
     }
 
     /**
      * coth(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return coth(x)
      */
-    public static BigDecimal coth(BigDecimal x, MathContext mc) {
+    public static BigDecimal coth(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("coth(x)要求x不为0, 实际x=" + plain(x));
-        return cosh(x, mc).divide(sinh(x, mc), mc);
+        return cosh(x).divide(sinh(x), DEFAULT_CONTEXT);
     }
 
     /**
      * arcsech(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arcsech(x)
      */
-    public static BigDecimal arcsech(BigDecimal x, MathContext mc) {
+    public static BigDecimal arcsech(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) <= 0 || x.compareTo(BigDecimal.ONE) > 0)
             throw new DevoreRuntimeException("arcsech(x)定义域为(0, 1], x超出范围, 实际x=" + plain(x));
-        return arccosh(BigDecimal.ONE.divide(x, mc), mc);
+        return arccosh(BigDecimal.ONE.divide(x, DEFAULT_CONTEXT));
     }
 
     /**
      * arccsch(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arccsch(x)
      */
-    public static BigDecimal arccsch(BigDecimal x, MathContext mc) {
+    public static BigDecimal arccsch(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("arccsch(x)要求x不为0, 实际x=" + plain(x));
-        return arcsinh(BigDecimal.ONE.divide(x, mc), mc);
+        return arcsinh(BigDecimal.ONE.divide(x, DEFAULT_CONTEXT));
     }
 
     /**
      * arccoth(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arccoth(x)
      */
-    public static BigDecimal arccoth(BigDecimal x, MathContext mc) {
+    public static BigDecimal arccoth(BigDecimal x) {
         if (x.abs().compareTo(BigDecimal.ONE) <= 0)
             throw new DevoreRuntimeException("arccoth(x)定义域为(-∞, -1)∪(1, +∞), x超出范围, 实际x="
                     + plain(x));
-        return arctanh(BigDecimal.ONE.divide(x, mc), mc);
+        return arctanh(BigDecimal.ONE.divide(x, DEFAULT_CONTEXT));
     }
 
     /**
      * sec(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return sec(x)
      */
-    public static BigDecimal sec(BigDecimal x, MathContext mc) {
-        BigDecimal c = cos(x, mc);
+    public static BigDecimal sec(BigDecimal x) {
+        BigDecimal c = cos(x);
         if (c.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("sec(x)在cos(x)=0时未定义, 实际x=" + plain(x));
-        return BigDecimal.ONE.divide(c, mc);
+        return BigDecimal.ONE.divide(c, DEFAULT_CONTEXT);
     }
 
     /**
      * csc(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return csch(x)
      */
-    public static BigDecimal csc(BigDecimal x, MathContext mc) {
-        BigDecimal s = sin(x, mc);
+    public static BigDecimal csc(BigDecimal x) {
+        BigDecimal s = sin(x);
         if (s.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("csc(x)在sin(x)=0时未定义, 实际x=" + plain(x));
-        return BigDecimal.ONE.divide(s, mc);
+        return BigDecimal.ONE.divide(s, DEFAULT_CONTEXT);
     }
 
     /**
      * cot(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return cot(x)
      */
-    public static BigDecimal cot(BigDecimal x, MathContext mc) {
-        BigDecimal s = sin(x, mc);
+    public static BigDecimal cot(BigDecimal x) {
+        BigDecimal s = sin(x);
         if (s.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("cot(x)在sin(x)=0时未定义, 实际x=" + plain(x));
-        return cos(x, mc).divide(s, mc);
+        return cos(x).divide(s, DEFAULT_CONTEXT);
     }
 
     /**
      * arcsec(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arcsech(x)
      */
-    public static BigDecimal arcsec(BigDecimal x, MathContext mc) {
+    public static BigDecimal arcsec(BigDecimal x) {
         if (x.abs().compareTo(BigDecimal.ONE) < 0)
             throw new DevoreRuntimeException("arcsec(x)定义域为(-∞, -1]∪[1, +∞), x超出范围, 实际x="
                     + plain(x));
-        return arccos(BigDecimal.ONE.divide(x, mc), mc);
+        return arccos(BigDecimal.ONE.divide(x, DEFAULT_CONTEXT));
     }
 
     /**
      * arccsc(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arccsc(x)
      */
-    public static BigDecimal arccsc(BigDecimal x, MathContext mc) {
+    public static BigDecimal arccsc(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0 || x.abs().compareTo(BigDecimal.ONE) < 0)
             throw new DevoreRuntimeException("arccsc(x)定义域为(-∞, -1]∪[1, +∞), x超出范围, 实际x="
                     + plain(x));
-        return arcsin(BigDecimal.ONE.divide(x, mc), mc);
+        return arcsin(BigDecimal.ONE.divide(x, DEFAULT_CONTEXT));
     }
 
     /**
      * arccot(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arccot(x)
      */
-    public static BigDecimal arccot(BigDecimal x, MathContext mc) {
+    public static BigDecimal arccot(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            return new BigDecimal(Math.PI / 2, mc);
-        return arctan(BigDecimal.ONE.divide(x, mc), mc);
+            return new BigDecimal(Math.PI / 2, DEFAULT_CONTEXT);
+        return arctan(BigDecimal.ONE.divide(x, DEFAULT_CONTEXT));
     }
 
     /**
      * sinh(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return sinh(x)
      */
-    public static BigDecimal sinh(BigDecimal x, MathContext mc) {
-        BigDecimal ex = exp(x, mc);
-        BigDecimal emx = exp(x.negate(), mc);
-        return ex.subtract(emx, mc)
-                .divide(BigDecimal.valueOf(2), mc)
-                .round(mc);
+    public static BigDecimal sinh(BigDecimal x) {
+        BigDecimal ex = exp(x);
+        BigDecimal emx = exp(x.negate());
+        return ex.subtract(emx, DEFAULT_CONTEXT)
+                .divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT)
+                .round(DEFAULT_CONTEXT);
     }
 
     /**
      * cosh(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return cosh(x)
      */
-    public static BigDecimal cosh(BigDecimal x, MathContext mc) {
-        BigDecimal ex = exp(x, mc);
-        BigDecimal emx = exp(x.negate(), mc);
-        return ex.add(emx, mc)
-                .divide(BigDecimal.valueOf(2), mc)
-                .round(mc);
+    public static BigDecimal cosh(BigDecimal x) {
+        BigDecimal ex = exp(x);
+        BigDecimal emx = exp(x.negate());
+        return ex.add(emx, DEFAULT_CONTEXT)
+                .divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT)
+                .round(DEFAULT_CONTEXT);
     }
 
     /**
      * tanh(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return tanh(x)
      */
-    public static BigDecimal tanh(BigDecimal x, MathContext mc) {
+    public static BigDecimal tanh(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
-        return sinh(x, mc).divide(cosh(x, mc), mc);
+        return sinh(x).divide(cosh(x), DEFAULT_CONTEXT);
     }
 
     /**
      * arcsinh(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arcsinh(x)
      */
-    public static BigDecimal arcsinh(BigDecimal x, MathContext mc) {
-        BigDecimal x2 = x.multiply(x, mc);
-        BigDecimal sqrt = sqrt(x2.add(BigDecimal.ONE, mc), mc);
-        BigDecimal inner = x.add(sqrt, mc);
-        return ln(inner, mc).round(mc);
+    public static BigDecimal arcsinh(BigDecimal x) {
+        BigDecimal x2 = x.multiply(x, DEFAULT_CONTEXT);
+        BigDecimal sqrt = sqrt(x2.add(BigDecimal.ONE, DEFAULT_CONTEXT));
+        BigDecimal inner = x.add(sqrt, DEFAULT_CONTEXT);
+        return ln(inner).round(DEFAULT_CONTEXT);
     }
 
     /**
      * arccosh(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arccosh(x)
      */
-    public static BigDecimal arccosh(BigDecimal x, MathContext mc) {
+    public static BigDecimal arccosh(BigDecimal x) {
         if (x.compareTo(BigDecimal.ONE) < 0)
             throw new DevoreRuntimeException("arcosh(x)的定义域为[1, +∞), x超出范围, 实际x="
                     + plain(x));
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ZERO;
-        BigDecimal xm1 = x.subtract(BigDecimal.ONE, mc);
-        BigDecimal xp1 = x.add(BigDecimal.ONE, mc);
-        BigDecimal sqrt = sqrt(xm1.multiply(xp1, mc), mc);
-        return ln(x.add(sqrt, mc), mc).round(mc);
+        BigDecimal xm1 = x.subtract(BigDecimal.ONE, DEFAULT_CONTEXT);
+        BigDecimal xp1 = x.add(BigDecimal.ONE, DEFAULT_CONTEXT);
+        BigDecimal sqrt = sqrt(xm1.multiply(xp1, DEFAULT_CONTEXT));
+        return ln(x.add(sqrt, DEFAULT_CONTEXT)).round(DEFAULT_CONTEXT);
     }
 
     /**
      * arctanh(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arctanh(x)
      */
-    public static BigDecimal arctanh(BigDecimal x, MathContext mc) {
+    public static BigDecimal arctanh(BigDecimal x) {
         if (x.compareTo(BigDecimal.ONE) >= 0 || x.compareTo(BigDecimal.ONE.negate()) <= 0)
             throw new DevoreRuntimeException("artanh(x)的定义域为(-1, 1), x超出范围, 实际x="
                     + plain(x));
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
-        BigDecimal onePlus = BigDecimal.ONE.add(x, mc);
-        BigDecimal oneMinus = BigDecimal.ONE.subtract(x, mc);
-        BigDecimal ln = ln(onePlus.divide(oneMinus, mc), mc);
-        return ln.divide(BigDecimal.valueOf(2), mc).round(mc);
+        BigDecimal onePlus = BigDecimal.ONE.add(x, DEFAULT_CONTEXT);
+        BigDecimal oneMinus = BigDecimal.ONE.subtract(x, DEFAULT_CONTEXT);
+        BigDecimal ln = ln(onePlus.divide(oneMinus, DEFAULT_CONTEXT));
+        return ln.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT).round(DEFAULT_CONTEXT);
     }
 
     /**
      * arccos(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arccos(x)
      */
-    public static BigDecimal arccos(BigDecimal x, MathContext mc) {
+    public static BigDecimal arccos(BigDecimal x) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
             throw new DevoreRuntimeException("arccos(x)的定义域为[-1, 1], x超出范围, 实际x="
                     + plain(x));
@@ -398,76 +377,74 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ONE.negate()) == 0)
             return PI;
         if (x.compareTo(BigDecimal.ZERO) == 0)
-            return PI.divide(BigDecimal.valueOf(2), mc);
-        BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), mc);
-        BigDecimal arcsinX = arcsin(x, mc);
-        BigDecimal result = piOver2.subtract(arcsinX, mc);
+            return PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT);
+        BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT);
+        BigDecimal arcsinX = arcsin(x);
+        BigDecimal result = piOver2.subtract(arcsinX, DEFAULT_CONTEXT);
         if (result.compareTo(BigDecimal.ZERO) < 0)
-            result = result.add(PI, mc);
+            result = result.add(PI, DEFAULT_CONTEXT);
         else if (result.compareTo(PI) > 0)
-            result = result.subtract(PI, mc);
-        return result.round(mc);
+            result = result.subtract(PI, DEFAULT_CONTEXT);
+        return result.round(DEFAULT_CONTEXT);
     }
 
     /**
      * arcsin(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arcsin(x)
      */
-    public static BigDecimal arcsin(BigDecimal x, MathContext mc) {
+    public static BigDecimal arcsin(BigDecimal x) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0)
             throw new DevoreRuntimeException("arcsin(x)的定义域为[-1, 1], x超出范围, 实际x="
                     + plain(x));
         if (x.compareTo(BigDecimal.ONE) == 0)
-            return PI.divide(BigDecimal.valueOf(2), mc);
+            return PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT);
         if (x.compareTo(BigDecimal.ONE.negate()) == 0)
-            return PI.divide(BigDecimal.valueOf(2), mc).negate();
+            return PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT).negate();
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         BigDecimal absX = x.abs();
         BigDecimal result;
         if (absX.compareTo(new BigDecimal("0.7")) <= 0)
-            result = arcsinTaylor(x, mc);
+            result = arcsinTaylor(x);
         else {
             BigDecimal transformed = sqrt(BigDecimal.ONE.subtract(absX)
-                    .divide(BigDecimal.valueOf(2), mc), mc);
-            result = PI.divide(BigDecimal.valueOf(2), mc)
-                    .subtract(BigDecimal.valueOf(2).multiply(arcsinTaylor(transformed, mc), mc), mc);
+                    .divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT));
+            result = PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT)
+                    .subtract(BigDecimal.valueOf(2).multiply(arcsinTaylor(transformed), DEFAULT_CONTEXT), DEFAULT_CONTEXT);
             if (x.compareTo(BigDecimal.ZERO) < 0)
                 result = result.negate();
         }
-        return result.round(mc);
+        return result.round(DEFAULT_CONTEXT);
     }
 
     /**
      * arcsin(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arcsin(x)
      */
-    private static BigDecimal arcsinTaylor(BigDecimal x, MathContext mc) {
+    private static BigDecimal arcsinTaylor(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         BigDecimal result = x;
-        BigDecimal xSquared = x.multiply(x, mc);
+        BigDecimal xSquared = x.multiply(x, DEFAULT_CONTEXT);
         BigDecimal term = x;
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         int n = 1;
         BigDecimal numerator = BigDecimal.ONE;
         BigDecimal denominator = BigDecimal.ONE;
         while (term.abs().compareTo(tolerance) >= 0) {
-            numerator = numerator.multiply(BigDecimal.valueOf(2L * n - 1), mc);
-            denominator = denominator.multiply(BigDecimal.valueOf(2L * n), mc);
-            BigDecimal coefficient = numerator.divide(denominator, mc)
-                    .divide(BigDecimal.valueOf(2L * n + 1), mc);
-            term = term.multiply(xSquared, mc);
-            BigDecimal currentTerm = coefficient.multiply(term, mc);
-            result = result.add(currentTerm, mc);
+            numerator = numerator.multiply(BigDecimal.valueOf(2L * n - 1), DEFAULT_CONTEXT);
+            denominator = denominator.multiply(BigDecimal.valueOf(2L * n), DEFAULT_CONTEXT);
+            BigDecimal coefficient = numerator.divide(denominator, DEFAULT_CONTEXT)
+                    .divide(BigDecimal.valueOf(2L * n + 1), DEFAULT_CONTEXT);
+            term = term.multiply(xSquared, DEFAULT_CONTEXT);
+            BigDecimal currentTerm = coefficient.multiply(term, DEFAULT_CONTEXT);
+            result = result.add(currentTerm, DEFAULT_CONTEXT);
             ++n;
-            if (n > mc.getPrecision() * 10)
+            if (n > DEFAULT_CONTEXT.getPrecision() * 10)
                 break;
         }
         return result;
@@ -477,54 +454,52 @@ public class NumberUtils {
      * arctan(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arctan(x)
      */
-    public static BigDecimal arctan(BigDecimal x, MathContext mc) {
+    public static BigDecimal arctan(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         if (x.compareTo(BigDecimal.ONE) == 0)
-            return PI.divide(BigDecimal.valueOf(4), mc);
+            return PI.divide(BigDecimal.valueOf(4), DEFAULT_CONTEXT);
         if (x.compareTo(BigDecimal.ONE.negate()) == 0)
-            return PI.divide(BigDecimal.valueOf(4), mc).negate();
+            return PI.divide(BigDecimal.valueOf(4), DEFAULT_CONTEXT).negate();
         BigDecimal absX = x.abs();
         BigDecimal result;
         if (absX.compareTo(BigDecimal.ONE) <= 0)
-            result = arctanTaylor(absX, mc);
+            result = arctanTaylor(absX);
         else {
-            BigDecimal reciprocal = BigDecimal.ONE.divide(absX, mc);
-            BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), mc);
-            result = piOver2.subtract(arctanTaylor(reciprocal, mc), mc);
+            BigDecimal reciprocal = BigDecimal.ONE.divide(absX, DEFAULT_CONTEXT);
+            BigDecimal piOver2 = PI.divide(BigDecimal.valueOf(2), DEFAULT_CONTEXT);
+            result = piOver2.subtract(arctanTaylor(reciprocal), DEFAULT_CONTEXT);
         }
         if (x.compareTo(BigDecimal.ZERO) < 0)
             result = result.negate();
-        return result.round(mc);
+        return result.round(DEFAULT_CONTEXT);
     }
 
     /**
      * arctan(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return arctan(x)
      */
-    private static BigDecimal arctanTaylor(BigDecimal x, MathContext mc) {
+    private static BigDecimal arctanTaylor(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         BigDecimal result = BigDecimal.ZERO;
-        BigDecimal xSquared = x.multiply(x, mc);
+        BigDecimal xSquared = x.multiply(x, DEFAULT_CONTEXT);
         BigDecimal term = x;
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         int n = 0;
         boolean add = true;
         while (term.abs().compareTo(tolerance) >= 0) {
             BigDecimal denominator = BigDecimal.valueOf(2L * n + 1);
-            BigDecimal currentTerm = term.divide(denominator, mc);
-            result = add ? result.add(currentTerm, mc) : result.subtract(currentTerm, mc);
-            term = term.multiply(xSquared, mc);
+            BigDecimal currentTerm = term.divide(denominator, DEFAULT_CONTEXT);
+            result = add ? result.add(currentTerm, DEFAULT_CONTEXT) : result.subtract(currentTerm, DEFAULT_CONTEXT);
+            term = term.multiply(xSquared, DEFAULT_CONTEXT);
             ++n;
             add = !add;
-            if (n > mc.getPrecision() * 20)
+            if (n > DEFAULT_CONTEXT.getPrecision() * 20)
                 break;
         }
         return result;
@@ -534,11 +509,10 @@ public class NumberUtils {
      * 将角度缩小到范围 [-π, π]
      *
      * @param angle 角度
-     * @param mc    精度
      * @return [-π, π]
      */
-    private static BigDecimal reduceAngle(BigDecimal angle, MathContext mc) {
-        angle = angle.remainder(TWO_PI, mc);
+    private static BigDecimal reduceAngle(BigDecimal angle) {
+        angle = angle.remainder(TWO_PI, DEFAULT_CONTEXT);
         if (angle.compareTo(PI) > 0)
             angle = angle.subtract(TWO_PI);
         else if (angle.compareTo(PI.negate()) < 0)
@@ -560,70 +534,66 @@ public class NumberUtils {
      * sin(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return sin(x)
      */
-    public static BigDecimal sin(BigDecimal x, MathContext mc) {
-        x = reduceAngle(x, mc);
+    public static BigDecimal sin(BigDecimal x) {
+        x = reduceAngle(x);
         BigDecimal result = BigDecimal.ZERO;
         BigDecimal term = x;
-        BigDecimal xSquared = x.multiply(x, mc);
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal xSquared = x.multiply(x, DEFAULT_CONTEXT);
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         int i = 1;
         while (term.abs().compareTo(tolerance) > 0) {
             result = result.add(term);
-            term = term.multiply(xSquared, mc).negate()
-                    .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), mc);
+            term = term.multiply(xSquared, DEFAULT_CONTEXT).negate()
+                    .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), DEFAULT_CONTEXT);
             i += 2;
         }
-        return result.round(mc);
+        return result.round(DEFAULT_CONTEXT);
     }
 
     /**
      * cos(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return cos(x)
      */
-    public static BigDecimal cos(BigDecimal x, MathContext mc) {
-        x = reduceAngle(x, mc);
+    public static BigDecimal cos(BigDecimal x) {
+        x = reduceAngle(x);
         BigDecimal result = BigDecimal.ZERO;
         BigDecimal term = BigDecimal.ONE;
-        BigDecimal xSquared = x.multiply(x, mc);
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal xSquared = x.multiply(x, DEFAULT_CONTEXT);
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         int i = 0;
         while (term.abs().compareTo(tolerance) > 0) {
             result = result.add(term);
-            term = term.multiply(xSquared, mc).negate()
-                    .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), mc);
+            term = term.multiply(xSquared, DEFAULT_CONTEXT).negate()
+                    .divide(BigDecimal.valueOf((long) (i + 1) * (i + 2)), DEFAULT_CONTEXT);
             i += 2;
         }
-        return result.round(mc);
+        return result.round(DEFAULT_CONTEXT);
     }
 
     /**
      * tan(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return tan(x)
      */
-    public static BigDecimal tan(BigDecimal x, MathContext mc) {
-        BigDecimal cos = cos(x, mc);
+    public static BigDecimal tan(BigDecimal x) {
+        BigDecimal cos = cos(x);
         if (cos.compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("tan(x)在cos(x)=0时未定义, 实际x=" + plain(x));
-        return sin(x, mc).divide(cos, mc);
+        return sin(x).divide(cos, DEFAULT_CONTEXT);
     }
 
     /**
      * sqrt(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return sqrt(x)
      */
-    public static BigDecimal sqrt(BigDecimal x, MathContext mc) {
+    public static BigDecimal sqrt(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new DevoreRuntimeException("sqrt(x)要求x不为负数, 实际x=" + plain(x));
         if (x.compareTo(BigDecimal.ZERO) == 0)
@@ -633,24 +603,23 @@ public class NumberUtils {
         BigDecimal exact = exactNthRoot(x, 2);
         if (exact != null)
             return exact;
-        BigDecimal guess = x.divide(TWO, mc);
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal guess = x.divide(TWO, DEFAULT_CONTEXT);
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         BigDecimal lastGuess;
         do {
             lastGuess = guess;
-            guess = x.divide(guess, mc).add(guess).divide(TWO, mc);
+            guess = x.divide(guess, DEFAULT_CONTEXT).add(guess).divide(TWO, DEFAULT_CONTEXT);
         } while (guess.subtract(lastGuess).abs().compareTo(tolerance) > 0);
-        return guess.round(mc);
+        return guess.round(DEFAULT_CONTEXT);
     }
 
     /**
      * cbrt(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return cbrt(x)
      */
-    public static BigDecimal cbrt(BigDecimal x, MathContext mc) {
+    public static BigDecimal cbrt(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
         BigDecimal exact = exactNthRoot(x, 3);
@@ -658,16 +627,16 @@ public class NumberUtils {
             return exact;
         boolean negative = x.compareTo(BigDecimal.ZERO) < 0;
         BigDecimal absX = negative ? x.negate() : x;
-        BigDecimal guess = absX.divide(BigDecimal.valueOf(3), mc);
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal guess = absX.divide(BigDecimal.valueOf(3), DEFAULT_CONTEXT);
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         BigDecimal lastGuess;
         do {
             lastGuess = guess;
-            guess = guess.multiply(BigDecimal.valueOf(2), mc)
-                    .add(absX.divide(guess.multiply(guess, mc), mc))
-                    .divide(BigDecimal.valueOf(3), mc);
+            guess = guess.multiply(BigDecimal.valueOf(2), DEFAULT_CONTEXT)
+                    .add(absX.divide(guess.multiply(guess, DEFAULT_CONTEXT), DEFAULT_CONTEXT))
+                    .divide(BigDecimal.valueOf(3), DEFAULT_CONTEXT);
         } while (guess.subtract(lastGuess).abs().compareTo(tolerance) > 0);
-        guess = guess.round(mc);
+        guess = guess.round(DEFAULT_CONTEXT);
         return negative ? guess.negate() : guess;
     }
 
@@ -676,10 +645,9 @@ public class NumberUtils {
      *
      * @param x  x
      * @param y  y
-     * @param mc 精度
      * @return x^y
      */
-    public static BigDecimal pow(BigDecimal x, BigDecimal y, MathContext mc) {
+    public static BigDecimal pow(BigDecimal x, BigDecimal y) {
         if (y.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ONE;
         if (x.compareTo(BigDecimal.ZERO) == 0) {
@@ -691,22 +659,22 @@ public class NumberUtils {
         if (x.compareTo(BigDecimal.ONE) == 0)
             return BigDecimal.ONE;
         if (isInt(y))
-            return powInt(x, y.toBigInteger(), mc);
-        Fraction exponent = approximateFraction(y.abs(), mc);
+            return powInt(x, y.toBigInteger());
+        Fraction exponent = approximateFraction(y.abs());
         if (x.compareTo(BigDecimal.ZERO) < 0
                 && !exponent.denominator.mod(BigInteger.valueOf(2)).equals(BigInteger.ONE))
             throw new DevoreRuntimeException("x^y要求但y为非整数且分母为偶数时, x不能为负数, 实际x="
                     + plain(x) + ", y=" + plain(y) + ", 近似指数分母=" + exponent.denominator);
-        BigDecimal exact = powRationalExact(x.abs(), exponent, y.signum() < 0, mc);
+        BigDecimal exact = powRationalExact(x.abs(), exponent, y.signum() < 0);
         if (exact != null) {
             if (x.compareTo(BigDecimal.ZERO) < 0 && exponent.numerator.testBit(0))
                 exact = exact.negate();
             return exact;
         }
-        BigDecimal exponentValue = divide(new BigDecimal(exponent.numerator), new BigDecimal(exponent.denominator), mc);
+        BigDecimal exponentValue = divide(new BigDecimal(exponent.numerator), new BigDecimal(exponent.denominator));
         if (x.compareTo(BigDecimal.ZERO) > 0)
-            return powPositiveBase(x, exponentValue, y.signum() < 0, mc);
-        BigDecimal result = powPositiveBase(x.abs(), exponentValue, y.signum() < 0, mc);
+            return powPositiveBase(x, exponentValue, y.signum() < 0);
+        BigDecimal result = powPositiveBase(x.abs(), exponentValue, y.signum() < 0);
         if (exponent.numerator.testBit(0))
             result = result.negate();
         return result;
@@ -716,17 +684,16 @@ public class NumberUtils {
      * 将有限小数近似为分母较小的分数
      *
      * @param value 非负数
-     * @param mc    精度
      * @return 分数
      */
-    private static Fraction approximateFraction(BigDecimal value, MathContext mc) {
+    private static Fraction approximateFraction(BigDecimal value) {
         value = value.stripTrailingZeros();
         if (isInt(value))
             return new Fraction(value.toBigInteger(), BigInteger.ONE);
         int scale = Math.max(1, value.scale());
         BigDecimal tolerance = BigDecimal.valueOf(5).scaleByPowerOfTen(-scale - 1);
-        BigInteger maxDenominator = BigInteger.TEN.pow(Math.max(1, mc.getPrecision() / 2));
-        MathContext workMc = new MathContext(mc.getPrecision() + 5, mc.getRoundingMode());
+        BigInteger maxDenominator = BigInteger.TEN.pow(Math.max(1, DEFAULT_CONTEXT.getPrecision() / 2));
+        MathContext workMc = new MathContext(DEFAULT_CONTEXT.getPrecision() + 5, DEFAULT_CONTEXT.getRoundingMode());
         BigInteger h0 = BigInteger.ZERO;
         BigInteger h1 = BigInteger.ONE;
         BigInteger k0 = BigInteger.ONE;
@@ -764,12 +731,11 @@ public class NumberUtils {
      * @param x        正底数
      * @param exponent 正指数
      * @param inverse  是否取倒数
-     * @param mc       精度
      * @return x^exponent 或其倒数
      */
-    private static BigDecimal powPositiveBase(BigDecimal x, BigDecimal exponent, boolean inverse, MathContext mc) {
-        BigDecimal result = roundIfCloseToInteger(exp(exponent.multiply(ln(x, mc), mc), mc), mc);
-        return inverse ? divide(BigDecimal.ONE, result, mc) : result;
+    private static BigDecimal powPositiveBase(BigDecimal x, BigDecimal exponent, boolean inverse) {
+        BigDecimal result = roundIfCloseToInteger(exp(exponent.multiply(ln(x), DEFAULT_CONTEXT)));
+        return inverse ? divide(BigDecimal.ONE, result) : result;
     }
 
     /**
@@ -778,32 +744,30 @@ public class NumberUtils {
      * @param x        非负底数
      * @param exponent 指数的绝对值
      * @param inverse  是否取倒数
-     * @param mc       精度
      * @return 可精确表示时返回精确结果, 否则返回null
      */
-    private static BigDecimal powRationalExact(BigDecimal x, Fraction exponent, boolean inverse, MathContext mc) {
+    private static BigDecimal powRationalExact(BigDecimal x, Fraction exponent, boolean inverse) {
         if (exponent.denominator.equals(BigInteger.ONE)) {
-            BigDecimal result = powInt(x, exponent.numerator, mc);
-            return inverse ? divide(BigDecimal.ONE, result, mc) : result;
+            BigDecimal result = powInt(x, exponent.numerator);
+            return inverse ? divide(BigDecimal.ONE, result) : result;
         }
         if (exponent.denominator.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0)
             return null;
         BigDecimal root = exactNthRoot(x, exponent.denominator.intValue());
         if (root == null)
             return null;
-        BigDecimal result = powInt(root, exponent.numerator, mc);
-        return inverse ? divide(BigDecimal.ONE, result, mc) : result;
+        BigDecimal result = powInt(root, exponent.numerator);
+        return inverse ? divide(BigDecimal.ONE, result) : result;
     }
 
     /**
      * 将非常接近整数的结果修正为整数
      *
      * @param value 值
-     * @param mc    精度
      * @return 修正后的值
      */
-    private static BigDecimal roundIfCloseToInteger(BigDecimal value, MathContext mc) {
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-Math.max(1, mc.getPrecision() - 4));
+    private static BigDecimal roundIfCloseToInteger(BigDecimal value) {
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-Math.max(1, DEFAULT_CONTEXT.getPrecision() - 4));
         BigDecimal rounded = value.setScale(0, RoundingMode.HALF_UP);
         return rounded.subtract(value).abs().compareTo(tolerance) <= 0 ? rounded : value;
     }
@@ -826,14 +790,13 @@ public class NumberUtils {
      *
      * @param x  x
      * @param y  y
-     * @param mc 精度
      * @return x^y
      */
-    private static BigDecimal powInt(BigDecimal x, BigInteger y, MathContext mc) {
+    private static BigDecimal powInt(BigDecimal x, BigInteger y) {
         if (y.signum() == 0)
             return BigDecimal.ONE;
         if (y.signum() < 0)
-            return divide(BigDecimal.ONE, powInt(x, y.negate(), mc), mc);
+            return divide(BigDecimal.ONE, powInt(x, y.negate()));
         BigDecimal result = BigDecimal.ONE;
         BigDecimal base = x;
         BigInteger exp = y;
@@ -913,25 +876,24 @@ public class NumberUtils {
      * ln(x)
      *
      * @param x  x
-     * @param mc 精度
      * @return ln(x)
      */
-    public static BigDecimal ln(BigDecimal x, MathContext mc) {
+    public static BigDecimal ln(BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) <= 0)
             throw new DevoreRuntimeException("ln(x)要求x为正数, 实际x=" + plain(x));
-        BigDecimal term = x.subtract(BigDecimal.ONE).divide(x.add(BigDecimal.ONE), mc);
-        BigDecimal termSquared = term.multiply(term, mc);
+        BigDecimal term = x.subtract(BigDecimal.ONE).divide(x.add(BigDecimal.ONE), DEFAULT_CONTEXT);
+        BigDecimal termSquared = term.multiply(term, DEFAULT_CONTEXT);
         BigDecimal result = term;
         BigDecimal currentTerm = term;
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         for (int k = 3; ; k += 2) {
-            currentTerm = currentTerm.multiply(termSquared, mc);
-            BigDecimal delta = currentTerm.divide(BigDecimal.valueOf(k), mc);
-            result = result.add(delta, mc);
+            currentTerm = currentTerm.multiply(termSquared, DEFAULT_CONTEXT);
+            BigDecimal delta = currentTerm.divide(BigDecimal.valueOf(k), DEFAULT_CONTEXT);
+            result = result.add(delta, DEFAULT_CONTEXT);
             if (delta.abs().compareTo(tolerance) < 0)
                 break;
         }
-        return result.multiply(TWO, mc);
+        return result.multiply(TWO, DEFAULT_CONTEXT);
     }
 
     /**
@@ -939,10 +901,9 @@ public class NumberUtils {
      *
      * @param a  a
      * @param b  b
-     * @param mc 精度
      * @return log_b(a)
      */
-    public static BigDecimal log(BigDecimal a, BigDecimal b, MathContext mc) {
+    public static BigDecimal log(BigDecimal a, BigDecimal b) {
         if (a.compareTo(BigDecimal.ZERO) <= 0)
             throw new DevoreRuntimeException("log_b(a)要求a为正数, 实际a=" + plain(a) + ", b=" + plain(b));
         if (b.compareTo(BigDecimal.ZERO) <= 0)
@@ -952,7 +913,7 @@ public class NumberUtils {
         BigDecimal exact = exactIntegerLog(a, b);
         if (exact != null)
             return exact;
-        return roundIfCloseToInteger(divide(ln(a, mc), ln(b, mc), mc), mc);
+        return roundIfCloseToInteger(divide(ln(a), ln(b)));
     }
 
     /**
@@ -988,21 +949,20 @@ public class NumberUtils {
      * e^x
      *
      * @param x  x
-     * @param mc 精度
      * @return e^x
      */
-    public static BigDecimal exp(BigDecimal x, MathContext mc) {
+    public static BigDecimal exp(BigDecimal x) {
         BigDecimal result = BigDecimal.ONE;
         BigDecimal term = BigDecimal.ONE;
-        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-mc.getPrecision());
+        BigDecimal tolerance = BigDecimal.ONE.scaleByPowerOfTen(-DEFAULT_CONTEXT.getPrecision());
         int n = 1;
         while (true) {
-            term = term.multiply(x, mc).divide(BigDecimal.valueOf(n), mc);
-            result = result.add(term, mc);
+            term = term.multiply(x, DEFAULT_CONTEXT).divide(BigDecimal.valueOf(n), DEFAULT_CONTEXT);
+            result = result.add(term, DEFAULT_CONTEXT);
             if (term.abs().compareTo(tolerance) < 0)
                 break;
             ++n;
         }
-        return result.round(mc);
+        return result.round(DEFAULT_CONTEXT);
     }
 }

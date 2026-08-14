@@ -66,7 +66,7 @@ public abstract class DNumber extends DToken {
     public DNumber div(DNumber a) {
         if (a.toBigDecimal().compareTo(BigDecimal.ZERO) == 0)
             throw new DevoreRuntimeException("除数不能为0, 被除数=" + this + ", 除数=" + a);
-        return DNumber.valueOf(NumberUtils.divide(this.toBigDecimal(), a.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.divide(this.toBigDecimal(), a.toBigDecimal()));
     }
 
     /**
@@ -75,7 +75,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber sin() {
-        return DNumber.valueOf(NumberUtils.sin(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.sin(this.toBigDecimal()));
     }
 
     /**
@@ -84,7 +84,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber cos() {
-        return DNumber.valueOf(NumberUtils.cos(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.cos(this.toBigDecimal()));
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber tan() {
-        return DNumber.valueOf(NumberUtils.tan(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.tan(this.toBigDecimal()));
     }
 
     /**
@@ -102,7 +102,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arctan() {
-        return DNumber.valueOf(NumberUtils.arctan(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arctan(this.toBigDecimal()));
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arcsin() {
-        return DNumber.valueOf(NumberUtils.arcsin(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arcsin(this.toBigDecimal()));
     }
 
     /**
@@ -120,7 +120,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arccos() {
-        return DNumber.valueOf(NumberUtils.arccos(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arccos(this.toBigDecimal()));
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber tanh() {
-        return DNumber.valueOf(NumberUtils.tanh(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.tanh(this.toBigDecimal()));
     }
 
     /**
@@ -138,7 +138,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber sinh() {
-        return DNumber.valueOf(NumberUtils.sinh(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.sinh(this.toBigDecimal()));
     }
 
     /**
@@ -147,7 +147,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber cosh() {
-        return DNumber.valueOf(NumberUtils.cosh(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.cosh(this.toBigDecimal()));
     }
 
     /**
@@ -156,7 +156,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arccosh() {
-        return DNumber.valueOf(NumberUtils.arccosh(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arccosh(this.toBigDecimal()));
     }
 
     /**
@@ -165,7 +165,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arctanh() {
-        return DNumber.valueOf(NumberUtils.arctanh(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arctanh(this.toBigDecimal()));
     }
 
     /**
@@ -174,7 +174,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arcsinh() {
-        return DNumber.valueOf(NumberUtils.arcsinh(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arcsinh(this.toBigDecimal()));
     }
 
     /**
@@ -183,7 +183,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber sech() {
-        return DNumber.valueOf(NumberUtils.sech(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.sech(this.toBigDecimal()));
     }
 
     /**
@@ -192,7 +192,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber csch() {
-        return DNumber.valueOf(NumberUtils.csch(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.csch(this.toBigDecimal()));
     }
 
     /**
@@ -201,7 +201,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber coth() {
-        return DNumber.valueOf(NumberUtils.coth(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.coth(this.toBigDecimal()));
     }
 
     /**
@@ -210,7 +210,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arcsech() {
-        return DNumber.valueOf(NumberUtils.arcsech(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arcsech(this.toBigDecimal()));
     }
 
     /**
@@ -219,7 +219,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arccsch() {
-        return DNumber.valueOf(NumberUtils.arccsch(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arccsch(this.toBigDecimal()));
     }
 
     /**
@@ -228,7 +228,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arccoth() {
-        return DNumber.valueOf(NumberUtils.arccoth(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arccoth(this.toBigDecimal()));
     }
 
     /**
@@ -237,7 +237,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber sec() {
-        return DNumber.valueOf(NumberUtils.sec(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.sec(this.toBigDecimal()));
     }
 
     /**
@@ -246,7 +246,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber csc() {
-        return DNumber.valueOf(NumberUtils.csc(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.csc(this.toBigDecimal()));
     }
 
     /**
@@ -255,7 +255,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber cot() {
-        return DNumber.valueOf(NumberUtils.cot(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.cot(this.toBigDecimal()));
     }
 
     /**
@@ -264,7 +264,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arcsec() {
-        return DNumber.valueOf(NumberUtils.arcsec(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arcsec(this.toBigDecimal()));
     }
 
     /**
@@ -273,7 +273,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arccsc() {
-        return DNumber.valueOf(NumberUtils.arccsc(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arccsc(this.toBigDecimal()));
     }
 
     /**
@@ -282,7 +282,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arccot() {
-        return DNumber.valueOf(NumberUtils.arccot(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arccot(this.toBigDecimal()));
     }
 
     /**
@@ -329,7 +329,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber sqrt() {
-        return DNumber.valueOf(NumberUtils.sqrt(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.sqrt(this.toBigDecimal()));
     }
 
     /**
@@ -338,7 +338,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber cbrt() {
-        return DNumber.valueOf(NumberUtils.cbrt(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.cbrt(this.toBigDecimal()));
     }
 
     /**
@@ -347,7 +347,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber pow(DNumber n) {
-        return DNumber.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.pow(this.toBigDecimal(), n.toBigDecimal()));
     }
 
     /**
@@ -365,7 +365,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber ln() {
-        return DNumber.valueOf(NumberUtils.ln(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.ln(this.toBigDecimal()));
     }
 
     /**
@@ -375,7 +375,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber log(DNumber a) {
-        return DNumber.valueOf(NumberUtils.log(this.toBigDecimal(), a.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.log(this.toBigDecimal(), a.toBigDecimal()));
     }
 
     /**
@@ -385,7 +385,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber arctan(DNumber x) {
-        return DNumber.valueOf(NumberUtils.arctan2(this.toBigDecimal(), x.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.arctan2(this.toBigDecimal(), x.toBigDecimal()));
     }
 
     /**
@@ -394,7 +394,7 @@ public abstract class DNumber extends DToken {
      * @return 结果
      */
     public DNumber exp() {
-        return DNumber.valueOf(NumberUtils.exp(this.toBigDecimal(), NumberUtils.DEFAULT_CONTEXT));
+        return DNumber.valueOf(NumberUtils.exp(this.toBigDecimal()));
     }
 
     /**
