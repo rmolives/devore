@@ -30,10 +30,7 @@ public class NumberUtils {
      * @return a mod m
      */
     public static BigDecimal mod(BigDecimal a, BigDecimal m) {
-        if (m.signum() <= 0)
-            throw new DevoreRuntimeException("模数必须为正数，当前模数为：" + m.toPlainString());
-        BigDecimal r = a.remainder(m);
-        return r.signum() < 0 ? r.add(m) : r;
+        return a.subtract(m.multiply(a.divide(m, 0, RoundingMode.FLOOR)));
     }
 
     /**
