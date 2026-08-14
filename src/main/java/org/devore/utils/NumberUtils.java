@@ -23,6 +23,20 @@ public class NumberUtils {
     }
 
     /**
+     * a mod m
+     *
+     * @param a a
+     * @param m m
+     * @return a mod m
+     */
+    public static BigDecimal mod(BigDecimal a, BigDecimal m) {
+        if (m.signum() <= 0)
+            throw new DevoreRuntimeException("模数必须为正数，当前模数为：" + m.toPlainString());
+        BigDecimal r = a.remainder(m);
+        return r.signum() < 0 ? r.add(m) : r;
+    }
+
+    /**
      * gcd(a, b)
      *
      * @param a a

@@ -135,22 +135,22 @@ public class CoreModule extends DModule {
             return num.div(DNumber.valueOf(args.size()));
         }), 1, true);
         dEnv.addTokenProcedure("mod", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            if (!(args.get(1) instanceof DInt))
+            if (!(args.get(1) instanceof DNumber))
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (args.get(1).equals(DNumber.valueOf(0)))
                 throw new DevoreRuntimeException("模数不能为0, 被除数=" + args.get(0) + ", 模数=" + args.get(1));
-            return ((DInt) args.get(0)).mod((DInt) args.get(1));
+            return ((DNumber) args.get(0)).mod((DNumber) args.get(1));
         }), 2, false);
         dEnv.addTokenProcedure("rem", ((args, env) -> {
-            if (!(args.get(0) instanceof DInt))
+            if (!(args.get(0) instanceof DNumber))
                 throw new DevoreCastException(args.get(0).type(), "int");
-            if (!(args.get(1) instanceof DInt))
+            if (!(args.get(1) instanceof DNumber))
                 throw new DevoreCastException(args.get(1).type(), "int");
             if (args.get(1).equals(DNumber.valueOf(0)))
                 throw new DevoreRuntimeException("除数不能为0, 被除数=" + args.get(0) + ", 除数=" + args.get(1));
-            return ((DInt) args.get(0)).rem((DInt) args.get(1));
+            return ((DNumber) args.get(0)).rem((DNumber) args.get(1));
         }), 2, false);
         dEnv.addTokenProcedure("abs", ((args, env) -> {
             if (!(args.get(0) instanceof DNumber))

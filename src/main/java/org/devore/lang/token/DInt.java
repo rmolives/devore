@@ -27,24 +27,4 @@ public class DInt extends DNumber {
     public String type() {
         return "int";
     }
-
-    /**
-     * 取模运算
-     *
-     * @param a 模数
-     * @return 结果
-     */
-    public DInt mod(DInt a) {
-        return new DInt(this.toBigInteger().mod(a.toBigInteger()));
-    }
-
-    /**
-     * 取余运算
-     *
-     * @param a 除数
-     * @return 结果
-     */
-    public DInt rem(DInt a) {
-        return new DInt(this.toBigInteger().remainder(a.toBigInteger()));
-    }
 }

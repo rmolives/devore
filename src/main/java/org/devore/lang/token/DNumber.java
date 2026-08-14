@@ -398,6 +398,26 @@ public abstract class DNumber extends DToken {
     }
 
     /**
+     * 取模运算
+     *
+     * @param a 模数
+     * @return 结果
+     */
+    public DNumber mod(DNumber a) {
+        return DNumber.valueOf(NumberUtils.mod(this.toBigDecimal(), a.toBigDecimal()));
+    }
+
+    /**
+     * 取余运算
+     *
+     * @param a 除数
+     * @return 结果
+     */
+    public DNumber rem(DNumber a) {
+        return DNumber.valueOf(this.toBigDecimal().remainder(a.toBigDecimal()));
+    }
+
+    /**
      * 转换为BigInteger
      *
      * @return 结果
