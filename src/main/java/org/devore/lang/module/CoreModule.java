@@ -410,7 +410,7 @@ public class CoreModule extends DModule {
         dEnv.addAstProcedure("let", ((ast, env) -> {
             Env newEnv = env.createChild();
             List<Ast> nodes = new ArrayList<>(ast.get(0).children);
-            if (ast.get(0).symbol instanceof Ast && !isEmptyProcedure(ast.get(0)))
+            if (ast.get(0).symbol instanceof Ast && isNotEmptyProcedure(ast.get(0)))
                 nodes.add(0, (Ast) ast.get(0).symbol);
             nodes.forEach(node -> {
                 DToken name = node.symbol;
@@ -429,7 +429,7 @@ public class CoreModule extends DModule {
         }), 2, true);
         dEnv.addAstProcedure("lambda", ((ast, env) -> {
             Ast paramsAst = ast.get(0);
-            boolean hasParams = paramsAst.isNotNil() && !isEmptyProcedure(paramsAst);
+            boolean hasParams = paramsAst.isNotNil() && isNotEmptyProcedure(paramsAst);
             List<String> params = hasParams
                     ? Stream.concat(Stream.of(ast.get(0)), ast.get(0).children.stream())
                     .map(param -> {
@@ -1275,12 +1275,12 @@ public class CoreModule extends DModule {
     }
 
     /**
-     * 判断AST节点是否为空过程占位
+     * 判断AST节点是否不是空过程占位
      */
-    private boolean isEmptyProcedure(Ast ast) {
-        return ast.type == Ast.Type.PROCEDURE
-                && ast.isEmpty()
-                && ast.symbol instanceof Ast
-                && !((Ast) ast.symbol).isNotNil();
+    private boolean isNotEmptyProcedure(Ast ast) {
+        return ast.type != Ast.Type.PROCEDURE
+                || !ast.isEmpty()
+                || !(ast.symbol instanceof Ast)
+                || ((Ast) ast.symbol).isNotNil();
     }
 }
