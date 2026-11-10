@@ -40,7 +40,7 @@
 * [加密](module/Crypto.md)
 * [UUID](module/UUID.md)
 * [正则表达式](module/Regex.md)
-* 
+
 ## 系统与工具
 
 * [操作系统](module/OS.md)
