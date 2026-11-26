@@ -81,7 +81,7 @@ public class RegexModule extends DModule {
      */
     private static DList matchResult(Matcher matcher) {
         List<DToken> groups = new ArrayList<>();
-        for (int i = 0; i <= matcher.groupCount(); i++)
+        for (int i = 0; i <= matcher.groupCount(); ++i)
             groups.add(group(matcher, i));
         return DList.valueOf(Arrays.asList(
                 DString.valueOf(matcher.group()),
